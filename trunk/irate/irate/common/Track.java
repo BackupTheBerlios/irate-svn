@@ -445,9 +445,8 @@ public class Track implements TrackDetails {
     File file = getFile();
     if (file == null) {
       if(percent_complete != -1)
-        return "" + percent_complete + "% done";
-      else
-        return Resources.getString("track.rating.notdownloaded");
+        return Resources.getString("track.rating.downloading") + " " + percent_complete + "%";
+      return Resources.getString("track.rating.notdownloaded");
     }
     if (!file.exists())
       return Resources.getString("track.rating.missing");
