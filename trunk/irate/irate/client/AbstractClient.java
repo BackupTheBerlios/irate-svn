@@ -131,19 +131,15 @@ public abstract class AbstractClient
    * Set rating for the specified track.
    */
   public void setRating(final Track track, int rating) {
-    final Integer ratingInt = new Integer(rating);
-
     lastRatedTrack = track;
     lastTrackPreviousRank = -1;
-    if (track.isRated()) {
+    if (track.isRated())
       lastTrackPreviousRank = (int) track.getRating();
-      updateTrack(track);
-    }
 
     // Update the Track Rating
-    track.setRating(ratingInt.intValue());
+    track.setRating(rating);
 
-    if (ratingInt.intValue() == 0 && track == getSelectedTrack()) {
+    if (rating == 0 && track == getSelectedTrack()) {
       playThread.reject();
     }
 
@@ -154,6 +150,8 @@ public abstract class AbstractClient
     catch (Exception e) {
       e.printStackTrace();
     }
+
+    updateTrack(track);
   }
 
   /**

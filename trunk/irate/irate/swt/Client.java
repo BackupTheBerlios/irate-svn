@@ -26,14 +26,14 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/27 04:36:58 $
+ * Date Updated: $Date: 2003/11/27 05:23:14 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.113 $
+ * @version $Revision: 1.114 $
  */
 public class Client extends AbstractClient {
 
@@ -151,6 +151,12 @@ public class Client extends AbstractClient {
     });
   }
 
+  public void updateTrack(Track track) {
+    // Update the SWT GUI
+    trackTable.updateTrack(track);
+    update();
+  }
+
   public void update() {
     //synchronizePlaylist(playListManager, tblSongs);
     Track track = playThread.getCurrentTrack();
@@ -187,12 +193,6 @@ public class Client extends AbstractClient {
   public Track getSelectedTrack() {
     // Return the track that is playing - ignoring the currently selected track.
     return playThread.getCurrentTrack();
-  }
-
-  public void updateTrack(Track track) {
-    // Update the SWT GUI
-    trackTable.updateTrack(track);
-    update();
   }
 
   /**
