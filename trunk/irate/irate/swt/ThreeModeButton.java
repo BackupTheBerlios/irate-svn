@@ -2,6 +2,7 @@ package irate.swt;
 
 import java.util.Hashtable;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Canvas;
@@ -132,7 +133,6 @@ public class ThreeModeButton extends Canvas implements Skinable {
     // Text Mode!
 
     if (imageDataHash.get("") == null) {
-/*      
       int textHeight = gc.getFontMetrics().getHeight();
 
       // If we have some kind of background, we need to deal with printing the
@@ -200,7 +200,6 @@ public class ThreeModeButton extends Canvas implements Skinable {
           gc.drawText(normalText, x, y, true);
         }
       }
-*/      
     }
     else {
       // Graphic mode!
@@ -257,18 +256,29 @@ public class ThreeModeButton extends Canvas implements Skinable {
   // Base the size of the button on the normal image.  All images should be the
   // same size -- if this isn't the case, it will look pretty bad.
   public Point computeSize(int wHint, int hHint, boolean changed) {
-    ImageData imageData = (ImageData) imageDataHash.get("");
+    ImageData imageData = (ImageData) imageDataHash.get("");    
+
+    if (imageData == null && textBackground != null)
+      imageData = textBackground.getImageData();
 
     if (imageData != null) {
       width = imageData.width;
       height = imageData.height;
     }
+    
+    if (wHint > width)
+        width = wHint;
+    
+    if (hHint > height)
+        height = hHint;
+    
     return new Point(width, height);
   }
 
   private Image createTransparentImage(String key) {
     ImageData imageData = (ImageData) imageDataHash.get(key);
-    if (imageData == null) imageData = (ImageData) imageDataHash.get("");
+    if (imageData == null)
+      imageData = (ImageData) imageDataHash.get("");
     ImageData mergedImage = imageMerger.merge(0, 0, imageData);
     return new Image(this.getDisplay(), mergedImage);
   }

@@ -107,6 +107,10 @@ public class SkinManager {
     }, name);
   }
 
+  /** Apply the a skin. 
+   * @param is The input stream containing a zip file with all the appropriate
+   * files in it. Use null to specify the default text skin. 
+   */
   public void applySkin(InputStream is) {
     for (Iterator itr = itemHash.values().iterator(); itr.hasNext();) {
       SkinItem skinItem = (SkinItem) itr.next();
@@ -149,6 +153,7 @@ public class SkinManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
+    
     for (Iterator itr = itemHash.values().iterator(); itr.hasNext();) {
       SkinItem skinItem = (SkinItem) itr.next();
       skinItem.post();
@@ -170,25 +175,32 @@ public class SkinManager {
     public void add(Skinable skinable) {
       skinable.setTransparencyManager(transparencyManager);
       skinables.add(skinable);
+      applyText(skinable);
     }
 
     public String getName() {
       return name;
     }
-
-    void pre() {
+    
+    private void applyText(Skinable skinable) {
       String text = Resources.getString(name);
+      skinable.setText(text);
+
       String pressed = Resources.getString(name+".pressed");
       if (pressed.startsWith("!"))
         pressed = text;
+      skinable.setPressedText(pressed);
+      
       String toolTip = Resources.getString(name + ".tooltip");
       if (toolTip.startsWith("!"))
         toolTip = "";
+      skinable.setToolTipText(toolTip);
+    }
+
+    void pre() {
       for (Iterator itr = skinables.iterator(); itr.hasNext(); ) {
         Skinable skinable = (Skinable) itr.next();
-        skinable.setText(text);
-        skinable.setPressedText(pressed);
-        skinable.setToolTipText(toolTip);
+        applyText(skinable);
       }
       gotImage = false;
     }

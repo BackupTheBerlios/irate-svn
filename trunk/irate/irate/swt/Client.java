@@ -52,7 +52,7 @@ public class Client extends AbstractClient {
 //  private TrackProgressBar songProgressBar;
 
   private SkinManager.SkinItem pauseSkin;
-  private ThreeModeButton pause;
+  private ThreeModeButton play;
   private ThreeModeButton previous;
   private Track previousTrack;
   private Help help = new Help();
@@ -108,6 +108,7 @@ public class Client extends AbstractClient {
         playThread.play(trackTable.getSelectedTrack());
       }
     });
+    setPaused(false);
     playThread.start();
     
     while (true) {
@@ -281,10 +282,12 @@ public class Client extends AbstractClient {
     display.asyncExec(new Runnable() {
       public void run() {
         if (pausedFinal.booleanValue()) {
-          pause.setToolTipText(Resources.getString("button.play.tooltip"));
+          play.setSelection(false);
+          play.setToolTipText(Resources.getString("button.play.tooltip"));
         }
         else {
-          pause.setToolTipText(Resources.getString("button.pause.tooltip"));
+          play.setSelection(true);
+          play.setToolTipText(Resources.getString("button.pause.tooltip"));
         }
       }
     });
@@ -297,8 +300,8 @@ public class Client extends AbstractClient {
     }
     // If the play/pause button is pressed, meaning it is paused, then
     // 'press' the button.  
-    if(pause.isPressed()) {
-      pause.setSelection(false);
+    if(play.isPressed()) {
+      play.setSelection(false);
     }
   }
 
@@ -803,13 +806,13 @@ public class Client extends AbstractClient {
     skinManager.add(previous, "button.previous");
     
     /************ PLAY / PAUSE BUTTON  ****************/
-    pause = new ThreeModeButton(topPanel, SWT.NONE);
+    play = new ThreeModeButton(topPanel, SWT.NONE);
     
     gridData = new GridData();
     gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
-    pause.setLayoutData(gridData);
+    play.setLayoutData(gridData);
     
-    pause.addMouseListener(new MouseListener() {
+    play.addMouseListener(new MouseListener() {
       public void mouseDoubleClick(MouseEvent arg0) {}
       public void mouseDown(MouseEvent arg0) {}
       public void mouseUp(MouseEvent arg0) {
@@ -817,7 +820,7 @@ public class Client extends AbstractClient {
       }    
     });
     
-    skinManager.add(pause, "button.play");
+    skinManager.add(play, "button.play");
     
     /************ NEXT BUTTON  ****************/
     ThreeModeButton next = new ThreeModeButton(topPanel, SWT.NONE);
@@ -1078,7 +1081,7 @@ public class Client extends AbstractClient {
       catch (IOException e) {
           e.printStackTrace();
       }    
-
+      
     if (skin != null)
       client.skinManager.applySkin(skin);
       
