@@ -18,7 +18,18 @@ public class TrackTable implements TableModel {
   public TrackTable(PlayListManager playListManager) {
     this.playListManager = playListManager;
     listeners = new Vector();
-    tracks = playListManager.getPlayList().getTracks();
+    tracks = fetchTracks();
+  }
+
+  private Track[] fetchTracks() {
+    Vector tracks = new Vector();
+    Track[] allTracks = playListManager.getPlayList().getTracks();
+    for (int i = 0; i < allTracks.length; i++) {
+      Track track = allTracks[i];
+      if (!track.isHidden())
+        tracks.add(track);
+    }
+    return (Track[]) tracks.toArray(new Track[tracks.size()]);
   }
 
   public void addTableModelListener(TableModelListener l) {
@@ -31,7 +42,8 @@ public class TrackTable implements TableModel {
   
   public synchronized void notifyListeners() {
     TrackDatabase td = playListManager.getPlayList();
-    tracks = td.getTracks();
+    tracks = fetchTracks();
+//    tracks = td.getTracks();
     for (int i = 0; i < listeners.size(); i++) 
       ((TableModelListener) listeners.elementAt(i)).tableChanged(new TableModelEvent(this));
   }
