@@ -433,6 +433,11 @@ public class TrackDatabase {
       if (!track.isRated() && (toOmit == null || !toOmit.containsKey(track)) && track.getFile() != null)
         list.add(track);
     }
+    
+      // If there are no unrated tracks then return null.
+    if (list.size() == 0)
+      return null;
+    
     int rand = Math.round(Math.abs(random.nextFloat()) * list.size());
     return (Track) list.get(rand);
   }
