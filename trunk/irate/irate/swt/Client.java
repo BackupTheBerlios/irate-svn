@@ -25,13 +25,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/13 01:21:30 $
+ * Date Updated: $Date: 2003/11/13 03:19:53 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.99 $
+ * @version $Revision: 1.100 $
  */
 public class Client extends AbstractClient {
 
@@ -296,7 +296,7 @@ public class Client extends AbstractClient {
 
     try {
       ImageData icon =
-        new ImageData(Resources.getResourceAsStream("irate.gif"));
+        new ImageData(Resources.getResourceAsStream("icon.gif"));
       int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
       icon.transparentPixel = whitePixel;
       shell.setImage(new Image(display, icon));
