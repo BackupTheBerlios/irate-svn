@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 public class BaseDialog {
 
   public BaseDialog(Display display, String title) {
-    shell = new Shell(display);
+    shell = new Shell(display,SWT.DIALOG_TRIM);
     shell.setLayout(new GridLayout(1, false));
     shell.setText(title);
     shell.setMenuBar(MacMenuFixer.grayMenuBar(shell));

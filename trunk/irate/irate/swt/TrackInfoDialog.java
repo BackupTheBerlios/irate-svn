@@ -72,16 +72,17 @@ public class TrackInfoDialog {
 
   private Label createLabel(Composite grid, String tag, String data,
                             Font font) {
-    Label labelTag = new Label(grid, SWT.HORIZONTAL);
+    Label labelTag = new Label(grid,SWT.NONE);
     labelTag.setText(tag);
-    GridData gridData = new GridData();
+    GridData gridData = new GridData(GridData.VERTICAL_ALIGN_BEGINNING);
     labelTag.setLayoutData(gridData);
     labelTag.setFont(font);
-    Label labelData = new Label(grid, SWT.HORIZONTAL | SWT.WRAP);
-    gridData = new GridData();
+    Label labelData = new Label(grid,SWT.WRAP);
+    gridData = new GridData(GridData.VERTICAL_ALIGN_END);
+    gridData.widthHint = 320;
     labelData.setLayoutData(gridData);
     labelData.setFont(font);
-    labelData.setText(data);
+    labelData.setText(data.trim());
     return labelData;
   }
 
