@@ -221,6 +221,13 @@ public abstract class AbstractClient
     }
 
     updateTrack(lastRatedTrack);
+    
+    // Disable the undo option
+    lastRatedTrack = null;
+  }
+  
+  public boolean canUndoLastRating() {
+    return (lastRatedTrack != null);
   }
 
   public void setVolume(final int volume) {

@@ -527,6 +527,7 @@ public class Client extends AbstractClient {
     
     Menu menubar = new Menu(shell, SWT.BAR);
     shell.setMenuBar(menubar);
+    final int accel=(isMac() ? SWT.COMMAND : SWT.CTRL);
 
     MenuItem item1 = new MenuItem(menubar, SWT.CASCADE);
     skinManager.addItem(item1, "toolbar.menu_title.action");
@@ -550,6 +551,15 @@ public class Client extends AbstractClient {
     });
     item_undo.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.undo")));
     skinManager.addItem(item_undo, "toolbar.menu_item.undo");
+    item_undo.setAccelerator('Z' + accel);
+
+    // Disable the undo menu item if it's not available
+    final MenuItem item_undoX=item_undo;
+    menu1.addMenuListener(new MenuAdapter() {
+      public void menuShown(MenuEvent e) {
+        item_undoX.setEnabled(canUndoLastRating());
+      }
+    });
     
     if (!isMac()) {
       // Mac OS X already has Quit in the app menu
