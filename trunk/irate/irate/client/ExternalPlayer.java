@@ -5,6 +5,8 @@ package irate.client;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class ExternalPlayer implements Player {
 
@@ -135,6 +137,8 @@ public class ExternalPlayer implements Player {
 //          System.out.print(args[i] + " ");
 //        System.out.println();
         process = Runtime.getRuntime().exec(args);
+        route(process.getInputStream(), System.out, "player out");
+        route(process.getErrorStream(), System.out, "player err");
       }
       catch (IOException e) {
         e.printStackTrace();
@@ -173,5 +177,33 @@ public class ExternalPlayer implements Player {
       action = ACTION_CLOSE;
       process.destroy();
     }
+  }
+
+  public void route(final InputStream is, final OutputStream os, String title) {
+    new Thread(title) {
+      public void run() {
+        try {
+          byte[] buf = new byte[128];
+          while (true) {
+            int avail = is.available();
+            if (avail == 0)
+              avail = 1;
+            else 
+              if (avail > buf.length)
+                avail = buf.length;
+            int nbytes = is.read(buf, 0, avail);
+            if (nbytes < 0)
+              break;
+            if (nbytes != 0) {
+              os.write(buf, 0, nbytes);
+              os.flush();
+            }
+          } 
+        } 
+        catch (IOException ioe) {
+          ioe.printStackTrace();
+        }
+      }
+    }.start();
   }
 }
