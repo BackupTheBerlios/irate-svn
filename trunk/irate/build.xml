@@ -137,7 +137,7 @@
       preservelastmodified="true"/>
     <mkdir dir="iRATE.app/Contents/Resources/Java"/>
     <copy file="irate-client-swt.jar"
-      todir="iRATE.app/Contents/Resources/java" preservelastmodified="true"/>
+      todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true"/>
     <copy todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true">
       <fileset dir="lib" includes="*.jar"/>
     </copy>
