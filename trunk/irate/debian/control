@@ -9,6 +9,6 @@ Package: irate-client-motif
 Architecture: any
 Depends: madplay | mpg123 | mpg321
 Depends: libgcj2, libmotif, xlibs
-Replaces: irate, irate-client
+Replaces: irate
 Description: iRATE radio client - A collaborative filtering client that downloads and plays music. 
  The iRATE server has a large database of music. You rate the tracks and it uses your ratings and other peoples to guess what you'll like. The tracks are downloaded from websites which allow free downloads of their music.

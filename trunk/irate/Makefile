@@ -1,6 +1,6 @@
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
-DOC=$(DESTDIR)/usr/doc/irate
+DOC=$(DESTDIR)/usr/doc/irate-client-motif
 export GCJ=gcj -g -pipe -O0
 IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
