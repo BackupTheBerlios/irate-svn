@@ -42,6 +42,7 @@ public class Client implements UpdateListener, PluginApplication {
   private PlayThread playThread;
   private DownloadThread downloadThread;
   private ToolItem pause;
+  private ToolItem previous;
   private Track previousTrack;
   private ErrorDialog errorDialog;
   private PluginManager pluginManager;
@@ -376,15 +377,23 @@ public class Client implements UpdateListener, PluginApplication {
    * PluginApplication interface:
    * Skip to the next song.
    */
-  public void skip()
-  {
+  public void skip() {
+		skip(false);
+	}
+	
+	public void skip(boolean reverse){
     setPaused(false);
-    playThread.reject();
-    downloadThread.checkAutoDownload();
+		if(!reverse){
+				playThread.reject();
+		    downloadThread.checkAutoDownload();
+		}
+		else {
+				playThread.goBack();
+		}
+		previous.setEnabled(playThread.hasHistory());
   }
 
-  void sortTable(Table table, Comparator c)
-  {
+  void sortTable(Table table, Comparator c) {
     //problem with code below is that it loses track/tableitem relationship
     TableItem[] items = table.getItems();
     Vector v = new Vector();
@@ -815,6 +824,18 @@ public class Client implements UpdateListener, PluginApplication {
     });
 
     item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText("<<");
+    item.setToolTipText("Return to previous track");
+    item.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        skip(true);
+      }
+    });
+		previous = item;
+		previous.setEnabled(false);
+    
+
+    item = new ToolItem(toolbar,SWT.PUSH);
     item.setText(">>");
     item.setToolTipText("Skip to the next track.");
     item.addSelectionListener(new SelectionAdapter(){
@@ -822,7 +843,7 @@ public class Client implements UpdateListener, PluginApplication {
         skip();
       }
     });
-    
+
     volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(1);

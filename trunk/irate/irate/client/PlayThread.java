@@ -19,7 +19,8 @@ public class PlayThread extends Thread {
   private Speech speech = new Speech();
   private boolean speaking;
   private boolean toKeepPlaying;
-  
+  Vector history = new Vector();
+	
   public PlayThread(PlayListManager playListManager, PlayerList playerList) {
     this.playListManager = playListManager;
     this.playerList = playerList;
@@ -115,10 +116,19 @@ public class PlayThread extends Thread {
     return currentTrack;
   }
 
-  public synchronized void reject() {
+  private void skipSong(boolean reverse) {
       // It must not be paused if you want to reject a track.
     setPaused(false);
-    
+   
+		//record current track in history
+		if(reverse)
+			 if(hasHistory()) {
+				  nextTrack = (Track)history.elementAt(history.size()-1);
+				  history.removeElementAt(history.size()-1);
+			 }else
+				  return;
+		else
+				history.add(getCurrentTrack()); 
       // Clear the toKeepPlaying flag to instruct the play thread to co-operatively stop.
     toKeepPlaying = false;
     if (player != null)
@@ -129,6 +139,18 @@ public class PlayThread extends Thread {
       speech.abort();
   }
 
+	public synchronized void reject(){
+    skipSong(false);			
+	}
+
+	public synchronized void goBack(){
+    skipSong(true);			
+	}
+	
+	public boolean hasHistory() {
+		return history.size()!=0;
+	}
+	
   public void setRating(int rating) {
     currentTrack.setRating(rating);
   }
