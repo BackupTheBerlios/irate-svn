@@ -30,6 +30,12 @@ public class BaseDialog extends Shell {
     data = new GridData();
     data.horizontalAlignment = GridData.END;
     buttonsComposite.setLayoutData(data);
+    addDisposeListener(new DisposeListener() {
+        public void widgetDisposed(DisposeEvent e) {
+          if (image != null)
+            image.dispose();
+        }
+      });
   }
 
   public Button addButton(String text) {
@@ -66,12 +72,6 @@ public class BaseDialog extends Shell {
     else if (y > yMax)
       y = yMax;
     setLocation(x, y);
-  }
-
-  public void dispose() {
-    if (image != null)
-      image.dispose();
-    super.dispose();
   }
 
   private Composite buttonsComposite;
