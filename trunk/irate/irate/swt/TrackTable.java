@@ -202,7 +202,7 @@ public class TrackTable
     skinManager.addItem(lastPlayedCol, "TrackTable.Heading.Last"); 
 
     final TableColumn licenseCol = new TableColumn(table, SWT.LEFT);
-    licenseCol.setWidth(60);
+    licenseCol.setWidth(80);
     addColumnListener(licenseCol, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         currentSortColumn = table.indexOf(licenseCol);
