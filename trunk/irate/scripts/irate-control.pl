@@ -13,7 +13,7 @@
 
 # Version 0.03 - 22/9/2003
 
-# $Id: irate-control.pl,v 1.5 2003/09/21 14:56:35 eythian Exp $
+# $Id: irate-control.pl,v 1.6 2004/02/14 03:50:04 eythian Exp $
 
 use XML::Simple;
 use IO::Socket;
@@ -21,8 +21,17 @@ use Digest::MD5 qw(md5 md5_hex md5_base64);
 
 # Start by connecting to iRATE, default port is 12473
 my $remote_host = "127.0.0.1";
+if (@ARGV) {
+    $remote_host = shift @ARGV;
+}
 my $remote_port = "12473";
+if (@ARGV) {
+    $remote_port = shift @ARGV;
+}
 my $password =    "mypassword";
+if (@ARGV) {
+    $password = shift @ARGV;
+}
 
 $socket = IO::Socket::INET->new(PeerAddr => $remote_host,
                                 PeerPort => $remote_port,
@@ -105,7 +114,7 @@ while (!$finished) {
     my %result = %{XMLin($reply)};
     
     print "Track:\t$result{artist} \\ $result{title}\n";
-    print "Plays:\t$result{rating}\n";
+    print "Plays:\t$result{numtimes}\n";
     print "Rate:\t$result{state}\n\n";
 
     print "[S]kip\t\t[P]ause/unpause\n";
