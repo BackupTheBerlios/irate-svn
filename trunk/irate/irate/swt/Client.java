@@ -25,14 +25,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/04 11:05:10 $
+ * Date Updated: $Date: 2003/12/05 04:11:33 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.121 $
+ * @version $Revision: 1.122 $
  */
 public class Client extends AbstractClient {
 
@@ -734,7 +734,7 @@ public class Client extends AbstractClient {
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       MenuItem item = new MenuItem(menu, SWT.NONE);
-      item.setText(rf.getName());
+      item.setText(Resources.getString(rf.getName()));
       item.addArmListener(new ToolTipArmListener(Resources.getString(rf.getName() + ".tooltip")));
       final int value = rf.getValue();
       item.addSelectionListener(new SelectionAdapter() {
