@@ -7,22 +7,25 @@ all: libswt.o libnanoxml-lite.o
 #	ar -rcs libswt-pi.a libswt-pi.o
 #libswt.a:libswt.o 
 #	ar -rcs libswt.a libswt.o
-swt.jar:
 ifeq ($(PLATFORM),linux-motif)
+swt.jar: swt-2.1-motif-linux.zip
 	unzip swt-2.1-motif-linux.zip
 else
 
 ifeq ($(PLATFORM),win32)
+swt.jar: swt-2.1-win32.zip
 	unzip swt-2.1-win32.zip
 	touch libswt.o
 else
 
 ifeq ($(PLATFORM),linux-gtk2)
+swt.jar: swt-2.1.1-linux-gtk.zip
 	unzip swt-2.1.1-linux-gtk.zip
 
 else
 
 ifeq ($(PLATFORM),linux-libswt-gtk2)
+swt.jar: swt-2.1.1-linux-gtk.zip
 	unzip swt-2.1.1-linux-gtk.zip
 
 else
@@ -34,6 +37,15 @@ endif
 endif
 
 endif
+
+swt-2.1-motif-linux.zip:
+	wget http://download2.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-motif-linux.zip
+	
+swt-2.1-win32.zip:
+	wget http://download2.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-win32.zip
+
+swt.jar: swt-2.1.1-linux-gtk.zip
+	wget http://download2.eclipse.org/downloads/drops/R-2.1.1-200306271545/swt-2.1.1-linux-gtk.zip
 
 libswt.o: swt.jar
 ifeq ($(PLATFORM),win32)
