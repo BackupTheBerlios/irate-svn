@@ -129,18 +129,24 @@ public class Track {
   }
 
   public String getArtist() {
-    return elt.getStringAttribute("artist");
+    String artist = elt.getStringAttribute("artist");
+    if (artist == null)
+      return "";
+    return artist;
   }
 
   public String getTitle() {
-    return elt.getStringAttribute("title");
+    String title = elt.getStringAttribute("title");
+    if (title == null)
+      return "";
+    return title;
   }
 
   public URL getURL() {
     try {
       return new URL(elt.getStringAttribute("url"));
     }
-    catch (MalformedURLException e) {
+    catch (Exception e) {
       e.printStackTrace();
     }
     return null;
@@ -152,7 +158,7 @@ public class Track {
 
   public File getFile() {
     String filename = elt.getStringAttribute("file");
-    if (filename.length() == 0) {
+    if (filename == null || filename.length() == 0) {
       URL url = getURL();
       if (url.getProtocol().equals("file"))
         return new File(url.getFile());
