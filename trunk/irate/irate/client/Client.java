@@ -211,7 +211,7 @@ public class Client extends JFrame {
     
     JMenu m = new JMenu("Auto download");
     ButtonGroup bg = new ButtonGroup();
-    int counts[] = new int[] {0, 11, 17, 23, 29};
+    int counts[] = new int[] {0, 5, 11, 17, 23, 29};
     for (int i = 0; i < counts.length; i++) {
       final int count = counts[i];
       JCheckBoxMenuItem mi = new JCheckBoxMenuItem(count == 0 ? "Disabled" : "Every " + count + " plays");

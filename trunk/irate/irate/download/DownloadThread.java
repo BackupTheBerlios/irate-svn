@@ -25,24 +25,36 @@ public class DownloadThread extends Thread {
   }
 
   public void run() {
-    while (true) {
-      checkAutoDownload();
+      while (true) {
+      doCheckAutoDownload();
       
       try {
-        while (!ready) {
-          sleep(250);
-        }
-        process();
-        ready = false;
+	synchronized (this) {
+	  wait();
+	}
+	if (ready) {
+	  process();
+	  ready = false;
+	}
       }
       catch (InterruptedException e) {
-        e.printStackTrace();
+	e.printStackTrace();
       }
     }
   }
 
+  public void checkAutoDownload()
+  {
+    synchronized (this) {
+      notifyAll();
+    }
+  }
+
   public void go() {
-    ready = true;
+    synchronized (this) {
+      ready = true;
+      notifyAll();
+    }
   }
   
   public void process() {
@@ -198,8 +210,8 @@ public class DownloadThread extends Thread {
       actionListener.actionPerformed(null);
     }
   }
-
-  public void checkAutoDownload() {
+  
+  private void doCheckAutoDownload() {
     String state = null;
     synchronized (trackDatabase) {
       int autoDownload = trackDatabase.getAutoDownload();
@@ -212,7 +224,7 @@ public class DownloadThread extends Thread {
         trackDatabase.setAutoDownloadCount(0);
     }
     if (state == null)
-      go();
+      ready = true;
     else
       setState(state);
   }
