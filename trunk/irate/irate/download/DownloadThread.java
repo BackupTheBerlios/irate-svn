@@ -330,7 +330,7 @@ public class DownloadThread extends Thread {
         socket = new Socket("202.72.160.235", trackDatabase.getPort());
       }
 
-      InputStream is = socket.getInputStream();
+      InputStream is = /*new java.util.zip.GZIPInputStream*/(socket.getInputStream());
       setState("Sending server request");
       OutputStream os = socket.getOutputStream();
       String str;

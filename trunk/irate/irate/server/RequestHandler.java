@@ -69,7 +69,8 @@ public class RequestHandler {
 
       String headers[] = getHeaders(is);
       byte[] buf = new byte[getContentLength(headers)];
-      if(getHeader(headers, "Content-Encoding:").equals("gzip"))
+      boolean gzip = getHeader(headers, "Content-Encoding:").equals("gzip");
+      if(gzip)
         is = new java.util.zip.GZIPInputStream(is);
       int pos = 0;
       while (pos < buf.length) {
@@ -87,7 +88,10 @@ public class RequestHandler {
 
 //      System.out.println("Reply:");
 //      System.out.println(reply.toString());
+      if(gzip)
+        os = new java.util.zip.GZIPOutputStream(os);
       os.write(reply.toString().getBytes());
+      os.flush();
 
         // Print any error
       String error = reply.getErrorCode();
