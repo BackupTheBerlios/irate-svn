@@ -15,5 +15,12 @@ import irate.common.Track;
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
 public interface DownloadListener {
+
+  public void downloadStarted(Track track);
+
   public void downloadProgressed(Track track, int percentComplete, String state);
+
+  public void downloadData(Track track, byte[] buffer, int offset, int length);
+
+  public void downloadFinished(Track track, boolean succeeded);
 }

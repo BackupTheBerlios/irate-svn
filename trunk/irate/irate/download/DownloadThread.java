@@ -263,7 +263,11 @@ public class DownloadThread extends Thread {
         // append mode. If the file on the server is shorter than the one 
         // we have on disk then we just start again.
         OutputStream os = new FileOutputStream(file.toString(), resume);
+        boolean succeeded = false;
         try {
+          for (int i = 0; i < downloadListeners.size(); i++)
+            ((DownloadListener)downloadListeners.get(i)).downloadStarted(track);
+
           final byte buf[] = new byte[128000];
           int totalBytes = (int)continueOffset;          
           while (true) {
@@ -271,6 +275,10 @@ public class DownloadThread extends Thread {
             if (nbytes < 0)
               break;
             os.write(buf, 0, nbytes);
+              // Stephen Blackheath: I am in two minds as to whether this should be a separate
+              // listener, but it should be efficient enough as it is.
+            for (int i = 0; i < downloadListeners.size(); i++)
+              ((DownloadListener)downloadListeners.get(i)).downloadData(track, buf, 0, nbytes);
             if (contentLength >= 0) {
               totalBytes += nbytes;
               int percent = totalBytes * 100 / contentLength;
@@ -285,6 +293,7 @@ public class DownloadThread extends Thread {
               }
             }
           }
+          succeeded = true;
         }
         finally {
           os.close();
@@ -293,6 +302,8 @@ public class DownloadThread extends Thread {
           }
           catch (IOException exception) {
           }
+          for (int i = 0; i < downloadListeners.size(); i++)
+            ((DownloadListener)downloadListeners.get(i)).downloadFinished(track, succeeded);
         }
       }
       track.setFile(file);
@@ -412,6 +423,10 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
 
   public void addDownloadListener(DownloadListener downloadListener) {
     downloadListeners.add(downloadListener);
+  }
+
+  public void removeDownloadListener(DownloadListener downloadListener) {
+    downloadListeners.remove(downloadListener);
   }
 
   public void removeUpdateListener(UpdateListener updateListener) {

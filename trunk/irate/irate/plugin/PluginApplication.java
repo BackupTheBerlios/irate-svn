@@ -1,16 +1,14 @@
-// Copyright 2003 Stephen Blackheath
-
 package irate.plugin;
 
 import java.io.File;
 
 import irate.common.Track;
+import irate.client.TrackLifeCycleListener;
+import irate.download.DownloadListener;
+import irate.client.VolumePolicy;
 
 /**
  * This is the interface through which plugins talk to the application.
- *
- * Some things we could add:
- *   Event registration for plugins that want to 
  *
  * @author Stephen Blackheath
  */
@@ -52,11 +50,51 @@ public interface PluginApplication
    * Set rating for the specified track.
    */
   public void setRating(Track track, int rating);
-  
+
   /**
    * Plays a sound event on the client.
    */
   public void playSoundEvent(File file, String description);
-  
+
+  /**
+   * Add a listener which allows plugins to monitor the lifecycle of tracks
+   * through the application.
+   */
+  public void addTrackLifeCycleListener(TrackLifeCycleListener listener);
+
+  /**
+   * Remove a TrackLifeCycleListener.
+   */
+  public void removeTrackLifeCycleListener(TrackLifeCycleListener listener);
+
+  /**
+   * Add a listener that allows the plugin to monitor the downloading of files.
+   */
+  public void addDownloadListener(DownloadListener downloadListener);
+
+  /**
+   * Remove a download listener.
+   */
+  public void removeDownloadListener(DownloadListener downloadListener);
+
+  /**
+   * PluginApplication interface:
+   * Save the information associated with the specified track.
+   * If 'immediate' is true, it will save the track data immediately, otherwise
+   * it will save it at some later stage.
+   */
+  public void saveTrack(Track track, boolean immediate);
+
+  /**
+   * Add a policy for determining how loud tracks should be played.
+   * See VolumeMeister class for more details.
+   */
+  public void addVolumePolicy(VolumePolicy policy, int priority);
+
+  /**
+   * Remove a policy for determining how loud tracks should be played.
+   * See VolumeMeister class for more details.
+   */
+  public void removeVolumePolicy(VolumePolicy policy);
 }
 

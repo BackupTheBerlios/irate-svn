@@ -81,7 +81,7 @@ public class Track implements TrackDetails {
     this.trackDatabase = trackDatabase;
   }
 
-  public void updateSerial() {
+  public synchronized void updateSerial() {
     if(trackDatabase == null)
       return;
 
@@ -128,7 +128,7 @@ public class Track implements TrackDetails {
   /**
    * Return the rating with Float.NaN meaning that it hasn't been rated.
    */
-  protected float getRawRating() {
+  protected synchronized float getRawRating() {
     try {
       String s = elt.getStringAttribute("rating");
       if (s != null)
@@ -153,7 +153,7 @@ public class Track implements TrackDetails {
     return defaultRating;
   }
 
-  public void erase() {
+  public synchronized void erase() {
     if (!isErased()) {
       File f = getFile();
       if (f != null && f.exists()) {
@@ -173,7 +173,7 @@ public class Track implements TrackDetails {
     return getFileState().equals("erased");
   }
 
-  public int getNoOfTimesPlayed() {
+  public synchronized int getNoOfTimesPlayed() {
     try {
       String s = elt.getStringAttribute("played");
       if (s == null)
@@ -193,7 +193,7 @@ public class Track implements TrackDetails {
   }
 
   /** Set the last played time stamp to the current time. */
-  public void updateTimeStamp() {
+  public synchronized void updateTimeStamp() {
     try {
       Calendar c = new GregorianCalendar(UTC);
       elt.setAttribute("last",
@@ -225,7 +225,7 @@ public class Track implements TrackDetails {
     }
   }
 
-  public Date getLastPlayed() {
+  public synchronized Date getLastPlayed() {
     String s = elt.getStringAttribute("last");
     if (s != null && s.length() == 14)
       try {
@@ -243,7 +243,7 @@ public class Track implements TrackDetails {
     return new Date(null);
   }
 
-  public void setRating(float rating) {
+  public synchronized void setRating(float rating) {
     if (Float.isNaN(rating))
       unSetRating();
     else
@@ -251,11 +251,11 @@ public class Track implements TrackDetails {
     updateSerial();
   }
 
-  public void unSetRating() {
+  public synchronized void unSetRating() {
     elt.removeAttribute("rating");
   }
 
-  public void setWeight(float weight) {
+  public synchronized void setWeight(float weight) {
     if (Float.isNaN(weight))
       unSetWeight();
     else
@@ -263,11 +263,11 @@ public class Track implements TrackDetails {
     updateSerial();
   }
 
-  public void unSetWeight() {
+  public synchronized void unSetWeight() {
     elt.removeAttribute("weight");
   }
 
-  public float getWeight() {
+  public synchronized float getWeight() {
     try {
       String s = elt.getStringAttribute("weight");
       if (s != null)
@@ -278,11 +278,11 @@ public class Track implements TrackDetails {
     return Float.NaN;
   }
 
-  public void setVolume(int volume) {
+  public synchronized void setVolume(int volume) {
     elt.setAttribute("volume", Integer.toString(volume));
   }
 
-  public int getVolume() {
+  public synchronized int getVolume() {
     try {
       return Integer.parseInt(elt.getStringAttribute("volume"));
     }
@@ -291,7 +291,7 @@ public class Track implements TrackDetails {
     return 0;
   }
   
-  public void unSetVolume() {
+  public synchronized void unSetVolume() {
     elt.removeAttribute("volume");
   }
   
@@ -299,18 +299,18 @@ public class Track implements TrackDetails {
     setFileState("broken");
   }
 
-  private String getFileState() {
+  private synchronized String getFileState() {
     String s = elt.getStringAttribute("state");
     if (s == null)
       return "";
     return s;
   }
 
-  private void setFileState(String state) {
+  private synchronized void setFileState(String state) {
     elt.setAttribute("state", state);
   }
 
-  public boolean isBroken() {
+  public synchronized boolean isBroken() {
     if (getFileState().equals("broken"))
       return true;
 
@@ -344,33 +344,33 @@ public class Track implements TrackDetails {
     return file.exists();
   }
 
-  public void setArtist(String artist) {
+  public synchronized void setArtist(String artist) {
     elt.setAttribute("artist", artist);
   }
 
-  public String getArtist() {
+  public synchronized String getArtist() {
     String artist = elt.getStringAttribute("artist");
     if (artist == null)
       return "";
     return artist;
   }
   
-  public void setTitle(String title) {
+  public synchronized void setTitle(String title) {
     elt.setAttribute("title", title);
   }
 
-  public String getTitle() {
+  public synchronized String getTitle() {
     String title = elt.getStringAttribute("title");
     if (title == null)
       return "";
     return title;
   }
 
-  public void setURL(URL url) {
+  public synchronized void setURL(URL url) {
     elt.setAttribute("url", url.toString());
   }
   
-  public URL getURL() {
+  public synchronized URL getURL() {
     try {
       String urlString = elt.getStringAttribute("url");
       if (urlString == null)
@@ -383,14 +383,14 @@ public class Track implements TrackDetails {
     return null;
   }
 
-  public String getKey() {
+  public synchronized String getKey() {
     String key = elt.getStringAttribute("url");
     if (key == null)
       return "";
     return key;
   }
 
-  public File getFile() {
+  public synchronized File getFile() {
     String filename = elt.getStringAttribute("file");
     if (filename == null || filename.length() == 0) {
       URL url = getURL();
@@ -405,11 +405,11 @@ public class Track implements TrackDetails {
     return new File(dir, filename); 
   }
 
-  public void setFile(File file) {
+  public synchronized void setFile(File file) {
     elt.setAttribute("file", file.getPath());
   }
 
-  public void unSetFile() {
+  public synchronized void unSetFile() {
     elt.removeAttribute("file");
   }
   
@@ -478,7 +478,7 @@ public class Track implements TrackDetails {
   }
 
   /** Returns the web site associated with this track */
-  public URL getWebSite() {
+  public synchronized URL getWebSite() {
     try {
     	String www = elt.getStringAttribute("www");
       if (www == null)
@@ -492,7 +492,7 @@ public class Track implements TrackDetails {
   }
 	
   /** Returns license */
-  public URL getLicense() {
+  public synchronized URL getLicense() {
     try {
       String www = elt.getStringAttribute("license");
       if (www == null)
@@ -560,13 +560,16 @@ public class Track implements TrackDetails {
    */
   public String getCopyrightInfo() {
     /* First check if there is a copyright attribute, which is faster than reading the ID3 tag. */
-    String copyrightInfo = elt.getStringAttribute("copyright");
-    if (copyrightInfo != null)
-      return copyrightInfo;
+    String copyrightInfo;
+    synchronized (this) {
+      copyrightInfo = elt.getStringAttribute("copyright");
+      if (copyrightInfo != null)
+        return copyrightInfo;
 
     /* If we don't have the track yet then we just return an empty copyright string. */
     if (!exists())
       return "";
+    }
     
     /* If no copyright attribute then we read the ID3 tag. */
     try {
@@ -580,8 +583,10 @@ public class Track implements TrackDetails {
     /* We've either got a vlue or not got a value so let's continue. */
     if (copyrightInfo == null)
       copyrightInfo = "";
-    elt.setAttribute("copyright", copyrightInfo);
-    return copyrightInfo;
+    synchronized (this) {
+      elt.setAttribute("copyright", copyrightInfo);
+      return copyrightInfo;
+    }
   }
 
   /**
@@ -652,6 +657,29 @@ public class Track implements TrackDetails {
    */
   public void setPercentComplete(int percent) {
     percent_complete = percent;
+  }
+
+  /**
+   * Add a generalized property to this track, which will be stored in the track database.
+   * This method is useful for plugins that want to associate their own data with a track.
+   * @param value is the string value to set, or null to remove the property.
+   */
+  public synchronized void setProperty(String name, String value)
+  {
+    if (value == null)
+      elt.removeAttribute(name);
+    else
+      elt.setAttribute(name, value);
+  }
+
+  /**
+   * Get a generalized property from this track.
+   * This method is useful for plugins that want to associate their own data with a track.
+   * @return String value or null if this property does not exist.
+   */
+  public synchronized String getProperty(String name)
+  {
+    return elt.getStringAttribute(name);
   }
 
 }

@@ -22,7 +22,8 @@ public class PlayThread extends Thread {
   private Vector history = new Vector();
   private boolean reverse = false;
   private boolean stopThread = false;
-	
+  private VolumeMeister volumeMeister = new VolumeMeister();
+
   public PlayThread(PlayListManager playListManager, PlayerList playerList) {
     this.playListManager = playListManager;
     this.playerList = playerList;
@@ -93,7 +94,7 @@ public class PlayThread extends Thread {
             }
           }
           if (toKeepPlaying) {
-            playFile(file, currentTrack.getVolume());
+            playFile(file, volumeMeister.determineVolume(currentTrack));
             if(!reverse){
               history.add(currentTrack);
               //System.out.println("Added to history:"+currentTrack+" reverse="+reverse);
@@ -216,4 +217,8 @@ public class PlayThread extends Thread {
     }    
   }
  
+  public VolumeMeister getVolumeMeister()
+  {
+    return volumeMeister;
+  }
 }

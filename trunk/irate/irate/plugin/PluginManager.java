@@ -1,5 +1,3 @@
-// Copyright 2003 Stephen Blackheath
-
 package irate.plugin;
 
 import java.io.*;
@@ -10,8 +8,9 @@ import java.util.Vector;
 import nanoxml.*;
 
 import irate.common.Preferences;
-import irate.plugin.lircremote.LircRemoteControlPlugin;
+import irate.plugin.autonormalize.AutoNormalizePlugin;
 import irate.plugin.externalcontrol.ExternalControlPlugin;
+import irate.plugin.lircremote.LircRemoteControlPlugin;
 import irate.plugin.unratednotifier.UnratedNotifierPlugin;
 
 /**
@@ -51,8 +50,9 @@ public class PluginManager
   private void loadPlugins()
   {
     plugins = new Vector();
-    plugins.add(new LircRemoteControlPlugin());
+    plugins.add(new AutoNormalizePlugin());
     plugins.add(new ExternalControlPlugin());
+    plugins.add(new LircRemoteControlPlugin());
     plugins.add(new UnratedNotifierPlugin());
     try {
       loadConfig();

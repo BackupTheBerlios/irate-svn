@@ -18,6 +18,8 @@ public class PlayListManager {
 
   private Track lastPlayedTrack;
 
+  private Vector trackLifeCycleListeners = new Vector();
+
   public PlayListManager(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
     this.playList = new Vector();
@@ -44,6 +46,7 @@ public class PlayListManager {
     if (playListIndex < playList.size()) {
       Track track = (Track) playList.get(playListIndex);
       if (!track.isOnPlayList()) {
+        notifyRemovedFromPlayList((Track)playList.get(playListIndex));
         playList.remove(playListIndex);
 
           // Subtract one from the index because it'll get incremented later.
@@ -52,8 +55,11 @@ public class PlayListManager {
     }
 
       // Remove extra unwanted items.
-    while (playList.size() > playListLength)
-      playList.remove(playList.size() - 1);
+    while (playList.size() > playListLength) {
+      int toRemove = playList.size() - 1;
+      notifyRemovedFromPlayList((Track)playList.get(toRemove));
+      playList.remove(toRemove);
+    }
 
       // Maintain a 'toOmit' hash table, which is used to make the choosing
       // of tracks not choose ones we have already got on the list.
@@ -63,6 +69,7 @@ public class PlayListManager {
       Track track = (Track) playList.get(i);
 //      if (!track.isOnPlayList()) {
 //        if (track.getRating() == 0) {
+//          notifyRemovedFromPlayList((Track)playList.get(i));
 //          playList.remove(i);
 //          if (i < playListIndex)
 //            --playListIndex;
@@ -106,6 +113,7 @@ public class PlayListManager {
         if (unratedPlayListRatio != 0 || track.isRated()) {
           int insertIndex = random.nextInt(playList.size() + 1);
           playList.add(insertIndex, track);
+          notifyAddedToPlayList(track);
           if (insertIndex <= playListIndex)
             ++playListIndex;
         }
@@ -164,4 +172,32 @@ public class PlayListManager {
     }
   }
 
+  /**
+   * Add a listener that will be notified when tracks are added or removed
+   * from the playlist.
+   */
+  public void addTrackLifeCycleListener(TrackLifeCycleListener listener)
+  {
+    trackLifeCycleListeners.add(listener);
+  }
+
+  /**
+   * Remove listener.
+   */
+  public void removeTrackLifeCycleListener(TrackLifeCycleListener listener)
+  {
+    trackLifeCycleListeners.remove(listener);
+  }
+
+  private void notifyAddedToPlayList(Track track)
+  {
+    for (int i = 0; i < trackLifeCycleListeners.size(); i++)
+      ((TrackLifeCycleListener)trackLifeCycleListeners.get(i)).addedToPlayList(track);
+  }
+
+  private void notifyRemovedFromPlayList(Track track)
+  {
+    for (int i = 0; i < trackLifeCycleListeners.size(); i++)
+      ((TrackLifeCycleListener)trackLifeCycleListeners.get(i)).removedFromPlayList(track);
+  }
 }

@@ -16,16 +16,15 @@ export PLATFORM=linux-gtk2
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:lib/jd3lib.jar
 
-CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o #libmadplayer.o
+CLIENT_DEPS = irate-swt.o irate-client.o irate-common.o irate-download.o #libmadplayer.o
 CLIENT_LIBS = lib/libnanoxml-lite.o lib/libjd3.o
 
 JAVA_SWTSRC=irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
 JAVA_SWINGSRC=irate/swing/*.java
-JAVA_CLIENT=irate/client/*.java
-JAVA_COMMONSRC=irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java irate/resources/*.java
+JAVA_COMMONSRC=irate/common/*.java irate/resources/*.java
 JAVA_DOWNLOAD=irate/download/*.java
 HELPFILES=irate/client/help/*.html
-JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CLIENT:.java=.class) $(JAVA_DOWNLOAD:.java=.class)
+JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_CLIENT:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_DOWNLOAD:.java=.class)
 
 #request resource compilation if not gcj 3.0.4
 #set in make.configure
@@ -67,7 +66,7 @@ endif
 
 endif
 
-CLIENT_FILES = \
+JAVA_CLIENT = \
 	irate/client/AbstractClient.java \
 	irate/client/PlayThread.java \
 	irate/client/PlayerException.java \
@@ -82,7 +81,12 @@ CLIENT_FILES = \
 	irate/client/PlayerListener.java \
 	irate/client/Resources.java \
 	irate/client/StreamPlayer.java \
-	irate/client/SoundEventPlayer.java
+	irate/client/SoundEventPlayer.java \
+	irate/client/TrackLifeCycleListener.java \
+	irate/client/VolumePolicy.java \
+	irate/client/VolumeMeister.java \
+	irate/plugin/*.java \
+	irate/plugin/*/*.java
 #	irate/client/LibMadPlayer.java
 #	irate/client/AudioDevice.java 
 #	irate/client/JavaSoundAudioDevice.java 
@@ -167,8 +171,8 @@ irate/resources/skin.zip: irate/resources/skin/*.png
 irate-swt.o: irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java lib/swt.jar
 	$(GCJ) -c $(JAVA_SWTSRC) -o irate-swt.o
 
-irate-client.o: $(CLIENT_FILES)
-	$(GCJ) -c $(CLIENT_FILES) -o irate-client.o
+irate-client.o: $(JAVA_CLIENT)
+	$(GCJ) -c $(JAVA_CLIENT) -o irate-client.o
 
 irate-download.o: $(JAVA_DOWNLOAD)
 	$(GCJ) -c $(JAVA_DOWNLOAD) -o irate-download.o

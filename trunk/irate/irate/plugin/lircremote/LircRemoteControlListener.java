@@ -1,5 +1,3 @@
-// Copyright 2003 Stephen Blackheath
-
 package irate.plugin.lircremote;
 
 /**

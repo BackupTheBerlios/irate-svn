@@ -17,6 +17,7 @@ import irate.plugin.PluginManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Vector;
 
 /**
  * @author Anthony Jones
@@ -35,6 +36,8 @@ public abstract class AbstractClient
 
   private Track lastRatedTrack;
   private int lastTrackPreviousRank;
+
+  private Vector trackLifeCycleListeners = new Vector();
 
   public AbstractClient() {
 		init();
@@ -93,8 +96,6 @@ public abstract class AbstractClient
     playThread = new PlayThread(playListManager, playerList);
     soundEventPlayer  = new SoundEventPlayer(playListManager);
 
-    pluginManager = new PluginManager(this, dir);
-
     if (playerList.getPlayers().length == 0)
       handleError(null, "missingplayer.html");
 
@@ -112,10 +113,15 @@ public abstract class AbstractClient
     };
 
     downloadThread.addDownloadListener(new DownloadListener() {
+      public void downloadStarted(Track track) {}
       public void downloadProgressed(Track track, int percentComplete, String state) {
         updateDownloadInfo(track, state, percentComplete);
       }
+      public void downloadData(Track track, byte[] buffer, int offset, int length) {}
+      public void downloadFinished(Track track, boolean succeeded) {}
     });
+
+    pluginManager = new PluginManager(this, dir);
 
     System.out.println("Number of tracks "+trackDatabase.getNoOfTracks() );
 		// If a track database couldn't be loaded from the file system, then we
@@ -310,7 +316,86 @@ public abstract class AbstractClient
     for (int i = 0; i < plugins.size(); i++) {
       Plugin plugin = (Plugin) plugins.get(i);
       plugin.eventNewTrack(track);
-    }  
+    } 
+    notifyStartingToPlay(track);
   }
 
+  /**
+   * PluginApplication interface:
+   * Add a listener which allows plugins to monitor the lifecycle of tracks
+   * through the application.
+   */
+  public void addTrackLifeCycleListener(TrackLifeCycleListener listener)
+  {
+    trackLifeCycleListeners.add(listener);
+    playListManager.addTrackLifeCycleListener(listener);
+  }
+
+  /**
+   * PluginApplication interface:
+   * Remove a TrackLifeCycleListener.
+   */
+  public void removeTrackLifeCycleListener(TrackLifeCycleListener listener)
+  {
+    trackLifeCycleListeners.remove(listener);
+    playListManager.removeTrackLifeCycleListener(listener);
+  }
+
+  private void notifyStartingToPlay(Track track)
+  {
+    for (int i = 0; i < trackLifeCycleListeners.size(); i++)
+      ((TrackLifeCycleListener)trackLifeCycleListeners.get(i)).startingToPlay(track);
+  }
+
+  /**
+   * PluginApplication interface:
+   * Add a listener that allows the plugin to monitor the downloading of files.
+   */
+  public void addDownloadListener(DownloadListener listener)
+  {
+    downloadThread.addDownloadListener(listener);
+  }
+
+  /**
+   * PluginApplication interface:
+   * Remove a download listener.
+   */
+  public void removeDownloadListener(DownloadListener listener)
+  {
+    downloadThread.removeDownloadListener(listener);
+  }
+
+  /**
+   * PluginApplication interface:
+   * Save the information associated with the specified track.
+   * If 'immediate' is true, it will save the track data immediately, otherwise
+   * it will save it at some later stage.
+   */
+  public void saveTrack(Track track, boolean immediate)
+  {
+    // Be lazy for now:  The information will be saved fairly soon because the whole
+    // track database gets saved any time anyone rates something.
+    // If written properly, this method needs to be written CAREFULLY because it could
+    // be called from any thread.
+  }
+
+  /**
+   * PluginApplication interface:
+   * Add a policy for determining how loud tracks should be played.
+   * See VolumeMeister class for more details.
+   */
+  public void addVolumePolicy(VolumePolicy policy, int priority)
+  {
+    playThread.getVolumeMeister().addVolumePolicy(policy, priority);
+  }
+
+  /**
+   * PluginApplication interface:
+   * Remove a policy for determining how loud tracks should be played.
+   * See VolumeMeister class for more details.
+   */
+  public void removeVolumePolicy(VolumePolicy policy)
+  {
+    playThread.getVolumeMeister().removeVolumePolicy(policy);
+  }
 }
