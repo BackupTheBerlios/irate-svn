@@ -35,7 +35,8 @@ public class Client implements UpdateListener {
   private PlayThread playThread;
   private DownloadThread downloadThread;
   private ToolItem pause;
-  
+  private Track previousTrack;
+	
   private String strState = "";
   // private PlayThread playThread;
   
@@ -105,24 +106,33 @@ public class Client implements UpdateListener {
     };
     final Client client = this;
     downloadThread.addUpdateListener(new UpdateListener() {
+    boolean newState = false;
       public void actionPerformed() {
         String state = downloadThread.getState();
+        newState = false;
         if (!strState.equals(state)) {
           strState = state;
+          newState = true;
         }
         display.asyncExec(new Runnable() {
           public void run() {
             int n = downloadThread.getPercentComplete();
+            boolean barVisible = progressBar.getVisible();
             if(n > 0 && n < 100)
             {
               lblState.setText(strState + " "+n +"%");
               progressBar.setSelection(n);
+			  if(!barVisible)
+				progressBar.setVisible(true);
             }else 
             {
               lblState.setText(strState);            
-              progressBar.setSelection(0);
+			  if(barVisible)
+				progressBar.setVisible(false);
             }
             lblState.pack();
+            if(newState)
+            	synchronizePlaylist(playListManager, tblSongs);
           }
         });
       }
@@ -136,13 +146,21 @@ public class Client implements UpdateListener {
   }
   
   public void update(){    
-    synchronizePlaylist(playListManager, tblSongs);
+    //synchronizePlaylist(playListManager, tblSongs);
     Track track = playThread.getCurrentTrack();
     lblTitle.setText(""+track);
     TableItem item = (TableItem)hashSongs.get(track);
     tblSongs.select(tblSongs.indexOf(item));
     tblSongs.showItem(item);    
-    downloadThread.checkAutoDownload();    
+    //just in case :)
+    track2TableItem(track, item);
+    
+	if(track != previousTrack) {
+		if(previousTrack != null)
+			track2TableItem(previousTrack, (TableItem)hashSongs.get(previousTrack));
+		previousTrack = track;
+	}
+    downloadThread.checkAutoDownload();   
   }
   
   //called from playThread.addUpdateListener(this);
@@ -168,6 +186,15 @@ public class Client implements UpdateListener {
     return null;
   }
   
+  void track2TableItem(Track track, TableItem tableItem) {
+	String[] data = {track.getArtist(),
+	track.getTitle(),
+	track.getState(),
+	String.valueOf(track.getNoOfTimesPlayed()),
+	track.getLastPlayed() };
+	tableItem.setText(data);	
+  }
+  
   public void setRating(int rating) {
   //    int index = list.getSelectedIndex();
     int index = tblSongs.getSelectionIndex();
@@ -179,11 +206,7 @@ public class Client implements UpdateListener {
     track.setRating(rating);
     
     TableItem ti = (TableItem) hashSongs.get(track);
-    ti.dispose();
-    //reinsert the track with new info
-    //should probly update the info inplace with setText :)
-    hashSongs.remove(track);
-    synchronizePlaylist(playListManager, tblSongs);
+    track2TableItem(track, ti);
     update();
   } 
  
@@ -252,16 +275,15 @@ public class Client implements UpdateListener {
     td.sort();
     Track tracks[] = td.getTracks();
     for(int i=0;i<tracks.length;i++){
-      if(hashSongs.containsKey(tracks[i]))
-        continue;
-      TableItem item = new TableItem(tblSongs,SWT.NULL);
-      String[] data = {tracks[i].getArtist(),
-      tracks[i].getTitle(),
-      tracks[i].getState(),
-      String.valueOf(tracks[i].getNoOfTimesPlayed()),
-      tracks[i].getLastPlayed() };
-      item.setText(data);
-      hashSongs.put(tracks[i], item);
+	TableItem item;
+      if(hashSongs.containsKey(tracks[i])) {
+      	item = (TableItem)hashSongs.get(tracks[i]);
+      }
+      else{
+      	item = new TableItem(tblSongs,SWT.NULL);
+		hashSongs.put(tracks[i], item);
+      }
+      track2TableItem(tracks[i], item);
     }
   }
   
@@ -542,20 +564,17 @@ public class Client implements UpdateListener {
     progressBar = new ProgressBar(shell, SWT.HORIZONTAL);
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.END;
-    progressBar.setLayoutData(gridData);
-    
-    shell.pack();
+    progressBar.setLayoutData(gridData);    
     progressBar.setMinimum(0);
     progressBar.setMaximum(100);
-    //progressBar.setSelection(100);
-    
+
+	shell.pack();
     
     Rectangle rec = shell.getBounds();
     rec.height = 300;
     shell.setBounds(rec);
-   // Point p = progressBar.getSize();
-    //lblState.setSize(rec.width - p.x-5, p.y);
-    
+ 
+ 	progressBar.setVisible(false);
     shell.open();
   }
   
