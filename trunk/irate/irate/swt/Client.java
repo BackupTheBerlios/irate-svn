@@ -52,6 +52,7 @@ public class Client extends AbstractClient {
   private Track previousTrack;
   private Help help = new Help();
   private ErrorDialog errorDialog;
+  private AboutDialog aboutDialog;
 
   //  private SettingDialog settingDialog;
   private String strState = "";
@@ -85,6 +86,7 @@ public class Client extends AbstractClient {
     
     initGUI();
     errorDialog = new ErrorDialog(display, shell);
+    aboutDialog = new AboutDialog(display, shell);
 		uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
     createDropTarget();
   }
@@ -360,7 +362,7 @@ public class Client extends AbstractClient {
   }
 
   public void actionAbout() {
-    errorDialog.show(getResource("help/about.html"));
+    aboutDialog.show(getResource("help/about.html"));
   }
 
   /** launches a web browser 
