@@ -119,14 +119,15 @@ public class DownloadThread extends Thread {
   	return null;
   }
   
-  private abstract class Worker implements Runnable{
+  private abstract class TimeoutWorker implements Runnable{
 	protected Object input;
   	private Object output;
 	private Thread timeoutThread;
 	private Exception exception;
-	
-	public Worker(Object input) {
+    
+	public TimeoutWorker(Object input) {
 	  this.input = input;
+//    workerThread = new Thread(this);
 	}
 	
 	protected void setOutput(Object output) {
@@ -144,9 +145,9 @@ public class DownloadThread extends Thread {
 	public Object runOrTimeout(long timeout) throws Exception {
 		//running thread
 		timeoutThread = Thread.currentThread();
-		//thread with a task that might timeout
-		Thread th = new Thread(this);
-		th.start();
+		//start thread with a task that might timeout
+    Thread th = new Thread(this);
+    th.start();
 		try {
 			Thread.sleep(timeout);
 		} catch(InterruptedException ie) {
@@ -155,6 +156,7 @@ public class DownloadThread extends Thread {
 			else
 				return output;
 		}
+    th.stop();
 		throw new IOException("Timeout exceeded");
 	}
   }
@@ -162,8 +164,6 @@ public class DownloadThread extends Thread {
   
   public void download(Track track) throws IOException {
     try {
-      OutputStream os = null;
-      InputStream is = null;
       try {
         URL url = track.getURL();
 
@@ -183,7 +183,7 @@ public class DownloadThread extends Thread {
         
         //30 second timeout for the impatient
         long timeout = 60000;
-        Worker worker = new Worker(url) {
+        TimeoutWorker worker = new TimeoutWorker(url) {
         	public void run() {
         		try {
         			URLConnection conn = ((URL)input).openConnection();
@@ -197,52 +197,45 @@ public class DownloadThread extends Thread {
         		}
         	}
         };
-		URLConnection conn;
-		Integer intContentLength; 
+        URLConnection conn;
+        Integer intContentLength; 
         try{
-			Vector v =  (Vector) worker.runOrTimeout(timeout);
-			conn = (URLConnection) v.elementAt(0);
-			intContentLength = (Integer) v.elementAt(1);
+          Vector v =  (Vector) worker.runOrTimeout(timeout);
+          conn = (URLConnection) v.elementAt(0);
+          intContentLength = (Integer) v.elementAt(1);
         }catch(Exception e) {
         	setState("Could not connect: "+ e);
+          e.printStackTrace();
         	return;
         }
         worker = null;
         int contentLength = intContentLength.intValue();
         setState("Downloading " + track.getName());
-        is = conn.getInputStream();
-        os = new FileOutputStream(file);
-        byte buf[];// = new byte[128000];
+        final InputStream is = conn.getInputStream();
+        OutputStream os = new FileOutputStream(file);
+        final byte buf[] = new byte[128000];
         int totalBytes = 0;
-        
-		worker = new Worker(is){
-			public void run() {
-				InputStream is = (InputStream) input;
-				byte buf[] = new byte[128000];
-				int n;
-				try {
-					n = is.read(buf);
-				} catch(Exception e) {
-					setException(e);
-					return;
-				}
-				Vector v= new Vector();
-				v.add(buf);
-				v.add(new Integer(n));
-				setOutput(v);
-			}
-		};
-        
+        worker = new TimeoutWorker(is){
+          public void run() {
+            int n;
+            try {
+              n = is.read(buf);
+            } catch(Exception e) {
+              setException(e);
+              return;
+            }
+            setOutput(new Integer(n));
+          }
+        };
+            
         while (true) {
-			int nbytes;
-	    	try {
-	    		Vector v = (Vector) worker.runOrTimeout(timeout);
-	    		buf = (byte[]) v.elementAt(0);
-	    		nbytes = ((Integer) v.elementAt(1)).intValue();
-	    	} catch(Exception e) {
-	    		e.printStackTrace();
-	    		return;
-	    	}
+          int nbytes;
+          try {
+            nbytes = ((Integer) worker.runOrTimeout(timeout)).intValue();
+          } catch(Exception e) {
+            e.printStackTrace();
+            return;
+          }
 	    	
           if (nbytes < 0)
             break;
@@ -257,14 +250,14 @@ public class DownloadThread extends Thread {
             }
           }
         }
-        os.close(); os = null;
-        is.close(); is = null;
+        os.close();
+        is.close();
         track.setFile(file);
         trackDatabase.save();
       }
       finally {
-        if (is != null) try { is.close(); } catch (IOException e) { e.printStackTrace(); }
-        if (os != null) try { os.close(); } catch (IOException e) { e.printStackTrace(); }
+        //if (is != null) try { is.close(); } catch (IOException e) { e.printStackTrace(); }
+        //if (os != null) try { os.close(); } catch (IOException e) { e.printStackTrace(); }
         percentComplete = 0;
       }
     }
