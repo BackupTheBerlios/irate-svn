@@ -47,11 +47,11 @@ public class Client extends JFrame {
     
     try {
       Client client = new Client() {
-        public void actionClose() {
-          super.actionClose();
-          System.exit(0);
-        }
-      };
+          public void actionClose() {
+            super.actionClose();
+            System.exit(0);
+          }
+        };
       client.show();
       if (client.menuItemAccount.isEnabled())
         client.actionAccount();
@@ -60,7 +60,7 @@ public class Client extends JFrame {
       e.printStackTrace();
     }
   }
-
+  
   private PlayListManager playListManager;
   private TrackDatabase trackDatabase;
   private PlayerList playerList;
@@ -75,14 +75,14 @@ public class Client extends JFrame {
   private ButtonGroup playerButtonGroup;
  
   public Client() throws Exception {
-    setTitle("iRATE radio");
+    setTitle("iRATE Radio");
 
     setSize(640, 400);
 
     File home = new File(System.getProperties().getProperty("user.home"));
   
-      // Check the current directory for an existing trackdatabase.xml for
-      // compatibility reasons only.    
+    // Check the current directory for an existing trackdatabase.xml for
+    // compatibility reasons only.    
     File dir = new File(".");    
     File file = new File(dir, "trackdatabase.xml");
     if (!file.exists()) {
@@ -93,49 +93,49 @@ public class Client extends JFrame {
         if (!dir.exists())
           dir.mkdir();
         file = new File(dir, "trackdatabase.xml");
-       }
-     }
+      }
+    }
 
-     try {
-       trackDatabase = new TrackDatabase(file);
-     }
-     catch (IOException e) {
-       e.printStackTrace();
-     }
-     playListManager = new PlayListManager(trackDatabase);
+    try {
+      trackDatabase = new TrackDatabase(file);
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    playListManager = new PlayListManager(trackDatabase);
     
-     playerList = new PlayerList();
-     playThread = new PlayThread(playListManager, playerList);
-     playPanel = new PlayPanel(playListManager, playThread);
-     playThread.start();
-     getContentPane().add(playPanel, BorderLayout.CENTER);
+    playerList = new PlayerList();
+    playThread = new PlayThread(playListManager, playerList);
+    playPanel = new PlayPanel(playListManager, playThread, this);
+    playThread.start();
+    getContentPane().add(playPanel, BorderLayout.CENTER);
      
-     errorDialog = new ErrorDialog(this);
+    errorDialog = new ErrorDialog(this);
      
-     downloadThread = new DownloadThread(trackDatabase) {
-	     public void process() throws IOException {
-		 menuItemDownload.setEnabled(false);
-		 super.process();
-		 perhapsDisableAccount();
-		 menuItemDownload.setEnabled(true);
-       }
+    downloadThread = new DownloadThread(trackDatabase) {
+        public void process() throws IOException {
+          menuItemDownload.setEnabled(false);
+          super.process();
+          perhapsDisableAccount();
+          menuItemDownload.setEnabled(true);
+        }
 
-       public void handleError(String code, String urlString) {
-         actionSetContinuousDownload(false);
-         URL url;
-         if (urlString.indexOf(':') < 0)
-           url = getResource("help/" + urlString);
-         else 
-           try {
-             url = new URL(urlString);
-           }
-           catch (MalformedURLException e) {
-             e.printStackTrace();
-             url = getResource("help/malformedurl.html");
-           }
-         errorDialog.showURL(url);
-       }
-     };
+        public void handleError(String code, String urlString) {
+          actionSetContinuousDownload(false);
+          URL url;
+          if (urlString.indexOf(':') < 0)
+            url = getResource("help/" + urlString);
+          else 
+            try {
+              url = new URL(urlString);
+            }
+            catch (MalformedURLException e) {
+              e.printStackTrace();
+              url = getResource("help/malformedurl.html");
+            }
+          errorDialog.showURL(url);
+        }
+      };
      downloadPanel = new DownloadPanel(downloadThread);
      downloadThread.addUpdateListener(new UpdateListener() {
        private String state = "";

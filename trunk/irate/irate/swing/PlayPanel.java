@@ -20,12 +20,15 @@ public class PlayPanel extends JPanel implements MouseListener {
   private JTable table;
   private JButton pauseButton;
   private TableSorter sorter;
-  
-  public PlayPanel(PlayListManager playListManager, PlayThread playThread) {
+  private Client client;
+
+  public PlayPanel(PlayListManager playListManager, PlayThread playThread, 
+                   Client client) {
     super(new BorderLayout());
     this.playListManager = playListManager;
     this.playThread = playThread;
-    
+    this.client = client;
+
     playThread.addUpdateListener(new UpdateListener() {
       public void actionPerformed() {
         update();
@@ -183,6 +186,12 @@ public class PlayPanel extends JPanel implements MouseListener {
   public void update() {
     Track currentTrack = playThread.getCurrentTrack();
     currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
+
+    if (client != null) {
+      client.setTitle(currentTrack == null ? "iRATE Radio" : 
+                      currentTrack.toString() + " - iRATE Radio");
+    }
+
     trackTable.notifyListeners();
     pauseButton.setText(playThread.isPaused() ? "|>" : "||");
     
