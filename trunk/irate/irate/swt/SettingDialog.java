@@ -2,20 +2,23 @@
 
 package irate.swt;
 
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.SWT;
-import java.io.IOException;
-
 import irate.common.Preferences;
 import irate.plugin.*;
+import irate.resources.Resources;
+
+import java.io.IOException;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/11/29 05:46:54 $
+ * Date Updated: $Date: 2003/11/30 17:58:31 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class SettingDialog
 {
@@ -32,9 +35,9 @@ public class SettingDialog
   public SettingDialog(Display display, PluginManager pluginManager, PluginApplication app) {
     this.pluginManager = pluginManager;
     this.app = app;
-    browser = Preferences.getUserPreference("browser");
+    browser = Preferences.getUserPreference("browser"); 
     if (browser == null) {
-      browser = "";
+      browser = ""; 
     }
     createWidgets(display);
     
@@ -67,7 +70,7 @@ public class SettingDialog
   /** Creates widgets */
   private void createWidgets(Display display) {
     shell = new Shell(display);
-    shell.setText("Settings");
+    shell.setText(Resources.getString("SettingDialog.Title.Settings")); 
     shell.addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           done=true;
@@ -79,22 +82,22 @@ public class SettingDialog
     tabs = new TabFolder(shell, SWT.NONE);
     //Pluginpage
     TabItem tabItem = new TabItem(tabs, SWT.NONE);
-    tabItem.setText("Plugins");
+    tabItem.setText(Resources.getString("SettingDialog.TabItem.Plugins")); 
     tabItem.setControl(createPluginPage(tabs));
     tabItem = new TabItem(tabs, SWT.NONE);
-    tabItem.setText("Browser");
+    tabItem.setText(Resources.getString("SettingDialog.TabItem.Browser")); 
     tabItem.setControl(createBrowserPage(tabs));
     tabs.pack();
 
     Button ok = new Button(shell, SWT.NONE);
-    ok.setText("Close");
+    ok.setText(Resources.getString("SettingDialog.Button.Close")); 
     
     //gd.horizontalSpan = 2;
     ok.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
     ok.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
           try {
-            Preferences.savePreferenceToFile("browser", browser);
+            Preferences.savePreferenceToFile("browser", browser); 
           } catch (IOException ioe) {
             ioe.printStackTrace();
             shell.close();
@@ -112,7 +115,7 @@ public class SettingDialog
     comp.setLayout(layout);
     
     Label heading = new Label(comp, SWT.NONE);
-    heading.setText("Select the plugins you wish to enable");
+    heading.setText(Resources.getString("SettingDialog.Label.PluginHeading")); 
     GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
     gd.horizontalSpan = 2;
     heading.setLayoutData(gd);
@@ -133,7 +136,7 @@ public class SettingDialog
           }
         });
       Button configure = new Button(comp, SWT.NONE);
-      configure.setText("Configure");
+      configure.setText(Resources.getString("SettingDialog.Button.Configure")); 
       configure.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
           app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
@@ -149,7 +152,7 @@ public class SettingDialog
     final Composite comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(1, false);
     comp.setLayout(layout);
-    new Label(comp, SWT.NONE).setText("Browser:");
+    new Label(comp, SWT.NONE).setText(Resources.getString("SettingDialog.Label.Browser")); 
 
     class BrowserButton {
       String description; // Button label
@@ -184,17 +187,14 @@ public class SettingDialog
     }
 
     final BrowserButton[] browsers = { 
-      new BrowserButton("Mozilla/Firebird (Linux/UNIX)",
-                        "mozilla -remote openURL(%u,new-window)",
-                        "The Mozilla or Mozilla Firebird browsers on Linux "+
-                        "or UNIX platforms. This will open the link in a "+
-                        "new window."),
-      new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec",
-                        "The default KDE browser, almost certainly "+
-                        "Konqueror."),
-      new BrowserButton("Windows Default",
-                        "rundll32 url.dll,FileProtocolHandler",
-                        "This will launch the default Windows browser.")};
+      new BrowserButton("Mozilla/Firebird (Linux/UNIX)", 
+                        "mozilla -remote openURL(%u,new-window)", 
+                        Resources.getString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
+      new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec",  //$NON-NLS-2$
+                        Resources.getString("SettingDialog.Button.Browser.Tooltip.Konqueror")),  
+      new BrowserButton(Resources.getString("SettingDialog.Button.Browser.WindowsDefault"), 
+                        "rundll32 url.dll,FileProtocolHandler", 
+                        Resources.getString("SettingDialog.Button.Browser.Tooltip.WindowsDefault"))}; 
 
     final Button browserSpecified = new Button(comp, SWT.RADIO);
     final Text browserText = new Text(comp, SWT.NONE);
@@ -240,11 +240,8 @@ public class SettingDialog
       browseButton.setEnabled(false);
     }
 
-    browserSpecified.setText("User Specified:");
-    browserSpecified.setToolTipText("Select this and then either enter the browser "+
-                             "into the box below, or browse to it. If '%u' "+
-                             "is included here, it will be replaced with "+
-                             "the URL, otherwise the URL will be appended.");
+    browserSpecified.setText(Resources.getString("SettingDialog.Button.Browser.UserSpecified")); 
+    browserSpecified.setToolTipText(Resources.getString("SettingDialog.Button.Browser.ToolTip.UserSpecified")); 
     browserSpecified.addSelectionListener(sel);
 
     browserText.setText(browser);
@@ -255,15 +252,15 @@ public class SettingDialog
         }
       });
     
-    browseButton.setText("Browse ...");
+    browseButton.setText(Resources.getString("SettingDialog.Button.Browse")); 
     
     browseButton.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
           FileDialog fd = new FileDialog(shell, SWT.OPEN);
-          fd.setText("Select browser to use");
+          fd.setText(Resources.getString("SettingDialog.FileDialog.Text")); 
           fd.open();
-          if (!fd.getFileName().equals("")) {
-            browserText.setText(fd.getFilterPath() + "/" + fd.getFileName());
+          if (!fd.getFileName().equals("")) { 
+            browserText.setText(fd.getFilterPath() + "/" + fd.getFileName()); 
             browser = browserText.getText();
           }
         }

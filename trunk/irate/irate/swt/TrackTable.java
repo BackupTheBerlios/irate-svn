@@ -5,31 +5,16 @@ package irate.swt;
 
 import irate.common.Track;
 import irate.common.TrackDatabase;
+import irate.resources.Resources;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.DragSource;
-import org.eclipse.swt.dnd.DragSourceEvent;
-import org.eclipse.swt.dnd.DragSourceListener;
-import org.eclipse.swt.dnd.FileTransfer;
-import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.dnd.*;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Table;
-import org.eclipse.swt.widgets.TableColumn;
-import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.*;
 
 /**
  * @author Anthony Jones
@@ -74,7 +59,7 @@ public class TrackTable {
 
     TableColumn col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
-    col.setText("Artist");
+    col.setText(Resources.getString("TrackTable.Heading.Artist")); 
     addColumnListener(col, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getArtist()).compareTo(new MagicString(track1.getArtist()));
@@ -83,7 +68,7 @@ public class TrackTable {
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
-    col.setText("Track");
+    col.setText(Resources.getString("TrackTable.Heading.Track")); 
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getTitle()).compareTo(new MagicString(track1.getTitle()));
@@ -92,7 +77,7 @@ public class TrackTable {
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(100);
-    col.setText("Rating");
+    col.setText(Resources.getString("TrackTable.Heading.Rating"));
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getState()).compareTo(new MagicString(track1.getState()));
@@ -101,7 +86,7 @@ public class TrackTable {
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(50);
-    col.setText("Plays");
+    col.setText(Resources.getString("TrackTable.Heading.Plays"));
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new Integer(track0.getNoOfTimesPlayed()).compareTo(new Integer(track1.getNoOfTimesPlayed()));
@@ -110,7 +95,7 @@ public class TrackTable {
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(180);
-    col.setText("Last");
+    col.setText(Resources.getString("TrackTable.Heading.Last")); 
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return track0.getLastPlayed().compareTo(track1.getLastPlayed());
@@ -189,7 +174,7 @@ public class TrackTable {
     // Sort first
     Collections.sort(listOfTracks, comparator);
     
-    System.out.println("TrackTable: Resizing");
+    System.out.println("TrackTable: Resizing"); //$NON-NLS-1$
     // Update the list of tracks
     int size = listOfTracks.size();
     while (table.getItemCount() > size)
@@ -197,7 +182,7 @@ public class TrackTable {
     while (table.getItemCount() < size)
       new TableItem(table, SWT.NONE);
       
-    System.out.println("TrackTable: Updating");
+    System.out.println("TrackTable: Updating"); //$NON-NLS-1$
     // Update the table    
     int i = 0;
     hashByTrack = new Hashtable();
@@ -210,7 +195,7 @@ public class TrackTable {
       hashByTableItem.put(tableItem, track);
     }
     
-    System.out.println("TrackTable: Done");
+    System.out.println("TrackTable: Done"); //$NON-NLS-1$
     // Make sure the correct track is selected
     if (selected != null)
       select(selected);

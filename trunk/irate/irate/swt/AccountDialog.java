@@ -3,34 +3,27 @@ package irate.swt;
 import irate.common.Preferences;
 import irate.common.TrackDatabase;
 import irate.download.DownloadThread;
+import irate.resources.Resources;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Random;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.ShellAdapter;
-import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.DirectoryDialog;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Shell;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.*;
 
 
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/11/29 06:15:33 $
+ * Date Updated: $Date: 2003/11/30 17:58:31 $
  * @author Creator:	taras
- * @author Updated:	$Author: eythian $
- * @version $Revision: 1.12 $
+ * @author Updated:	$Author: parlabane $
+ * @version $Revision: 1.13 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -63,7 +56,7 @@ public class AccountDialog {
       }
     });
 
-    shell.setText("Account Settings");
+    shell.setText(Resources.getString("AccountDialog.Title.Account_Settings"));  
     GridLayout layout = new GridLayout(3, false);
     shell.setLayout(layout);
 
@@ -73,7 +66,7 @@ public class AccountDialog {
   
     createUserInfo();
 
-    new Label(shell, SWT.NONE).setText("Password");
+    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.Password"));  
     txtPassword = new Text(shell, SWT.SINGLE | SWT.BORDER);
     GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 2;
@@ -81,49 +74,41 @@ public class AccountDialog {
     if (password.length() == 0)
       password = randomString(10);
     txtPassword.setText(password);
-    txtPassword.setToolTipText("This is the password to authenticate you. "+
-                               "You may want to set it to something you can "+
-                               "remember.");
+    txtPassword.setToolTipText(Resources.getString("AccountDialog.Text.Tooltip.Password")); 
 
-    new Label(shell, SWT.NONE).setText("Server");
+    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.Server"));  
     txtServer = new Text(shell, SWT.SINGLE | SWT.BORDER);
     data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 2;
     txtServer.setLayoutData(data);
     txtServer.setText(trackDatabase.getHost());
-    txtServer.setToolTipText("The server to use. The standard server is "+
-                             "server.irateradio.org.");
+    txtServer.setToolTipText(Resources.getString("AccountDialog.Text.Tooltip.Server"));  
 
-    new Label(shell, SWT.NONE).setText("Port");
+    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.Port"));  
     txtPort = new Text(shell, SWT.SINGLE | SWT.BORDER);
     data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 2;
     txtPort.setLayoutData(data);
     txtPort.setText(Integer.toString(trackDatabase.getPort()));
-    txtPort.setToolTipText("The port to comunicate with the server on. The "+
-                           "standard port is 2278.");
+    txtPort.setToolTipText(Resources.getString("AccountDialog.Text.Tooltip.Port"));  
     
-    new Label(shell, SWT.NONE).setText("Directory");
+    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.Directory"));  
     txtDirectory = new Text(shell, SWT.SINGLE | SWT.BORDER);
     data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 1;
     data.widthHint = 200;
     txtDirectory.setEnabled(false);
     txtDirectory.setLayoutData(data);
-    txtDirectory.setText(System.getProperties().getProperty("user.home"));
-    txtDirectory.setToolTipText("The location for iRATE downloads. The "+
-                                "directory 'irate' will be created in this "+
-                                "location");
+    txtDirectory.setText(System.getProperties().getProperty("user.home"));  
+    txtDirectory.setToolTipText(Resources.getString("AccountDialog.Text.Tooltip.Directory"));  
 
     Button btnDirectory = new Button(shell, SWT.NONE);
-    btnDirectory.setText("Browse...");
+    btnDirectory.setText(Resources.getString("AccountDialog.Button.Browse"));  
     btnDirectory.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         DirectoryDialog dialog = new DirectoryDialog (shell);
-        dialog.setMessage("Choose the location for iRATE downloads -- The "+
-                          "directory 'irate' will be created in this "+
-                          "location");
-        dialog.setText("iRATE Downloads Directory");
+        dialog.setMessage(Resources.getString("AccountDialog.Dialog.Message"));  
+        dialog.setText(Resources.getString("AccountDialog.Dialog.Download_Directory"));  
         String result = dialog.open();
         if(result != null) {
           txtDirectory.setText(result);
@@ -132,7 +117,7 @@ public class AccountDialog {
     });
     
     Button btnCancel = new Button(shell, SWT.NONE);
-    btnCancel.setText("Cancel");
+    btnCancel.setText(Resources.getString("AccountDialog.Button.Cancel"));  
     btnCancel.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         done = true;
@@ -166,22 +151,21 @@ public class AccountDialog {
 
   /** Create the user input field. */
   private void createUserInfo() {
-    new Label(shell, SWT.NONE).setText("User");
+    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.User"));  
     txtUser = new Text(shell, SWT.SINGLE | SWT.BORDER);
     GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 2;
     txtUser.setLayoutData(data);String userName = trackDatabase.getUserName();
     if (userName.length() == 0) 
-      userName = System.getProperty("user.name");// + " " + randomString(3); 
+      userName = System.getProperty("user.name");// + " " + randomString(3);   
     txtUser.setText(userName);
-    txtUser.setToolTipText("This is the username use to store your rating "+
-                           "information. It will need to be unique.");
+    txtUser.setToolTipText(Resources.getString("AccountDialog.Text.ToolTip.User"));  
   }
  
   /** Create the OK button. */
   private void createAcceptButton() {
     Button btnAccept = new Button(shell, SWT.NONE);
-    btnAccept.setText("OK");
+    btnAccept.setText(Resources.getString("AccountDialog.Button.OK"));  
   
     btnAccept.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -192,19 +176,19 @@ public class AccountDialog {
         
          // Check the current directory for an existing trackdatabase.xml for
          // compatibility reasons only.
-         File dir = new File(".");
+         File dir = new File(".");  
     
-         File file = new File(dir, "trackdatabase.xml");
+         File file = new File(dir, "trackdatabase.xml");  
          if (!file.exists()) {
-          dir = new File("/irate");
-          file = new File(dir, "trackdatabase.xml");
-          dir = new File(txtDirectory.getText(), "irate");
+          dir = new File("/irate");  
+          file = new File(dir, "trackdatabase.xml");  
+          dir = new File(txtDirectory.getText(), "irate");  
           
           if (!dir.exists())
             dir.mkdir();
           
-          file = new File(dir, "trackdatabase.xml");
-          dir = new File(dir, "download");
+          file = new File(dir, "trackdatabase.xml");  
+          dir = new File(dir, "download");  
           
           if(!dir.exists())
             dir.mkdir();
@@ -212,7 +196,7 @@ public class AccountDialog {
           
         
         try {
-          Preferences.savePreferenceToFile("downloadDir", file.toString());
+          Preferences.savePreferenceToFile("downloadDir", file.toString());  
         } catch (IOException ioe) {
           ioe.printStackTrace();
         }

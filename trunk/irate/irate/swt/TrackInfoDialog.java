@@ -2,18 +2,19 @@
 
 package irate.swt;
 
-import irate.resources.Resources;
 import irate.common.LicensingScheme;
 import irate.common.Track;
+import irate.resources.Resources;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.*;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.*;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
 
 public class TrackInfoDialog {
   
@@ -54,7 +55,7 @@ public class TrackInfoDialog {
     
     try {
       ImageData icon =
-        new ImageData(Resources.getResourceAsStream("icon.gif"));
+        new ImageData(Resources.getResourceAsStream("icon.gif")); 
         int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
         icon.transparentPixel = whitePixel;
         shell.setImage(new Image(display, icon));
@@ -101,7 +102,7 @@ public class TrackInfoDialog {
      
     // Left Grid, Column 1, Row 1: Create an 'Artist:' label
     Label artistLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    artistLabel.setText("Artist:");
+    artistLabel.setText(Resources.getString("TrackInfoDialog.Label.Artist")); 
     
     gridData = new GridData();
     gridData.widthHint = 80;
@@ -124,7 +125,7 @@ public class TrackInfoDialog {
   
     // Left Grid, Column 1, Row 2: 'Album:' label
     Label albumLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    albumLabel.setText("Album:");
+    albumLabel.setText(Resources.getString("TrackInfoDialog.Label.Album")); 
     albumLabel.setFont(resizeFontTo(albumLabel.getFont(),12));
     
     gridData = new GridData();
@@ -145,7 +146,7 @@ public class TrackInfoDialog {
     
     // Left Grid, Column 1, Row 3: 'Length:' label
     Label playTimeLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    playTimeLabel.setText("Length:");
+    playTimeLabel.setText(Resources.getString("TrackInfoDialog.Label.Length")); 
     playTimeLabel.setFont(resizeFontTo(playTimeLabel.getFont(),12));
     
     gridData = new GridData();
@@ -167,7 +168,7 @@ public class TrackInfoDialog {
     
     //	Left Grid, Column 1, Row 4: 'Copyright:' label
     Label copyrightLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    copyrightLabel.setText("Copyright:");
+    copyrightLabel.setText(Resources.getString("TrackInfoDialog.Label.Copyright")); 
     copyrightLabel.setFont(resizeFontTo(copyrightLabel.getFont(),12));
     
     gridData = new GridData();
@@ -191,7 +192,7 @@ public class TrackInfoDialog {
     copyright.pack();
     
     // If this track has an icon associated with the license, then display it.
-    if(license.getIcon() != null && !license.getIcon().equals("")) {	
+    if(license.getIcon() != null && !license.getIcon().equals("")) {	 
     	
     	licenseButton = new Button(leftGrid,SWT.FLAT);
       
@@ -215,7 +216,7 @@ public class TrackInfoDialog {
     
     // Left Grid, Column 1, Row 5: 'Comment:' label
     Label commentLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    commentLabel.setText("Comment:");
+    commentLabel.setText(Resources.getString("TrackInfoDialog.Label.Comment")); 
     commentLabel.setFont(resizeFontTo(commentLabel.getFont(),12));
     
     gridData = new GridData();
@@ -260,12 +261,12 @@ public class TrackInfoDialog {
       
     // Right Grid, Column 2, Row 2: Search button
     searchButton = new Button(rightGrid,0);
-    searchButton.setText("Search");
+    searchButton.setText(Resources.getString("TrackInfoDialog.Button.Search")); 
     searchButton.pack();
     
     // Right Grid, Column 2, Row 2: WWW Button
     wwwLink = new Button(rightGrid,0);
-    wwwLink.setText("WWW");
+    wwwLink.setText(Resources.getString("TrackInfoDialog.Button.WWW")); 
       
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.END;
@@ -274,7 +275,7 @@ public class TrackInfoDialog {
     wwwLink.setLayoutData(gridData);
     
     // If the website isn't available, grey out this area.  
-    if(currentTrack.getArtistWebsite() == null || currentTrack.getArtistWebsite().equals("")) 
+    if(currentTrack.getArtistWebsite() == null || currentTrack.getArtistWebsite().equals(""))  
     {
       wwwLink.setEnabled(false);
     }
@@ -282,7 +283,7 @@ public class TrackInfoDialog {
     
     // Right Grid, Column 2, Row 3: Close Button
     closeButton = new Button(rightGrid,0);
-    closeButton.setText("Close");
+    closeButton.setText(Resources.getString("TrackInfoDialog.Button.Close")); 
       
     gridData = new GridData();
     gridData.widthHint = searchButton.getSize().x;
@@ -327,11 +328,11 @@ public class TrackInfoDialog {
   searchButton.addSelectionListener(new SelectionAdapter() {
     public void widgetSelected(SelectionEvent e) {
     
-      String www = "";
-      www = "\"" + currentTrack.getArtist() + "\" ";
-      www += "\"" + currentTrack.getTitle() + "\"";
+      String www = ""; 
+      www = "\"" + currentTrack.getArtist() + "\" ";  //$NON-NLS-2$
+      www += "\"" + currentTrack.getTitle() + "\"";  //$NON-NLS-2$
       try {
-        www = "http://www.google.com/search?q=" + URLEncoder.encode(www);
+        www = "http://www.google.com/search?q=" + URLEncoder.encode(www); 
       }
       catch (Exception z) {
         z.printStackTrace();

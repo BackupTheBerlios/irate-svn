@@ -2,12 +2,16 @@
 
 package irate.swt;
 
-import java.io.*;
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.*;
+import irate.resources.Resources;
+
+import java.io.Reader;
+
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.*;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.*;
 
 public class ErrorDialog {
   
@@ -76,7 +80,7 @@ public class ErrorDialog {
   private void createCloseButton() {
     Button close = new Button(shell, SWT.NONE);
     close.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    close.setText("Close");
+    close.setText(Resources.getString("ErrorDialog.Button.Close")); 
     close.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         actionClose();
