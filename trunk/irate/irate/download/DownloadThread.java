@@ -230,7 +230,12 @@ public class DownloadThread extends Thread {
   public void download(final Track track) throws IOException {
     final URL url = getProxyURL(track.getURL());
     System.out.println(url);
-    final File file = getFileName(url);
+    final File finishedFile = getFileName(url);
+    if (finishedFile.exists()) {
+      // We've already successfully downloaded the file, nothing to do
+      return;
+    }
+    final File downloadingFile = new File(finishedFile.toString() + ".part");
     setState(getResourceString("DownloadThread.Connecting_to")
              + url.getHost());
     try {
@@ -246,7 +251,7 @@ public class DownloadThread extends Thread {
       if (contentType.indexOf("text") != -1)
         throw new FileNotFoundException("Content type is Text");
       int contentLength = connection.getContentLength();
-      long continueOffset = file.exists() ? file.length() : 0;
+      long continueOffset = downloadingFile.exists() ? downloadingFile.length() : 0;
       // If the file isn't already the right length, then we need to download
       if (continueOffset != contentLength) {
         boolean resume = false;
@@ -283,7 +288,7 @@ public class DownloadThread extends Thread {
           // part of the file to the download listeners.  They are only expected
           // to deal with whole files.
         if (resume && downloadListeners.size() != 0) {
-          FileInputStream is = new FileInputStream(file.toString());
+          FileInputStream is = new FileInputStream(downloadingFile.toString());
           try {
             while (true) {
               int nbytes = is.read(buf, 0, buf.length);
@@ -301,7 +306,7 @@ public class DownloadThread extends Thread {
         // If the continue offset is non-zero then we open the file in
         // append mode. If the file on the server is shorter than the one 
         // we have on disk then we just start again.
-        OutputStream os = new FileOutputStream(file.toString(), resume);
+        OutputStream os = new FileOutputStream(downloadingFile.toString(), resume);
         boolean succeeded = false;
         try {
           int totalBytes = (int)continueOffset;          
@@ -329,6 +334,13 @@ public class DownloadThread extends Thread {
             }
           }
           succeeded = true;
+          if (downloadingFile.renameTo(finishedFile)) {
+            track.setFile(finishedFile);
+          } else {
+            // I don't think this could occur, since we've already
+            // checked to see if finishedFile exists, but...
+            System.out.println("For some reason we couldn't rename the file!");
+          }
           exponentialBackoffManager.succeeded(track.getURL());
         }
         finally {
@@ -342,7 +354,6 @@ public class DownloadThread extends Thread {
             ((DownloadListener)downloadListeners.get(i)).downloadFinished(track, succeeded);
         }
       }
-      track.setFile(file);
       trackDatabase.save();
     }
     catch (Exception e) {
