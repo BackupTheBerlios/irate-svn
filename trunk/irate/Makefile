@@ -10,9 +10,13 @@ export PLATFORM=linux-motif
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
 
-
 CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
 CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o 
+
+#cute hack to see if we can bundle the docs too
+ifneq ($(shell html2text -help 2> /dev/null),)
+CLIENT_DEPS += resource_irate_client_*.o
+endif
 
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
@@ -86,13 +90,15 @@ irate-server.o:irate/server/*.java
 deb:
 	dpkg-buildpackage -b -rfakeroot
 
-setup.exe: $(IRATE_CLIENT)
+#for help txt + resources
+resource_irate_client_*.o:
 	./build-help
+
+setup.exe: $(IRATE_CLIENT)
 	iscc irate-client.iss
 	mv Output/setup.exe .
 
-tarball: $(IRATE_CLIENT) build-help
-	./build-help
+tarball: $(IRATE_CLIENT)
 	bin/mktarball.sh
 
 clean:

@@ -2,9 +2,12 @@
 for FILE in irate/client/help/*.html 
 do
   OUTFILE=`echo "${FILE}" | sed -e "s/\\.html/\\.txt/"`
+  OFILE=resource_`echo "${FILE}" | sed -e "s/\\.html/\\.o/" -e 's/\//_/g'`
   if test "${OUTFILE}" != "${FILE}"
   then
     echo "${FILE} -> ${OUTFILE}"
     html2text "${FILE}" > "${OUTFILE}"
+	echo "${OUTFILE} -> ${OFILE}"
+	$GCJ -c --resource ${OUTFILE} ${OUTFILE} -o ${OFILE}
   fi
 done
