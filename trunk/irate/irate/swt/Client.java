@@ -816,9 +816,28 @@ public class Client extends AbstractClient {
 //    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
   }
   
+  /**
+   * Creates the menu that is presented when a track is right-clicked on.
+   */
   public void createTableMenu() {
     Menu menu = new Menu(shell, SWT.POP_UP);
     trackTable.setMenu(menu);
+    MenuItem info = new MenuItem(menu, SWT.NONE);
+    info.addArmListener(new ToolTipArmListener(Resources.getString("button.info.tooltip")));
+    final Client clientToPass = this;
+    info.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          Track track = trackTable.getSelectedTrack();
+          if (track == null)
+            return;
+          
+          TrackInfoDialog trackInfoDialog = 
+            new TrackInfoDialog(display, shell);
+          trackInfoDialog.displayTrackInfo(track, clientToPass);   
+        }
+      });
+    skinManager.add(info, "button.info");
+
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       MenuItem item = new MenuItem(menu, SWT.NONE);
