@@ -162,23 +162,46 @@ XMLRPC params :
 
 
 The function will return an array of new tracks, with a
-struct for each one, describing it and where it can be downloaded.
+struct for each one, describing it and where it can be downloaded,
+and some metadata (artistname, title, crediturl, irate ID, ..)
+
+
+A returned struct will look like this :
+
+
+struct (
+ artistname => ... (all strings are UTF8)
+ trackname => ...
+ license => ...
+ albumname => ...
+ pubdate => ... (publishing date)
+ id => ... (the iRATE ID of the track)
+ duration => ... (seconds)
+ crediturl => ...
+ Distributions => array(
+  0 => struct(
+   codec => ...
+   crediturl => ...
+   filesize => ...
+   hash_sha1 => ...
+   Sources => array(
+    0 => struct(
+     crediturl => ...
+     protocol => ... ("http" mostly)
+     link => ... (download url)
+    )
+   )
+  )
+ )
+)
 
 
 
-[TODO example of struct return]
+So we have 3 hierarchical elements : track, distribution and source.
 
 
 
-
-
-So we have 3 hierarchical things : track, distribution and source.
-
-- Fields for a track
-
-* id : 
-
-This is a custom LDBID (http://www.libredb.org/).
+Each track is given an irate ID by the server.
 
 iRATE servers can have two kinds of files. The ones that come
 from LibreDB, and the other, server-specific ones.
@@ -189,28 +212,16 @@ For the others, the ID will be XXXXXXX-YYY-ZZ-1 (same scheme
 as LDBIDs, but it's the irate server admin who gives
 these IDs.)
 
-* artistname : string
-* albumname : string
-* trackname : string
-* duration : int (length in seconds)
-* license
-* crediturl : string
+See www.libredb.org for more info.
 
-- Fields for a distribution
+The point of using libredb IDs is to allow clients that connect
+to a new server send the ratings of the libredb tracks they
+previously rated. As libredb tracks will be registered on most
+irate servers, the client will get good recommendations on
+the new server, without rating random tracks at the beginning.
 
-* crediturl : string
-* codec : string (http://www.matroska.org/technical/specs/codecid/)
-* hash_sha1 : string(40)
-* filesize : int
-
-- Fields for a source
-
-* protocol : string (eg. "http" or "bittorrent" or whatever)
-* link : string
-* crediturl : string
-
-
-The shown crediturl should be the first available from source, distribution and then track.
+The shown crediturl should be the first available from source,
+distribution and then track.
 
 
 
@@ -267,40 +278,29 @@ each {rating} is the same as before with irate.rate, but of course
 * Getting all the ratings back to the client
 --------------------------------------------
 
+Get all the ratings the client has already done
 
-TBC
-
-
-
-
-
----- Outdated past this ----
+XMLRPC function : irate.getRatings
+XMLRPC params : none
 
 
-Client : GET http://../&u=myuser&h=HASH&do=getratings
+The server will return an array containing one struct for
+each rating. The struct will be :
 
-"do=getratings" : the client asks for its previous ratings
+struct(
+ id => ...
+ rating => ...
+ weight => ...
+)
 
-Server replies : 
-(HTTP Headers)
-
-<ratings>XX:6,YY:3</ratings>
-
-The client had previously done 2 ratings : it rated the track with ID XX to 6/10, and the track YY to 3/10
 
 
 * Errors
 --------
 
-At any time, the server can return an error like this :
+The errors will be thrown as XMLRPC errors, with
+a minimal key as description (for instance, "MUST_LOGIN")
 
-Server reply :
-
-<error>ERROR_CODE</error>
-
-The error codes can be :
-* WRONG_PASSWORD : The password doesn't match for the user.
-* MUST_LOGIN : The username or the password wasn't given
 
 
 
@@ -309,33 +309,24 @@ The error codes can be :
 
 The user named "admin" is the admin of the server (not kidding)
 
-You must set a password for this user when setting up your
-server, logging in with "?u=admin&p=new_admin_password", at
-the very beginning.
-
-Then what you can do is :
-
- - Grab all new tracks from LibreDB :
-   "?u=admin&p=...&do=admin&action=grab&grab=libredb_audio1"
+ - To grab all new tracks from LibreDB :
+   Request "?u=admin&h=...&m=grab"
 
 
 
 
-* Migrating from old irate (dev only !)
----------------------------------------
 
-Get a track ID from a http url :
- - "?u=..&p=..&do=OLD_url2id&url=http://artist.iuma.com/..."
 
-Migration steps :
 
- 1. server: Import user database
- 2. server: Export all tracks to libredb and them import them from libredb to irate (they have IDs now)
- 3. client: Make the new client ask for IDs. (see above)
- 4. client: Make the client send again all his ratings with
- appropriate IDs
- 5. client: Move files,database,... to the new scheme
 
+
+****
+Where to test my implementation ?
+*********************************
+
+There's an irate-phpserver running at irate.jamendo.com
+
+irate registration is turned off so you'll need to register at www.jamendo.com (free, easy & quick)
 
 
 

@@ -354,7 +354,7 @@ return true;
 
 function getratings() {
 
- $a=$this->db->getAll("SELECT trackid,rating,weight FROM irate_ratings WHERE userid=?",array($this->user["id"]));
+ $a=$this->db->getAll("SELECT trackid as id,rating,weight FROM irate_ratings WHERE userid=?",array($this->user["id"]));
 
  return $a;
 
@@ -424,7 +424,7 @@ function addTrack($data) {
 
 
 
-
+ //todo debug
  function prepareCorrelation() {
 
  $oldid=$this->user["id"];
@@ -648,6 +648,28 @@ function IRS_xmlrpc_getInfo($params) {
  return new XML_RPC_Response($IRS->getTrackXMLRPC($r2));
 
 }
+
+
+
+
+
+function IRS_xmlrpc_getRatings($params) {
+ global $IRS;
+
+ $IRS->requireAuth();
+
+
+ $r=$IRS->getratings();
+
+ return new XML_RPC_Response(XML_RPC_PLN::php2xmlrpc($r));
+
+}
+
+
+
+
+
+
 
 
 

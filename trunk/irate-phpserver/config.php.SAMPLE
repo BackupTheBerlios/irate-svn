@@ -35,7 +35,7 @@ $cfg["allow_registering"]=true;
 
 
  //Activate the prepare function (compute correlation in background, needs cron, see README)
-$cfg["prepare"]=true;
+$cfg["prepare"]=false;
 
  //How many users to prepare at each batch
 $cfg["prepare_users"]=30;
