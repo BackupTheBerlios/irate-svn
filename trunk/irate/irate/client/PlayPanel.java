@@ -11,8 +11,10 @@ public class PlayPanel extends JPanel {
   private PlayListManager playListManager;
   private PlayThread playThread;
   private JLabel currentSongLabel = new JLabel(" ");
-  private JList list = new JList();
-  private Track[] tracks;
+//  privatAe JList list = new JList();
+//  private Track[] tracks;
+  private TrackTable trackTable;
+  private JTable table;
   
   public PlayPanel(PlayListManager playListManager, PlayThread playThread) {
     super(new BorderLayout());
@@ -30,30 +32,31 @@ public class PlayPanel extends JPanel {
     currentSongLabel.setFont(new Font("Serif", Font.PLAIN, 16));
     add(currentSongLabel, BorderLayout.NORTH);
 
-      // Work around annoying bug whereby swing makes some of the rows in the
-      // list ridiculously large for no good reason.
-    list.setPrototypeCellValue("XXX");
+    trackTable = new TrackTable(playListManager);
+    table = new JTable(trackTable); 
+//      // Work around annoying bug whereby swing makes some of the rows in the
+//      // list ridiculously large for no good reason.
+//    list.setPrototypeCellValue("XXX");
 
       // If you click on the current song label, it clears the list selection.
     currentSongLabel.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
-	list.clearSelection();
+	table.clearSelection();
       }
     });
 
       // Double click to play a specified track.
-    list.addMouseListener(new MouseAdapter() {
+    table.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
 	if (e.getClickCount() == 2) {
-	  int index = list.getSelectedIndex();
+	  int index = table.getSelectedRow();
 	  if (index >= 0)
-	    PlayPanel.this.playThread.play(tracks[index]);
+	    PlayPanel.this.playThread.play(trackTable.getTrack(index));
 	}
       }
     });
-
-    add(new JScrollPane(list), BorderLayout.CENTER);
-
+    
+    add(new JScrollPane(table), BorderLayout.CENTER);
     add(createButtonPanel(), BorderLayout.SOUTH);
   }
 
@@ -111,26 +114,29 @@ public class PlayPanel extends JPanel {
   }
 
   public void setRating(int rating) {
-    int index = list.getSelectedIndex();
+//    int index = list.getSelectedIndex();
+    int index = table.getSelectedRow();
     if (index < 0)
       playThread.getCurrentTrack().setRating(rating);
     else
-      tracks[index].setRating(rating);
+      trackTable.getTrack(index).setRating(rating);
     update();
   }
 
   public void update() {
-    synchronized (this) {
-      Track currentTrack = playThread.getCurrentTrack();
-      currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
-
-      tracks = playListManager.getPlayList().getTracks();
-      String items[] = new String[tracks.length];
-      for (int i = 0; i < tracks.length; i++) 
-        items[i] = tracks[i].toString();
-      Object o = list.getSelectedValue();
-      list.setListData(items);
-      list.setSelectedValue(o, true);
-    }
+    Track currentTrack = playThread.getCurrentTrack();
+    currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
+    trackTable.notifyListeners();
+//    synchronized (this) {
+//      currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
+//
+//      tracks = playListManager.getPlayList().getTracks();
+//      String items[] = new String[tracks.length];
+//      for (int i = 0; i < tracks.length; i++) 
+//        items[i] = tracks[i].toString();
+//      Object o = list.getSelectedValue();
+//      list.setListData(items);
+//      list.setSelectedValue(o, true);
+//    }
   }
 }

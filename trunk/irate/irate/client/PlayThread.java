@@ -1,11 +1,10 @@
 package irate.client;
 
-import irate.common.*;
-import MAD.*;
-
 import java.awt.event.*;
 import java.io.*;
 import java.util.*;
+import javax.sound.sampled.*;
+import irate.common.*;
 
 public class PlayThread extends Thread {
  
@@ -15,12 +14,14 @@ public class PlayThread extends Thread {
   private PlayListManager playListManager;
   private Vector actionListeners = new Vector();
   private Process playerProcess;
-  private MadPlayer madPlayer;
+  private String externalPlayer;
+  private String[] possiblePlayers = new String[] { "/usr/bin/mpg123", "madplay.exe" };
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
-    if (MadPlayer.isSupported())
-      madPlayer = new MadPlayer();
+    for (int i = 0; i < possiblePlayers.length; i++)
+      if (new File(possiblePlayers[i]).exists())
+        externalPlayer = possiblePlayers[i];
   }
 
   public void run() {
@@ -30,8 +31,15 @@ public class PlayThread extends Thread {
   }
 
   private void playFile(File file) throws Exception {
-    if (madPlayer != null) {
-      madPlayer.start(file.getPath());
+    if (externalPlayer.length() != 0) {
+      playerProcess = Runtime.getRuntime().exec(new String[] { externalPlayer, file.getPath() });
+      try {
+        playerProcess.waitFor();
+        if (playerProcess.exitValue() != 0) 
+          throw new Exception("extern player returned " + playerProcess.exitValue());
+      }
+      catch (InterruptedException e) {
+      }
     }
     else {
       player = new Player(new BufferedInputStream(
@@ -79,11 +87,14 @@ public class PlayThread extends Thread {
   }
 
   public void reject() {
-    if (madPlayer != null)
-      madPlayer.stop();
-    else    
+    if (externalPlayer.length() != 0) {
+      if (playerProcess != null)
+        playerProcess.destroy();
+    }
+    else {
       if (player != null)
         player.stop();
+    }
   }
 
   public void setRating(int rating) {
