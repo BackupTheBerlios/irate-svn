@@ -259,6 +259,12 @@ public class DownloadThread extends Thread {
     }
   }
 
+  /**
+   * Connects to the server, uploads the trackdatabase and requests
+   * new tracks to download.
+   *
+   * @param trackDatabase the trackdatabase that we work with.
+   */
   public void contactServer(TrackDatabase trackDatabase) {
     try {
       setState(getResourceString("DownloadThread.Connecting_to_server")); //$NON-NLS-1$
@@ -294,15 +300,20 @@ public class DownloadThread extends Thread {
 
       String errorCode = reply.getErrorCode();
 //if errorCode == "password" we can give a better prompt.
-System.out.println("DownloadThread.java:326: " + errorCode); //$NON-NLS-1$
-      if (errorCode.length() != 0)
+System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
+      if (errorCode.length() != 0) {
         handleError(errorCode, reply.getErrorURLString());
-      else//if no error incrmement serial
+        try {
+          Thread.sleep(90000); // Pause for 15 minutes before trying again.
+        } catch (InterruptedException e) {}
+      } else//if no error incrmement serial
         trackDatabase.incrementSerial();
-
     }
     catch (UnknownHostException uhe) {
       handleError("nohost", "hostnotfound.html"); //$NON-NLS-1$ //$NON-NLS-2$
+      try {
+        Thread.sleep(90000);
+      } catch (InterruptedException e) {}
     }
     catch (ConnectException ce) {
       if (ce.getMessage().equals("Connection timed out")) //$NON-NLS-1$
@@ -311,9 +322,15 @@ System.out.println("DownloadThread.java:326: " + errorCode); //$NON-NLS-1$
         handleError("connrefused", "connectionrefused.html"); //$NON-NLS-1$ //$NON-NLS-2$
       else
         handleError("conntimeout", "connectionfailed.html"); //$NON-NLS-1$ //$NON-NLS-2$
+      try {
+        Thread.sleep(90000);
+      } catch (InterruptedException e) {}
     }
     catch (IOException e) {
       e.printStackTrace();
+      try {
+        Thread.sleep(90000);
+      } catch (InterruptedException ie) {}
     }
   }
 
