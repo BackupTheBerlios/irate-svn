@@ -9,7 +9,7 @@ session_start();
  <title>iRATE web client</title>
 </head>
 <body>
-This is iRATE proof-of-concept web client. It was written to show how simple the new XMLRPC protocol is. Warning, it's very slow and hammers the iRATE server ! You must have cookies turned on. To use irate.jamendo.com, please use the account irate-test / password test (defaults). The server must have PEAR's XML/RPC.php (pear install -o XML_RPC)<br><br>
+This is iRATE proof-of-concept web client. It was written to show how simple the new XMLRPC protocol is. Warning, it's very slow and hammers the iRATE server ! You must have cookies turned on. To use irate.jamendo.com, please use the account irate-test / password test (defaults). The server must have PEAR's XML/RPC.php (pear install -o XML_RPC). <a href='webclient.php?logout=1'>Logout</a><br><br>
 <?
 
  //ask for login
