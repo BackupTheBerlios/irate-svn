@@ -11,7 +11,7 @@
         <pathelement path="lib/swt.jar"/>
         <pathelement path="lib/swt-pi.jar"/>
         <pathelement path="lib/skinlf.jar"/>
-        <pathelement path="lib/id3.jar"/>
+        <pathelement path="lib/jd3lib.jar"/>
       </classpath>
     </javac>
   </target>
