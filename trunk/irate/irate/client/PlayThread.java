@@ -218,6 +218,11 @@ public class PlayThread extends Thread {
   {
     return volumeMeister;
   }
+
+  public void setSpeechVolume(int volume)
+  {
+    speech.setVolume(volume);
+  }
   
   /** Automatically add up volume settings from different parts of the program
    * to give the net volume for the track.

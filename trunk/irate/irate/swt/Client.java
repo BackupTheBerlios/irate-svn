@@ -140,11 +140,20 @@ public class Client extends AbstractClient {
         shell.setMaximized(true);
     }
     
-    
-    String volumeLevel = Preferences.getUserPreference("volumeLevel");
-    if(volumeLevel != null) {
-      setVolumeSlider(new Integer(volumeLevel).intValue());
-      setPlayerVolume(getVolumeSlider());
+      // Set initial volume level in the player.  We have already set it on the volume
+      // slider widget when it was created.
+    String volumeLevelStr = Preferences.getUserPreference("volumeLevel");
+    if (volumeLevelStr != null) {
+      final int volumeLevel = Integer.parseInt(volumeLevelStr);
+      setPlayerVolume(volumeLevel);
+        // If we don't do this on the display thread, then - for some reason - it seems
+        // to set the slider in accordance with its default range rather than the range
+        // we have configured it with.
+      display.asyncExec(new Runnable() {
+        public void run() {
+          setVolumeSlider(volumeLevel);
+        }
+      });
     }
     
     shell.open();
@@ -855,7 +864,22 @@ public class Client extends AbstractClient {
           }
         }
       });
-    
+
+      // Add "Enable RoboJock" menu item if the system has festival installed.
+    if (playThread.isSpeechSupported()) {
+      MenuItem mRoboJock = new MenuItem(mSettings, SWT.CHECK);
+      skinManager.addItem(mRoboJock, "toolbar.menu_item.robojock");
+      mRoboJock.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.robojock")));
+      if (playListManager.getTrackDatabase().isRoboJockEnabled())
+        mRoboJock.setSelection(true);
+      mRoboJock.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          MenuItem self = (MenuItem) e.getSource();
+          playListManager.getTrackDatabase().setRoboJockEnabled(self.getSelection());
+        }
+      });
+    }
+
     /*Menu menuNewUnrated = new Menu(mNewUnrated);
     mNewUnrated.setMenu(menuNewUnrated);
 
@@ -1183,7 +1207,6 @@ public class Client extends AbstractClient {
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(2);
     volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
-    setVolumeSlider(0);
     volumeScale.setToolTipText(Resources.getString("slider.volume.tooltip"));
     volumeScale.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -1277,7 +1300,7 @@ public class Client extends AbstractClient {
     return volume;
   }
 
-  public void setVolumeSlider(int volume) {
+  public void setVolumeSlider(final int volume) {
     //System.out.println("setVolumeSlider: " + volume + " dB");
     if (isMac())
       volumeScale.setSelection((VOLUME_SPAN - VOLUME_OFFSET + volume) / VOLUME_RESOLUTION);

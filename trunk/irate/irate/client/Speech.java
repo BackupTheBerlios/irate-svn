@@ -3,6 +3,7 @@
 package irate.client;
 
 import java.io.*;
+import java.text.DecimalFormat;
 
 public class Speech {
 
@@ -11,6 +12,8 @@ public class Speech {
   private Process synthProcess;
   private InputStream is;
   private OutputStream os;
+  private int volumeOffset;
+  private boolean toSetVolume;
   
   public Speech() {
     supported = new File(synthPath).exists();
@@ -50,10 +53,11 @@ public class Speech {
           if (getch() == ' ')
             break;
 
-      festival("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt 4.0))))");
-      festival("(Parameter.set 'Duration_Stretch 1.5)");
+      toSetVolume = true;
     }
   }
+
+  private static DecimalFormat df = new DecimalFormat("0.0");
 
   private void festival(String s) throws IOException {
       // Do nothing if there's no speech executable.
@@ -63,24 +67,34 @@ public class Speech {
     try {
       startSynthProcess();
 
-      while (is.available() > 0)
-	getch();
-      
-  //    System.out.println(s);
-      os.write((s + "\n").getBytes());
-      os.flush();
-
-      while (true)
-	if (getch() == '>')
-	  if (getch() == ' ')
-	    break;
-     
-  //    System.out.println();
+      if (toSetVolume) {
+          // Convert the volume offset in decibels into an amplitude.
+        double amplitude = 4.0 * Math.pow(10.0, ((double) volumeOffset / 20.0));
+        String amplitudeStr = df.format(amplitude);
+        // System.out.println("vo="+volumeOffset+" - set speech amplitude to "+amplitudeStr);
+        doFestival("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt "+amplitudeStr+"))))");
+        doFestival("(Parameter.set 'Duration_Stretch 1.5)");
+        toSetVolume = false;
+      }
+      doFestival(s);
     }
     catch (IOException e) {
       abort();
       throw e;
     }
+  }
+
+  private void doFestival(String s) throws IOException {
+    while (is.available() > 0)
+      getch();
+    
+    os.write((s + "\n").getBytes());
+    os.flush();
+
+    while (true)
+      if (getch() == '>')
+        if (getch() == ' ')
+          break;
   }
 
   public synchronized void abort() {
@@ -95,5 +109,11 @@ public class Speech {
 	synthProcess = null;
       }
     }
+  }
+
+  public void setVolume(int volume)
+  {
+      Speech.volumeOffset = volume;
+      toSetVolume = true;
   }
 }

@@ -236,6 +236,7 @@ public abstract class AbstractClient
   
   public void setPlayerVolume(int volume) {
     playerVolume.setVolume(volume);
+    playThread.setSpeechVolume(volume);
   }
 
   public void setTrackVolume(int volume) {
