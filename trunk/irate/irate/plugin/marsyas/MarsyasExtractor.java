@@ -58,7 +58,7 @@ public class MarsyasExtractor extends Thread{
       wav.delete();
       
       try {
-        Process p = Runtime.getRuntime().exec(new String[]{"madplay","--mono","--sample-rate","22050","--output","wav:" + wav.getAbsolutePath(), track.getFile().getAbsolutePath()});
+        Process p = Runtime.getRuntime().exec(new String[]{"madplay","-Q","--mono","--sample-rate","22050","--output","wav:" + wav.getAbsolutePath(), track.getFile().getAbsolutePath()});
         int ret = p.waitFor();
         if(ret != 0) {
           dbg("Madplay failed to convert "+track + " with code "+ret);
