@@ -4,10 +4,8 @@ import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.InetAddress;
-import java.util.Hashtable;
 
 import irate.plugin.*;
-import irate.common.*;
 import nanoxml.*;
 
 /**
@@ -15,10 +13,10 @@ import nanoxml.*;
  * network socket.
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/09/21 14:34:04 $$
+ * Date Updated: $$Date: 2003/09/23 16:51:25 $$
  * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
- * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.10 $$
+ * @author Updated:	$$Author: ajones $$
+ * @version $$Revision: 1.11 $$
  */
 
 public class ExternalControlPlugin 

@@ -27,12 +27,12 @@ public class PlayerList {
       e.printStackTrace();
     }
 
-    try {
-      players.add(new ExternalPlayer("mpg123", new String[] { "mpg123", "/usr/bin/mpg123", "/usr/local/bin/mpg123" }));
-    }
-    catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
+//    try {
+//      players.add(new ExternalPlayer("mpg123", new String[] { "mpg123", "/usr/bin/mpg123", "/usr/local/bin/mpg123" }));
+//    }
+//    catch (FileNotFoundException e) {
+//      e.printStackTrace();
+//    }
     
     this.players = (Player[]) players.toArray(new Player[players.size()]);
   }
