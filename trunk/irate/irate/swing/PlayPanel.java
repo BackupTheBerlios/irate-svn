@@ -1,6 +1,10 @@
-package irate.client;
+package irate.swing;
 
-import irate.common.*;
+import irate.common.Track;
+import irate.common.TrackDatabase;
+import irate.common.UpdateListener;
+import irate.client.PlayListManager;
+import irate.client.PlayThread;
 
 import java.awt.*;
 import java.awt.event.*;

@@ -1,9 +1,10 @@
-package irate.client;
+package irate.swing;
 
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
 import irate.download.DownloadThread;
-import irate.download.DownloadPanel;
+import irate.client.PlayListManager;
+import irate.client.PlayThread;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -87,9 +88,9 @@ public class Client extends JFrame {
       }
     };
     downloadPanel = new DownloadPanel(downloadThread);
-    downloadThread.addActionListener(new ActionListener() {
+    downloadThread.addUpdateListener(new UpdateListener() {
       private String state = "";
-      public void actionPerformed(ActionEvent e) {
+      public void actionPerformed() {
         String state = downloadThread.getState();
         if (!state.equals(this.state)) {
           this.state = state;

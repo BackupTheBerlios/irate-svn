@@ -2,7 +2,7 @@
 
 <project name="iRATE radio" default="jar">
   <target name="compile">
-    <javac srcdir="." debug="true" debuglevel="lines,vars,source">
+    <javac srcdir="." debug="true" debuglevel="lines,vars,source" deprecation="true">
       <classpath>
         <pathelement path="lib/nanoxml-lite-2.2.3.jar"/>
         <pathelement path="lib/jl020.jar"/>

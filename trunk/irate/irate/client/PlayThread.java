@@ -1,11 +1,12 @@
 package irate.client;
 
+import irate.common.Track;
+import irate.common.TrackDatabase;
+import irate.common.UpdateListener;
+
 import java.io.*;
 import java.util.*;
 import javax.sound.sampled.*;
-//import javazoom.jl.decoder.BitstreamException;
-
-import irate.common.*;
 
 public class PlayThread extends Thread {
  
@@ -22,7 +23,7 @@ public class PlayThread extends Thread {
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
-    player = new JavaLayerPlayer();
+//    player = new JavaLayerPlayer();
     externalPlayer = "";
   }
 

@@ -1,6 +1,8 @@
 package irate.download;
 
-import irate.common.*;
+import irate.common.Track;
+import irate.common.TrackDatabase;
+import irate.common.UpdateListener;
 
 import java.awt.event.*;
 import java.io.*;
@@ -9,7 +11,7 @@ import java.util.*;
 
 public class DownloadThread extends Thread {
   
-  private Vector actionListeners = new Vector();
+  private Vector updateListeners = new Vector();
   private TrackDatabase trackDatabase;
   private Track currentTrack;
   private File downloadDir;
@@ -131,7 +133,7 @@ public class DownloadThread extends Thread {
             int percent = totalBytes * 100 / contentLength;
             if (percent != percentComplete) {
               percentComplete = percent;
-              notifyActionListeners();
+              notifyUpdateListeners();
             }
           }
         }
@@ -207,17 +209,17 @@ public class DownloadThread extends Thread {
 
   private void setState(String state) {
     this.state = state;
-    notifyActionListeners();
+    notifyUpdateListeners();
   }
   
-  public void addActionListener(ActionListener actionListener) {
-    actionListeners.add(actionListener);
+  public void addUpdateListener(UpdateListener updateListener) {
+    updateListeners.add(updateListener);
   }
   
-  private void notifyActionListeners() {
-    for (int i = 0; i < actionListeners.size(); i++) {
-      ActionListener actionListener = (ActionListener) actionListeners.elementAt(i);
-      actionListener.actionPerformed(null);
+  private void notifyUpdateListeners() {
+    for (int i = 0; i < updateListeners.size(); i++) {
+      UpdateListener updateListener = (UpdateListener) updateListeners.elementAt(i);
+      updateListener.actionPerformed();
     }
   }
   

@@ -1,4 +1,4 @@
-package irate.client;
+package irate.swing;
 
 import irate.common.*;
 

@@ -1,7 +1,8 @@
-package irate.client;
+package irate.swt;
 
 import irate.common.TrackDatabase;
 import irate.common.Track;
+import irate.client.*;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
@@ -9,7 +10,7 @@ import org.eclipse.swt.layout.*;
 import java.io.*;
 
 
-public class SWTClient {
+public class Client {
 	static Label lblTitle;
 	static Table tblSongs;
 	static Display display;
@@ -20,7 +21,7 @@ public class SWTClient {
  // private PlayThread playThread;
   
 	
-	public SWTClient() throws Exception {
+	public Client() throws Exception {
     initGUI();
     File file = new File("trackdatabase.xml");
     try {
@@ -155,7 +156,7 @@ public class SWTClient {
 	}
 
 	public static void main(String[] args) throws Exception{
-		new SWTClient().run();
+		new Client().run();
 	}
 }
 

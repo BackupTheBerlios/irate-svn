@@ -1,4 +1,7 @@
-package irate.download;
+package irate.swing;
+
+import irate.common.UpdateListener;
+import irate.download.DownloadThread;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -17,8 +20,8 @@ public class DownloadPanel extends JPanel {
     add(stateLabel, BorderLayout.CENTER);
     add(progressBar, BorderLayout.EAST);
 
-    downloadThread.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
+    downloadThread.addUpdateListener(new UpdateListener() {
+      public void actionPerformed() {
         update();
       }
     });

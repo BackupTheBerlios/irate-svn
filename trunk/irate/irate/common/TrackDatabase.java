@@ -228,12 +228,12 @@ public class TrackDatabase {
     if(docElt == null)
       create();
     docElt.parseFromReader(new InputStreamReader(is));
-    if (docElt.getTagName().equals(docElementName)) {
+    if (docElt.getName().equals(docElementName)) {
       Enumeration enum = docElt.enumerateChildren();
       while(enum.hasMoreElements())
       {
         XMLElement elt = (XMLElement)enum.nextElement();
-        if(!elt.getTagName().equals(trackElementName)) continue;
+        if(!elt.getName().equals(trackElementName)) continue;
         //System.out.println(elt.toString());
         Track track = new Track(elt);
         tracks.add(track);

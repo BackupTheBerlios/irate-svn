@@ -1,6 +1,9 @@
 All of the files except those in the lib directory are copyright by
-Anthony Jones <ajones@clear.net.nz> unless marked otherwise. The lib directory 
-contains files from other projects which are copyright their authors.
+Anthony Jones <ajones@clear.net.nz> unless marked otherwise. The lib 
+directory contains files from other projects which are copyright
+their authors. The file irate/client/JavaSoundAudioDevice.java is
+from the JavaLayer project and has been carefully tweaked up to add
+pause functionality.
 
 		    GNU GENERAL PUBLIC LICENSE
 		       Version 2, June 1991
