@@ -119,6 +119,7 @@ public class Client implements UpdateListener {
               progressBar.setSelection(n);
             }else
               lblState.setText(strState);            
+			lblState.pack();
           }
         });
       }
