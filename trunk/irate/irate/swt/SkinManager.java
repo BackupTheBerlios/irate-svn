@@ -104,6 +104,7 @@ public class SkinManager {
       }
 
       public void redraw() {
+          
       }
     }, name);
   }
@@ -179,7 +180,7 @@ public class SkinManager {
     public void pre() {
       String text = Resources.getString(name);
       skinable.setText(text);
-      String pressed = Resources.getString(name+".pressedText");
+      String pressed = Resources.getString(name+".pressed");
       skinable.setPressedText(pressed.startsWith("!") ? text : pressed);
       skinable.setToolTipText(Resources.getString(name + ".tooltip"));
       gotImage = false;
