@@ -22,8 +22,8 @@ public class PlayPanel extends JPanel {
     this.playListManager = playListManager;
     this.playThread = playThread;
     
-    playThread.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
+    playThread.addUpdateListener(new UpdateListener() {
+      public void actionPerformed() {
         update();
       }
     });

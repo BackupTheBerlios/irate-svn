@@ -1,6 +1,5 @@
 package irate.client;
 
-import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.sound.sampled.*;
@@ -14,7 +13,7 @@ public class PlayThread extends Thread {
   private Track nextTrack;
   private Player player;
   private PlayListManager playListManager;
-  private Vector actionListeners = new Vector();
+  private Vector updateListeners = new Vector();
   private Process playerProcess;
   private String externalPlayer;
   private Speech speech = new Speech();
@@ -85,7 +84,7 @@ public class PlayThread extends Thread {
       if (currentTrack != null) {
           // Work out which player we're planning to use
         externalPlayer = playListManager.getPlayList().getPlayer();
-        notifyActionListeners();
+        notifyUpdateListeners();
         File file = currentTrack.getFile();
         if (file.exists()) {
           if (speaking) {
@@ -166,14 +165,14 @@ public class PlayThread extends Thread {
     return externalPlayer.length() == 0;
   }
 
-  public void addActionListener(ActionListener actionListener) {
-    actionListeners.add(actionListener);
+  public void addUpdateListener(UpdateListener updateListener) {
+    updateListeners.add(updateListener);
   }
   
-  private void notifyActionListeners() {
-    for (int i = 0; i < actionListeners.size(); i++) {
-      ActionListener actionListener = (ActionListener) actionListeners.elementAt(i);
-      actionListener.actionPerformed(null);
+  private void notifyUpdateListeners() {
+    for (int i = 0; i < updateListeners.size(); i++) {
+      UpdateListener updateListener = (UpdateListener) updateListeners.elementAt(i);
+      updateListener.actionPerformed();
     }
   }
 }

@@ -1,6 +1,7 @@
 package irate.client;
 
 import irate.common.TrackDatabase;
+import irate.common.UpdateListener;
 import irate.download.DownloadThread;
 import irate.download.DownloadPanel;
 
@@ -96,8 +97,8 @@ public class Client extends JFrame {
         }
       }
     });
-    playThread.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
+    playThread.addUpdateListener(new UpdateListener() {
+      public void actionPerformed() {
         downloadThread.checkAutoDownload();
       }
     });
