@@ -186,6 +186,7 @@ public class PlayThread extends Thread {
   }
   
   public synchronized void setVolume(int volume) {
+  if ( currentTrack == null ) return;
     currentTrack.setVolume(volume);
     player.setVolume(volume);
   }
