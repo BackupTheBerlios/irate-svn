@@ -18,6 +18,8 @@ import java.util.*;
 import java.net.*;
 
 
+
+
 public class Client implements UpdateListener {
   static Label lblTitle;
   static Label lblState;
@@ -492,8 +494,8 @@ public class Client implements UpdateListener {
     Rectangle rec = shell.getBounds();
     rec.height = 300;
     shell.setBounds(rec);
-    Point p = progressBar.getSize();
-    lblState.setSize(rec.width - p.x-5, p.y);
+   // Point p = progressBar.getSize();
+    //lblState.setSize(rec.width - p.x-5, p.y);
     
     shell.open();
   }
@@ -504,8 +506,10 @@ public class Client implements UpdateListener {
     }		
   }
   
+  
   public static void main(String[] args) throws Exception{
-    new Client().run();
+	
+	new Client().run();
   }
 }
 
