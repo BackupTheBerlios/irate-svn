@@ -600,7 +600,7 @@ public class Client extends AbstractClient {
     MenuItem sep = new MenuItem(menu1, SWT.SEPARATOR);
     
     MenuItem play = new MenuItem(menu1, SWT.PUSH);
-    play.setText("Play/Pause");
+    skinManager.addItem(play, "toolbar.menu_item.play");
     play.setAccelerator(' ');
     play.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -609,7 +609,7 @@ public class Client extends AbstractClient {
     });
     
     MenuItem next = new MenuItem(menu1, SWT.PUSH);
-    next.setText("Next");
+    skinManager.addItem(next, "toolbar.menu_item.next");
     next.setAccelerator(SWT.ARROW_RIGHT + accel);
     next.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -618,7 +618,7 @@ public class Client extends AbstractClient {
     });
 
     MenuItem prev = new MenuItem(menu1, SWT.PUSH);
-    prev.setText("Previous");
+    skinManager.addItem(prev, "toolbar.menu_item.prev");
     prev.setAccelerator(SWT.ARROW_LEFT + accel);
     prev.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -1181,7 +1181,7 @@ public class Client extends AbstractClient {
     MenuItem sep = new MenuItem(trayMenu, SWT.SEPARATOR);
     
     MenuItem play = new MenuItem(trayMenu, SWT.PUSH);
-    play.setText("Play/Pause");
+    skinManager.addItem(play, "toolbar.menu_item.play");
     play.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         setPaused(!isPaused());
@@ -1189,7 +1189,7 @@ public class Client extends AbstractClient {
     });
     
     MenuItem next = new MenuItem(trayMenu, SWT.PUSH);
-    next.setText("Next");
+    skinManager.addItem(next, "toolbar.menu_item.next");
     next.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         skip(false);
@@ -1197,7 +1197,7 @@ public class Client extends AbstractClient {
     });
 
     MenuItem prev = new MenuItem(trayMenu, SWT.PUSH);
-    prev.setText("Previous");
+    skinManager.addItem(prev, "toolbar.menu_item.prev");
     prev.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         skip(true);
