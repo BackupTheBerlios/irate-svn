@@ -26,13 +26,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/26 14:32:04 $
+ * Date Updated: $Date: 2003/11/26 15:22:36 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.108 $
+ * @version $Revision: 1.109 $
  */
 public class Client extends AbstractClient {
 
@@ -348,7 +348,11 @@ public class Client extends AbstractClient {
       // try the Windows default.
       if (cmd == null || cmd.length() == 0) {
         try {
-          cmd = "kfmclient exec " + urlString;
+          // kfmclient doesn't like the first part of the protocol
+          // being encoded, and the search terms part have already
+          // been encoded, so we just use the straight URL given to
+          // us.
+          cmd = "kfmclient exec " + url;
           System.out.println(cmd);
           r.exec(cmd);
           return;
