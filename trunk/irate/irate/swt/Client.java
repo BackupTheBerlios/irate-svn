@@ -118,8 +118,35 @@ public class Client extends AbstractClient {
   public void run() {
     trackTable.updateTable();
     topPanel.layout();
+    
+
+    
     shell.layout();
+    
+    String length = Preferences.getUserPreference("shellLength");
+    String height = Preferences.getUserPreference("shellHeight");
+    if(length != null && height != null) {
+      shell.setSize(new Integer(length).intValue(),new Integer(height).intValue());
+    }
+    
+    String xLocation = Preferences.getUserPreference("shellX");
+    String yLocation = Preferences.getUserPreference("shellY");
+    
+    if(xLocation != null && yLocation != null) {
+        shell.setLocation(new Integer(xLocation).intValue(),new Integer(yLocation).intValue());
+      }
+    
+    String volumeLevel = Preferences.getUserPreference("volumeLevel");
+    if(volumeLevel != null) {
+       volumeScale.setSelection(new Integer(volumeLevel).intValue());
+    setPlayerVolume(
+            VOLUME_OFFSET - volumeScale.getSelection() * VOLUME_RESOLUTION);
+    }
+    
     shell.open();
+   
+
+    
     downloadThread.start();
     trackTable.addSelectionListener(new SelectionAdapter() {
         // Play track if the user double-clicks on it (or whatever the equivalent
@@ -136,9 +163,13 @@ public class Client extends AbstractClient {
     playThread.start();
     
     while (true) {
-      if (!display.readAndDispatch())
+      if (!display.readAndDispatch()) {
         display.sleep();
+      }
     }
+    
+   
+    
   }
 
 
@@ -466,6 +497,15 @@ public class Client extends AbstractClient {
     }
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
+        Point closingSize = shell.getSize();
+        Point closingLocation = shell.getLocation();
+        try {
+            Preferences.savePreferenceToFile("shellLength", new Integer(closingSize.x).toString());
+            Preferences.savePreferenceToFile("shellHeight", new Integer(closingSize.y).toString());  
+            Preferences.savePreferenceToFile("shellX",new Integer(closingLocation.x).toString());
+            Preferences.savePreferenceToFile("shellY",new Integer(closingLocation.y).toString());
+            Preferences.savePreferenceToFile("volumeLevel",new Integer(volumeScale.getSelection()).toString());
+        } catch (IOException io) {}
         quit();
       }
     });
