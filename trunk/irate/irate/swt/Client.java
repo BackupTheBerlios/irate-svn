@@ -343,8 +343,12 @@ public class Client extends AbstractClient {
     shell = new Shell(display);
     shell.setText(Resources.getString("titlebar.program_name"));
 
-    shell.setImage(Resources.getIconImage(display));
-    shell.addShellListener(new ShellAdapter() {
+    try {
+      shell.setImage(Resources.getIconImage(display));
+    } catch(Exception e) {
+      System.out.println("Couldn't load the silly Icon");
+    }
+      shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
         quit();
       }
