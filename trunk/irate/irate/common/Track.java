@@ -2,6 +2,8 @@ package irate.common;
 
 import java.io.*;
 import java.net.*;
+import java.text.*;
+import java.util.*;
 import org.w3c.dom.*;
 
 public class Track {
@@ -70,13 +72,19 @@ public class Track {
   public void incNoOfTimesPlayed() {
     synchronized (this) {
       elt.setAttribute("played", Integer.toString(getNoOfTimesPlayed() + 1));
+      elt.setAttribute("last", new SimpleDateFormat().format(new Date()));
     }
   }
 
   public void unSetNoOfTimesPlayed() {
     synchronized (this) {
       elt.setAttribute("played", "");
+      elt.setAttribute("last", "");
     }
+  }
+
+  public String getLastPlayed() {
+    return elt.getAttribute("last");
   }
 
   public void setRating(float rating) {

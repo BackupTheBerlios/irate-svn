@@ -3,6 +3,7 @@ package irate.client;
 import irate.common.*;
 
 import java.awt.event.*;
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.event.*;
@@ -10,7 +11,7 @@ import javax.swing.table.*;
 
 public class TrackTable implements TableModel {
 
-  private final String[] columnName = new String[] { "Artist", "Track", "Rating", "Plays" };
+  private final String[] columnName = new String[] { "Artist", "Track", "Rating", "Plays", "Last" };
   private Track[] tracks;
   private Vector listeners;
   private PlayListManager playListManager;
@@ -30,7 +31,9 @@ public class TrackTable implements TableModel {
   }
   
   public synchronized void notifyListeners() {
-    tracks = playListManager.getPlayList().getTracks();
+    TrackDatabase td = playListManager.getPlayList();
+    td.sort();
+    tracks = td.getTracks();
     for (int i = 0; i < listeners.size(); i++) 
       ((TableModelListener) listeners.elementAt(i)).tableChanged(new TableModelEvent(this));
   }
@@ -57,11 +60,16 @@ public class TrackTable implements TableModel {
       case 0: return track.getArtist();
       case 1: return track.getTitle();
       case 2: 
+        File file = track.getFile();
+        if (file == null)
+          return "Not downloaded";
+        if (!file.exists())
+          return "Missing";
         if (track.isRated())
           return Integer.toString((int) track.getRating());
         return "Unrated";
       case 3: return Integer.toString(track.getNoOfTimesPlayed());
-      case 4: return "-";
+      case 4: return track.getLastPlayed();
     }
     return "?";
   }

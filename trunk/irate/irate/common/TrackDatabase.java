@@ -70,26 +70,32 @@ public class TrackDatabase {
   }
 
   public Track add(Track track) {
-    Track copy;
-    if ((copy = getTrack(track)) == null) {
-      copy = new Track((Element) doc.importNode(track.getElement(), false));
-      docElt.appendChild(copy.getElement());
-      tracks.add(copy);
-      hash.put(copy.getKey(), copy);
+    synchronized (this) {
+      Track copy;
+      if ((copy = getTrack(track)) == null) {
+        copy = new Track((Element) doc.importNode(track.getElement(), false));
+        docElt.appendChild(copy.getElement());
+        tracks.add(copy);
+        hash.put(copy.getKey(), copy);
+      }
+      return copy;
     }
-    return copy;
   }
 
   public void remove(Track track) {
-    docElt.removeChild(track.getElement());
-    tracks.remove(track);
-    hash.remove(track.getKey());
+    synchronized (this) {
+      docElt.removeChild(track.getElement());
+      tracks.remove(track);
+      hash.remove(track.getKey());
+    }
   }
   
   public Track[] getTracks() {
-    Track[] tracks = new Track[this.tracks.size()];
-    this.tracks.toArray(tracks);
-    return tracks;
+    synchronized (this) {
+      Track[] tracks = new Track[this.tracks.size()];
+      this.tracks.toArray(tracks);
+      return tracks;
+    }
   }
 
   public int getNoOfTracks() {
@@ -161,6 +167,17 @@ public class TrackDatabase {
   public void setPort(int port) {
     setAttribute(userElementName, "port", Integer.toString(port));
   }
+  
+  public boolean isRoboJockEnabled() {
+    String s = getAttribute("RoboJock", "enabled").toLowerCase();
+    if (s.equals("true") || s.equals("yes"))
+      return true;
+    return false;
+  }
+
+  public void setRoboJockEnabled(boolean enabled) {
+    setAttribute("RoboJock", "enabled", enabled ? "yes" : "no");
+  }
 
   public void setFile(File file) {
     this.file = file;
@@ -197,13 +214,15 @@ public class TrackDatabase {
   }
 
   public void save() throws IOException {
-    FileWriter fw = null;
-    try {
-      fw = new FileWriter(file);
-      fw.write(toString());
-    }
-    finally {
-      if (fw != null) try { fw.close(); } catch (IOException e) { e.printStackTrace(); }
+    synchronized (this) {
+      FileWriter fw = null;
+      try {
+        fw = new FileWriter(file);
+        fw.write(toString());
+      }
+      finally {
+        if (fw != null) try { fw.close(); } catch (IOException e) { e.printStackTrace(); }
+      }
     }
   }
 
@@ -276,6 +295,30 @@ public class TrackDatabase {
       for (int i = 0; i < tracks.length; i++) 
         if (rand <= probs[i])
           return tracks[i];
+    }
+  }
+
+  private int compare(Track track0, Track track1) {
+    return track0.getName().compareTo(track1.getName());
+  }
+
+    /** A nice ol' bubble sort. This is used because it has a passable 
+     * performance when the list starts off sorted. */
+  public void sort() {
+    synchronized (this) {
+      boolean swap;
+      do {
+        swap = false;
+        for (int i = 1; i < tracks.size(); i++) {
+          Track lastTrack = (Track) tracks.elementAt(i - 1);
+          Track track = (Track) tracks.elementAt(i);
+          if (compare(lastTrack, track) > 0) {
+            tracks.setElementAt(track, i - 1);
+            tracks.setElementAt(lastTrack, i);
+            swap = true;
+          }
+        }
+      } while (swap);
     }
   }
   

@@ -16,12 +16,17 @@ public class PlayThread extends Thread {
   private Process playerProcess;
   private String externalPlayer;
   private String[] possiblePlayers = new String[] { "/usr/bin/mpg123", "madplay.exe" };
+  private Speech speech = new Speech();
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
     for (int i = 0; i < possiblePlayers.length; i++)
       if (new File(possiblePlayers[i]).exists())
         externalPlayer = possiblePlayers[i];
+  }
+
+  public boolean isSpeechSupported() {
+    return speech.isSupported();
   }
 
   public void run() {
@@ -65,6 +70,14 @@ public class PlayThread extends Thread {
         notifyActionListeners();
         File file = currentTrack.getFile();
         if (file.exists()) {
+          if (playListManager.getPlayList().isRoboJockEnabled()) {
+            try {
+              speech.say((currentTrack.isRated() ? "" : "Unrated. ") + currentTrack.getTitle() + " by " + currentTrack.getArtist());
+            }
+            catch (Exception e) {
+              e.printStackTrace();
+            }
+          }
           playFile(file);
           currentTrack.incNoOfTimesPlayed();
         }

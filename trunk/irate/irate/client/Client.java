@@ -41,12 +41,10 @@ public class Client extends JFrame {
     setTitle("iRATE radio");
 
     setSize(600, 400);
-    setJMenuBar(createMenuBar());
   
     File file = new File("trackdatabase.xml");
     try {
       trackDatabase = new TrackDatabase(file);
-      perhapsDisableAccount();
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -103,6 +101,8 @@ public class Client extends JFrame {
         actionClose();
       }
     });
+
+    setJMenuBar(createMenuBar());
   }
 
   /** Disable the 'Account' settings if the number of tracks is non-zero.
@@ -170,6 +170,18 @@ public class Client extends JFrame {
       }
     });
     m.add(menuItemAccount);
+    perhapsDisableAccount();
+
+    final JCheckBoxMenuItem roboJock = new JCheckBoxMenuItem("Enable RoboJock");
+    roboJock.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        trackDatabase.setRoboJockEnabled(roboJock.getState());
+      }
+    });
+    roboJock.setState(trackDatabase.isRoboJockEnabled());
+    roboJock.setEnabled(playThread.isSpeechSupported());
+    m.add(roboJock);
+    
     return m;
   }
 
