@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
@@ -33,6 +34,7 @@ public class MarsyasSimilaritySearch extends Thread  {
   private Track selectedTrack;
   private MarsyasPlugin plugin;
   private MarsyasResultDialog resultDialog = null;
+  
   /**
    * @param plugin
    * @param tracks
@@ -75,43 +77,31 @@ public class MarsyasSimilaritySearch extends Thread  {
     Collections.sort(al);
     
     resultDialog = new MarsyasResultDialog(plugin, selectedTrack, al.subList(0,10));
-    //start();
+    start();
   }
   
   /** most inefficient string escape ever */
   private String escape(String str) {
-    int i = str.indexOf('"');
-    if(i==-1)
-      return str;
-    
-    return str.substring(0,i)+"\""+escape(str.substring(i+1));
+    return URLEncoder.encode(str);
   }
   
   /** do the remote track comparison in a thread */
   public void run() {
     StringBuffer sb = new StringBuffer();
+    sb.append(""+tracks.length+"\n");
     for (int i = 0; i < tracks.length; i++) {
-      sb.append('"');
       sb.append(escape(tracks[i].getURL().toString()));
-      sb.append('"');
       sb.append(',');
-      sb.append('"');
-      sb.append(escape(tracks[i].getCopyrightInfo()));
-      sb.append('"');
-      sb.append(',');
-      sb.append('"');
-      sb.append(escape(tracks[i].getArtist()));
-      sb.append('"');
-      sb.append(',');
-      sb.append('"');
-      sb.append(escape(tracks[i].getTitle()));
-      sb.append('"');
-      sb.append(',');
-      sb.append('"');
       sb.append(escape(tracks[i].getProperty("marsyas")));
-      sb.append('"');
-      sb.append("\r\n");
+      sb.append(',');
+      sb.append(escape(tracks[i].getCopyrightInfo()));
+      sb.append(',');
+      sb.append(escape(tracks[i].getArtist()));
+      sb.append(',');
+      sb.append(escape(tracks[i].getTitle()));
+      sb.append("\n");
     }
+    
     URL url = null;
     try {
        url = new URL("http://glek.net/cgi-bin/similar.pl?query="+selectedTrack.getURL());
