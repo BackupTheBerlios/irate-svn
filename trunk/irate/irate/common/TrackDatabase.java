@@ -389,7 +389,7 @@ public class TrackDatabase {
       float[] probs = new float[tracks.length]; 
 
         // Choose a minimum probability
-      float minRating = MAX_RATING * Math.abs(random.nextFloat());
+      float minRating = (MAX_RATING - 2) * Math.abs(random.nextFloat());
     
       float totalProb = 0;
       for (int i = 0; i < tracks.length; i++) {
