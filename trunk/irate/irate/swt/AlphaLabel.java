@@ -5,6 +5,7 @@ package irate.swt;
 
 import java.util.Hashtable;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
@@ -107,21 +108,26 @@ public class AlphaLabel extends Canvas implements Skinable {
         // worrying about updating the image.
         if (bounds.width == 0 || bounds.height == 0)
         	return;
-         
+
+     
+        
         newImage = new Image(label.getDisplay(), bounds.width, bounds.height);
         gc = new GC(newImage);
         gc.setBackground(getBackground());
         gc.fillRectangle(0, 0, bounds.width, bounds.height);
+        gc.drawText(text, 0, 0, true);
+        gc.dispose();
+        ImageData newImageData = newImage.getImageData();
+        newImageData.transparentPixel = newImageData.palette.getPixel(getBackground().getRGB());
+        newImage.dispose();
+        newImage = new Image(label.getDisplay(), newImageData);
       }
       else {
         newImage = new Image(label.getDisplay(), backgroundData);
         gc = new GC(newImage);
+        gc.drawText(text, 0, 0, true);
+        gc.dispose();
       }
-      
-      /* Draw the text onto it. */
-      gc.drawText(text, 0, 0, true);
-      gc.dispose();
-      // System.out.println("Text: " + text);
     }
     else {
       ImageData mergedImageData;
