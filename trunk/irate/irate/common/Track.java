@@ -413,8 +413,9 @@ public class Track implements TrackDetails {
   }
   
   public boolean isOnPlayList() {
-    float rating = getRating();
-    return rating != 0 && (getNoOfTimesPlayed() % rating) != 0;      
+    int rating = Math.round(getRating());
+    int mod = (getNoOfTimesPlayed() % rating);
+    return rating != 0 && mod != 0 && mod != (rating / 2);
   }
 
   public float getProbability() {
