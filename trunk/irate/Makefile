@@ -98,11 +98,11 @@ ifdef NO_RESOURCE
 	install irate-client-resource.sh $(BIN)/irate-client
 	install -d $(RES)/irate/
 	install -d $(RES)/irate/common/
-	install irate/common/locale.properties $(RES)/irate/common/
+	install irate/common/locale*.properties $(RES)/irate/common/
 	install -d $(RES)/irate/download/
-	install irate/download/locale.properties $(RES)/irate/download/
+	install irate/download/locale*.properties $(RES)/irate/download/
 	install -d $(RES)/irate/swt/
-	install irate/swt/locale.properties $(RES)/irate/swt/
+	install irate/swt/locale*.properties $(RES)/irate/swt/
 	install -d $(RES)/irate/resources/
 	install irate/resources/*.gif $(RES)/irate/resources/
 else
