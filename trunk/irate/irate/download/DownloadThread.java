@@ -494,7 +494,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
       // This doesn't work - (When % unrated on playlist is not zero, it never downloads.)
     //if (noOfRated > noOfUnrated / 2 && noOfUnrated < noOfUnratedOnPlaylist)
       // Replaced it with this, which at least does work:
-      if (noOfRated > noOfUnrated / 2 && noOfUnrated >= 5)
+      if (noOfUnrated >= 5)
         setState(noOfUnrated + (noOfUnrated == 1 ? getResourceString("DownloadThread.unrated_track") : getResourceString("DownloadThread.unrated_tracks")));
       else
         go();
