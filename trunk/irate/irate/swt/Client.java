@@ -45,6 +45,7 @@ public class Client extends AbstractClient {
   private Composite topPanel;
   private Composite bottomPanel;
   private AlphaLabel lblState;
+  private String lastStatusMessage = null;
   private Display display;;
   private Shell shell;
   private AlphaLabel trackLabel;
@@ -224,7 +225,10 @@ public class Client extends AbstractClient {
         String text = getHighestPriorityStatusMessage();
         if (text == null)
           text = "";
-        lblState.setText(text);
+        if (lastStatusMessage == null || !lastStatusMessage.equals(text)) {
+          lastStatusMessage = text;
+          lblState.setText(text);
+        }
       }
     });
   }
@@ -1075,6 +1079,7 @@ public class Client extends AbstractClient {
       this.str = str;
     }
     public void widgetArmed(ArmEvent e) {
+      lastStatusMessage = null;
       lblState.setText(str);
     }
   }
