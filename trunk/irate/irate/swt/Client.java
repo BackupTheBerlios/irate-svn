@@ -1095,7 +1095,7 @@ public class Client extends AbstractClient {
     
     volumeScale = new Scale(topPanel, SWT.VERTICAL | SWT.FLAT);
     volumeScale.setIncrement(1);
-    volumeScale.setPageIncrement(1);
+    volumeScale.setPageIncrement(2);
     volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
     volumeScale.setSelection(VOLUME_OFFSET / VOLUME_RESOLUTION);
     volumeScale.setToolTipText(Resources.getString("slider.volume.tooltip"));
@@ -1105,9 +1105,9 @@ public class Client extends AbstractClient {
           VOLUME_OFFSET - volumeScale.getSelection() * VOLUME_RESOLUTION);
       }
     });
-//    gridData = new GridData();
-//    gridData.horizontalSpan = 3;
-//    volumeScale.setLayoutData(gridData);
+    gridData = new GridData();
+    gridData.heightHint = 75;
+    volumeScale.setLayoutData(gridData);
     
     //songProgressBar = new TrackProgressBar(shell, SWT.NONE);
   }
