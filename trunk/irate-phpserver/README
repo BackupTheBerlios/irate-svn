@@ -22,9 +22,17 @@ Currently, we only tested it with MySQL, but it should work
 with other databases as well.
 
 You need to create a database, and import the database scheme in 
-the file setup.sql
+the file setup.sql. To do so, you have to do somethin like :
 
-Then edit config.php
+irate-phpserver/# mysql -u root -p
+password:
+> create database irate;
+> use irate;
+> source setup.sql;
+> exit;
+
+
+Then edit config.php, and fix the DSN with your database password.
 
 Then log in as admin to create the admin account.
 
@@ -38,7 +46,7 @@ Client : GET http://irate.server.org/?u=myuser&p=mypass
 
 "u=myuser&p=mypass" : The client connects with login/pass : myuser/mypass . If the user "myuser" doesn't exists, it'll be automatically created with the given password.
 
-After the first login, the client will only send a hash of this password to the server.
+After the first login, the client can only send a hash of this password to the server.
 
 ! Computing the hash
 
