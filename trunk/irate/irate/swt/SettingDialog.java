@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/01/14 03:47:23 $
+ * Date Updated: $Date: 2004/02/09 05:25:17 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.18 $
+ * @version $Revision: 1.19 $
  */
 public class SettingDialog
 {
@@ -191,7 +191,11 @@ public class SettingDialog
                         getResourceString("SettingDialog.Button.Browser.Tooltip.Konqueror")),  
       new BrowserButton(getResourceString("SettingDialog.Button.Browser.WindowsDefault"), 
                         "rundll32 url.dll,FileProtocolHandler", 
-                        getResourceString("SettingDialog.Button.Browser.Tooltip.WindowsDefault"))}; 
+                        getResourceString("SettingDialog.Button.Browser.Tooltip.WindowsDefault")),
+      new BrowserButton(getResourceString("SettingDialog.Button.Browser.MacOSXDefault"), 
+                        "open", 
+                        getResourceString("SettingDialog.Button.Browser.Tooltip.MacOSXDefault")),
+    }; 
 
     final Button browserSpecified = new Button(comp, SWT.RADIO);
     final Text browserText = new Text(comp, SWT.NONE);
