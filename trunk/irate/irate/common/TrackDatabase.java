@@ -19,6 +19,7 @@ public class TrackDatabase {
   private TreeSet tracks;
   private Hashtable hash;
   private File file;
+  private File downloadDir;
   private XMLElement docElt;
     
   public TrackDatabase() {
@@ -72,7 +73,7 @@ public class TrackDatabase {
     synchronized (this) {
       Track copy;
       if ((copy = getTrack(track)) == null) {
-        copy = new Track((XMLElement) track.getElement());
+        copy = new Track(track);
         docElt.addChild(copy.getElement());
         tracks.add(copy);
         hash.put(copy.getKey(), copy);
@@ -248,6 +249,7 @@ public class TrackDatabase {
 
   public void load(File file) throws IOException {
     this.file = file;
+    this.downloadDir = new File(file.getParent(), "download");
     load(new FileInputStream(file));
   }
       
@@ -255,13 +257,14 @@ public class TrackDatabase {
     if(docElt == null)
       create();
     docElt.parseFromReader(new InputStreamReader(is));
+    
     if (docElt.getName().equals(docElementName)) {
       Enumeration enum = docElt.enumerateChildren();
       while(enum.hasMoreElements()) {
         XMLElement elt = (XMLElement)enum.nextElement();
         if(!elt.getName().equals(trackElementName)) continue;
         //System.out.println(elt.toString());
-        Track track = new Track(elt);
+        Track track = new Track(elt, downloadDir);
         tracks.add(track);
         //System.out.println("key="+track.getKey());
         hash.put(track.getKey(), track);

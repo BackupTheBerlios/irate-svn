@@ -40,7 +40,17 @@ public class Client implements UpdateListener {
   
   public Client() {
 
-    File file = new File("trackdatabase.xml");
+    File home = new File(System.getProperties().getProperty("user.home"));
+
+      // Check the current directory for an existing trackdatabase.xml for
+      // compatibility reasons only.    
+    File file = new File("trackdatabase.xml");    
+    if (!file.exists()) {
+      File dir = new File(home, "irate");
+      if (!dir.exists())
+        dir.mkdir();
+      file = new File(dir, "trackdatabase.xml");
+    }
   
     try {
       trackDatabase = new TrackDatabase(file);

@@ -14,11 +14,17 @@ public class Track {
   private final int INITIAL_RATING = 10;
   
   private XMLElement elt;
+  private File dir;
   
-  public Track(XMLElement elt) {
+  public Track(XMLElement elt, File dir) {
     this.elt = elt;
+    this.dir = dir;
   }
-
+  
+  public Track(Track track) {
+    this((XMLElement) track.getElement(), track.dir);
+  }
+  
   public String toString() {
     String ratingStr = getState();
     String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ")";
@@ -219,7 +225,11 @@ public class Track {
         return new File(url.getFile());
       return null;
     }
-    return new File(filename); 
+    String separator = System.getProperties().getProperty("file.separator");
+    int index = filename.lastIndexOf(separator);
+    if (index >= 0)
+      filename = filename.substring(index + 1);
+    return new File(dir, filename); 
   }
 
   public void setFile(File file) {
