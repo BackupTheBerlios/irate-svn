@@ -77,6 +77,7 @@ public class DownloadThread extends Thread {
   }
 
   private boolean downloadSinglePending() throws IOException {
+    boolean success = false;
     Track[] tracks = trackDatabase.getTracks();
     for (int i = 0; i < tracks.length; i++) {
       currentTrack = tracks[i];
@@ -89,9 +90,7 @@ public class DownloadThread extends Thread {
               trackDatabase.save();
             }
             download(currentTrack);
-
-              // We've successfully downloaded a track.
-            return true;
+            success = true;
           }
           catch (IOException e) {
             e.printStackTrace();
@@ -99,7 +98,7 @@ public class DownloadThread extends Thread {
         }
       }
     }
-    return false;
+    return success;
   }
 
   public void process() throws IOException {

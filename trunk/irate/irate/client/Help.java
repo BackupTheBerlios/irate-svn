@@ -64,5 +64,6 @@ public class Help {
     add("help/password.txt", "The password you have entered is incorrect.");
     add("help/user.txt", "You have tried to create a user account with an invalid user name or password.\n" 
         + "Perhaps either the user name or password is blank.");
+    add("help/notenoughratings.txt", "You have not rated enough tracks for the server to recognise your tastes.");
   }
 }
