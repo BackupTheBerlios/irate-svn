@@ -201,10 +201,15 @@ public class Client extends AbstractClient {
     });
   }
 
-  public void updateTrack(Track track) {
-    // Update the SWT GUI
-    trackTable.updateTrack(track);
-    update();
+  public void updateTrack(final Track track) {
+    // This needs to use asyncExec because it is called by the plugin interface.
+    display.asyncExec(new Runnable() {
+      public void run() {
+        // Update the SWT GUI
+        trackTable.updateTrack(track);
+        update();
+      }
+    });
   }
 
   public void update() {

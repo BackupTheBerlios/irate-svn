@@ -16,7 +16,7 @@ public class Help {
   
 	public Help()
   {
-    add("help/about.txt", "iRATE radio 0.3rc2 http://irate.sourceforge.net\n"
+    add("help/about.txt", "iRATE radio 0.3rc3 http://irate.sourceforge.net\n"
         + "\n"
         + "Written by Anthony Jones <ajones@clear.net.nz>. Many thanks to Taras Glek for\n"
         + "SWT client, GCJ compilation, nanoxml library. Thanks to Stephen Blackheath for\n"
