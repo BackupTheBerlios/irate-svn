@@ -88,7 +88,7 @@ class View : public KMainWindow {
 		void rateLove();
 		void downloadMessage(const QString& message);
 		void totalDownloadSpeed(const QString& speed);
-		void OSDLinkClicked();
+		void OSDLinkClicked(const QString& url);
 	signals:
 		void hidden();
 		void shown();	

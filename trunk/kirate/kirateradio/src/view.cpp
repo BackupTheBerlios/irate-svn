@@ -154,7 +154,7 @@ View::View(IratePlugin *): KMainWindow(0,0) {
 	//this->m_osd->setDuration(0);
 	//this->m_osd->setIcon(KGlobal::iconLoader()->loadIcon("irate",KIcon::User,0,KIcon::ActiveState,0,false));
 	this->osdMode=1;
-	//connect(this->m_osd,SIGNAL(linkActivated()),this,SLOT(OSDLinkClicked()));
+	connect(this->m_osd,SIGNAL(linkActivated(const QString&)),this,SLOT(OSDLinkClicked(const QString&)));
 }
 
 
@@ -192,14 +192,14 @@ void View::init() {
 	*/
 	select->setCarePlayed(true);
 	select->setMinRating(0);
-	select->setUnratedWeight(15);
+	select->setUnratedWeight(10);
 	select->setUseExp(false);
 	select->setUseSqrtPlayed(false);
 	this->list->setShowPassivePopup(config->readBoolEntry("show_passive",true));
 	this->list->setAllowConnect(config->readBoolEntry("allow_connect",true));
 	QFont ft=config->readFontEntry("display_font");
 	this->list->setFont(ft);
-	this->list->init(config->readPathEntry("irate_directory",QString::null));//user.homeDir()+"/irate/");
+	this->list->init();//user.homeDir()+"/irate/");
 	//Needed since list->init change it
 	config->setGroup("irate");
 	Template::instance()->init(list->getTD()->getIRateDir()+"templates/",KGlobal::instance()->dirs()->findResourceDir("data","noatun/pics/irate.png")+"noatun/pics/");
@@ -362,10 +362,18 @@ void View::downloadMessage(const QString& /*message*/){
 void View::totalDownloadSpeed(const QString& speed){
 	this->statusBar()->changeItem(i18n("Total speed %1").arg(speed),1);
 }
-void View::OSDLinkClicked(){
-	SafeListViewItem *i = static_cast<SafeListViewItem*>(IratePlugin::SPL()->current().data());//this->m_osd->linkData();
-	this->ktb->setText(Template::instance()->infoTemplate(i),i18n("[%1] - %2").arg(i->property("artist")).arg(i->property("title")));
-	this->ktb->show();
+void View::OSDLinkClicked(const QString& url){
+	if(url=="info"){
+		SafeListViewItem *i = static_cast<SafeListViewItem*>(IratePlugin::SPL()->current().data());//this->m_osd->linkData();
+		this->ktb->setText(Template::instance()->infoTemplate(i),i18n("[%1] - %2").arg(i->property("artist")).arg(i->property("title")));
+		this->ktb->show();
+	}
+	else if(url=="next"){
+		this->noa_for->activate();
+	}
+	else if(url=="back"){
+		this->noa_back->activate();
+	}
 }
 #include "viewdeleteddialog.h"
 void View::showDeleted(){

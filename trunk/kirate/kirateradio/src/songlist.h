@@ -47,7 +47,7 @@ class SongList : public KListView/*, public DownloadListener*/{
 	public:
 		SongList(View *parent);
 		virtual ~SongList();
-		void init(const QString &irateDir);
+		void init();
 		PlaylistItem next();
 		PlaylistItem previous();
 		/*void addToRemoveList(SafeListViewItem* i){

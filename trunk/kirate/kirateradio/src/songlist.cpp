@@ -32,6 +32,8 @@
 #include <kdialogbase.h>
 #include <kfiledialog.h>
 #include <qheader.h>
+#include <kuser.h>
+#include <qregexp.h>
 #include "template.h"
 
 SongList::SongList(View *parent): KListView(parent)/*,DownloadListener() */{
@@ -49,6 +51,7 @@ SongList::SongList(View *parent): KListView(parent)/*,DownloadListener() */{
 	addColumn(i18n("Download"));
 	//addColumn(i18n("Probs"));
 	this->nextToRemove=0;
+	this->noUnrated=0;
 	//this->setShowSortIndicator(true);
 	this->setColumnAlignment(2,Qt::AlignCenter);
 	this->setColumnAlignment(3,Qt::AlignCenter);
@@ -132,8 +135,8 @@ SongList::~SongList() {
 	//KMessageBox::information(0,"TrackDb deleted","Start",QString::null,KMessageBox::AllowLink);
 }
 //The methods where too much things are TODO clean it
-void SongList::init(const QString &startDir) {
-	QString irateDir=startDir;
+void SongList::init() {
+	/*QString irateDir=startDir;
 	this->noUnrated=0;
 	//QFileInfo ifile(irateDir+"trackdatabase.xml");
 	if(!irateDir.isEmpty()&&!irateDir.endsWith("/")) {
@@ -156,14 +159,58 @@ void SongList::init(const QString &startDir) {
 		//printf("Finished constructor \n");
 		initplaylist=true;
 
-	} else {
-		QString newIrateDir;
-		int ret=KMessageBox::questionYesNo(this->getMainView(),i18n("Hi!\n\n Seems like it's the first time your running this plugin. So welcome and enjoy!\n\nIn order to use iRate Radio you need to have an account on the server.\n\nHave you already an account ?"),i18n("Create Account"), i18n("I have an account"),i18n("Create a new account"));
+	} else {*/
+		
+		bool initplaylist=false;
+		KUser user;
+		bool irateDirFounded=false;
+		QString irateDir;
+		//Check for an existing irate dir
+		
+		td= new TrackDatabase(irateDir,this,"TrackDatabase");
+		connect(td,SIGNAL(trackAdded(TrackInfo* )),this,SLOT(addTrack(TrackInfo* )));
+		connect(td,SIGNAL(serverError(QString, QString )),this,SLOT(serverError(QString, QString )));
+		
+		if(QFile::exists(user.homeDir()+"/irate/irate.xml")){
+			QFile firate(user.homeDir()+"/irate/irate.xml");
+			if(firate.open(IO_ReadOnly)){
+				QRegExp irExp("<preference\\s+id=\"downloadDir\">([^<]*)</preference>");
+				QString irContent(firate.readAll());
+				kdDebug()<<irContent<<endl;
+				irExp.search(irContent,0);
+				if(irExp.numCaptures()>0){
+					kdDebug()<<irExp.cap(0)<<irExp.cap(1)<<endl;
+					if(QFile::exists(irExp.cap(1))){
+						irateDirFounded=true;
+						//newIrateDir= irExp.cap(1);
+						QFileInfo tdFileInfo(KStandardDirs::realPath(irExp.cap(1)));
+						/*kdDebug()<<"Irate directory "<<KStandardDirs::realPath(tdFileInfo.dirPath(TRUE))<<" Selected "<<newIrateDir<<endl;*/
+						irateDir=tdFileInfo.dirPath(TRUE);
+						if(!irateDir.endsWith("/")) {
+							irateDir+='/';
+						}
+						td->setIRateDir(irateDir);
+						kdDebug()<<"Irate directory "<<td->getIRateDir()<<" Selected "<<irateDir<<endl;
+						/*KConfig* config=KGlobal::config();
+						config->setGroup("irate");
+						config->writePathEntry("irate_directory",td->getIRateDir());*/
+						//irateDir=td->getIRateDir();
+						QFile tdFile(irateDir+"trackdatabase.xml");
+						//kdDebug()<<"File "<<tdFile.name()<<" "<<tdFile.exists()<<endl;
+						QXmlInputSource source(&tdFile);
+						td->processXML(&source);
+						initplaylist=true;
+					}
+				}
+			}
+		}
+		
+		/*int ret=KMessageBox::questionYesNo(this->getMainView(),i18n("Hi!\n\n Seems like it's the first time your running this plugin. So welcome and enjoy!\n\nIn order to use iRate Radio you need to have an account on the server.\n\nHave you already an account ?"),i18n("Create Account"), i18n("I have an account"),i18n("Create a new account"));
 		if(ret ==KMessageBox::Yes) {
 			newIrateDir=KFileDialog::getOpenFileName(QString::null,"trackdatabase.xml|iRate account (trackdatabase.xml)",this->getMainView());
 			if(!newIrateDir.isEmpty()) {
 				QFileInfo tdFileInfo(KStandardDirs::realPath(newIrateDir));
-				/*kdDebug()<<"Irate directory "<<KStandardDirs::realPath(tdFileInfo.dirPath(TRUE))<<" Selected "<<newIrateDir<<endl;*/
+				kdDebug()<<"Irate directory "<<KStandardDirs::realPath(tdFileInfo.dirPath(TRUE))<<" Selected "<<newIrateDir<<endl;
 				irateDir=tdFileInfo.dirPath(TRUE);
 				if(!irateDir.endsWith("/")) {
 					irateDir+='/';
@@ -182,9 +229,9 @@ void SongList::init(const QString &startDir) {
 			} else {
 				ret=KMessageBox::No;
 			}
-		}
+		}*/
 		//No else since last could abort
-		if(ret==KMessageBox::No) {
+		if(!irateDirFounded) {
 			kdDebug()<<"Building dialog"<<endl;
 
 			NewAccountDialog* nad=new NewAccountDialog(td,this);
@@ -192,9 +239,9 @@ void SongList::init(const QString &startDir) {
 			kdDebug()<<"Done Building dialog"<<endl;
 			if(nad->exec()==QDialog::Accepted) {
 				irateDir=td->getIRateDir();
-				KConfig* config=KGlobal::config();
+				/*KConfig* config=KGlobal::config();
 				config->setGroup("irate");
-				config->writePathEntry("irate_directory",td->getIRateDir());
+				config->writePathEntry("irate_directory",td->getIRateDir());*/
 				initplaylist=true;
 				td->saveFile();
 			} else {
@@ -202,7 +249,7 @@ void SongList::init(const QString &startDir) {
 			}
 			delete nad;
 		}
-	}
+	//}
 	DownloadCenter::instance()->setDownloadListener(this);
 	if(initplaylist) {
 

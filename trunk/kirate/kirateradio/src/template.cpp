@@ -25,6 +25,8 @@
 #include <kmacroexpander.h>
 #include <qdir.h>
 #include <kdebug.h>
+
+#include <kiconloader.h>
 Template * Template::m_instance= new Template();
 Template::Template()
 {
@@ -45,6 +47,9 @@ void Template::init(const QString& tmplDir,const QString& iconDir){
 	this->keywords["0rated"]=iconDir+"rate0.png";
 	this->keywords["unrated"]=iconDir+"unrated.png";
 	this->keywords["IR_TEMPLATE_DIR"]=tmplDir;
+	this->keywords["IR_NEXT_BUTTON"]="<a href=\"next\"><img src=\""+KGlobal::iconLoader()->iconPath("player_fwd",KIcon::Small)+"\"></a>";
+	this->keywords["IR_BACK_BUTTON"]="<a href=\"back\"><img src=\""+KGlobal::iconLoader()->iconPath("player_rew",KIcon::Small)+"\"></a>";
+	this->keywords["IR_INFO_BUTTON"]="<a href=\"info\"><img src=\""+KGlobal::iconLoader()->iconPath("info",KIcon::Small)+"\"></a>";
 	//iconDir=KGlobal::dirs()->findResourceDir("data","noatun/pics/irate.png");
 	this->keywords["LOC_SONG_PART"]=i18n("Song information");
 	this->keywords["LOC_FILE_PART"]=i18n("File information");

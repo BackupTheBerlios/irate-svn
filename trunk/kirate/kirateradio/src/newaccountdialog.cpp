@@ -52,7 +52,9 @@ void NewAccountDialog::slotOk() {
 		KMessageBox::sorry(this,i18n("Sorry, %1 directory is not a correct entry.").arg(irateURL.url()),i18n("Can't create directory"));
 		return;
 	}
+	
 	QString irateDir=irateURL.path(1);
+	irateDir=KStandardDirs::realPath(irateDir);
 	QDir ird(irateDir);
 	if(!ird.exists()) {
 		if(!ird.mkdir(irateDir)){
@@ -71,10 +73,17 @@ void NewAccountDialog::slotOk() {
 			KMessageBox::sorry(this,i18n("Sorry, unable to create %1 directory.\nThis directory isn't absolutely necessary. Create it manually if you want to use custom templates.").arg(irateDir+"templates/"), i18n("Can't create directory"));
 		}
 	}
+	KUser userAcc;
+	ird.mkdir(userAcc.homeDir()+"/irate", TRUE);
 	irateDir=KStandardDirs::realPath(irateDir);
 	if(!irateDir.endsWith("/")){
 		irateDir+='/';
 	}
+	QFile firate(userAcc.homeDir()+"/irate/irate.xml");
+	firate.open(IO_WriteOnly);
+	QString ir="<?xml version=\"1.0\"?>\n<irate><preference id=\"downloadDir\">"+irateDir+"trackdatabase.xml</preference><preference id=\"browser\">"+KStandardDirs::findExe("konqueror")+" %u</preference><plugin attached=\"false\" id=\"auto-normalize\"/><plugin localhostOnly=\"true\" simConns=\"20\" port=\"12473\" password=\"\" attached=\"false\" requirePassword=\"false\" id=\"external-control\"/><plugin attached=\"false\" id=\"lirc-remote\"><connect port=\"8765\" host=\"localhost\"/><function id=\"this-sux\"/><function id=\"yawn\"/><function id=\"not-bad\"/><function id=\"cool\"/><function id=\"love-it\"/><function id=\"pause/resume\"/><function id=\"skip\"/><function id=\"back\"/></plugin><plugin attached=\"true\" unratedNotificationMode=\"3\" id=\"unrated-notifier\"/></irate>\n";
+	firate.writeBlock(ir.latin1(),ir.length());
+	firate.close();
 	this->mtd->setIRateDir(irateDir);
 	int port=this->portInput->value();
 	QString host=this->hostEdit->text();
@@ -132,6 +141,7 @@ void NewAccountDialog::connectionState(int code){
 		break;
 		case 5:
 			if(!this->error&&this->read>0){
+				
 				KMessageBox::information(this,i18n("Account succesfully created"),i18n("Account created"));
 				QDialog::accept();
 			}
