@@ -1,0 +1,448 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2004-12-13 22:56+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: configurationcenter.cpp:40
+msgid "Configuration center"
+msgstr ""
+
+#: configurationcenter.cpp:42
+msgid "iRate Options"
+msgstr ""
+
+#: configurationcenter.cpp:43
+msgid "Play unrated tracks"
+msgstr ""
+
+#: configurationcenter.cpp:45
+msgid "Display"
+msgstr ""
+
+#: configurationcenter.cpp:46
+msgid "Playlist font"
+msgstr ""
+
+#: configurationcenter.cpp:50
+msgid "Info Template"
+msgstr ""
+
+#: configurationcenter.cpp:57 configurationcenter.cpp:82
+msgid "You don't have any template available"
+msgstr ""
+
+#: configurationcenter.cpp:60
+msgid "Show a passive window for unrated"
+msgstr ""
+
+#: configurationcenter.cpp:63
+msgid "OSD settings"
+msgstr ""
+
+#: configurationcenter.cpp:65
+msgid "Never"
+msgstr ""
+
+#: configurationcenter.cpp:66
+msgid "Always"
+msgstr ""
+
+#: configurationcenter.cpp:67
+msgid "Only for unrated"
+msgstr ""
+
+#: configurationcenter.cpp:70
+msgid "OSD duration in msec."
+msgstr ""
+
+#: configurationcenter.cpp:74
+msgid "OSD Templates"
+msgstr ""
+
+#: configurationcenter.cpp:80
+msgid "Test OSD"
+msgstr ""
+
+#: exportdialog.cpp:32
+msgid "Export playlist"
+msgstr ""
+
+#: exportdialog.cpp:39
+msgid "Minimum rating : "
+msgstr ""
+
+#: exportdialog.cpp:43
+msgid "Yawn (All)"
+msgstr ""
+
+#: exportdialog.cpp:44 songlist.cpp:71 view.cpp:171
+msgid "Not bad"
+msgstr ""
+
+#: exportdialog.cpp:45 safelistviewitem.cpp:47 songlist.cpp:72 view.cpp:172
+msgid "Cool"
+msgstr ""
+
+#: exportdialog.cpp:46 safelistviewitem.cpp:48 songlist.cpp:73 view.cpp:173
+msgid "Love it"
+msgstr ""
+
+#: exportdialog.cpp:49
+msgid "Format : "
+msgstr ""
+
+#: exportdialog.cpp:51
+msgid "URL (good for sharing)"
+msgstr ""
+
+#: exportdialog.cpp:52
+msgid "Absolute file"
+msgstr ""
+
+#: exportdialog.cpp:53
+msgid "Include unrated tracks"
+msgstr ""
+
+#: exportdialog.cpp:66
+msgid "Playlist"
+msgstr ""
+
+#: exportdialog.cpp:66
+msgid "Save as..."
+msgstr ""
+
+#: exportdialog.cpp:72
+msgid "Failed to open (Write acces) %1"
+msgstr ""
+
+#: exportdialog.cpp:72
+msgid "File error"
+msgstr ""
+
+#: exportdialog.cpp:102
+msgid "File successfully created"
+msgstr ""
+
+#: infodialog.cpp:48 view.cpp:65
+msgid "About iRate Radio"
+msgstr ""
+
+#: main.cpp:31
+msgid "A KDE KPart Application"
+msgstr ""
+
+#: main.cpp:43
+msgid "kirateradioxmms"
+msgstr ""
+
+#: newaccount.cpp:43
+msgid "New Account"
+msgstr ""
+
+#: newaccount.cpp:123
+msgid "Host :"
+msgstr ""
+
+#: newaccount.cpp:124
+msgid "Port :"
+msgstr ""
+
+#: newaccount.cpp:125
+msgid "Password :"
+msgstr ""
+
+#: newaccount.cpp:126
+msgid "User (login) :"
+msgstr ""
+
+#: newaccount.cpp:127
+msgid ""
+"Choose a directory :\n"
+"We strongly recommand \n"
+"choosing an non-existant directory."
+msgstr ""
+
+#: newaccount.cpp:130
+msgid "Server Communication"
+msgstr ""
+
+#: newaccountdialog.cpp:53
+msgid "Sorry, %1 directory is not a correct entry."
+msgstr ""
+
+#: newaccountdialog.cpp:53
+msgid "Can't create directory"
+msgstr ""
+
+#: newaccountdialog.cpp:119 songlist.cpp:270
+msgid ""
+"The communication with the server as generated the following error\n"
+" code %1\n"
+"url %2\n"
+"\n"
+"More detailled error description is not yet available"
+msgstr ""
+
+#: newaccountdialog.cpp:119 newaccountdialog.cpp:124 songlist.cpp:270
+#: songlist.cpp:275
+msgid "iRate Server Error"
+msgstr ""
+
+#: newaccountdialog.cpp:137 newaccountdialog.cpp:138
+msgid "Account succesfully created"
+msgstr ""
+
+#: newaccountdialog.cpp:138
+msgid "Account created"
+msgstr ""
+
+#: newaccountdialog.cpp:145
+msgid "Account creation failed!!!"
+msgstr ""
+
+#: rc.cpp:2
+#, no-c-format
+msgid "C&ustom"
+msgstr ""
+
+#: safelistviewitem.cpp:44
+msgid "This Sux"
+msgstr ""
+
+#: safelistviewitem.cpp:45 songlist.cpp:70 view.cpp:170
+msgid "Yawn"
+msgstr ""
+
+#: safelistviewitem.cpp:46
+msgid "Not Bad"
+msgstr ""
+
+#: safelistviewitem.cpp:49
+msgid "Unrated"
+msgstr ""
+
+#: safelistviewitem.cpp:64 safelistviewitem.cpp:194
+msgid "Queued"
+msgstr ""
+
+#: safelistviewitem.cpp:213
+#, c-format
+msgid "%1% downloaded"
+msgstr ""
+
+#: songlist.cpp:43 template.cpp:57
+msgid "Artist"
+msgstr ""
+
+#: songlist.cpp:44 template.cpp:56
+msgid "Title"
+msgstr ""
+
+#: songlist.cpp:45 template.cpp:60
+msgid "Rating"
+msgstr ""
+
+#: songlist.cpp:46 template.cpp:68
+msgid "Played"
+msgstr ""
+
+#: songlist.cpp:47 template.cpp:59
+msgid "Time"
+msgstr ""
+
+#: songlist.cpp:48 template.cpp:61
+msgid "Last played"
+msgstr ""
+
+#: songlist.cpp:49 template.cpp:67
+msgid "Copyright"
+msgstr ""
+
+#: songlist.cpp:51
+msgid "Download"
+msgstr ""
+
+#: songlist.cpp:65 view.cpp:168
+msgid "Info"
+msgstr ""
+
+#: songlist.cpp:67
+msgid "Rate"
+msgstr ""
+
+#: songlist.cpp:69 view.cpp:169
+msgid "This sux"
+msgstr ""
+
+#: songlist.cpp:77
+msgid "Download Again"
+msgstr ""
+
+#: songlist.cpp:79
+msgid "Save playlist..."
+msgstr ""
+
+#: songlist.cpp:184
+msgid "Available Columns"
+msgstr ""
+
+#: songlist.cpp:260
+msgid "Grouped action"
+msgstr ""
+
+#: songlist.cpp:300
+msgid "Playlist (*.m3u)"
+msgstr ""
+
+#: songlist.cpp:305
+msgid ""
+"Do you want to save the playlist using URL(good to share) or absolute "
+"filename ?"
+msgstr ""
+
+#: songlist.cpp:305
+msgid "Save as m3u..."
+msgstr ""
+
+#: songlist.cpp:305
+msgid "URL"
+msgstr ""
+
+#: songlist.cpp:305
+msgid "Absolute filename"
+msgstr ""
+
+#: template.cpp:54
+msgid "Song information"
+msgstr ""
+
+#: template.cpp:55
+msgid "File information"
+msgstr ""
+
+#: template.cpp:58
+msgid "Bitrate"
+msgstr ""
+
+#: template.cpp:63
+msgid "File url"
+msgstr ""
+
+#: template.cpp:64
+msgid "Comment"
+msgstr ""
+
+#: template.cpp:65
+msgid "Genre"
+msgstr ""
+
+#: template.cpp:66
+msgid "Date"
+msgstr ""
+
+#: template.cpp:69
+msgid "Sample rate in kHz"
+msgstr ""
+
+#: template.cpp:70
+msgid "Channels"
+msgstr ""
+
+#: template.cpp:130
+msgid "Unknow"
+msgstr ""
+
+#: _translatorinfo.cpp:1
+msgid ""
+"_: NAME OF TRANSLATORS\n"
+"Your names"
+msgstr ""
+
+#: _translatorinfo.cpp:3
+msgid ""
+"_: EMAIL OF TRANSLATORS\n"
+"Your emails"
+msgstr ""
+
+#: view.cpp:63
+msgid "Configure iRate"
+msgstr ""
+
+#: view.cpp:67
+msgid "Export as m3u..."
+msgstr ""
+
+#: view.cpp:68
+msgid "View current"
+msgstr ""
+
+#: view.cpp:70
+msgid "Previous track"
+msgstr ""
+
+#: view.cpp:72 view.cpp:177
+msgid "Play"
+msgstr ""
+
+#: view.cpp:74 view.cpp:176
+msgid "Pause"
+msgstr ""
+
+#: view.cpp:76
+msgid "Next track"
+msgstr ""
+
+#: view.cpp:95
+msgid "Welcome on iRate Radio"
+msgstr ""
+
+#: view.cpp:96
+msgid "iRate Radio"
+msgstr ""
+
+#: view.cpp:167
+msgid "Rate current track"
+msgstr ""
+
+#: view.cpp:174
+msgid "Player"
+msgstr ""
+
+#: view.cpp:175
+msgid "Next"
+msgstr ""
+
+#: view.cpp:178
+msgid "Previous"
+msgstr ""
+
+#: view.cpp:276
+msgid "Now playing : %1"
+msgstr ""
+
+#: view.cpp:376
+msgid "[%1] - %2"
+msgstr ""
+
+#: view.cpp:419
+msgid ""
+"Can't find a running Xmms program, you should start Xmms before KiRateRadio-"
+"Xmms. Good by and have a nice day!"
+msgstr ""
+
+#: view.cpp:419
+msgid "Can't find Xmms"
+msgstr ""

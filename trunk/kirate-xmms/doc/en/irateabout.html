@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+<html><head>
+  
+  <title>iRATE radio documentation - FAQ</title><meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+
+<body bgcolor="#000000" alink="#000099" link="#000099" vlink="#990099">
+<center><h1>iRate Radio</h1></center>
+<table border="0" cellspacing="1" cellpadding="0" bgcolor="90c9ff"><tr><td valign="top"><table width="100%" border="0" cellspacing="1" cellpadding="8"><tr><td valign="top" bgcolor="#758CFF"><h2>What is this program?</h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+            </b><br>
+This program allow you to use iRate Radio track selection of freely downloadable music into XMMS.<br>
+iRATE radio is a client-server system. A program called the iRATE client(this plugin,for exemple) downloads and plays MP3s, while the iRATE server keeps track of the relationships between users' listening preferences. The client asks the server for a list of MP3 tracks and downloads those tracks from their respective web sites:
+<br><br>
+To listen to iRATE Radio, individual users download the iRATE client program to to their computers. When the client is run, it contacts the iRATE server over the Internet and asks for a list of songs the user might be interested in hearing.
+<br><br>
+this program was written by Matthias Studer <a href="mailto:matthias.studer@ezwww.ch">matthias.studer@ezwww.ch</a>.
+<br><br>
+<b>credit for original iRate</b>
+<br><br>
+Original concept by Anthony Jones &lt;ajones@clear.net.nz&gt;. Written by Anthony Jones and Taras Glek. Thanks to Stephen Blackheath, Robin Sheat, Chris Manley, Eric Dalquist, Markus Enzenberger, Todd Pytel, Michael Crawford, Judd Cohen and Sebastian Spaeth. Thanks also to those who contributed patches or bug fixes, filed bug reports or submitted music web sites. Many thanks to Taras Glek for SWT client, GCJ compilation, nanoxml library. Thanks to Stephen Blackheath for several bug fixes.<br><br>
+Please go to <a href="http://irate.sourceforge.net">http://irate.sourceforge.net</a> to have more information/help etc.<br>
+<br>
+<i>This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at
+your option)  any later version.</i><br>
+<br><br><br>
+</td></tr><tr><td valign="top" bgcolor="#758CFF"><h2>How does the iRATE server choose the tracks?</h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+            </b><br>
+When the user requests a track it will sends all the user's ratings to
+the server and the server chooses tracks based on these ratings. The
+server uses the following methods to choose the tracks:<br>
+            <ul>
+              <li><b>Initial</b> - when the user first joins a standard
+set of tracks are downloaded.</li>
+              <li><b>Correlation</b> - the user's preferences are
+correlated with each other user's preferences. This correlation gives a
+weighting factor for each user's ratings. A track is chosen using the
+weighted average ratings.<br>
+              </li>
+              <li><b>Random</b> - this just chooses a completely random
+track from the database. 1 time in 20. Random is also used to top up if
+the other methods don't choose a track.</li>
+            </ul>
+The response from the server contains a list of tracks containing the
+Artist, Track Name and URL for the track. The client application
+downloads the track via HTTP from the given URL.<br>
+            <br>
+            </td></tr><tr><td valign="top" bgcolor="#758CFF"><h2>Why
+doesn't iRATE use genres?</h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+The philosophy or iRATE is to allow people to listen to music and rate
+it 'without prejudice'. Users are expected to rate tracks on their own
+merit based on how much they would like to listen to ehe track.<br>
+            <br>
+            </td></tr><tr><td valign="top" bgcolor="#758CFF"><h2>How do I
+rate the tracks?</h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+Concentrate on your local play list and let the server do it's thing.
+Rate the tracks based on what you want to hear. Don't try to second
+guess the server because the server algorithm may change from time to
+time.<br>
+            <br>
+</td></tr><tr><td valign="top" bgcolor="#758CFF"><h2>What
+should I do about bugs or feature requests?</h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+	    If your request go to irate go to irate <a href="http://sourceforge.net/tracker/?group_id=77232&amp;atid=549602">feature
+request</a> system. First check if your feature is already in
+the database, if not then feel free to add it. 
+<br>
+<br /> If it's a bug or a feature request for this plugin feel free to write me an email at <a href="mailto:matthias.studer@ezwww.ch">matthias.studer@ezwww.ch</a>.
+            <br>
+            </td></tr><tr><td valign="top" bgcolor="#758CFF"><h2>Why
+doesn't it play music I like?
+            </h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+You have to rate tracks for it to be able to find music that you like.
+It may take a while before it figures out the users with the closest
+tastes to you. It will always give you some randomly selected music so
+that the system can get ratings for new tracks. If you've downloaded a
+lot of music then you may run out of recommendations and therefore get
+random selections.<br>
+            <br>
+            </td></tr><tr><td valign="top" bgcolor="#758CFF"><h2>Where does
+the music come from?</h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+A bunch of web sites host tracks and make them available for http
+download. Anything I can find on the Internet which appears to be a
+ligitimate site offering free downloads.<br>
+            <br>
+</td></tr><tr><td valign="top" bgcolor="#758CFF"><h2>Are the
+artists getting ripped off?</h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+No. The artists have chosen to make their music available. Record
+companies have to pay to get music onto the radio and iRATE performs
+the
+same function as radio, if you like their music then perhaps you'll buy
+the album or go to their concert.<br>
+            <br>
+</td></tr><tr><td valign="top" bgcolor="#758CFF"><h2>Links</h2></td></tr><tr><td valign="top" bgcolor="#FFFFFF">
+
+<p>If you are new to the concept of free music or free culture, here are a few articles that may be of interest to you:</p>
+<ul>
+<li><a href="http://www.openp2p.com/pub/a/p2p/2003/06/10/musician_pov.html">A Musician's Take on File Sharing</a></li>
+<li>Not an article, but a book by <a href="http://www.lessig.org/">Lawrence Lessig</a>: <a href="http://www.free-culture.org/"><i>Free Culture</i></a> is a must-read for anybody interested in the music/content industry.  It is <a href="http://www.easylum.net/book/view/32">available for free</a> online</li>
+<li>The music activist site <a href="http://www.downhillbattle.org">DownhillBattle.org</a> has a lot of good, relevant information.</li>
+</ul>
+</td></tr>
+</table> 
+</td></tr>
+</table> 
+<br>
+<br>
+</body></html>
