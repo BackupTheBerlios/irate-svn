@@ -578,7 +578,40 @@ public class Client extends AbstractClient {
       }
     });
     
-    if (!isMac()) {
+    if (isMac()) {
+      // Drag-n-drop is broken on SWT/Carbon; need another way to
+      // let users get at the files behind their tracks.
+      MenuItem mShowFile = new MenuItem(menu1, SWT.PUSH);
+      mShowFile.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          Track track = trackTable.getSelectedTrack();
+          File trackfile = track.getFile();
+          if (trackfile.exists()) {
+            System.out.println("Show track file: " + trackfile);
+            String macpath = "file \"" + trackfile.getName() + "\" of ";
+            while ((trackfile = trackfile.getParentFile()) != null) {
+              if (!trackfile.getName().equals(""))
+                macpath = macpath + "folder \"" + trackfile.getName() + "\" of ";
+            }
+            macpath = macpath + "startup disk";
+            System.out.println("Mac path: " + macpath);
+            try {
+              Process script = Runtime.getRuntime().exec("/usr/bin/osascript");
+              PrintStream out = new PrintStream(script.getOutputStream());
+              out.println("tell application \"Finder\"");
+              out.println("    activate");
+              out.println("    select " + macpath);
+              out.println("end tell");
+              out.close();
+              script.waitFor();
+            } catch (Exception ex) {
+              ex.printStackTrace();
+            }
+          }
+        }
+      });
+      skinManager.addItem(mShowFile, "toolbar.menu_item.showfile");
+    } else {
       // Mac OS X already has Quit in the app menu
       MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
       item1_4.addSelectionListener(new SelectionAdapter() {
