@@ -7,8 +7,7 @@ Standards-Version: 3.5.2
 
 Package: irate-client-motif
 Architecture: any
-Depends: madplay
-Depends: libgcj2, libmotif, xlibs
+Depends: madplay, libgcj2, libmotif, xlibs
 Replaces: irate
 Description: A collaborative filtering client that downloads and plays music. 
  The iRATE server has a large database of music. You rate the tracks and it
