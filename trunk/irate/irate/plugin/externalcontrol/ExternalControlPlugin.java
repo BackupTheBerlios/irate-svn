@@ -15,10 +15,10 @@ import nanoxml.*;
  * network socket.
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/09/21 11:59:03 $$
+ * Date Updated: $$Date: 2003/09/21 14:34:04 $$
  * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.9 $$
+ * @version $$Revision: 1.10 $$
  */
 
 public class ExternalControlPlugin 
@@ -236,7 +236,7 @@ public class ExternalControlPlugin
           // Past this point means we have gotten a connection. Yay us!
           // Spawn a new thread of the communicator.
           ExternalControlCommunicator comm = 
-            new ExternalControlCommunicator(app, s);
+            new ExternalControlCommunicator(app, s, requirePassword, password);
           comm.start();
         } catch (InterruptedIOException e) {
         } catch (IOException e) {

@@ -1,5 +1,6 @@
 package irate.plugin.externalcontrol;
 
+import java.security.SecureRandom;
 import java.net.Socket;
 import java.util.Hashtable;
 import java.io.*;
@@ -14,10 +15,10 @@ import nanoxml.*;
  *  connections can be handled by different instances.
  *
  * Date Created: 20/9/2003
- * Date Updated: $$Date: 2003/09/20 11:49:08 $$
+ * Date Updated: $$Date: 2003/09/21 14:34:04 $$
  * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.2 $$
+ * @version $$Revision: 1.3 $$
  */
 
 public class ExternalControlCommunicator
@@ -25,6 +26,8 @@ public class ExternalControlCommunicator
 
   private PluginApplication app = null;
   private Socket sock = null;
+  private boolean requirePassword;
+  private String password;
   static int instanceCount = 0; // Allows restrictions to be
      // placed on the number of connections allowed at a time to
      // prevent memory being filled if someone attempts a DoS.
@@ -37,14 +40,19 @@ public class ExternalControlCommunicator
 
   /**
    * Normal constructor. Allows the iRATE application to be set, along
-   * with the streams for communication.
+   * with the streams for communication and authorisation information.
    *
-   * @param a  Instance of the iRATE application
-   * @param s  The socket to talk over.
+   * @param a    Instance of the iRATE application
+   * @param s    The socket to talk over.
+   * @param req  True if a password is required
+   * @param pw   The password
    */
-  public ExternalControlCommunicator(PluginApplication a, Socket s) {
+  public ExternalControlCommunicator(PluginApplication a, Socket s,
+                                     boolean req, String pw) {
     app = a;
     sock = s;
+    requirePassword = req;
+    password = pw;
   }
 
   /**
@@ -79,6 +87,15 @@ public class ExternalControlCommunicator
       e.printStackTrace();
       return;
     }
+    if (requirePassword) {
+      if (!handlePassword(in, out)) {
+        try {
+          in.close();
+          out.close();
+        } catch (IOException e) {}
+        return;
+      }
+    }
     try {
       while (notFinished) {
         XMLElement command = new XMLElement(new Hashtable(), true, false);
@@ -99,7 +116,7 @@ public class ExternalControlCommunicator
           replyNeeded = true;
         } else {
           // Check commands
-          String cmdType = command.getStringAttribute("type");
+          String cmdType = command.getStringAttribute("type","");
           if (cmdType.equals("currenttrack")) {
             trackResponseXML(response, app.getPlayingTrack());
             response.setAttribute("source","playing");
@@ -167,6 +184,119 @@ public class ExternalControlCommunicator
       out.close();
     } catch (IOException e) {}
   } // makeContact(InputStream in, OutputStream out)
+
+  /**
+   * Handles the authorisation protocol.
+   *
+   * @param in  The input stream
+   * @param out The output stream
+   * @return    True if the login was successful
+   */ 
+  private boolean handlePassword(InputStream in, OutputStream out) {
+    boolean finish = false;
+    boolean loginSuccess = false;
+    boolean sentChallenge = false;
+    String challenge = "";
+   try {
+      while (!finish) {
+        XMLElement command = new XMLElement(new Hashtable(), true, false);
+        XMLElement response = new XMLElement(new Hashtable(), true, false);
+        response.setName("IrateClient");
+        try {
+          command.parseFromReader(new InputStreamReader(in));
+        } catch (XMLParseException e) {
+          finish = true;
+        }
+      
+        if (finish || !command.getName().equals("Command")) {
+          // Fatal error - compose response, disconnect.
+          response.setAttribute("type", "error");
+          response.setAttribute("errorcondition", "unknown-command");
+          response.setIntAttribute("fatal",1);
+          loginSuccess = false;
+          finish = true;
+        } else {
+          String cmdType = command.getStringAttribute("type","");
+          if (cmdType.equals("login")) {
+            String cmdFormat = command.getStringAttribute("format","");
+            if (cmdFormat.equals("plaintext")) {
+              if (command.getStringAttribute("password","").equals(password)) {
+                response.setAttribute("type","login-success");
+                loginSuccess = true;
+                finish = true;
+              } else {
+                response.setAttribute("type","login-failure");
+                loginSuccess = false;
+                finish = true;
+              }
+            } else if (cmdFormat.equals("digest-md5-getchallenge")) {
+              if (!sentChallenge) {
+                challenge = createChallenge();
+                response.setAttribute("type","login-challenge");
+                response.setAttribute("challenge",challenge);
+                sentChallenge = true;
+              } else {
+                response.setAttribute("type","login-protocol-error");
+                loginSuccess = false;
+                finish = true;
+              }
+            } else if (cmdFormat.equals("digest-md5")) {
+              if (!sentChallenge) {
+                response.setAttribute("type","login-protocol-error");
+                loginSuccess = false;
+                finish = true;
+              } else {
+                String expected = MD5.getHashString(password+challenge);
+                String got = command.getStringAttribute("password","");
+                if (expected.equals(got)) {
+                  response.setAttribute("type","login-success");
+                  loginSuccess = true;
+                  finish = true;
+                } else {
+                  response.setAttribute("type","login-failure");
+                  loginSuccess = false;
+                  finish = true;
+                }
+              }
+            } else {
+              response.setAttribute("type","login-format-not-implemented");
+            }
+          } else {
+            response.setAttribute("type","login-required");
+          }
+        }
+        OutputStreamWriter outSW = new OutputStreamWriter(out);
+        response.write(outSW);
+        outSW.write('\n');
+        outSW.flush();
+        outSW = null;
+      } 
+    } catch (IOException e) {}
+    return loginSuccess;
+  }
+
+  /**
+   * Generates a string with 20 random letters (mixed case) and
+   * numbers.
+   *
+   * @return The random string
+   */
+  private String createChallenge() {
+    SecureRandom random = new SecureRandom();
+    byte[] bytes = new byte[1];
+    char[] chars = new char[20];
+
+    for (int i=0; i<20; i++) {
+      random.nextBytes(bytes);
+      while ((bytes[0] > 57  || bytes[0] < 48) && // 0-9
+             (bytes[0] > 90  || bytes[0] < 65) && // A-Z
+             (bytes[0] > 122 || bytes[0] < 97)) { // a-z
+        random.nextBytes(bytes);
+      }
+      chars[i] = (char)bytes[0];
+    }
+    return new String(chars);
+  }
 
   /**
    * Alters e so that it has the additional fields required to be a
