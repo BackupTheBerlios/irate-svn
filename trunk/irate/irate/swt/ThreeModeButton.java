@@ -17,7 +17,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
 
   private Hashtable imageDataHash = new Hashtable();
   
-  private Cache cache = new Cache();
+  private Cache cache = new Cache("ThreeModeButton");
 
   private String normalText, pressedText;
 

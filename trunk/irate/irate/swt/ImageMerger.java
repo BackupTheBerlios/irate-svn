@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.RGB;
  */
 public class ImageMerger {
   
-  private Cache cache = new Cache();
+  private Cache cache = new Cache("ImageMerger");
   
   public ImageMerger() {
   }
@@ -133,7 +133,7 @@ public class ImageMerger {
       
       ColourMerge merge = (ColourMerge) obj;
       return foregroundData == merge.foregroundData 
-          && backgroundColour == merge.backgroundColour; 
+          && backgroundColour.equals(merge.backgroundColour); 
     }
   }
 }

@@ -8,7 +8,7 @@ public class TransparencyManager {
 
   private static final String key = "TransparencyManager.background";
   
-  private Cache cache = new Cache();
+  private Cache cache = new Cache("TransparencyManager");
   
   public TransparencyManager() {
   }

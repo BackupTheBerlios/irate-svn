@@ -47,7 +47,7 @@ public class TrackTable {
   private Hashtable hashByTableItem;
   
   /** A hash keeping track of the image handles by table item. */
-  private Hashtable imageHandleHash = new Hashtable();
+  private final Hashtable imageHandleHash = new Hashtable();
   
   /** The current comparitor used to sort the table. */
   private TrackComparator comparator;
@@ -62,7 +62,7 @@ public class TrackTable {
   private ImageMerger imageMerger = new ImageMerger();
 
   /** Cache for caching generated images. */
-  private Cache imageCache = new Cache();
+  private Cache imageCache = new Cache("TrackTable");
   
   /** Stores skinable images automagically */
   private BasicSkinable basicSkinable; 
@@ -283,8 +283,10 @@ public class TrackTable {
       ImageData mergedImageData = imageMerger.merge(background, stateImageData);
   //    mergedImageData.transparentPixel = mergedImageData.palette.getPixel(background.getRGB());
       imageHandle = (ImageHandle) imageCache.get(mergedImageData);
-      if (imageHandle == null)
-        imageCache.put(mergedImageData, imageHandle = new ImageHandle(new Image(display, mergedImageData)));
+      if (imageHandle == null) {
+        imageHandle = new ImageHandle(new Image(display, mergedImageData));
+        imageCache.put(mergedImageData, imageHandle);
+      }
     }
     else {
       /* We need to generate an image for the text */
@@ -321,8 +323,10 @@ public class TrackTable {
 
       ImageData mergedImageData = imageMerger.merge(background, scaledImageData);
       imageHandle = (ImageHandle) imageCache.get(mergedImageData);
-      if (imageHandle == null)      
-        imageCache.put(mergedImageData, imageHandle = new ImageHandle(new Image(display, scaledImageData)));
+      if (imageHandle == null) {      
+        imageHandle = new ImageHandle(new Image(display, scaledImageData));
+        imageCache.put(mergedImageData, imageHandle);
+      }
       return imageHandle;
     }
     catch (IOException e) {

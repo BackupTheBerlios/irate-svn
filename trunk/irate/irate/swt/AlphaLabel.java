@@ -24,7 +24,7 @@ public class AlphaLabel extends Canvas implements Skinable {
 
   private String text = "";
 
-  private Cache cache = new Cache();
+  private Cache cache = new Cache("AlphaLabel");
 
   private ImageMerger imageMerger;
 
