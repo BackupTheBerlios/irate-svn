@@ -95,10 +95,10 @@ public class ServerDatabase extends TrackDatabase {
 
   public void setFriendSet(Set newFriends) {
     XMLElement docElt = getDocElement();
-    Enumeration enum = docElt.enumerateChildren();
+    Enumeration e = docElt.enumerateChildren();
     Vector v = new Vector();
-    while(enum.hasMoreElements()) {      
-      XMLElement elt = (XMLElement)enum.nextElement();
+    while(e.hasMoreElements()) {      
+      XMLElement elt = (XMLElement)e.nextElement();
       if (elt.getName().equals("Friend"))
         v.add(elt);
     }

@@ -22,10 +22,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/05/31 04:38:45 $
+ * Date Updated: $Date: 2004/06/05 06:57:41 $
  * @author Creator:	taras
- * @author Updated:	$Author: eythian $
- * @version $Revision: 1.26 $
+ * @author Updated:	$Author: ajones $
+ * @version $Revision: 1.27 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -291,7 +291,7 @@ public class AccountDialog {
         public void actionPerformed() {
           display.syncExec(new Runnable() {
             public void run() {
-              lblStatus.setText(downloadThread.getState());
+              lblStatus.setText(downloadThread.getDownloadState());
               lblStatus.pack();
             }
           });//inner class

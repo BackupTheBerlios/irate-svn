@@ -436,7 +436,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
     }
   }
 
-  public String getState() {
+  public String getDownloadState() {
     return state;
   }
 

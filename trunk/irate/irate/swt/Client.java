@@ -88,7 +88,7 @@ public class Client extends AbstractClient {
 
     UpdateListener ul = new UpdateListener() {
       public void actionPerformed() {
-        showDownloadStatus(downloadThread.getState());
+        showDownloadStatus(downloadThread.getDownloadState());
       }//method
       public void newTrackStarted(Track track) { }
     };//ul

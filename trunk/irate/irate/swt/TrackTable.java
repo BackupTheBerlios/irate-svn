@@ -13,7 +13,12 @@ import java.util.*;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.*;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.GC;
@@ -21,7 +26,14 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.*;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableColumn;
+import org.eclipse.swt.widgets.TableItem;
 
 /**
  * @author Anthony Jones
@@ -46,9 +58,6 @@ public class TrackTable {
   /** A hash table which finds the Track associated with a given TableItem. */
   private Hashtable hashByTableItem;
   
-  /** A hash keeping track of the image handles by table item. */
-  private final Hashtable imageHandleHash = new Hashtable();
-  
   /** The current comparitor used to sort the table. */
   private TrackComparator comparator;
   
@@ -61,8 +70,8 @@ public class TrackTable {
   /** Alpha blends images with the background color. */ 
   private ImageMerger imageMerger = new ImageMerger();
 
-  /** Cache for caching generated images. */
-  private Cache imageCache = new Cache("TrackTable");
+  /** Hash table for caching generated images. */
+  private Hashtable imageHash = new Hashtable();
   
   /** Stores skinable images automagically */
   private BasicSkinable basicSkinable; 
@@ -251,7 +260,6 @@ public class TrackTable {
     while (table.getItemCount() > size) {
       int index = table.getItemCount() - 1;
       TableItem tableItem = table.getItem(index);
-      imageHandleHash.remove(tableItem);
       table.remove(index);
     }
     while (table.getItemCount() < size)
@@ -276,58 +284,56 @@ public class TrackTable {
       select(selected);
   }
   
-  private ImageHandle getStateImage(Color background, String state) {
-    ImageHandle imageHandle;
-    ImageData stateImageData = basicSkinable.getImageData(state);
-    if (stateImageData != null) {
-      ImageData mergedImageData = imageMerger.merge(background, stateImageData);
-  //    mergedImageData.transparentPixel = mergedImageData.palette.getPixel(background.getRGB());
-      imageHandle = (ImageHandle) imageCache.get(mergedImageData);
-      if (imageHandle == null) {
-        imageHandle = new ImageHandle(new Image(display, mergedImageData));
-        imageCache.put(mergedImageData, imageHandle);
+  private Image getStateImage(Color background, String state) {
+  	Image image = (Image) imageHash.get(state);
+  	if (image == null) 
+  	{
+      ImageData stateImageData = basicSkinable.getImageData(state);
+      if (stateImageData != null) {
+        ImageData mergedImageData = imageMerger.merge(background, stateImageData);
+        image = new Image(display, mergedImageData);
       }
-    }
-    else {
-      /* We need to generate an image for the text */
-      imageHandle = (ImageHandle) imageCache.get(state);
-      if (imageHandle == null) {
+      else {
+        /* We need to generate an image for the text */
         GC gc = new GC(table);      
         Point size = gc.stringExtent(state);
         gc.dispose();
-        Image image = new Image(display, size.x, size.y);
+
+        int x = 80;
+        int y = 20;
+        image = new Image(display, x, y);     
         gc = new GC(image);
-        gc.drawText(state, 0, 0, true);
+        gc.drawText(state, (x - size.x) / 2, (y - size.y) / 2, true);
         gc.dispose();
-        imageCache.put(state, imageHandle = new ImageHandle(image));
       }
-    }
-    return imageHandle;
+      imageHash.put(state, image);
+  	}
+    return image;
   }
   
-  private ImageHandle getIconImage(Color background, String icon) {
-    ImageHandle imageHandle = null;
+  private Image getIconImage(Color background, String icon) {
     if (icon == null || icon.length() == 0)
       return null;
-    ImageData scaledImageData = (ImageData) imageCache.get(icon);
+    
     try {
-      if (scaledImageData == null) {
+      Image image = (Image) imageHash.get(icon);
+      if (image == null) {
         System.out.println("Loading image: " + icon);
-        Image image = new Image(display, BaseResources.getResourceAsStream(icon));
-        ImageData imageData = image.getImageData();
-        image.dispose();
+        // Get the image
+        Image baseImage = new Image(display, BaseResources.getResourceAsStream(icon));
+        ImageData imageData = baseImage.getImageData();
+        baseImage.dispose();
+        
+        // Scale the image
         int scaledHeight = 20;
-        imageCache.put(icon, scaledImageData = imageData.scaledTo(
-            imageData.width * scaledHeight / imageData.height, scaledHeight));
-      }
+        ImageData scaledImageData = imageData.scaledTo(imageData.width * scaledHeight / imageData.height, scaledHeight);
 
-      ImageData mergedImageData = imageMerger.merge(background, scaledImageData);
-      imageHandle = (ImageHandle) imageCache.get(mergedImageData);
-      if (imageHandle == null) {      
-        imageHandle = new ImageHandle(new Image(display, scaledImageData));
-        imageCache.put(mergedImageData, imageHandle);
+        // Merge with the background colour
+        ImageData mergedImageData = imageMerger.merge(background, scaledImageData);
+        image = new Image(display, scaledImageData);
+        imageHash.put(icon, image);
       }
-      return imageHandle;
+      return image;
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -357,14 +363,8 @@ public class TrackTable {
 //      if (tableItem == selection[i])
 //        background = display.getSystemColor(SWT.COLOR_LIST_SELECTION);
   
-    ImageHandle stateImageHandle = getStateImage(background, track.getState()); 
-    tableItem.setImage(2, stateImageHandle.getImage());    
-       
-    ImageHandle licenseImageHandle = getIconImage(background, licenseIndex.get(track).getIcon());    
-    tableItem.setImage(5, licenseImageHandle == null ? null : licenseImageHandle.getImage());
-    
-    /* Put the image handles into the hash table so the images don't get forgotten. */
-    imageHandleHash.put(tableItem, new ImageHandle[] { stateImageHandle, licenseImageHandle });
+    tableItem.setImage(2, getStateImage(background, track.getState())); 
+    tableItem.setImage(5, getIconImage(background, licenseIndex.get(track).getIcon()));    
   }
   
   /** Remove the specified track from the table. */

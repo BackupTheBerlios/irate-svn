@@ -67,7 +67,9 @@ public class ImageMerger {
   
   public ImageData merge(Color backgroundColour, ImageData foregroundData) {
     ImageData background = createBackground(foregroundData.width, foregroundData.height, backgroundColour, foregroundData);
-    return merge(background, 0, 0, foregroundData);
+    ImageData imageData = merge(background, 0, 0, foregroundData);
+    imageData.transparentPixel = imageData.palette.getPixel(backgroundColour.getRGB());
+    return imageData;
   }
   
 }

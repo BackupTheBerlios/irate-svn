@@ -29,7 +29,7 @@ public class DownloadPanel extends JPanel {
   }
 
   public void update() {
-    stateLabel.setText(downloadThread.getState());
+    stateLabel.setText(downloadThread.getDownloadState());
     progressBar.setValue(downloadThread.getPercentComplete());
   }
 }
