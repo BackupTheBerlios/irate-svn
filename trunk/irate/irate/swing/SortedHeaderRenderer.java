@@ -12,6 +12,7 @@ import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JTable;
+import javax.swing.SwingConstants;
 import javax.swing.table.TableCellRenderer;
 
 /**
@@ -29,7 +30,7 @@ public class SortedHeaderRenderer
 
   public SortedHeaderRenderer(){
     renderer.setBorder(BorderFactory.createEtchedBorder());
-    renderer.setHorizontalTextPosition(renderer.LEFT);
+    renderer.setHorizontalTextPosition(SwingConstants.LEFT);
   }
   /* (non-Javadoc)
    * @see javax.swing.table.TableCellRenderer#getTableCellRendererComponent(javax.swing.JTable, java.lang.Object, boolean, boolean, int, int)
@@ -41,12 +42,12 @@ public class SortedHeaderRenderer
     
     int tmp=arg0.convertColumnIndexToModel(arg5);
     if (arg0.getModel().getColumnClass(tmp) == Integer.class){
-      renderer.setHorizontalTextPosition(renderer.RIGHT);
-      renderer.setHorizontalAlignment(renderer.RIGHT);
+      renderer.setHorizontalTextPosition(SwingConstants.RIGHT);
+      renderer.setHorizontalAlignment(SwingConstants.RIGHT);
     }
     else
-    {renderer.setHorizontalTextPosition(renderer.LEFT);
-     renderer.setHorizontalAlignment(renderer.LEFT);
+    {renderer.setHorizontalTextPosition(SwingConstants.LEFT);
+     renderer.setHorizontalAlignment(SwingConstants.LEFT);
     }
     if (ts.sortedColumn==tmp){
       if (ts.ascending) renderer.setIcon(down);

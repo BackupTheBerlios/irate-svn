@@ -179,7 +179,7 @@ public class StreamPlayer extends AbstractPlayer implements Runnable {
     //semaphore!!! 
     while (isRunning) {
       try {
-        Thread.currentThread().sleep(300);
+        Thread.sleep(300);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }

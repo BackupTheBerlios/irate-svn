@@ -5,7 +5,6 @@ package irate.swt;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.zip.ZipEntry;

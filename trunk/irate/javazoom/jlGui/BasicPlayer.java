@@ -369,7 +369,7 @@ public class BasicPlayer implements Runnable
             if (m_thread != null)
             {
               cnt++;
-              m_thread.sleep(1000);
+              Thread.sleep(1000);
               if (cnt > 2)
               {
                 m_thread.interrupt();
