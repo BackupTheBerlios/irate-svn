@@ -66,22 +66,31 @@ public class PlayListManager {
     }
     
     int size = playList.size();
-    if (playList.size() == 0)
+    if (size < 1)
       return null;
     
+    if (playListIndex >= size)
+      playListIndex = 0;   
+
     //
     // Make sure the track you select isn't the same as the track
     // that was previously played
     //
-    
+  
     Track selectedTrack;
-//    do {
-      if (++playListIndex >= size) {
-        playListIndex = 0;
-      }
-      selectedTrack = (Track) playList.get(playListIndex);
-//    }  while (selectedTrack == lastPlayedTrack);
-
+    if (size == 1) {
+      selectedTrack = (Track) playList.get(0);
+    } else {        
+      int currentIndex = playListIndex;
+      do {
+        if (++playListIndex >= size)
+          playListIndex = 0;
+        selectedTrack = (Track) playList.get(playListIndex);
+        if (selectedTrack != lastPlayedTrack)
+          break;
+      } while (playListIndex != currentIndex);
+    }
+        
     lastPlayedTrack = selectedTrack;
     
     System.out.println("---Play list---");
