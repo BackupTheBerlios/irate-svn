@@ -1,5 +1,7 @@
 package irate.common;
 
+import irate.resources.Resources;
+
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -22,14 +24,14 @@ public class LicensingScheme {
   // track.
   public LicensingScheme(String copyrightData) {
     buildImageTable();
-    if(copyrightData == null || copyrightData.equals("")) {
-      initializeLicensingScheme(null, "", "No Copyright Information Available", "");
+    if(copyrightData == null || copyrightData.equals("")) { //$NON-NLS-1$
+      initializeLicensingScheme(null, "", getResourceString("LicensingScheme.No_Copyright_Information_Available"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
     else {	
       String urlFound = findURLInText(copyrightData);
       String nameFound = null;
 			
-      if(urlFound != null && !urlFound.equals("")) {
+      if(urlFound != null && !urlFound.equals("")) { //$NON-NLS-1$
         nameFound = findNameInURL(urlFound);	
         try {
           initializeLicensingScheme(new URL(urlFound), nameFound, copyrightData, (String)imageTable.get(nameFound));
@@ -39,15 +41,15 @@ public class LicensingScheme {
         }
       }
       else {
-        initializeLicensingScheme(null, "", copyrightData, "");
+        initializeLicensingScheme(null, "", copyrightData, ""); //$NON-NLS-1$ //$NON-NLS-2$
       }
     }
   }
 	
   private void buildImageTable() {
     imageTable = new Hashtable();
-    imageTable.put("creativecommons","creativecommons.gif");
-    imageTable.put("foobar", "foobar.gif");
+    imageTable.put("creativecommons","creativecommons.gif"); //$NON-NLS-1$ //$NON-NLS-2$
+    imageTable.put("foobar", "foobar.gif"); //$NON-NLS-1$ //$NON-NLS-2$
   }
 		
   private String findNameInURL(String urlFound) {
@@ -68,10 +70,10 @@ public class LicensingScheme {
 
   private String findURLInText(String copyrightData) {
 			
-    int urlStart = copyrightData.indexOf("http://");
+    int urlStart = copyrightData.indexOf("http://"); //$NON-NLS-1$
     int urlEnd = -1;
-    if(copyrightData.indexOf("http://") != -1) {
-      urlEnd = copyrightData.indexOf(" ", urlStart);
+    if(copyrightData.indexOf("http://") != -1) { //$NON-NLS-1$
+      urlEnd = copyrightData.indexOf(" ", urlStart); //$NON-NLS-1$
       return copyrightData.substring(urlStart, urlEnd);
     }
     return null;
@@ -90,5 +92,13 @@ public class LicensingScheme {
 
   public String getFullText() {
     return fullText;
+  }
+  
+  /**
+   * Get a resource string from the properties file associated with this 
+   * class.
+   */
+  private String getResourceString(String key) {
+    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
   }
 }
