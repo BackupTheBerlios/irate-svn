@@ -1,23 +1,14 @@
 package irate.client;
 
-import java.io.InputStream;
-import javazoom.jl.decoder.JavaLayerException;
+import java.io.File;
 
-public class Player extends javazoom.jl.player.Player {
+public interface Player {
 
-  private AudioDevice audio;
+  public void setPaused(boolean paused);
 
-  public Player(InputStream is, AudioDevice audio) throws JavaLayerException {
-    super(is, audio);
-    this.audio = audio;
-  }
-  
-  public void setPaused(boolean paused) {
-    audio.setPaused(paused);
-  }
+  public boolean isPaused();
 
-  public boolean isPaused() {
-    return audio.isPaused();
-  }
+  public void play(File file) throws PlayerException;
 
+  public void close();
 }

@@ -3,7 +3,7 @@ package irate.client;
 import java.io.*;
 import java.util.*;
 import javax.sound.sampled.*;
-import javazoom.jl.decoder.BitstreamException;
+//import javazoom.jl.decoder.BitstreamException;
 
 import irate.common.*;
 
@@ -19,10 +19,10 @@ public class PlayThread extends Thread {
   private Speech speech = new Speech();
   private boolean speaking;
   private boolean toKeepPlaying;
-  private AudioDevice audioDevice;
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
+    player = new JavaLayerPlayer();
   }
 
   public boolean isSpeechSupported() {
@@ -47,12 +47,10 @@ public class PlayThread extends Thread {
       }
     }
     else {
-      player = new Player(new BufferedInputStream(
-          new FileInputStream(file), 2048), new AudioDevice());
       try {
-	player.play();
+	player.play(file);
       }
-      catch (BitstreamException e) {
+      catch (PlayerException e) {
         e.printStackTrace();
       }
       finally {
