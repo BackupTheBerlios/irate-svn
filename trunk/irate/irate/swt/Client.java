@@ -107,7 +107,7 @@ public class Client implements UpdateListener, PluginApplication {
 
     playThread.addUpdateListener(this);
     playThread.start();
-    playThread.setPaused(playerList.getPlayers().length > 0);   
+        
     
     downloadThread = new DownloadThread(trackDatabase) {
       public void process() throws IOException {
@@ -480,6 +480,9 @@ public class Client implements UpdateListener, PluginApplication {
   public void createShell() {
     shell = new Shell(display);
     shell.setText("iRATE radio");
+		/*ImageData icon = new ImageData("/tmp/irate-logo-daniel.png");
+		shell.setImage(new Image(display, icon));
+*/
     shell.addShellListener(new ShellAdapter()
     {
       public void shellClosed(ShellEvent e){
@@ -537,7 +540,6 @@ public class Client implements UpdateListener, PluginApplication {
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Last");
-    addColumnListener(col, new MagicComparator(4));
     col.setWidth(150);
     tblSongs.setHeaderVisible(true);
     synchronizePlaylist(playListManager, tblSongs);
@@ -584,10 +586,7 @@ public class Client implements UpdateListener, PluginApplication {
     item1_1.setText("Download");
     item1_1.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        if (trackDatabase.hasRatedEnoughTracks())
-          downloadThread.go();
-        else
-          errorDialog.show(getResource("help/notenoughratings.html"));
+        downloadThread.go();
       }
     });    
     
@@ -838,7 +837,9 @@ public class Client implements UpdateListener, PluginApplication {
   }
 
   public static void main(String[] args) throws Exception{
-    new Client().run();
+			System.setProperty("gnu.gcj.runtime.NameFinder.demangle","false");
+			System.setProperty("gnu.gcj.runtime.NameFinder.use_addr2line","false");
+			new Client().run();
   }
 }
 
