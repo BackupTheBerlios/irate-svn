@@ -82,8 +82,13 @@ public class Client extends AbstractClient {
   
   /** Init gui. Called from constructor */
   public void init() {
-    display = new Display();
-    //need this baby to report problems :)
+    try {
+      display = new Display();
+    }catch(Exception e) {
+      handleError(null, "missingswt.html");
+      System.exit(1);
+    }
+    //need this baby to report problems with msg boxes :)
     errorDialog = new ErrorDialog(display, null);
   }
   
@@ -107,8 +112,8 @@ public class Client extends AbstractClient {
 
   public void handleError(String code, String urlString) {
     //actionSetContinuousDownload(false);
-    System.out.println("Error code:"+code);
-    System.out.println("Error url:"+urlString);
+    //System.out.println("Error code:"+code);
+    //System.out.println("Error url:"+urlString);
     Reader r;
     try {
       if (urlString.indexOf(':') < 0) {
