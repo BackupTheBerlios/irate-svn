@@ -184,7 +184,7 @@ public class DownloadThread extends Thread {
         break;
       urlString = urlString.substring(0, index) + " " + urlString.substring(index + 3);
     }
-    return new File(downloadDir, urlString);
+    return new File(trackDatabase.getDownloadDirectory(), urlString);
   }
   
   /** 

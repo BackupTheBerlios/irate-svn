@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Vector;
 import nanoxml.*;
 
+import irate.common.Preferences;
 import irate.plugin.lircremote.LircRemoteControlPlugin;
 import irate.plugin.externalcontrol.ExternalControlPlugin;
 
@@ -79,7 +80,11 @@ public class PluginManager
     throws IOException
   {
     XMLElement docElt = new XMLElement(new Hashtable(), false, false);
-    docElt.parseFromReader(new InputStreamReader(is));
+    
+    InputStreamReader inputStreamReader = new InputStreamReader(is);
+    docElt.parseFromReader(inputStreamReader);
+    inputStreamReader.close();
+    is.close();
     
     Enumeration enum = docElt.enumerateChildren();
     while(enum.hasMoreElements()) {
@@ -107,37 +112,18 @@ public class PluginManager
   public void saveConfig()
     throws IOException
   {
-    XMLElement docElt = new XMLElement(new Hashtable(), false, false);
-    docElt.setName("irate");
+    //XMLElement docElt = new XMLElement(new Hashtable(), false, false);
+    //docElt.setName("irate");
     for (int i = 0; i < plugins.size(); i++) {
       Plugin plugin = (Plugin) plugins.get(i);
       XMLElement elt = new XMLElement(new Hashtable(), false, false);
       elt.setName("plugin");
-      docElt.addChild(elt);
       elt.setAttribute("id", plugin.getIdentifier());
       elt.setAttribute("attached", plugin.isAttached()?"true":"false");
       plugin.formatConfig(elt);
+      Preferences.updateWithChild(elt);
     }
-    FileWriter fw = new FileWriter(getConfigFileTemporary());
-    try {
-      fw.write("<?xml version=\"1.0\"?>\n");
-      fw.write(docElt.toString());
-      fw.write("\n");
-      fw.close();
-      fw = null;
-        // If we wrote the file successfully, then rename the temporary
-	// file to the real name of the configuration file.  This makes
-	// the writing of the new file effectively atomic.
-      if (!getConfigFileTemporary().renameTo(getConfigFile())) {
-        getConfigFile().delete();
-	if (!getConfigFileTemporary().renameTo(getConfigFile()))
-	  throw new IOException("Failed to rename "+getConfigFileTemporary()+" to "+getConfigFile());
-      }
-    }
-    finally {
-      if (fw != null)
-	fw.close();
-    }
+
   }
 }
 

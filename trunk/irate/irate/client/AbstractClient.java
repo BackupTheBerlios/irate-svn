@@ -12,6 +12,7 @@ import irate.common.UpdateListener;
 import irate.download.DownloadThread;
 import irate.plugin.PluginApplication;
 import irate.plugin.PluginManager;
+import irate.common.Preferences;
 
 /**
  * @author Anthony Jones
@@ -24,24 +25,36 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
   protected PlayThread playThread;
   protected DownloadThread downloadThread;
   protected PluginManager pluginManager;
+  protected Preferences userPreferences;
   
   public AbstractClient() {
+    
+    userPreferences = new Preferences();
+    
     File home = new File(System.getProperties().getProperty("user.home"));
-
-    // Check the current directory for an existing trackdatabase.xml for
-    // compatibility reasons only.
-    File dir = new File(".");
-    File file = new File(dir, "trackdatabase.xml");
-    if (!file.exists()) {
-      dir = new File("/irate");
-      file = new File(dir, "trackdatabase.xml");
-      if (!file.exists()) {
-        dir = new File(home, "irate");
-        if (!dir.exists())
-          dir.mkdir();
-        file = new File(dir, "trackdatabase.xml");
-      }
+    File dir = null;
+    File file = null;
+    
+    // Check to see if the iRATE directory exists in the user's home.
+    // This needs to be there.
+    dir = new File(home, "/irate");
+    if(!dir.exists()){
+      dir.mkdir();
     }
+    
+    // Check to see if the user has a track database directory set in the
+    // irate.xml file.  If so, this directory should point to the trackdatabase.xml
+    // file.
+      String preference = Preferences.getUserDownloadDirectoryPreference();
+      if (preference != null) {
+        file = new File(preference);
+      } else {
+          // If they don't have one set, fall back on the home directory.
+          // If it doesn't exist in either location, then the user will need to fill in the
+          // registration information.
+          dir = new File(home, "irate");
+          file = new File(dir, "trackdatabase.xml");
+      }
 
     try {
       trackDatabase = new TrackDatabase(file);
@@ -49,6 +62,7 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
     catch (IOException e) {
       e.printStackTrace();
     }
+    
 
     playerList = new PlayerList();
     
@@ -89,9 +103,18 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
           updateTrackTable();     
       }
     });
+    
+    // If a track database couldn't be loaded from the file system, then we
+    // need to create a new account.
+    if(trackDatabase.getNoOfTracks() ==0) {
+      createNewAccount();
+    }
+    
   }
   
-	/**
+
+
+  /**
 	 * PluginApplication interface:
 	 * Get the track that is currently being played.
 	 */
@@ -174,6 +197,7 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
 		playThread.reject();
 	}
 	
+  protected abstract void createNewAccount();
 	public abstract Track getSelectedTrack();
   public abstract void handleError(String code, String urlString);
   public abstract void setState(String state);

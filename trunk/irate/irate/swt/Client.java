@@ -25,13 +25,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/19 14:30:58 $
+ * Date Updated: $Date: 2003/11/21 23:48:17 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.103 $
+ * @version $Revision: 1.104 $
  */
 public class Client extends AbstractClient {
 
@@ -40,7 +40,7 @@ public class Client extends AbstractClient {
   private static final int VOLUME_OFFSET = VOLUME_SPAN / 2;
 
   private Label lblState;
-  private Display display = new Display();
+  private Display display;;
   private Shell shell;
   private ProgressBar progressBar;
   private Scale volumeScale;
@@ -67,12 +67,14 @@ public class Client extends AbstractClient {
   };
   
   public Client() {
+    
+    if(display == null) {
+      display = new Display();
+    }
+    
     initGUI();
     errorDialog = new ErrorDialog(display, shell);
 		uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
-
-    if (trackDatabase.getNoOfTracks() == 0)
-      showAccountDialog();
 
     createDropTarget();
     shell.open();
@@ -261,6 +263,8 @@ public class Client extends AbstractClient {
   }
 
   void showAccountDialog() {
+    display = new Display();
+    strState = "";
     new AccountDialog(display, trackDatabase, downloadThread);
   }
 
@@ -854,5 +858,12 @@ public class Client extends AbstractClient {
   }
 
   public void bitRateUpdated(int bitRate) {}
+
+  /* (non-Javadoc)
+   * @see irate.client.AbstractClient#createNewAccount()
+   */
+  protected void createNewAccount() {
+    showAccountDialog();
+  }
 
 }

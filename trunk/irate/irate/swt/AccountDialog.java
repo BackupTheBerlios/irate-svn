@@ -1,24 +1,36 @@
 package irate.swt;
 
+import irate.common.Preferences;
+import irate.common.TrackDatabase;
+import irate.download.DownloadThread;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.Random;
 
-import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.layout.*;
-import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.Point;
-//import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.SWT;
-import irate.common.*;
-import irate.download.DownloadThread;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.ShellAdapter;
+import org.eclipse.swt.events.ShellEvent;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
+import org.eclipse.swt.widgets.Text;
 
 
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/09/29 11:19:13 $
+ * Date Updated: $Date: 2003/11/21 23:48:17 $
  * @author Creator:	taras
- * @author Updated:	$Author: ajones $
- * @version $Revision: 1.9 $
+ * @author Updated:	$Author: parlabane $
+ * @version $Revision: 1.10 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -32,6 +44,8 @@ public class AccountDialog {
   private Text txtPassword;
   private Text txtServer;
   private Text txtPort;
+  private Text txtDirectory;
+  private Button buttonDirectorySelect;
   /**
    * Creates a new AccountDialog class.
    * 
@@ -50,7 +64,7 @@ public class AccountDialog {
     });
 
     shell.setText("Account Settings");
-    GridLayout layout = new GridLayout(2, false);
+    GridLayout layout = new GridLayout(3, false);
     shell.setLayout(layout);
 
 //    new Label(shell, SWT.NONE).setText(
@@ -61,24 +75,49 @@ public class AccountDialog {
 
     new Label(shell, SWT.NONE).setText("Password");
     txtPassword = new Text(shell, SWT.SINGLE | SWT.BORDER);
-    txtPassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
-    String password = trackDatabase.getPassword();
+    GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+    data.horizontalSpan = 2;
+    txtPassword.setLayoutData(data);String password = trackDatabase.getPassword();
     if (password.length() == 0)
       password = randomString(10);
     txtPassword.setText(password);
 
     new Label(shell, SWT.NONE).setText("Server");
     txtServer = new Text(shell, SWT.SINGLE | SWT.BORDER);
-    txtServer.setLayoutData(
-      new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+    data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+    data.horizontalSpan = 2;
+    txtServer.setLayoutData(data);
     txtServer.setText(trackDatabase.getHost());
 
     new Label(shell, SWT.NONE).setText("Port");
     txtPort = new Text(shell, SWT.SINGLE | SWT.BORDER);
-    txtPort.setLayoutData(
-      new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+    data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+    data.horizontalSpan = 2;
+    txtPort.setLayoutData(data);
     txtPort.setText(Integer.toString(trackDatabase.getPort()));
+    
+    new Label(shell, SWT.NONE).setText("Directory");
+    txtDirectory = new Text(shell, SWT.SINGLE | SWT.BORDER);
+    data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+    data.horizontalSpan = 1;
+    data.widthHint = 200;
+    txtDirectory.setEnabled(false);
+    txtDirectory.setLayoutData(data);
+    txtDirectory.setText(System.getProperties().getProperty("user.home"));
 
+    Button btnDirectory = new Button(shell, SWT.NONE);
+    btnDirectory.setText("Browse...");
+    btnDirectory.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        DirectoryDialog dialog = new DirectoryDialog (shell);
+        dialog.setMessage("Choose the location for iRATE downloads -- The directory 'irate' will be created in this location");
+        String result = dialog.open();
+        if(!result.equals("")) {
+          txtDirectory.setText(result);
+        }
+      }
+    });
+    
     Button btnCancel = new Button(shell, SWT.NONE);
     btnCancel.setText("Cancel");
     btnCancel.addSelectionListener(new SelectionAdapter() {
@@ -116,9 +155,9 @@ public class AccountDialog {
   private void createUserInfo() {
     new Label(shell, SWT.NONE).setText("User");
     txtUser = new Text(shell, SWT.SINGLE | SWT.BORDER);
-    txtUser.setLayoutData(
-      new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
-    String userName = trackDatabase.getUserName();
+    GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+    data.horizontalSpan = 2;
+    txtUser.setLayoutData(data);String userName = trackDatabase.getUserName();
     if (userName.length() == 0) 
       userName = System.getProperty("user.name") + " " + randomString(3); 
     txtUser.setText(userName);
@@ -135,6 +174,36 @@ public class AccountDialog {
         trackDatabase.setPassword(txtPassword.getText());
         trackDatabase.setHost(txtServer.getText());
         trackDatabase.setPort(Integer.parseInt(txtPort.getText()));
+        
+         // Check the current directory for an existing trackdatabase.xml for
+         // compatibility reasons only.
+         File dir = new File(".");
+    
+         File file = new File(dir, "trackdatabase.xml");
+         if (!file.exists()) {
+          dir = new File("/irate");
+          file = new File(dir, "trackdatabase.xml");
+          dir = new File(txtDirectory.getText(), "irate");
+          
+          if (!dir.exists())
+            dir.mkdir();
+          
+          file = new File(dir, "trackdatabase.xml");
+          dir = new File(dir, "download");
+          
+          if(!dir.exists())
+            dir.mkdir();
+         }
+          
+        
+        try {
+          Preferences.savePreferenceToFile("downloadDir", file.toString());
+        } catch (IOException ioe) {
+          ioe.printStackTrace();
+        }
+        trackDatabase.setFile(file);
+        trackDatabase.setDownloadDir(dir);
+        
         downloadThread.contactServer(trackDatabase);
         if (trackDatabase.getNoOfTracks() != 0) {
           done = true;

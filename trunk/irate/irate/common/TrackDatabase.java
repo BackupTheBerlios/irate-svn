@@ -41,9 +41,10 @@ public class TrackDatabase {
     }
     catch (Exception e) {
       e.printStackTrace();
+      create();
       if (!(e instanceof IOException))
         throw new IOException(e.toString());
-      create();
+        
     }
   }
 
@@ -578,4 +579,12 @@ public class TrackDatabase {
     
     return noOfValidTracks < MAX_NO_OF_UNRATED || noOfRated >= MIN_NO_OF_RATED;
   }
+  
+  /** Set the directory that the files will be downloaded into.
+   * @param file
+   */
+  public void setDownloadDir(File file) {
+    downloadDir = file;
+  }
+
 }
