@@ -70,19 +70,16 @@ public class MadplayPlayer extends ExternalPlayer {
           BufferedReader in = new BufferedReader(new InputStreamReader(is));
           BufferedWriter out = new BufferedWriter(new OutputStreamWriter(os));
           
-          while (true) {
-            currentLine = in.readLine();
-            if (currentLine != null) {
-              if (currentLine.charAt(0) != '-') {
-                out.write(currentLine + '\n');
-                out.flush();
-              }
-              else {
-                processPlayerTrackOutput(currentLine);
-                out.flush();
-              }
-            } 
-          }
+          while ((currentLine=in.readLine()) != null) {
+            if (currentLine.charAt(0) != '-') {
+              out.write(currentLine + '\n');
+              out.flush();
+            }
+            else {
+              processPlayerTrackOutput(currentLine);
+              out.flush();
+            }
+          } 
         } 
         catch (IOException ioe) {
           //ioe.printStackTrace();
