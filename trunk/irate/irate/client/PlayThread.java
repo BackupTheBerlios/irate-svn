@@ -159,6 +159,32 @@ public class PlayThread extends Thread {
     if (speech != null && speaking) 
       speech.abort();
   }
+  
+  public synchronized void skipToUnrated(boolean reverse) {
+    setPaused(false);
+    Track[] tracks = playListManager.getPlayList(); 
+    int index = playListManager.getPlayListIndex();
+    int numTracks = tracks.length;
+    // Now search through that playlist for the next unrated track
+    int sIndex;
+    if (!reverse) {
+      sIndex = (index + 1) % numTracks;
+      while (tracks[sIndex].isRated() && sIndex != index) { 
+        sIndex = (sIndex + 1) % numTracks; 
+      }
+    } else {
+      sIndex = (index - 1) % numTracks;
+      while (tracks[sIndex].isRated() && sIndex != index) { 
+        sIndex--;
+        if (sIndex < 0) sIndex = numTracks-1;
+      }
+    }
+    if (sIndex == index) { // no unrated tracks on playlist
+      skipSong(reverse);
+      return;
+    }
+    play(tracks[sIndex]);        
+  }
 
 	public synchronized void reject(){
     skipSong(false);			

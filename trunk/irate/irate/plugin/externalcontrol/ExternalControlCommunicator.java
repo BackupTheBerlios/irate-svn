@@ -15,9 +15,9 @@ import nanoxml.*;
  *  connections can be handled by different instances.
  *
  * Date Created: 20/9/2003
- * Date Updated: $$Date: 2004/06/10 03:18:05 $$
+ * Date Updated: $$Date$$
  * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
- * @author Updated:	$$Author: blackh $$
+ * @author Updated:	$$Author$$
  * @version $$Revision: 1.5 $$
  */
 
@@ -149,8 +149,12 @@ public class ExternalControlCommunicator
             app.skip(false);
             trackResponseXML(response, app.getPlayingTrack());
             response.setAttribute("source","playing");
-            replyNeeded = true;          
-
+            replyNeeded = true;
+          } else if (cmdType.equals("skiptounrated")) {
+          	app.skipToUnrated(false);
+          	trackResponseXML(response, app.getPlayingTrack());
+          	response.setAttribute("source","playing");
+          	replyNeeded = true;
           } else if (cmdType.equals("rateplaying")) {
             int rating = command.getIntAttribute("rate");
             app.setRating(app.getPlayingTrack(), rating);

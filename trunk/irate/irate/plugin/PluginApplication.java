@@ -36,6 +36,12 @@ public interface PluginApplication
    * Skip to the next or previous song.
    */
   public void skip(boolean reverse);
+  
+  /**
+   * Skip to the next or previous unrated track. Behaves like 
+   * <code>skip</code> if there are no unrated tracks on the playlist. 
+   */
+  public void skipToUnrated(boolean reverse);
 
   /**
    * Get the track that is currently being played.

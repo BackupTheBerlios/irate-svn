@@ -4,16 +4,16 @@
 # external control plugin.
 
 # iRATE: http://irate.sf.net
-# Plugin specs: http://www.kallisti.net.nz/wiki/IrateDev/ExternalControlProto
+# Plugin specs: http://www.kallisti.net.nz/IrateDev/ExternalControlProto
 
 # Depends on XML::Simple, Digest::MD5
 
 # Copyright (C) 2003 Robin Sheat <robin@kallisti.net.nz>
 # Released under the GNU General Public License
 
-# Version 0.03 - 22/9/2003
+# Version 0.04 - 19/3/2005
 
-# $Id: irate-control.pl,v 1.6 2004/02/14 03:50:04 eythian Exp $
+# $Id$
 
 use XML::Simple;
 use IO::Socket;
@@ -117,7 +117,7 @@ while (!$finished) {
     print "Plays:\t$result{numtimes}\n";
     print "Rate:\t$result{state}\n\n";
 
-    print "[S]kip\t\t[P]ause/unpause\n";
+    print "[S]kip\t\t[P]ause/unpause\tSkip to [U]nrated\n";
     print "[1] This sux\t[2] Yawn\t[3] Not bad\n";
     print "[4] Cool\t[5] Love it\n";
     print "[W]hats playing\t[Q]uit\n";
@@ -132,6 +132,8 @@ while (!$finished) {
     if ($input =~ /s/i) {
         %command = ( 'type' => 'skip' );
         $poke = 1;
+    } elsif ($input =~ /u/i) {
+        %command = ( 'type' => 'skiptounrated' );
     } elsif ($input =~ /p/i) {
         %command = ( 'type' => 'invert-pause' );
     } elsif ($input =~ /q/i) {
@@ -147,7 +149,7 @@ while (!$finished) {
     print $socket XMLout(\%command, rootname => 'Command');
     
     # work around for iRATE bug
-    if ($input =~ /s|1/i) {
+    if ($input =~ /s|u|1/i) {
         sleep 3; # takes a moment for the player to change
     }
 }

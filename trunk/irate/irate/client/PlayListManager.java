@@ -31,6 +31,10 @@ public class PlayListManager {
   public synchronized Track[] getPlayList() {
     return (Track[]) playList.toArray(new Track[playList.size()]);
   }
+  
+  public int getPlayListIndex() {
+    return playListIndex;
+  }
 
   public synchronized Track chooseTrack() {
      int playListLength = trackDatabase.getPlayListLength();

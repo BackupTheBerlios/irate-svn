@@ -488,6 +488,25 @@ public class Client extends AbstractClient {
       }
     });
   }
+  
+  public void skipToUnrated(final boolean reverse) {
+   super.skipToUnrated(reverse);
+   // We have to delegate to the SWT event thread, because we might be
+   // called from a thread other than it, such as the remote control thread.
+   display.asyncExec(new Runnable() {
+     public void run() {
+       if (reverse && !playThread.goBack()) {
+         previous.setEnabled(false);
+       }
+       // If the play/pause button is pressed, meaning it is paused, then
+       // 'press' the button.  
+       if(!play.isPressed()) {
+         play.setSelection(false);
+       }
+     }
+   });
+  
+  }
 
   void showAccountDialog() {
     new AccountDialog(display, trackDatabase, downloadThread);

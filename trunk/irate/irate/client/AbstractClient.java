@@ -280,6 +280,12 @@ public abstract class AbstractClient
       downloadThread.checkAutoDownload();
     }
   }
+  
+  public void skipToUnrated(boolean reverse) {
+    setPaused(false);
+    playThread.skipToUnrated(reverse);
+    downloadThread.checkAutoDownload();
+  }
 
   public void quit() {
     trackDatabase.purge();
