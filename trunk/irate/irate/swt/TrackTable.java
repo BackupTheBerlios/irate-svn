@@ -102,6 +102,8 @@ public class TrackTable
   
   private TrackTableMenu popupMenu;
   
+  private static int columnAdjustTime = 0;
+  
   /** Constructor to create a table contained in the given Shell where the
    * tracks are updated from the given TrackDatabase. 
    * @param composite     The Composite to add the Table to.
@@ -176,7 +178,7 @@ public class TrackTable
     });
     skinManager.addItem(col, "TrackTable.Heading.License");
     skinManager.add(basicSkinable, "TrackTable");
-    
+
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
@@ -238,13 +240,22 @@ public class TrackTable
       {
         // Carbon tables have some extra column margin width.
         // Table.EXTRA_WIDTH is hardcoded to 24, and of course not public.
-        // There are also about 4 pixels on the right due for the focus ring.
+        // There are also about 4 pixels around the edges for the focus ring.
         final int margin = Client.isMac() ? 24 : 0;
         final int gutter = Client.isMac() ? 4 : 0;
         
         // On Mac OS X, column header selection is broken. We need to check
         // here for a column header hit to provide sort-on-click:
-        if (Client.isMac() && e.y < 20) {
+        final int header = table.getHeaderHeight();
+        if (e.y > gutter && e.y < gutter + header - 1 && Client.isMac()) {
+          // Mysteriously we receive the initial mouse down event after the
+          // resize events when the user resizes columns by dragging.
+          // Check the event timestamp against the last column resize event
+          // (Naturally the timestamps are unsigned 32-bit integers, which
+          // Java doesn't support. Thanks Java!)
+          if (((long)e.time & 0xffffffffL) < ((long)columnAdjustTime & 0xffffffffL))
+            return;
+
           final int sizeHandle = 4; // Resizing columns
           int colStart = gutter;
           for(int i = 0; i < table.getColumnCount(); i++ ) {
@@ -325,6 +336,12 @@ public class TrackTable
         }
         updateTable();
       } 
+    });
+    column.addListener(SWT.Resize, new Listener() {
+      public void handleEvent(Event e) {
+        // Avoid weird out of order click events on Mac OS X
+        columnAdjustTime = e.time;
+      }
     });
   }
   
