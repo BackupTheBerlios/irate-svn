@@ -16,10 +16,10 @@ import irate.plugin.externalcontrol.ExternalControlPlugin;
  * SWT version of the configurator for the external control plugin
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/09/21 11:26:15 $$
+ * Date Updated: $$Date: 2003/09/21 11:59:03 $$
  * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.4 $$
+ * @version $$Revision: 1.5 $$
  */
 public class ExternalControlConfigurator {
   private Display display;
@@ -30,6 +30,8 @@ public class ExternalControlConfigurator {
   private Text port;
   private Text simConn;
   private Button localhostOnly;
+  private Button requirePassword;
+  private Text password;
 
   public ExternalControlConfigurator(Display display_, PluginApplication app_, Plugin plugin_)
   {
@@ -81,6 +83,18 @@ public class ExternalControlConfigurator {
     localhostOnly.setSelection(plugin.getLocalhostOnly());
     localhostOnly.addSelectionListener(buttonSelected);
 
+    new Label(shell, SWT.NONE).setText("Require password");
+    requirePassword = new Button(shell, SWT.CHECK);
+    requirePassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+    requirePassword.setSelection(plugin.getRequirePassword());
+    requirePassword.addSelectionListener(buttonSelected);
+    
+    new Label(shell, SWT.NONE).setText("Password");
+    password = new Text(shell, SWT.SINGLE | SWT.BORDER);
+    password.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+    password.setText(plugin.getPassword());
+    password.addModifyListener(callSetup);
+
     org.eclipse.swt.widgets.Button ok = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
     ok.setText("OK");
     GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
@@ -108,6 +122,8 @@ public class ExternalControlConfigurator {
         plugin.setPort(Integer.parseInt(port.getText()));
         plugin.setSimConnections(Integer.parseInt(simConn.getText()));
         plugin.setLocalhostOnly(localhostOnly.getSelection());
+        plugin.setRequirePassword(requirePassword.getSelection());
+        plugin.setPassword(password.getText());
       }
     }
     catch (NumberFormatException e) {

@@ -15,10 +15,10 @@ import nanoxml.*;
  * network socket.
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/09/21 11:26:15 $$
+ * Date Updated: $$Date: 2003/09/21 11:59:03 $$
  * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.8 $$
+ * @version $$Revision: 1.9 $$
  */
 
 public class ExternalControlPlugin 
@@ -27,6 +27,8 @@ public class ExternalControlPlugin
   private int port;
   private int simConns;
   private boolean localhostOnly;
+  private boolean requirePassword;
+  private String password;
   private IOThread socketListener;
   private PluginApplication app;
   /**
@@ -35,7 +37,9 @@ public class ExternalControlPlugin
   public ExternalControlPlugin() {
     port = 12473;  // Default port number (12473 = RATE - sorry :)
     simConns = 20;
-    localhostOnly = true;
+    localhostOnly = true;     // Default to fairly safe...
+    requirePassword = false;  // ...and also convenient.
+    password = "";
   } // ExternalControlPlugin()
 
   /**
@@ -75,7 +79,11 @@ public class ExternalControlPlugin
   public void parseConfig(XMLElement elt) {
    port = elt.getIntAttribute("port",port);
    simConns = elt.getIntAttribute("simConns",simConns);
-   localhostOnly = elt.getBooleanAttribute("localhostOnly","yes","no",localhostOnly);
+   localhostOnly = 
+     elt.getBooleanAttribute("localhostOnly", "true","false",localhostOnly);
+   requirePassword =
+     elt.getBooleanAttribute("requirePassword","true","false",requirePassword);
+   password = elt.getStringAttribute("password",password);
   } // parseConfig(XMLElement elt)
 
   /**
@@ -84,7 +92,9 @@ public class ExternalControlPlugin
   public void formatConfig(XMLElement elt) {
     elt.setIntAttribute("port",port);
     elt.setIntAttribute("simConns",simConns);
-    elt.setAttribute("localhostOnly", localhostOnly?"yes":"no");
+    elt.setAttribute("localhostOnly",localhostOnly?"true":"false");
+    elt.setAttribute("requirePassword",requirePassword?"true":"false");
+    elt.setAttribute("password",password);
   } // formatConfig(XMLElement elt)
 
   // --- Accessors and Modifiers ---
@@ -129,6 +139,34 @@ public class ExternalControlPlugin
    */
   public void setLocalhostOnly(boolean l) {
     localhostOnly = l;
+  }
+
+  /**
+   * Returns true if we require password authorisation
+   */
+  public boolean getRequirePassword() {
+    return requirePassword;
+  }
+
+  /**
+   * Specifies whether a password should be required to connect
+   */
+  public void setRequirePassword(boolean r) {
+    requirePassword = r;
+  }
+
+  /**
+   * Returns the password
+   */
+  public String getPassword() {
+    return password;
+  }
+
+  /**
+   * Sets the password
+   */
+  public void setPassword(String p) {
+    password = p;
   }
 
   /* --- IOThread class --- */
