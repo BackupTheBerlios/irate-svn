@@ -536,12 +536,15 @@ public class Client extends AbstractClient {
   public void createShell() {
     shell = new Shell(display);
     shell.setText("iRATE Radio - Initializing");
-    try {
-      shell.setImage(Resources.getIconImage(display, shell.getBackground()));
-    } 
-    catch(IOException e) {
-      System.out.println("Couldn't load the silly Icon");
-    }
+    
+    // On Mac OS X we already have an icon set by the application bundle
+    if (!isMac())
+      try {
+        shell.setImage(Resources.getIconImage(display, shell.getBackground()));
+      } 
+      catch(IOException e) {
+        System.out.println("Couldn't load the silly Icon");
+      }
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
         quit();
