@@ -183,7 +183,7 @@ public class DownloadThread extends Thread {
         setState("Connecting " + track.getName());
         
         //30 second timeout for the impatient
-        long timeout = 60000;
+        long timeout = 180000;
         TimeoutWorker worker = new TimeoutWorker((Object) url) {
         	public void run() {
         		try {
