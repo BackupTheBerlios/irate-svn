@@ -19,8 +19,8 @@ public class UserList {
     for (int i = 0; i < files.length; i++)
       if (files[i].getName().toLowerCase().endsWith(".xml")) 
         try {
-          ServerDatabase user = new ServerDatabase(files[i]);
-          users.add(user);
+          DatabaseReference ref = new DatabaseReference(files[i]);
+          users.add(ref);
           if ((i % 100) == 0)
             System.out.print(".");
         }
@@ -32,38 +32,46 @@ public class UserList {
     System.out.println(users.size() + " users");
   }
 
-  public ServerDatabase getUser(String name) {
+  public DatabaseReference getUser(String name) {
     for (int i = 0; i < users.size(); i++) {
-      ServerDatabase user = (ServerDatabase) users.elementAt(i);
+      DatabaseReference user = (DatabaseReference) users.elementAt(i);
       if (name.equals(user.getUserName()))
         return user;
     }
     return null;
   }
 
-  public ServerDatabase createUser(String name, String password) {
+  public DatabaseReference createUser(String name, String password) throws IOException {
+    File file = new File(userDir, name + ".xml");
     ServerDatabase user = new ServerDatabase();
-    user.setFile(new File(userDir, name + ".xml"));
+    user.setFile(file);
     user.setUserName(name);
     user.setPassword(password);
+    user.save();    
     users.add(user);
-    return user;
+    return new DatabaseReference(file);
   }
   
-  public ServerDatabase[] getUsers() {
-    return (ServerDatabase[]) users.toArray(new ServerDatabase[users.size()]);
+  public DatabaseReference[] getUsers() {
+    return (DatabaseReference[]) users.toArray(new DatabaseReference[users.size()]);
   }
   
-  public ServerDatabase randomUser(Random random, ServerDatabase user) {
+  public DatabaseReference randomUser(Random random, ServerDatabase user) {
     if (users.size() == 0) 
       return null; 
     if (users.size() == 1 && users.elementAt(0) == user)
       return null;
     
     while (true) {
-      ServerDatabase peer = (ServerDatabase) users.elementAt((random.nextInt() & 0x7fffffff) % users.size());
-      if (peer != user) 
+      DatabaseReference peer = (DatabaseReference) users.elementAt((random.nextInt() & 0x7fffffff) % users.size());
+      if (!peer.refersTo(user)) 
         return peer;
     }
+  }
+  
+  public void discardAll() {
+    DatabaseReference[] users = getUsers();
+    for (int i = 0; i < users.length; i++)
+      users[i].discard();
   }
 }

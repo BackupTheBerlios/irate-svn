@@ -46,15 +46,36 @@ public class MasterDatabase extends ServerDatabase {
 
       // Find the orphans
     System.out.println("Finding orphans");
-    orphans = findOrphans();
-    System.out.println(orphans.getNoOfTracks() + " orphans");
+//    orphans = findOrphans();
+//    System.out.println(orphans.getNoOfTracks() + " orphans");
+    userList.discardAll();
   }
   
   public ServerDatabase processRequest(ServerDatabase request) {
+    ServerDatabase reply = null; 
+    try {
+      reply = doProcessRequest(request);
+    }
+    finally {
+      userList.discardAll();
+    }
+    return reply;
+  }
+  
+  private ServerDatabase doProcessRequest(ServerDatabase request) {
     ServerDatabase reply = new ServerDatabase();
 
     System.out.println("User " + request.getUserName() + " " + request.getNoOfTracks());
-    ServerDatabase user = userList.getUser(request.getUserName());
+    DatabaseReference userRef = userList.getUser(request.getUserName());
+    ServerDatabase user = null;
+    try {
+      user = userRef.getServerDatabase();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+      reply.setError("user", "user.html");
+      return reply;      
+    }
 
       // If the user doesn't exist or the password is incorrect the return a 
       // blank response.
@@ -64,7 +85,13 @@ public class MasterDatabase extends ServerDatabase {
         reply.setError("user", "user.html");
         return reply;
       }
-      user = userList.createUser(request.getUserName(), request.getPassword());
+      try {
+        DatabaseReference ref = userList.createUser(request.getUserName(), request.getPassword());
+      }
+      catch (IOException e) {
+        reply.setError("user", "user.html");
+        return reply;
+      }
     }
 
     if (!user.getPassword().equals(request.getPassword())) {
@@ -93,8 +120,8 @@ public class MasterDatabase extends ServerDatabase {
       }
     }
 
-
     if (user.getNoOfTracks() >= initialPeerTracks) {
+/*
       if ((random.nextInt() % orphanChance) == 0) {
           // If there are any orphans then we add one here
         Track track = orphans.randomTrack(random);
@@ -104,6 +131,7 @@ public class MasterDatabase extends ServerDatabase {
           reply.add(track);
         }
       }
+*/
 
         // See if we can correlate a track
       ServerDatabase corel = getBest(user);
@@ -121,14 +149,20 @@ public class MasterDatabase extends ServerDatabase {
       // Correlate tracks for new users
     if (reply.getNoOfTracks() == 0 && user.getNoOfTracks() < peerThreshhold) {
       for (int i = 0; i < peerRetries; i++) {
-        ServerDatabase peer = userList.randomUser(random, user);
-        if (peer != null) {
-          System.out.println("Peer: " + peer.getUserName());
-          Track track = peer.chooseTrack(random);
-          if (track != null && user.getTrack(track) == null) {
-            System.out.println("Peer track: " + track.getName() + " " + track.getRating());
-            reply.add(track);
-            break;
+        DatabaseReference peerRef = userList.randomUser(random, user);
+        if (peerRef != null) {
+          try {
+            ServerDatabase peer = peerRef.getServerDatabase();
+            System.out.println("Peer: " + peer.getUserName());
+            Track track = peer.chooseTrack(random);
+            if (track != null && user.getTrack(track) == null) {
+              System.out.println("Peer track: " + track.getName() + " " + track.getRating());
+              reply.add(track);
+              break;
+            }
+          }
+          catch (IOException e) {
+            e.printStackTrace();
           }
         }
       }
@@ -166,7 +200,7 @@ public class MasterDatabase extends ServerDatabase {
     purge(reply);
     try {
       user.add(reply);
-      user.save();
+      userRef.save();
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -178,11 +212,19 @@ public class MasterDatabase extends ServerDatabase {
   public ServerDatabase findOrphans() {
     ServerDatabase orphans = new ServerDatabase();
     Track[] tracks = getTracks();
-    ServerDatabase[] users = userList.getUsers();
+    DatabaseReference[] users = userList.getUsers();
+    ServerDatabase[] sd = new ServerDatabase[users.length];
+    for (int j = 0; j < users.length; j++) 
+      try {
+        sd[j] = users[j].getServerDatabase();
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
     for (int i = 0; i < tracks.length; i++) {
       add: {
-        for (int j = 0; j < users.length; j++) 
-          if (users[j].getTrack(tracks[i]) != null)
+        for (int j = 0; j < sd.length; j++)
+          if (sd[j] != null && sd[j].getTrack(tracks[i]) != null)
             break add;
         orphans.add(tracks[i]);
       }
@@ -200,7 +242,7 @@ public class MasterDatabase extends ServerDatabase {
   }
 
   public ServerDatabase getBest(ServerDatabase user) {
-    ServerDatabase[] users = userList.getUsers();
+    DatabaseReference[] users = userList.getUsers();
     TrackAverageRating tar = new TrackAverageRating();
     TreeMap treeMap = new TreeMap(new Comparator() {
       public int compare(Object o0, Object o1) {
@@ -212,15 +254,22 @@ public class MasterDatabase extends ServerDatabase {
       }
     });
     for (int i = 0; i < users.length; i++) {
-      if (user != users[i]) {
-        DatabaseCorrelator dc = new DatabaseCorrelator(user, users[i]);
-        dc.process();
-        float correlation = dc.getCorrelation();
-        if (correlation > 0) {
-//          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation() + " " + dc.getSpares().getNoOfTracks());
-          treeMap.put(dc, dc);
-//          tar.add(dc.getSpares(), correlation);
-        }
+      try {
+        if (!users[i].refersTo(user)) {
+          ServerDatabase sd = users[i].getServerDatabase();
+          DatabaseCorrelator dc = new DatabaseCorrelator(user, sd);
+          dc.process();
+          float correlation = dc.getCorrelation();
+          if (correlation > 0) {
+  //          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation() + " " + dc.getSpares().getNoOfTracks());
+            treeMap.put(dc, dc);
+  //          tar.add(dc.getSpares(), correlation);
+          }
+          users[i].discard();
+        }        
+      }
+      catch (IOException e) {
+        e.printStackTrace();
       }
     }
     int count = treeMap.size() / 10;

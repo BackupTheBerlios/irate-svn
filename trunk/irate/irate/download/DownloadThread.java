@@ -188,7 +188,22 @@ public class DownloadThread extends Thread {
 
         //0 second timeout for the impatient
         long timeout = 60000;
-        TimeoutWorker worker = new TimeoutWorker((Object) url) {
+        URL finalUrl = null; //JDR
+        String HTTPProxy = trackDatabase.getHTTPProxy(); //JDR
+        if ((HTTPProxy!=null) && (!HTTPProxy.trim().equals("")) ) //JDR
+        {//JDR HTTP proxy *is* defined in xml file.
+        	System.out.println("\nUsing HTTPProxy:"+HTTPProxy+"\n"); //JDR
+        	finalUrl = new URL ("http",HTTPProxy,trackDatabase.getHTTPProxyPort(),url.toString());//JDR
+        	//JDR The URL constructor created this way will cause the URL to go through the proxy.
+        	//JDR port -1 = protocol port default (example http uses port 80 unless otherwise specified).
+        } else //JDR
+        {//JDR HTTP proxy is *not* defined in xml file.
+        	System.out.println("\nNo HTTP proxy in use.\n"); //JDR
+        	finalUrl = url; //JDR
+        } //JDR
+        
+//JDR        TimeoutWorker worker = new TimeoutWorker((Object) url) {
+        TimeoutWorker worker = new TimeoutWorker((Object) finalUrl) { //JDR
           public void run() {
             try {
               URLConnection conn = ((URL) input).openConnection();

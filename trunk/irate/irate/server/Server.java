@@ -8,8 +8,19 @@ import java.net.*;
 public class Server {
 
   public static void main(String args[]) {
+    int socket = 2278;
+    for (int i = 0; i < args.length; i++) {
+      if (args[i].equals("--listen")) {
+        if (++i < args.length) 
+          try {
+            socket = Integer.parseInt(args[i]);
+          }
+          catch (NumberFormatException e) {
+          }
+      } 
+    }
     try {
-      Server server = new Server();
+      Server server = new Server(socket);
       server.run();
     }
     catch (IOException e) {
@@ -22,8 +33,12 @@ public class Server {
   private RequestHandler requestHandler;
   private ServerSocket serverSocket;
 
-  public Server() throws IOException {
-    serverSocket = new ServerSocket(2278);
+  /** Create a server.
+   * @param socketNo The socket number to listen to.
+   */
+
+  public Server(int socketNo) throws IOException {
+    serverSocket = new ServerSocket(socketNo);
     
     userList = new UserList();
 

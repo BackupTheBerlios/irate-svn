@@ -161,7 +161,13 @@ public class TrackDatabase {
   }
 
   public String getUserName() {
-    return getAttribute(userElementName, "name").replace('/', '.').replace('\\', '.');
+    char[] c = getAttribute(userElementName, "name").toCharArray();
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < c.length; i++) {
+      if (c[i] < ' ' || c[i] > '~' || c[i] == '/' || c[i] == '\\')
+        c[i] = '.'; 
+    }
+    return new String(c);
   }
 
   public void setUserName(String name) {
@@ -190,6 +196,29 @@ public class TrackDatabase {
   public void setHost(String host) {
     setAttribute(userElementName, "host", host);
   }
+
+//JDR \/ \/ \/ \/ \/ \/
+  public String getHTTPProxy() { //JDR
+    return getAttribute(userElementName, "HTTPProxy"); //JDR
+  } //JDR
+
+  public void setHTTPProxy(String proxy) { //JDR
+    setAttribute(userElementName, "HTTPProxy", proxy); //JDR
+  } //JDR
+
+  public int getHTTPProxyPort() { //JDR
+    try { //JDR
+      return Integer.parseInt(getAttribute(userElementName,"HTTPProxyPort")); //JDR
+    } //JDR
+    catch (NumberFormatException e) { //JDR
+    } //JDR
+    return -1;//-1 specifies the protocol default port //JDR
+  } //JDR
+
+  public void setHTTPProxyPort(int proxyPort) { //JDR
+    setAttribute(userElementName, "HTTPProxyPort", Integer.toString(proxyPort)); //JDR
+  } //JDR
+//JDR /\ /\ /\ /\ /\ /\
 
   public int getPort() {
     try {
