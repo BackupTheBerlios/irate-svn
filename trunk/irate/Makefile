@@ -62,6 +62,9 @@ lib/libnanoxml-lite.o:
 
 lib/libnanoxml-lite.o:
 	$(MAKE) -C lib/ libnanoxml-lite.o
+
+lib/libhttpclient.o:
+	$(MAKE) -C lib/ libhttpclient.o
 	
 $(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS)
 	$(GCJ)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
