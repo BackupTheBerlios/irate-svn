@@ -224,6 +224,7 @@ public class MasterDatabase extends ServerDatabase {
       track.unSetNoOfTimesPlayed();
       track.unSetFile();
       track.unSetWeight();
+      track.unSetVolume();
     }
   }
 

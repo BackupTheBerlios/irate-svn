@@ -167,7 +167,7 @@ public class Track {
     return 0;
   }
   
-  public void unsetVolume() {
+  public void unSetVolume() {
     elt.setAttribute("volume", "");
   }
   
