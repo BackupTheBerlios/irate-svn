@@ -1,7 +1,10 @@
+# Author: Taras Glek
+# Modifed by: Anthony Jones, Philip Brown
 include make.configure
 
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
+JAVAC=javac
 export GCJ=gcj -g -pipe -O0
 IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
@@ -14,6 +17,13 @@ export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar
 
 CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
 CLIENT_LIBS = lib/libnanoxml-lite.o 
+
+JAVA_SWTSRC=irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
+JAVA_SWINGSRC=irate/swing/*.java
+JAVA_COMMONSRC=irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java
+JAVA_DOWNLOAD=irate/download/*.java
+HELPFILES=irate/client/help/*.html
+JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(CLIENT_FILES:.java=.class) $(JAVA_DOWNLOAD:.java=.class)
 
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
@@ -98,20 +108,19 @@ lib/libhttpclient.o:
 $(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS)
 	$(GCJ) $(CLIENT_LINKFLAGS)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
 
-
 $(IRATE_SERVER): $(SERVER_LIBS) $(SERVER_DEPS) 
 	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o $(IRATE_SERVER) --main=irate.server.Server
 	
 irate-swt.o: irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java lib/swt.jar
-	$(GCJ) -c irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java -o irate-swt.o
+	$(GCJ) -c $(JAVA_SWTSRC) -o irate-swt.o
 
 irate-client.o: $(CLIENT_FILES)
 	$(GCJ) -c $(CLIENT_FILES) -o irate-client.o
 
-irate-download.o: irate/download/*.java
-	$(GCJ) -c irate/download/*.java -o irate-download.o
+irate-download.o: $(JAVA_DOWNLOAD)
+	$(GCJ) -c $(JAVA_DOWNLOAD) -o irate-download.o
 	
-irate-common.o:irate/common/FastTrack.java irate/common/TrackDatabase.java irate/common/Track.java irate/common/UpdateListener.java irate/plugin/*.java irate/plugin/*/*.java
+irate-common.o:	$(JAVA_COMMONSRC)
 	$(GCJ) -c $^ -o irate-common.o
 
 irate-server.o:irate/server/*.java
@@ -130,6 +139,14 @@ setup.exe: $(IRATE_CLIENT)
 
 tarball: $(IRATE_CLIENT)
 	bin/mktarball.sh
+
+# for "pure java" compilation of a "pure java" client
+irate-client-swing.jar:
+	$(JAVAC) $(JAVA_COMMONSRC)
+	$(JAVAC) $(JAVA_SWINGSRC)
+	$(JAVAC) $(CLIENT_FILES)
+	$(JAVAC) $(JAVA_DOWNLOAD)
+	jar -cmf META-INF/manifest.irate-client irate-client-swing.jar $(JAVA_OBJS) $(HELPFILES)
 
 clean:
 	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o setup.exe -R irate-linux-i586*
