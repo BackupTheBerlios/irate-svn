@@ -290,7 +290,7 @@ public class DownloadThread extends Thread {
                  + track.getName());
         for (int i = 0; i < downloadListeners.size(); i++)
           ((DownloadListener)downloadListeners.get(i)).downloadStarted(track);
-        final byte buf[] = new byte[128000];
+        final byte buf[] = new byte[8192];
 
           // If we are resuming a download, then we must feed the already-downloaded
           // part of the file to the download listeners.  They are only expected
