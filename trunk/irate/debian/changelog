@@ -1,3 +1,9 @@
+irate (0.3-0pre3) unstable; urgency=low
+
+  * Fixed GTK menu.
+
+ -- Anthony Jones <tj@escher>  Fri, 26 Sep 2003 22:56:47 +0800
+
 irate (0.3-0pre2) unstable; urgency=low
 
   * Now runs configure script.
