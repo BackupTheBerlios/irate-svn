@@ -31,23 +31,29 @@ public class DownloadThread extends Thread {
   public void run() {
     while (true) {
       doCheckAutoDownload();
-      
+
       try {
-	boolean wasReady = false;
-	synchronized (this) {
-	  if (!ready)
-	    wait();
+        boolean wasReady;
+        synchronized (this) {
+          if (!ready)
+            wait();
           wasReady = ready;
-	}
-	if (wasReady) {
+        }
+        if (wasReady) {
           do {
             process();
-          } while (continuous);
-	  ready = false;
-	}
+          }
+          while (continuous);
+          ready = false;
+        }
       }
-      catch (InterruptedException e) {
-	e.printStackTrace();
+      catch (IOException ioe) {
+        if (continuous) 
+          handleError("continuousfailed", "continuousfailed.html");
+        ioe.printStackTrace();
+      }
+      catch (InterruptedException ie) {
+        ie.printStackTrace();
       }
     }
   }
@@ -70,7 +76,7 @@ public class DownloadThread extends Thread {
     this.continuous = continuous;
   }
   
-  private boolean downloadSinglePending() {
+  private boolean downloadSinglePending() throws IOException {
     Track[] tracks = trackDatabase.getTracks();
     for (int i = 0; i < tracks.length; i++) {
       currentTrack = tracks[i];
@@ -96,7 +102,7 @@ public class DownloadThread extends Thread {
     return false;
   }
 
-  public void process() {
+  public void process() throws IOException {
     if (!downloadSinglePending()) {
       contactServer(trackDatabase);
       downloadSinglePending();
@@ -107,7 +113,7 @@ public class DownloadThread extends Thread {
     System.out.println("Server error: " + code);
   }
 
-  public void download(Track track) {
+  public void download(Track track) throws IOException {
     try {
       OutputStream os = null;
       InputStream is = null;

@@ -75,7 +75,7 @@ public class Client extends JFrame {
     errorDialog = new ErrorDialog(this);
     
     downloadThread = new DownloadThread(trackDatabase) {
-      public void process() {
+      public void process() throws IOException {
         menuItemDownload.setEnabled(false);
         super.process();
         perhapsDisableAccount();

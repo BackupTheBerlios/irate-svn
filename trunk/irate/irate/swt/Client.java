@@ -85,7 +85,7 @@ public class Client implements UpdateListener {
         
     
     downloadThread = new DownloadThread(trackDatabase) {
-      public void process() {
+      public void process() throws IOException {
         super.process();
        // perhapsDisableAccount();
       }

@@ -12,7 +12,7 @@
   </target>
 
   <target name="jar" depends="compile">
-<!--    <jar jarfile="irate-client.jar" manifest="META-INF/manifest.irate-client" compress="false">
+<!--    <jar jarfile="irate-swing-client.jar" manifest="META-INF/manifest.irate-client" compress="false">
       <fileset dir="." includes="irate/swing/*.class"/>
       <fileset dir="." includes="irate/client/*.class"/>
       <fileset dir="." includes="irate/client/help/*.html"/>
