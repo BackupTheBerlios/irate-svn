@@ -12,23 +12,26 @@ import irate.common.Preferences;
 import irate.plugin.*;
 
 /**
- * @author Stephen Blackheath
+ * Date Updated: $Date: 2003/11/27 08:12:26 $
+ * @author Creator: Stephen Blackheath
+ * @author Updated: Robin Sheat
+ * @version $Revision: 1.8 $
  */
 public class SettingDialog
 {
-	public static final int PLUGIN_PAGE = 0;
-	public static final int BROWSER_PAGE = 1;	
+  public static final int PLUGIN_PAGE = 0;
+  public static final int BROWSER_PAGE = 1;	
   private PluginManager pluginManager;
   private boolean done = false;
-	private Shell shell;
+  private Shell shell;
   private PluginApplication app;
   private TabFolder tabs;
   
   private String browser;
-    
-	public SettingDialog(Display display, PluginManager pluginManager, PluginApplication app) {
+  
+  public SettingDialog(Display display, PluginManager pluginManager, PluginApplication app) {
     this.pluginManager = pluginManager;
-		this.app = app;
+    this.app = app;
     browser = Preferences.getUserPreference("browser");
     if (browser == null) {
       browser = "";
@@ -141,12 +144,92 @@ public class SettingDialog
 
   
   private Composite createBrowserPage(Composite parent) {
-    Composite comp = new Composite(parent, SWT.NONE);
+    final Composite comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(1, false);
     comp.setLayout(layout);
-    new Label(comp, SWT.NONE).setText("Browser Executable:");
+    new Label(comp, SWT.NONE).setText("Browser:");
+
+    class BrowserButton {
+      String description; // Button label
+      String command;     // Command it generates
+      Button button;
     
+      public BrowserButton(String d, String c) {
+        description = d;
+        command = c;
+        button = new Button(comp, SWT.RADIO);
+        button.setText(description);
+      }
+
+      public void addSelectionListener(SelectionListener s) {
+        button.addSelectionListener(s);
+      }
+
+      public Button getButton() {
+        return button;
+      }
+    
+      public String getCommand() {
+        return command;
+      }
+    
+      public boolean isCommand(String s) {
+        return command.equals(s);
+      }
+    }
+
+    final BrowserButton[] browsers = { 
+      new BrowserButton("Mozilla/Firebird (Linux/UNIX)","mozilla"),
+      new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec"),
+      new BrowserButton("Windows Default",
+                        "rundll32 url.dll,FileProtocolHandler")};
+    final Button browserSpecified = new Button(comp, SWT.RADIO);
     final Text browserText = new Text(comp, SWT.NONE);
+    final Button browseButton = new Button(comp, SWT.NONE);
+
+    class DoBrowser implements SelectionListener {
+      public void widgetSelected(SelectionEvent e) {
+        for (int i=0; i<browsers.length; i++) {
+          if (browsers[i].getButton().getSelection()) {
+            browserText.setText(browsers[i].getCommand());
+          }
+        }
+        if (browserSpecified.getSelection()) {
+          browserText.setEnabled(true);
+          browseButton.setEnabled(true);
+        } else {
+          browserText.setEnabled(false);
+          browseButton.setEnabled(false);
+        }
+      }
+    
+      public void widgetDefaultSelected(SelectionEvent e) { }
+    }
+
+    SelectionListener sel = new DoBrowser();
+
+    // Set the default radio button, based on the browser text. Whilst
+    // doing this, we can se the selction listener.
+    boolean selected = false;
+    for (int i=0;i<browsers.length;i++) {
+      browsers[i].addSelectionListener(sel);
+      if (browsers[i].getCommand().equals(browser) && !selected) {
+        browsers[i].getButton().setSelection(true);
+        selected = true;
+      }
+    }
+    if (!selected) {
+      browserSpecified.setSelection(true);
+      browserText.setEnabled(true);
+      browseButton.setEnabled(true);
+    } else {
+      browserText.setEnabled(false);
+      browseButton.setEnabled(false);
+    }
+
+    browserSpecified.setText("User Specified:");
+    browserSpecified.addSelectionListener(sel);
+
     browserText.setText(browser);
     browserText.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
     browserText.addModifyListener(new ModifyListener(){
@@ -155,7 +238,6 @@ public class SettingDialog
         }
       });
     
-    Button browseButton = new Button(comp, SWT.NONE);
     browseButton.setText("Browse ...");
     
     browseButton.addSelectionListener(new SelectionAdapter(){
@@ -170,4 +252,6 @@ public class SettingDialog
     
     return comp;
   }
+
+ 
 }
