@@ -183,11 +183,21 @@ public class Track {
     }
   }
 
-  public String getLastPlayed() {
+  public Date getLastPlayed() {
     String s = elt.getStringAttribute("last");
-    if (s == null || s.indexOf(':') >= 0 || s.indexOf('/') >= 0 || s.indexOf('-') >= 0)
-      return "";
-    return s;
+    if (s != null && s.length() == 14)
+      try {
+        return new Date(new GregorianCalendar(
+          Integer.parseInt(s.substring(0, 4)), // year
+          Integer.parseInt(s.substring(4, 6)) - 1, // month
+          Integer.parseInt(s.substring(6, 8)), // day
+          Integer.parseInt(s.substring(8, 10)), // hour
+          Integer.parseInt(s.substring(10, 12)), // minute
+          Integer.parseInt(s.substring(12, 14)))); // second        
+      }
+      catch (NumberFormatException e) { 
+      }
+    return new Date(null);
   }
 
   public void setRating(float rating) {
@@ -403,13 +413,15 @@ public class Track {
       www = "\"" +getArtist()+ "\" ";
       www += "\"" +getTitle()+ "\"";
       try {
-        //stupid sun and deprecating every method under the sun!
-        www = "http://www.google.com/search?q="+URLEncoder.encode(www,"UTF-8");
+        // We need to use the deprecated version of this method because the
+        // un-deprecated version isn't implemented in GCJ 3.0.4. We can change
+        // this when we drop support for Debian Woody (when Sarge becomes 
+        // stable).
+        www = "http://www.google.com/search?q="+URLEncoder.encode(www);
       }
       catch(Exception e){
         System.out.println(e.toString());
       }
-      //www = replace(www, " ", "%20");
     }
     return www;
   }

@@ -2,7 +2,6 @@
 
 package irate.swt;
 
-import irate.common.TrackDatabase;
 import irate.common.Track;
 import irate.client.*;
 import irate.swt.plugin.SWTPluginUIFactory;
@@ -14,19 +13,17 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.program.*;
 import java.io.*;
-import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/25 07:17:39 $
+ * Date Updated: $Date: 2003/10/25 16:33:34 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.88 $
+ * @version $Revision: 1.89 $
  */
 public class Client extends AbstractClient {
 
@@ -35,21 +32,20 @@ public class Client extends AbstractClient {
   private static final int VOLUME_OFFSET = VOLUME_SPAN / 2;
 
   private Label lblState;
-  private Table tblSongs;
   private Display display = new Display();
   private Shell shell;
   private ProgressBar progressBar;
   private Scale volumeScale;
 
-  private Hashtable hashSongs = new Hashtable();
   private ToolItem pause;
   private ToolItem previous;
   private Track previousTrack;
   private Help help = new Help();
   private ErrorDialog errorDialog;
-	private SettingDialog settingDialog;
-  private String strState = "";
 
+  private SettingDialog settingDialog;
+  private String strState = "";
+  private TrackTable trackTable;
 	
   private SWTPluginUIFactory uiFactory;
 
@@ -63,10 +59,10 @@ public class Client extends AbstractClient {
     
     shell.open();    
     downloadThread.start();
-    tblSongs.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
+    trackTable.addSelectionListener(new SelectionAdapter() {
+      public void widgetDefaultSelected(SelectionEvent e) {
         setPaused(false);
-        playThread.play(getTrackByTableItem(tblSongs.getSelection()[0]));
+        playThread.play(trackTable.getSelectedTrack());
       }
     });
   }
@@ -120,8 +116,14 @@ public class Client extends AbstractClient {
             progressBar.setVisible(false);
         }
         lblState.pack();
-        if (newState)
-          synchronizePlaylist(playListManager, tblSongs);
+      }
+    });
+  }
+  
+  public void updateTrackTable() {
+    display.asyncExec(new Runnable() {
+      public void run() {
+        trackTable.updateTable();
       }
     });
   }
@@ -136,22 +138,14 @@ public class Client extends AbstractClient {
         shell.setText("iRATE radio" + (track == null ? "" : " - " + track.toString()));
         volumeScale.setSelection(
           (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
-        TableItem item = (TableItem) hashSongs.get(track);
-        tblSongs.select(tblSongs.indexOf(item));
-        tblSongs.showItem(item);
-        //just in case :)
-        track2TableItem(track, item);
-
+        trackTable.select(track);
         if (track != previousTrack) {
           if (previousTrack != null)
-            track2TableItem(
-              previousTrack,
-              (TableItem) hashSongs.get(previousTrack));
+            trackTable.updateTrack(previousTrack);
           previousTrack = track;
         }
         downloadThread.checkAutoDownload();
         previous.setEnabled(playThread.hasHistory());
-
       }
     });
   }
@@ -167,28 +161,6 @@ public class Client extends AbstractClient {
     });
   }
 
-  private Track getTrackByTableItem(TableItem i) {
-    Enumeration e = hashSongs.keys();
-    while (e.hasMoreElements()) {
-      Track track = (Track) e.nextElement();
-      TableItem t = (TableItem) hashSongs.get(track);
-      if (t == i)
-        return track;
-    }
-    return null;
-  }
-
-  private void track2TableItem(Track track, TableItem tableItem) {
-    String[] data =
-      {
-        track.getArtist(),
-        track.getTitle(),
-        track.getState(),
-        String.valueOf(track.getNoOfTimesPlayed()),
-        track.getLastPlayed()};
-    tableItem.setText(data);
-  }
-
   /**
    * PluginApplication interface:
    * Get the track that is currently being played.
@@ -201,45 +173,9 @@ public class Client extends AbstractClient {
    * PluginApplication interface:
    * Get the track that is currently selected.  In some implementations
    * this may be the same as the track that is playing.
-   */
+   */  
   public Track getSelectedTrack() {
-    final Track[] answer = new Track[1];
-    final Object[] monitor = new Object[1];
-    Runnable r = new Runnable() {
-      public void run() {
-        try {
-          int index = tblSongs.getSelectionIndex();
-          Track track;
-          if (index < 0)
-            answer[0] = getPlayingTrack();
-          else
-            answer[0] = getTrackByTableItem(tblSongs.getItems()[index]);
-        }
-        finally {
-          if (monitor[0] != null)
-            synchronized (monitor[0]) {
-              monitor[0].notify();
-            }
-        }
-      }
-    };
-    if (display.getThread().equals(Thread.currentThread()))
-      r.run();
-    else {
-      // If this isn't the SWT event thread, then we must delegate to it,
-      // because we might be called from a thread other than it, such as
-      // the remote control thread.
-      monitor[0] = new Object();
-      synchronized (monitor[0]) {
-        display.asyncExec(r);
-        try {
-          monitor[0].wait();
-        }
-        catch (InterruptedException e) {
-        };
-      }
-    }
-    return answer[0];
+    return trackTable.getSelectedTrack();
   }
 
   /**
@@ -255,10 +191,8 @@ public class Client extends AbstractClient {
         track.setRating(ratingInt.intValue());
         if (ratingInt.intValue() == 0 && track == getSelectedTrack())
           playThread.reject();
-
-        TableItem ti = (TableItem) hashSongs.get(track);
-        track2TableItem(track, ti);
-        update();
+        trackTable.updateTrack(track);
+        
         //save the precious ratings :)
         try {
           trackDatabase.save();
@@ -340,65 +274,6 @@ public class Client extends AbstractClient {
     }
   }
 
-  void sortTable(Table table, Comparator c) {
-    //problem with code below is that it loses track/tableitem relationship
-    TableItem[] items = table.getItems();
-    Vector v = new Vector();
-    int column_count = table.getColumnCount();
-    table.setVisible(false);
-
-    Enumeration e = hashSongs.keys();
-    while (e.hasMoreElements()) {
-      Object obj[] = new Object[2];
-      obj[0] = e.nextElement();
-      TableItem item = (TableItem) hashSongs.get(obj[0]);
-      String values[] = new String[column_count];
-      for (int j = 0; j < column_count; j++)
-        values[j] = item.getText(j);
-      item.dispose();
-
-      obj[1] = values;
-      v.add(obj);
-    }
-    hashSongs.clear();
-
-    Collections.sort(v, c);
-
-    for (int i = 0; i < v.size(); i++) {
-      //System.out.println(items[i].getText(column_index));
-      // items[i].dispose();
-      TableItem new_item = new TableItem(table, SWT.NONE, i);
-      Object obj[] = (Object[]) v.elementAt(i);
-      new_item.setText((String[]) obj[1]);
-      hashSongs.put(obj[0], new_item);
-
-    }
-    table.setVisible(true);
-
-    update();
-  }
-
-  /* todo update # of times played */
-  void synchronizePlaylist(PlayListManager playListManager, Table tblSongs) {
-    int itemCount = tblSongs.getItemCount();
-    TrackDatabase td = playListManager.getTrackDatabase();
-    Track tracks[] = td.getTracks();
-    for (int i = 0; i < tracks.length; i++) {
-      Track track = tracks[i];
-      if (!track.isHidden()) {
-        TableItem item;
-        if (hashSongs.containsKey(track)) {
-          item = (TableItem) hashSongs.get(track);
-        }
-        else {
-          item = new TableItem(tblSongs, SWT.NULL);
-          hashSongs.put(track, item);
-        }
-        track2TableItem(track, item);
-      }
-    }
-  }
-
   void quit() {
     try {
       shell.setVisible(false);
@@ -432,7 +307,7 @@ public class Client extends AbstractClient {
     createShell();
     createMenu();
     //    createTitle();
-    createSongTable();
+    trackTable = new TrackTable(shell, trackDatabase);
     createToolBar();
     createState();
     createProgressBar();
@@ -450,15 +325,18 @@ public class Client extends AbstractClient {
   public void createShell() {
     shell = new Shell(display);
     shell.setText("iRATE radio");
-		try{
-			ImageData icon = new ImageData( getClass().getResourceAsStream("irate.gif"));
-			int whitePixel = icon.palette.getPixel(new RGB(255,255,255));
-			icon.transparentPixel = whitePixel;
-			shell.setImage(new Image(display, icon));
+    
+    try {
+      ImageData icon =
+        new ImageData(getClass().getResourceAsStream("irate.gif"));
+      int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
+      icon.transparentPixel = whitePixel;
+      shell.setImage(new Image(display, icon));
     }
-		catch(Exception e) {
-			e.printStackTrace();
-		}
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
         quit();
@@ -472,58 +350,6 @@ public class Client extends AbstractClient {
     shell.setLayout(layout);
   }
 
-  private void addColumnListener(TableColumn col, final Comparator c) {
-    //final Integer colNo = new Integer(columnNumber);
-    col.addListener(SWT.Selection, new Listener() {
-      public void handleEvent(Event e) {
-        sortTable(tblSongs, c);
-      }
-    });
-  }
-
-  public void createSongTable() {
-    tblSongs = new Table(shell, SWT.NONE);
-
-    TableColumn col = new TableColumn(tblSongs, SWT.LEFT);
-    col.setWidth(200);
-    col.setText("Artist");
-    addColumnListener(col, new MagicComparator(0));
-
-    col = new TableColumn(tblSongs, SWT.LEFT);
-    col.setWidth(200);
-    col.setText("Track");
-    addColumnListener(col, new MagicComparator(1));
-
-    col = new TableColumn(tblSongs, SWT.LEFT);
-    col.setWidth(100);
-    col.setText("Rating");
-    addColumnListener(col, new MagicComparator(2));
-
-    col = new TableColumn(tblSongs, SWT.LEFT);
-    col.setWidth(50);
-    col.setText("Plays");
-    addColumnListener(col, new MagicComparator(3));
-
-    col = new TableColumn(tblSongs, SWT.LEFT);
-    col.setWidth(150);
-    col.setText("Last");
-    tblSongs.setHeaderVisible(true);
-    synchronizePlaylist(playListManager, tblSongs);
-    
-
-    //    for(int i = 0;i< tblSongs.getColumns().length;i++)
-    //      tblSongs.getColumns()[i].pack();
-
-    GridData gridData = new GridData();
-    gridData.horizontalAlignment = GridData.FILL;
-    gridData.grabExcessHorizontalSpace = true;
-    gridData.verticalAlignment = GridData.FILL;
-    gridData.grabExcessVerticalSpace = true;
-    gridData.horizontalSpan = 2;
-    tblSongs.setLayoutData(gridData);
-    tblSongs.pack();
-  }
-
   public Reader getResource(String s) {
     if (s.endsWith(".html"))
       s = s.substring(0, s.length() - 5) + ".txt";
@@ -534,28 +360,30 @@ public class Client extends AbstractClient {
     errorDialog.show(getResource("help/about.html"));
   }
 
-	/** launches a web browser 
-	@param url web address!
-	*/
-	public void showURL(String url) {
-			String cmd;
-			Runtime r = Runtime.getRuntime();
-			try {
-				cmd = "kfmclient exec "+ url+"";
-				System.out.println(cmd);
-				r.exec(cmd);
-			}
-			catch(Exception ex) {
-				try {
-						//win32 way
-						cmd = "rundll32 url.dll,FileProtocolHandler " + url;
-						System.out.println(cmd);
-						r.exec(cmd);
-				} catch(Exception eee) {
-						
-				}
-			}
-	}
+  /** launches a web browser 
+  @param url web address!
+  */
+  public void showURL(String url) {
+    String cmd;
+    Runtime r = Runtime.getRuntime();
+    try {
+      cmd = "kfmclient exec " + url + "";
+      System.out.println(cmd);
+      r.exec(cmd);
+    }
+    catch (Exception ex) {
+      try {
+        //win32 way
+        cmd = "rundll32 url.dll,FileProtocolHandler " + url;
+        System.out.println(cmd);
+        r.exec(cmd);
+      }
+      catch (Exception eee) {
+
+      }
+    }
+  }
+  
   public void createMenu() {
     Menu menubar = new Menu(shell, SWT.BAR);
     shell.setMenuBar(menubar);
