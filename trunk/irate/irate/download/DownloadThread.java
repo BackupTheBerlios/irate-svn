@@ -379,17 +379,8 @@ public class DownloadThread extends Thread {
   public void contactServer(TrackDatabase trackDatabase) {
     try {
       setState(getResourceString("DownloadThread.Connecting_to_server")); //$NON-NLS-1$
-      Socket socket;
-      try {
-        socket = new Socket(trackDatabase.getHost(), trackDatabase.getPort());
-      }
-      catch (UnknownHostException uhe) {
-        uhe.printStackTrace();
-
-          // Retrying using the IP address
-        socket = new Socket("202.72.160.235", trackDatabase.getPort()); //$NON-NLS-1$
-      }
-
+      Socket socket =
+        new Socket(trackDatabase.getHost(), trackDatabase.getPort());
       InputStream is = socket.getInputStream();
       setState(getResourceString("DownloadThread.Sending_server_request")); //$NON-NLS-1$
       OutputStream os = socket.getOutputStream();
@@ -503,3 +494,10 @@ System.out.println("DownloadThread.java:326: " + errorCode); //$NON-NLS-1$
     return BaseResources.getString(LOCALE_RESOURCE_LOCATION, key); 
   }
 }
+
+// Local Variables:
+// c-file-style:"gnu"
+// c-basic-offset:2
+// indent-tabs-mode:nil
+// tab-width:4
+// End:
