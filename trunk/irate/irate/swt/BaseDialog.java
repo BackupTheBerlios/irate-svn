@@ -24,15 +24,14 @@ public class BaseDialog {
     GridData data;
     data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     mainComposite.setLayoutData(data);
-    buttonsComposite = new Composite(shell, SWT.NONE);
-    buttonsComposite.setLayout(new FillLayout());
+    Composite buttonPanel = createButtonPanel(shell);
     data = new GridData();
     data.horizontalAlignment = GridData.END;
-    buttonsComposite.setLayoutData(data);
+    buttonPanel.setLayoutData(data);
   }
 
   public Button addButton(String text) {
-    Button button = new Button(buttonsComposite, SWT.NONE);
+    Button button = new Button(buttonComposite, SWT.NONE);
     GridData data = new GridData(GridData.FILL_HORIZONTAL);
     button.setLayoutData(data);
     button.setText(text);
@@ -84,13 +83,33 @@ public class BaseDialog {
     return mainComposite;
   }
 
-  private Composite buttonsComposite;
+  private Composite buttonComposite;
 
   private Composite mainComposite;
 
   private Image image;
 
   private Shell shell;
+
+  private Composite createButtonPanel(Composite parent) {
+    Composite outerComposite = new Composite(parent, SWT.NONE);
+    outerComposite.setLayout(new GridLayout(2, false));
+    buttonComposite = new Composite(outerComposite, SWT.NONE);
+    buttonComposite.setLayout(new FillLayout());
+    GridData data;
+    data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+    buttonComposite.setLayoutData(data);
+    // On Mac OS X, a small invisible filler is inserted on the right to
+    // avoid that the buttons overlap with the window resize control
+    String osName = System.getProperty("os.name");
+    if (osName != null && osName.equals("Mac OS X")) {
+      Label filler = new Label(outerComposite, SWT.HORIZONTAL);
+      data = new GridData();
+      data.widthHint = 20;
+      filler.setLayoutData(data);
+    }
+    return outerComposite;
+  }
 
   private void setImage(Display display) {
     try {
