@@ -962,10 +962,8 @@ public class Client extends AbstractClient {
     gridData = new GridData(GridData.FILL_BOTH|GridData.GRAB_HORIZONTAL);
     trackLabel.setLayoutData(gridData);
  
-    expandButton.addMouseListener(new MouseListener() {
-        public void mouseDoubleClick(MouseEvent arg0) {}
-        public void mouseDown(MouseEvent arg0) {}
-        public void mouseUp(MouseEvent arg0) {
+    expandButton.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent arg0) {
           if(expandButton.getAlignment() == SWT.RIGHT) {
               expandRatingMenu();
           }
