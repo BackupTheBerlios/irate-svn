@@ -10,10 +10,10 @@ import java.util.*;
 public class MasterDatabase extends ServerDatabase {
 
     /** Add an orphan track one time in n. */
-  private final int orphanChance = 5;
+  private final int orphanChance = 10;
 
     /** Add a random track one time in n. */
-  private final int randomChance = 10;
+  private final int randomChance = 20;
 
     /** The number of peer tracks to start with. */
   private final int initialPeerTracks = 7;
