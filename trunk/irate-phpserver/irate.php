@@ -261,14 +261,16 @@ function initCorrelation($corr="") {
 //XXXX-YYY-ZZ-0 => XXXXYYYZZ0
 function id2int($id) {
 
-return intval(str_replace("-","",$id));
+return str_replace("-","",$id) + 0;
 
 }
 
 //reverse one
 function int2id($int) {
 
- return floor(intval($int)/1000000)."-".(floor(intval($int)/1000)%1000)."-".(floor(intval($int)/10)%100)."-".(intval($int)%10);
+ $int+=0;
+
+ return floor(($int)/1000000)."-".(floor(($int)/1000)%1000)."-".(floor(($int)/10)%100)."-".(($int)%10);
 
 }
 
