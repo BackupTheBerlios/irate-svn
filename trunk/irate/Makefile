@@ -1,6 +1,7 @@
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
 DOC=$(DESTDIR)/usr/doc/irate
+GCJ=gcj
 
 PWD=$(shell pwd)
 export CLASSPATH=.:$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
@@ -27,7 +28,7 @@ SERVER_LIBS = lib/libnanoxml-lite.a
 # You need to set this as executable by going:
 # chmod a+x `find thisiscool-gcc/ -name \*.exe`
 
-GCJ_WIN32 = thisiscool-gcc/gcc-3.3/bin/gcj.exe  
+GCJ_WIN32 = thisiscool-gcc/gcc-3.3/bin/$(GCJ).exe  
 
 all: lib irate-client irate-server
 
@@ -50,30 +51,30 @@ lib/libnanoxml-lite.a:
 	$(MAKE) -C lib/ libnanoxml-lite.a
 	
 irate-client: $(CLIENT_DEPS) $(CLIENT_LIBS)
-	gcj  $(CLIENT_DEPS) $(CLIENT_LIBS) -o irate-client --main=irate.swt.Client
+	$(GCJ)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o irate-client --main=irate.swt.Client
 
 irate-server: $(SERVER_DEPS)
-	gcj  $(SERVER_DEPS) $(SERVER_LIBS) -o irate-server --main=irate.server.Server
+	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o irate-server --main=irate.server.Server
 	
 irate-swt.o: irate/swt/*.java
-	gcj -c irate/swt/*.java -o irate-swt.o
+	$(GCJ) -c irate/swt/*.java -o irate-swt.o
 
 irate-client.o: $(CLIENT_FILES)
-	gcj -c $(CLIENT_FILES) -o irate-client.o
+	$(GCJ) -c $(CLIENT_FILES) -o irate-client.o
 
 irate-download.o: irate/download/*.java
-	gcj -c irate/download/*.java -o irate-download.o
+	$(GCJ) -c irate/download/*.java -o irate-download.o
 	
 irate-common.a:irate-common.o
 	ar rcs irate-common.a irate-common.o
 	 
 irate-common.o:irate/common/*.java
-	gcj -c irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java -o irate-common.o
+	$(GCJ) -c irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java -o irate-common.o
 
 irate-server.o:irate/server/*.java
-	gcj -c irate/server/*.java -o irate-server.o
+	$(GCJ) -c irate/server/*.java -o irate-server.o
 
-#using gcj from http://thisiscool.com/gcc33_mingw.htm
+#using $(GCJ) from http://thisiscool.com/gcc33_mingw.htm
 win32:
 	$(GCJ_WIN32) \
 	$(CLIENT_FILES) \
