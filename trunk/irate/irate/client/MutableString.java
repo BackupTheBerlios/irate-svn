@@ -1,3 +1,5 @@
+package irate.client;
+
 /**
  * This class implements a mutable string.
  *
