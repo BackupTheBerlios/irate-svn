@@ -76,7 +76,7 @@ public class SettingDialog
 		tabs.pack();
 
     Button ok = new Button(shell, SWT.NONE);
-    ok.setText("Save");
+    ok.setText("Close");
     
     //gd.horizontalSpan = 2;
     ok.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
@@ -133,6 +133,7 @@ public class SettingDialog
     comp.setLayout(layout);
     new Label(comp, SWT.NONE).setText("Browser command(%url will be replaced with the address)");
     Text t = new Text(comp, SWT.NONE);
+    t.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     return comp;
   }
 }
