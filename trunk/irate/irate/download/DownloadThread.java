@@ -342,8 +342,8 @@ public class DownloadThread extends Thread {
       else
         str = trackDatabase.toString();
       
-      System.out.println("Request:");
-      System.out.println(str);
+      //System.out.println("Request:");
+      //System.out.println(str);
       byte[] buf = str.getBytes();
       os.write(("Content-Length: " + Integer.toString(buf.length) + "\r\nContent-Encoding: gzip\r\n\r\n").getBytes());
       GZIPOutputStream gos = new GZIPOutputStream(os);
@@ -354,8 +354,8 @@ public class DownloadThread extends Thread {
       TrackDatabase reply = new TrackDatabase(new GZIPInputStream(is));
       is.close();
       os.close();
-      System.out.println("reply: ");
-      System.out.println(reply.toString());
+      //System.out.println("reply: ");
+      //System.out.println(reply.toString());
       trackDatabase.add(reply);
       trackDatabase.save();
 

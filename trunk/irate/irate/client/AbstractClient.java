@@ -77,7 +77,8 @@ public abstract class AbstractClient implements UpdateListener, PluginApplicatio
       boolean newState = false;
       public void actionPerformed() {
         setState(downloadThread.getState());
-        updateTrackTable();     
+        if(downloadThread.getPercentComplete()==100)
+          updateTrackTable();     
       }
     });
   }
