@@ -1,9 +1,10 @@
 [Desktop Entry]
 Name=iRATE radio
+Name[es]=Radio iRATE
 Comment=iRATE radio client
-comment[de]=iRATE radio client
-comment[es]=iRATE radio client
-Encoding=Legacy-Mixed
+Comment[de]=iRATE radio client
+Comment[es]=Cliente de radio iRATE
+Encoding=ISO-8859-15
 Exec=/usr/bin/irate-client
 Icon=/usr/share/icons/irate.xpm
 Terminal=0
