@@ -1,4 +1,4 @@
-// Copyright 2003 Anthony Jones, Taras Glek
+// Copyright 2003 by authors listed below
 
 package irate.swt;
 
@@ -22,20 +22,20 @@ import java.util.*;
 import java.net.*;
 
 /**
- * 
- * Date Created: Sep 13, 2003
- * Date Updated: $Date: 2003/09/24 05:58:48 $
- * @author Creator:	Eric Dalquist
- * @author Updated:	$Author: ajones $
- * @version $Revision: 1.76 $
+ * Date Updated: $Date: 2003/09/26 17:15:16 $
+ * @author Creator: Taras Glek
+ * @author Creator: Anthony Jones
+ * @author Updated: Eric Dalquist
+ * @author Updated: Allen Tipper
+ * @author Updated: Stephen Blackheath
+ * @version $Revision: 1.77 $
  */
 public class Client implements UpdateListener, PluginApplication {
-  
+
   private static final int VOLUME_RESOLUTION = 3;
-  private static final int VOLUME_SPAN = 30; 
+  private static final int VOLUME_SPAN = 30;
   private static final int VOLUME_OFFSET = VOLUME_SPAN / 2;
-  
-//  static Label lblTitle;
+
   private Label lblState;
   private Table tblSongs;
   private Display display = new Display();
@@ -58,26 +58,13 @@ public class Client implements UpdateListener, PluginApplication {
 
   private String strState = "";
 
-    private SWTPluginUIFactory uiFactory;
+  private SWTPluginUIFactory uiFactory;
 
   public Client() {
-      //Added by Allen Tipper 16.9.03, code by Anthony
-  class TooltipArmListener {
-    private String str;
-    public TooltipArmListener(String str) {
-      this.str = str;
-    }
-    public void widgetArmed(ArmEvent e){
-      lblState.setText(strState = str);
-      lblState.pack();
-    }
-  }
-  //end add
-
     File home = new File(System.getProperties().getProperty("user.home"));
 
-      // Check the current directory for an existing trackdatabase.xml for
-      // compatibility reasons only.
+    // Check the current directory for an existing trackdatabase.xml for
+    // compatibility reasons only.
     File dir = new File(".");
     File file = new File(dir, "trackdatabase.xml");
     if (!file.exists()) {
@@ -99,21 +86,10 @@ public class Client implements UpdateListener, PluginApplication {
     }
 
     playerList = new PlayerList();
-      //try to do a nice initial experience for theuser
-      //do as much handholding as possible
-    if(trackDatabase.getNoOfTracks() == 0)
-    {
-      this.showAccountDialog();
-      Player players[] = playerList.getPlayers();
-      trackDatabase.setAutoDownload(2);
-      if(players.length > 0)
-        trackDatabase.setPlayer(players[0].getName());
-
-    }
     playListManager = new PlayListManager(trackDatabase);
     playThread = new PlayThread(playListManager, playerList);
 
-    uiFactory = new SWTPluginUIFactory(display, (PluginApplication)this);
+    uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
     pluginManager = new PluginManager(this, dir);
 
     initGUI();
@@ -125,11 +101,10 @@ public class Client implements UpdateListener, PluginApplication {
     playThread.addUpdateListener(this);
     playThread.start();
 
-
     downloadThread = new DownloadThread(trackDatabase) {
       public void process() throws IOException {
         super.process();
-       // perhapsDisableAccount();
+        // perhapsDisableAccount();
       }
 
       public void handleError(String code, String urlString) {
@@ -175,61 +150,64 @@ public class Client implements UpdateListener, PluginApplication {
           public void run() {
             int n = downloadThread.getPercentComplete();
             boolean barVisible = progressBar.getVisible();
-            if(n > 0 && n < 100)
-            {
-              lblState.setText(strState + " "+n +"%");
+            if (n > 0 && n < 100) {
+              lblState.setText(strState + " " + n + "%");
               progressBar.setSelection(n);
-              if(!barVisible)
+              if (!barVisible)
                 progressBar.setVisible(true);
-            }else
-            {
+            }
+            else {
               lblState.setText(strState);
-              if(barVisible)
+              if (barVisible)
                 progressBar.setVisible(false);
             }
             lblState.pack();
-            if(newState)
+            if (newState)
               synchronizePlaylist(playListManager, tblSongs);
           }
         });
       }
     });
-    downloadThread.start();
 
-    //if this is the first run of irate do that
-    if(!file.exists())
-      downloadThread.go();
+    if (trackDatabase.getNoOfTracks() == 0)
+      showAccountDialog();      
+    
+    downloadThread.start();
+    shell.open();
   }
 
-  public void update(){
+  public void update() {
     display.asyncExec(new Runnable() {
       public void run() {
         //synchronizePlaylist(playListManager, tblSongs);
         Track track = playThread.getCurrentTrack();
         String s = track.toString();
-    //    lblTitle.setText(s);
+        //    lblTitle.setText(s);
         shell.setText("iRATE radio - " + s);
-        volumeScale.setSelection((track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
-        TableItem item = (TableItem)hashSongs.get(track);
+        volumeScale.setSelection(
+          (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
+        TableItem item = (TableItem) hashSongs.get(track);
         tblSongs.select(tblSongs.indexOf(item));
         tblSongs.showItem(item);
         //just in case :)
         track2TableItem(track, item);
 
-        if(track != previousTrack) {
-          if(previousTrack != null)
-            track2TableItem(previousTrack, (TableItem)hashSongs.get(previousTrack));
+        if (track != previousTrack) {
+          if (previousTrack != null)
+            track2TableItem(
+              previousTrack,
+              (TableItem) hashSongs.get(previousTrack));
           previousTrack = track;
         }
         downloadThread.checkAutoDownload();
-				previous.setEnabled(playThread.hasHistory());
+        previous.setEnabled(playThread.hasHistory());
 
       }
     });
   }
 
   //called from playThread.addUpdateListener(this);
-  public void actionPerformed(){
+  public void actionPerformed() {
     // now update the UI. We don't depend on the result,
     // so use async.
     display.asyncExec(new Runnable() {
@@ -239,26 +217,25 @@ public class Client implements UpdateListener, PluginApplication {
     });
   }
 
-  private Track getTrackByTableItem(TableItem i)
-  {
+  private Track getTrackByTableItem(TableItem i) {
     Enumeration e = hashSongs.keys();
-    while(e.hasMoreElements()){
-      Track track = (Track)e.nextElement();
-      TableItem  t = (TableItem)hashSongs.get(track);
-      if(t == i)
+    while (e.hasMoreElements()) {
+      Track track = (Track) e.nextElement();
+      TableItem t = (TableItem) hashSongs.get(track);
+      if (t == i)
         return track;
     }
     return null;
   }
 
   private void track2TableItem(Track track, TableItem tableItem) {
-    String[] data = {
-      track.getArtist(),
-      track.getTitle(),
-      track.getState(),
-      String.valueOf(track.getNoOfTimesPlayed()),
-      track.getLastPlayed()
-    };
+    String[] data =
+      {
+        track.getArtist(),
+        track.getTitle(),
+        track.getState(),
+        String.valueOf(track.getNoOfTimesPlayed()),
+        track.getLastPlayed()};
     tableItem.setText(data);
   }
 
@@ -266,9 +243,8 @@ public class Client implements UpdateListener, PluginApplication {
    * PluginApplication interface:
    * Get the track that is currently being played.
    */
-  public Track getPlayingTrack()
-  {
-      return playThread.getCurrentTrack();
+  public Track getPlayingTrack() {
+    return playThread.getCurrentTrack();
   }
 
   /**
@@ -276,8 +252,7 @@ public class Client implements UpdateListener, PluginApplication {
    * Get the track that is currently selected.  In some implementations
    * this may be the same as the track that is playing.
    */
-  public Track getSelectedTrack()
-  {
+  public Track getSelectedTrack() {
     final Track[] answer = new Track[1];
     final Object[] monitor = new Object[1];
     Runnable r = new Runnable() {
@@ -301,13 +276,17 @@ public class Client implements UpdateListener, PluginApplication {
     if (display.getThread().equals(Thread.currentThread()))
       r.run();
     else {
-        // If this isn't the SWT event thread, then we must delegate to it,
-        // because we might be called from a thread other than it, such as
-        // the remote control thread.
+      // If this isn't the SWT event thread, then we must delegate to it,
+      // because we might be called from a thread other than it, such as
+      // the remote control thread.
       monitor[0] = new Object();
       synchronized (monitor[0]) {
         display.asyncExec(r);
-        try {monitor[0].wait();} catch (InterruptedException e) {};
+        try {
+          monitor[0].wait();
+        }
+        catch (InterruptedException e) {
+        };
       }
     }
     return answer[0];
@@ -318,8 +297,8 @@ public class Client implements UpdateListener, PluginApplication {
    * Set rating for the specified track.
    */
   public void setRating(final Track track, int rating) {
-      // We have to delegate to the SWT event thread, because we might be
-      // called from a thread other than it, such as the remote control thread.
+    // We have to delegate to the SWT event thread, because we might be
+    // called from a thread other than it, such as the remote control thread.
     final Integer ratingInt = new Integer(rating);
     display.asyncExec(new Runnable() {
       public void run() {
@@ -331,18 +310,19 @@ public class Client implements UpdateListener, PluginApplication {
         track2TableItem(track, ti);
         update();
         //save the precious ratings :)
-        try{
+        try {
           trackDatabase.save();
-        }catch(Exception e){
+        }
+        catch (Exception e) {
           e.printStackTrace();
         }
       }
     });
   }
-  
+
   public void setVolume(final int volume) {
-      // We have to delegate to the SWT event thread, because we might be
-      // called from a thread other than it, such as the remote control thread.
+    // We have to delegate to the SWT event thread, because we might be
+    // called from a thread other than it, such as the remote control thread.
     final Integer volumeInt = new Integer(volume);
     display.asyncExec(new Runnable() {
       public void run() {
@@ -363,8 +343,7 @@ public class Client implements UpdateListener, PluginApplication {
    * PluginApplication interface:
    * Return true if music play is paused.
    */
-  public boolean isPaused()
-  {
+  public boolean isPaused() {
     return playThread.isPaused();
   }
 
@@ -375,8 +354,8 @@ public class Client implements UpdateListener, PluginApplication {
   public void setPaused(boolean paused) {
     playThread.setPaused(paused);
     final Boolean pausedFinal = new Boolean(paused);
-      // We have to delegate to the SWT event thread, because we might be
-      // called from a thread other than it, such as the remote control thread.
+    // We have to delegate to the SWT event thread, because we might be
+    // called from a thread other than it, such as the remote control thread.
     display.asyncExec(new Runnable() {
       public void run() {
         if (pausedFinal.booleanValue()) {
@@ -396,18 +375,18 @@ public class Client implements UpdateListener, PluginApplication {
    * Skip to the next song.
    */
   public void skip() {
-		skip(false);
-	}
-	
-	public void skip(boolean reverse){
+    skip(false);
+  }
+
+  public void skip(boolean reverse) {
     setPaused(false);
-		if(!reverse){
-				playThread.reject();
-		    downloadThread.checkAutoDownload();
-		}
-		else {
-				playThread.goBack();
-		}
+    if (!reverse) {
+      playThread.reject();
+      downloadThread.checkAutoDownload();
+    }
+    else {
+      playThread.goBack();
+    }
   }
 
   void sortTable(Table table, Comparator c) {
@@ -418,13 +397,13 @@ public class Client implements UpdateListener, PluginApplication {
     table.setVisible(false);
 
     Enumeration e = hashSongs.keys();
-    while(e.hasMoreElements()){
+    while (e.hasMoreElements()) {
       Object obj[] = new Object[2];
       obj[0] = e.nextElement();
-      TableItem item = (TableItem)hashSongs.get(obj[0]);
+      TableItem item = (TableItem) hashSongs.get(obj[0]);
       String values[] = new String[column_count];
-      for(int j=0;j<column_count;j++)
-        values[j]=item.getText(j);
+      for (int j = 0; j < column_count; j++)
+        values[j] = item.getText(j);
       item.dispose();
 
       obj[1] = values;
@@ -434,13 +413,12 @@ public class Client implements UpdateListener, PluginApplication {
 
     Collections.sort(v, c);
 
-    for(int i=0;i< v.size();i++)
-    {
+    for (int i = 0; i < v.size(); i++) {
       //System.out.println(items[i].getText(column_index));
-     // items[i].dispose();
+      // items[i].dispose();
       TableItem new_item = new TableItem(table, SWT.NONE, i);
-      Object obj[] = (Object[])v.elementAt(i);
-      new_item.setText((String[])obj[1]);
+      Object obj[] = (Object[]) v.elementAt(i);
+      new_item.setText((String[]) obj[1]);
       hashSongs.put(obj[0], new_item);
 
     }
@@ -450,19 +428,19 @@ public class Client implements UpdateListener, PluginApplication {
   }
 
   /* todo update # of times played */
-  void synchronizePlaylist(PlayListManager playListManager, Table tblSongs){
+  void synchronizePlaylist(PlayListManager playListManager, Table tblSongs) {
     int itemCount = tblSongs.getItemCount();
     TrackDatabase td = playListManager.getTrackDatabase();
     Track tracks[] = td.getTracks();
-    for(int i=0;i<tracks.length;i++){
+    for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
       if (!track.isHidden()) {
         TableItem item;
-        if(hashSongs.containsKey(track)) {
-          item = (TableItem)hashSongs.get(track);
+        if (hashSongs.containsKey(track)) {
+          item = (TableItem) hashSongs.get(track);
         }
-        else{
-          item = new TableItem(tblSongs,SWT.NULL);
+        else {
+          item = new TableItem(tblSongs, SWT.NULL);
           hashSongs.put(track, item);
         }
         track2TableItem(track, item);
@@ -470,10 +448,9 @@ public class Client implements UpdateListener, PluginApplication {
     }
   }
 
-  void quit()
-  {
+  void quit() {
     shell.setVisible(false);
-		try {
+    try {
       trackDatabase.save();
     }
     catch (IOException ee) {
@@ -484,25 +461,21 @@ public class Client implements UpdateListener, PluginApplication {
     System.exit(0);
   }
 
-  void showAccountDialog() {  
-    if (shell != null)
-      shell.setVisible(false); 
-    new AccountDialog(display, trackDatabase);
-    if (shell != null)
-      shell.setVisible(true);
+  void showAccountDialog() {
+    new AccountDialog(display, trackDatabase, downloadThread);
   }
 
   void uncheckSiblingMenuItems(MenuItem self) {
     Menu parent = self.getParent();
-		MenuItem items[] = parent.getItems();
-		for(int i = 0;i< parent.getItemCount();i++)
+    MenuItem items[] = parent.getItems();
+    for (int i = 0; i < parent.getItemCount(); i++)
       parent.getItem(i).setSelection(false);
   }
 
-  void initGUI(){
+  void initGUI() {
     createShell();
     createMenu();
-//    createTitle();
+    //    createTitle();
     createSongTable();
     createToolBar();
     createState();
@@ -516,18 +489,16 @@ public class Client implements UpdateListener, PluginApplication {
 
     progressBar.setVisible(false);
 
-    shell.open();
   }
 
   public void createShell() {
     shell = new Shell(display);
     shell.setText("iRATE radio");
-		/*ImageData icon = new ImageData("/tmp/irate-logo-daniel.png");
-		shell.setImage(new Image(display, icon));
-*/
-    shell.addShellListener(new ShellAdapter()
-    {
-      public void shellClosed(ShellEvent e){
+    /*ImageData icon = new ImageData("/tmp/irate-logo-daniel.png");
+    shell.setImage(new Image(display, icon));
+    */
+    shell.addShellListener(new ShellAdapter() {
+      public void shellClosed(ShellEvent e) {
         quit();
       }
     });
@@ -548,51 +519,43 @@ public class Client implements UpdateListener, PluginApplication {
     });
   }
 
-//  public void createTitle() {
-//    lblTitle = new Label(shell, SWT.NONE);
-//    GridData gridData = new GridData();
-//    gridData.horizontalAlignment = GridData.FILL;
-//    gridData.horizontalSpan = 2;
-//    lblTitle.setLayoutData(gridData);
-//  }
-
   public void createSongTable() {
     tblSongs = new Table(shell, SWT.NONE);
 
-    TableColumn col = new TableColumn(tblSongs,SWT.LEFT);
+    TableColumn col = new TableColumn(tblSongs, SWT.LEFT);
     col.setWidth(200);
     col.setText("Artist");
     addColumnListener(col, new MagicComparator(0));
 
-    col = new TableColumn(tblSongs,SWT.LEFT);
+    col = new TableColumn(tblSongs, SWT.LEFT);
     col.setWidth(200);
     col.setText("Track");
     addColumnListener(col, new MagicComparator(1));
 
-    col = new TableColumn(tblSongs,SWT.LEFT);
+    col = new TableColumn(tblSongs, SWT.LEFT);
     col.setWidth(100);
     col.setText("Rating");
     addColumnListener(col, new MagicComparator(2));
 
-    col = new TableColumn(tblSongs,SWT.LEFT);
+    col = new TableColumn(tblSongs, SWT.LEFT);
     col.setWidth(50);
     col.setText("Plays");
     addColumnListener(col, new MagicComparator(3));
 
-    col = new TableColumn(tblSongs,SWT.LEFT);
+    col = new TableColumn(tblSongs, SWT.LEFT);
     col.setWidth(100);
     col.setText("Last");
     col.setWidth(150);
     tblSongs.setHeaderVisible(true);
     synchronizePlaylist(playListManager, tblSongs);
-    tblSongs.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    tblSongs.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         playThread.play(getTrackByTableItem(tblSongs.getSelection()[0]));
       }
     });
 
-//    for(int i = 0;i< tblSongs.getColumns().length;i++)
-//      tblSongs.getColumns()[i].pack();
+    //    for(int i = 0;i< tblSongs.getColumns().length;i++)
+    //      tblSongs.getColumns()[i].pack();
 
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
@@ -618,24 +581,24 @@ public class Client implements UpdateListener, PluginApplication {
     Menu menubar = new Menu(shell, SWT.BAR);
     shell.setMenuBar(menubar);
 
-    MenuItem item1 = new MenuItem(menubar,SWT.CASCADE);
+    MenuItem item1 = new MenuItem(menubar, SWT.CASCADE);
     item1.setText("Action");
 
     Menu menu1 = new Menu(item1);
     //Added for a nicer UI by Allen Tipper 14.9.03
-    menu1.addMenuListener(new MenuAdapter(){
-            public void menuHidden(MenuEvent e){
-                update();
-            }
-        });
+    menu1.addMenuListener(new MenuAdapter() {
+      public void menuHidden(MenuEvent e) {
+        update();
+      }
+    });
     //end add
 
     item1.setMenu(menu1);
 
-    MenuItem item1_1 = new MenuItem(menu1,SWT.PUSH);
+    MenuItem item1_1 = new MenuItem(menu1, SWT.PUSH);
     item1_1.setText("Download");
-    item1_1.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item1_1.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         downloadThread.go();
       }
     });
@@ -644,21 +607,10 @@ public class Client implements UpdateListener, PluginApplication {
     item1_1.addArmListener(new ToolTipArmListener("Download a new track"));
     //end add
 
-/*    MenuItem item1_2 = new MenuItem(menu1,SWT.PUSH);
-    item1_2.setText("Purge");
-    item1_2.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        trackDatabase.purge();
-        update();
-      }
-    });*/
-
-    //  MenuItem item1_3 = new MenuItem(menu1,SWT.SEPARATOR);
-
-    MenuItem item1_4 = new MenuItem(menu1,SWT.PUSH);
+    MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
     item1_4.setText("Quit");
-    item1_4.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item1_4.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         quit();
       }
     });
@@ -667,30 +619,18 @@ public class Client implements UpdateListener, PluginApplication {
     item1_4.addArmListener(new ToolTipArmListener("Quit iRATE radio"));
     //end add
 
-
-    MenuItem item2 = new MenuItem(menubar,SWT.CASCADE);
+    MenuItem item2 = new MenuItem(menubar, SWT.CASCADE);
     item2.setText("Settings");
 
     Menu mSettings = new Menu(item2);
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mSettings.addMenuListener(new MenuAdapter(){
-            public void menuHidden(MenuEvent e){
-                update();
-            }
-        });
-    //end add
-    item2.setMenu(mSettings);
-
-
-//Uncommented EBD - adding account edit functionality
-    MenuItem mAccount = new MenuItem(mSettings,SWT.PUSH);
-    mAccount.setText("Account");
-    mAccount.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        showAccountDialog();
+    mSettings.addMenuListener(new MenuAdapter() {
+      public void menuHidden(MenuEvent e) {
+        update();
       }
     });
-
+    //end add
+    item2.setMenu(mSettings);
 
     MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
     mDownload.setText("Auto download");
@@ -702,17 +642,17 @@ public class Client implements UpdateListener, PluginApplication {
     Menu menu2 = new Menu(mDownload);
     mDownload.setMenu(menu2);
 
-    int[] counts = new int[] {0, 5, 11, 17, 23, 29, 37 };
+    int[] counts = new int[] { 0, 5, 11, 17, 23, 29, 37 };
     int autoDownload = trackDatabase.getAutoDownload();
-    for(int i=0;i< counts.length;i++){
+    for (int i = 0; i < counts.length; i++) {
       MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
       final int count = counts[i];
-      mTimes.setText(i==0 ? "Disabled" : "< " + count + " unrated tracks" );
+      mTimes.setText(i == 0 ? "Disabled" : "< " + count + " unrated tracks");
       mTimes.setSelection(count == autoDownload);
-      mTimes.addSelectionListener(new SelectionAdapter(){
-        public void widgetSelected(SelectionEvent e){
+      mTimes.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
           //stupid trick to make self the only selected item
-          MenuItem self = (MenuItem)e.getSource();
+          MenuItem self = (MenuItem) e.getSource();
           uncheckSiblingMenuItems(self);
           self.setSelection(true);
           trackDatabase.setAutoDownload(count);
@@ -721,7 +661,10 @@ public class Client implements UpdateListener, PluginApplication {
       });
 
       //Added for a nicer UI by Allen Tipper 14.9.03
-      mTimes.addArmListener(new ToolTipArmListener("Automatically download when the number of unrated tracks is less than " + count));
+      mTimes.addArmListener(
+        new ToolTipArmListener(
+          "Automatically download when the number of unrated tracks is less than "
+            + count));
       //end add
 
     }
@@ -732,7 +675,6 @@ public class Client implements UpdateListener, PluginApplication {
     //Added for a nicer UI by Allen Tipper 14.9.03
     mPlayList.addArmListener(new ToolTipArmListener("Set playlist length"));
     //end add
-
 
     Menu menuPlayList = new Menu(mPlayList);
     mPlayList.setMenu(menuPlayList);
@@ -746,24 +688,25 @@ public class Client implements UpdateListener, PluginApplication {
       mTimes.setSelection(count == playListLength);
       mTimes.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
-          MenuItem self = (MenuItem)e.getSource();
+          MenuItem self = (MenuItem) e.getSource();
           uncheckSiblingMenuItems(self);
           self.setSelection(true);
-          trackDatabase.setPlayListLength(count);          
+          trackDatabase.setPlayListLength(count);
         }
       });
 
       //Added for a nicer UI by Allen Tipper 14.9.03
-      mTimes.addArmListener(new ToolTipArmListener("Set songs in playlist to " + count));
+      mTimes.addArmListener(
+        new ToolTipArmListener("Set songs in playlist to " + count));
       //end add
 
     }
 
-/**
- * Added by Eric Dalquist - 11.09.2003
- *
- * Allows the user to select the number of unrated tracks to add to each playlist generation
- */
+    /**
+     * Added by Eric Dalquist - 11.09.2003
+     *
+     * Allows the user to select the number of unrated tracks to add to each playlist generation
+     */
     MenuItem mNewUnrated = new MenuItem(mSettings, SWT.CASCADE);
     mNewUnrated.setText("Unrateds on List");
     Menu menuNewUnrated = new Menu(mNewUnrated);
@@ -772,13 +715,13 @@ public class Client implements UpdateListener, PluginApplication {
     int unratedPlayListRatio = trackDatabase.getUnratedPlayListRatio();
     counts = new int[] { 0, 13, 29, 47, 63, 79, 97 };
     for (int i = 0; i < counts.length; i++) {
-      final Integer ratio = new Integer(counts[i]); 
+      final Integer ratio = new Integer(counts[i]);
       MenuItem mRatio = new MenuItem(menuNewUnrated, SWT.CHECK, i);
       mRatio.setText(ratio + "%");
       mRatio.setSelection(ratio.intValue() == unratedPlayListRatio);
       mRatio.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
-          MenuItem self = (MenuItem)e.getSource();
+          MenuItem self = (MenuItem) e.getSource();
           uncheckSiblingMenuItems(self);
           self.setSelection(true);
 
@@ -787,11 +730,13 @@ public class Client implements UpdateListener, PluginApplication {
       });
 
       //Added for a nicer UI by Allen Tipper 14.9.03
-      mRatio.addArmListener(new ToolTipArmListener("Set percentage of unrated songs in playlist to " + ratio + "%."));
+      mRatio.addArmListener(
+        new ToolTipArmListener(
+          "Set percentage of unrated songs in playlist to " + ratio + "%."));
       //end add
 
     }
-/****/
+    /****/
 
     MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
     mPlayers.setText("Player");
@@ -803,18 +748,17 @@ public class Client implements UpdateListener, PluginApplication {
     //end add
 
     Player players[] = playerList.getPlayers();
-    for(int i=0;i<players.length;i++)
-    {
+    for (int i = 0; i < players.length; i++) {
       final String player = players[i].getName();
 
       MenuItem mPlayer = new MenuItem(menu2, SWT.CHECK, i);
       mPlayer.setText(player);
-      if(trackDatabase.getPlayer().equals(player))
+      if (trackDatabase.getPlayer().equals(player))
         mPlayer.setSelection(true);
-        mPlayer.addSelectionListener(new SelectionAdapter(){
-        public void widgetSelected(SelectionEvent e){
+      mPlayer.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
           //stupid trick to make self the only selected item
-          MenuItem self = (MenuItem)e.getSource();
+          MenuItem self = (MenuItem) e.getSource();
           uncheckSiblingMenuItems(self);
           self.setSelection(true);
 
@@ -822,18 +766,18 @@ public class Client implements UpdateListener, PluginApplication {
           downloadThread.checkAutoDownload();
         }
       });
-
-	//Added for a nicer UI by Allen Tipper 14.9.03
-        mPlayer.addArmListener(new ToolTipArmListener("Set mp3 player to " + player));
-        //end add
-
+      mPlayer.addArmListener(
+        new ToolTipArmListener("Set mp3 player to " + player));
     }
 
-    MenuItem item2_1 = new MenuItem(mSettings,SWT.PUSH);
+    MenuItem item2_1 = new MenuItem(mSettings, SWT.PUSH);
     item2_1.setText("Plug-ins");
-    item2_1.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        new PluginDialog(display, pluginManager, (PluginApplication)Client.this);
+    item2_1.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        new PluginDialog(
+          display,
+          pluginManager,
+          (PluginApplication) Client.this);
       }
     });
 
@@ -841,40 +785,33 @@ public class Client implements UpdateListener, PluginApplication {
     item2_1.addArmListener(new ToolTipArmListener("Select Plugins"));
     //end add
 
-    MenuItem item3 = new MenuItem(menubar,SWT.CASCADE);
+    MenuItem item3 = new MenuItem(menubar, SWT.CASCADE);
     item3.setText("Info");
 
     Menu menu3 = new Menu(item3);
 
-    //Added for a nicer UI by Allen Tipper 14.9.03
-    menu3.addMenuListener(new MenuAdapter(){
-            public void menuHidden(MenuEvent e){
-                update();
-            }
-        });
-    //end add
-
-    item3.setMenu(menu3);
-
-    MenuItem item3_1 = new MenuItem(menu3,SWT.PUSH);
-    item3_1.setText("Credits");
-    item3_1.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        actionAbout();
+    menu3.addMenuListener(new MenuAdapter() {
+      public void menuHidden(MenuEvent e) {
+        update();
       }
     });
 
-    //Added for a nicer UI by Allen Tipper 14.9.03
-item3_1.addArmListener(new ToolTipArmListener("Show the Credits"));
-    //end add
+    item3.setMenu(menu3);
 
-
+    MenuItem item3_1 = new MenuItem(menu3, SWT.PUSH);
+    item3_1.setText("Credits");
+    item3_1.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        actionAbout();
+      }
+    });
+    item3_1.addArmListener(new ToolTipArmListener("Show the Credits"));
   }
 
   public void createToolBar() {
-    ToolBar toolbar = new ToolBar(shell,SWT.FLAT);
+    ToolBar toolbar = new ToolBar(shell, SWT.FLAT);
     ToolItem item;
-    item = new ToolItem(toolbar,SWT.PUSH);
+    item = new ToolItem(toolbar, SWT.PUSH);
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = false;
@@ -882,76 +819,76 @@ item3_1.addArmListener(new ToolTipArmListener("Show the Credits"));
     toolbar.setLayoutData(gridData);
 
     item.setText("This sux");
-    item.setToolTipText("Stop playing the current track and never play it again.");
-    item.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item.setToolTipText(
+      "Stop playing the current track and never play it again.");
+    item.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         setRating(getSelectedTrack(), 0);
       }
     });
 
-    item = new ToolItem(toolbar,SWT.PUSH);
+    item = new ToolItem(toolbar, SWT.PUSH);
     item.setText("Yawn");
     item.setToolTipText("Rate the current track as 2 out of 10.");
-    item.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         setRating(getSelectedTrack(), 2);
       }
     });
 
-    item = new ToolItem(toolbar,SWT.PUSH);
+    item = new ToolItem(toolbar, SWT.PUSH);
     item.setText("Not bad");
     item.setToolTipText("Rate the current track as 5 out of 10.");
-    item.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         setRating(getSelectedTrack(), 5);
       }
     });
 
-    item = new ToolItem(toolbar,SWT.PUSH);
+    item = new ToolItem(toolbar, SWT.PUSH);
     item.setText("Cool");
     item.setToolTipText("Rate the current track as 7 out of 10.");
-    item.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         setRating(getSelectedTrack(), 7);
       }
     });
 
-    item = new ToolItem(toolbar,SWT.PUSH);
+    item = new ToolItem(toolbar, SWT.PUSH);
     item.setText("Love it");
     item.setToolTipText("Rate the current track as 10 out of 10.");
-    item.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         setRating(getSelectedTrack(), 10);
       }
     });
 
-    new ToolItem(toolbar,SWT.SEPARATOR);
+    new ToolItem(toolbar, SWT.SEPARATOR);
 
-    pause = new ToolItem(toolbar,SWT.PUSH);
+    pause = new ToolItem(toolbar, SWT.PUSH);
     setPaused(false);
-    pause.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    pause.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         setPaused(!isPaused());
       }
     });
 
-    item = new ToolItem(toolbar,SWT.PUSH);
+    item = new ToolItem(toolbar, SWT.PUSH);
     item.setText("<<");
     item.setToolTipText("Return to previous track");
-    item.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         skip(true);
       }
     });
-		previous = item;
-		previous.setEnabled(false);
-    
+    previous = item;
+    previous.setEnabled(false);
 
-    item = new ToolItem(toolbar,SWT.PUSH);
+    item = new ToolItem(toolbar, SWT.PUSH);
     item.setText(">>");
     item.setToolTipText("Skip to the next track.");
-    item.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
+    item.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
         skip();
       }
     });
@@ -961,9 +898,10 @@ item3_1.addArmListener(new ToolTipArmListener("Show the Credits"));
     volumeScale.setPageIncrement(1);
     volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
     volumeScale.setToolTipText("Adjust the volume for the current track.");
-    volumeScale.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        setVolume(volumeScale.getSelection() * VOLUME_RESOLUTION - VOLUME_OFFSET);
+    volumeScale.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        setVolume(
+          volumeScale.getSelection() * VOLUME_RESOLUTION - VOLUME_OFFSET);
       }
     });
     gridData = new GridData();
@@ -992,7 +930,7 @@ item3_1.addArmListener(new ToolTipArmListener("Show the Credits"));
     progressBar.setMaximum(100);
   }
 
-  public void run(){
+  public void run() {
     while (true) {
       if (!display.readAndDispatch())
         display.sleep();
@@ -1004,27 +942,23 @@ item3_1.addArmListener(new ToolTipArmListener("Show the Credits"));
    * Get a factory that creates suitable UI objects, depending on the style of
    * user interface used in the application.
    **/
-  public PluginUIFactory getUIFactory()
-  {
+  public PluginUIFactory getUIFactory() {
     return uiFactory;
   }
 
-//added 16.9.03 by Allen Tipper, code by Anthony
-class ToolTipArmListener implements ArmListener{
+  class ToolTipArmListener implements ArmListener {
     private String str;
     public ToolTipArmListener(String str) {
-	this.str = str;
+      this.str = str;
     }
-    public void widgetArmed(ArmEvent e){
-	lblState.setText(strState = str);
-	lblState.pack();
+    public void widgetArmed(ArmEvent e) {
+      lblState.setText(strState = str);
+      lblState.pack();
     }
-}
-    //end add
+  }
 
-    public static void main(String[] args) throws Exception{
-	new Client().run();
-    }
-
+  public static void main(String[] args) throws Exception {
+    new Client().run();
+  }
 
 }
