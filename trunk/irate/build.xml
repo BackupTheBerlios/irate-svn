@@ -141,4 +141,13 @@
       <fileset file="irate-client-installer.exe"/>
     </delete>
   </target>
+
+  <target name="javadoc">
+    <javadoc sourcepath="." destdir="javadoc"
+      doctitle="iRATE Source Documentation"
+      windowtitle="iRATE Source Documentation"
+      packagenames="irate.*"
+      private="yes"/>
+  </target>
+
 </project>
