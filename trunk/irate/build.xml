@@ -38,6 +38,7 @@
       <fileset dir="." includes="irate/swt/locale*.properties"/>
       <fileset dir="." includes="irate/resources/*.class"/>
       <fileset dir="." includes="irate/resources/*.gif"/>
+      <fileset dir="." includes="irate/resources/*.mp3"/>
       <fileset dir="." includes="irate/client/*.class"/>
       <fileset dir="." includes="irate/client/locale*.properties"/>
       <fileset dir="." includes="irate/client/help/*.txt"/>
