@@ -252,9 +252,10 @@ void View::headerClicked(int column) {
 void View::trackChanged(SafeListViewItem* i) {
 	QString str(i->property("artist","")+" - "+i->property("title",""));
 
-	//this->statusBar()->changeItem("Now playing : "+str+" Rated : "+rate,0);
+	
 	QString song="["+(i->getStringRating())+"] - "+str;
 	this->setCaption(song+" / iRate Radio");
+	this->statusBar()->changeItem(i18n("Now playing : %1").arg(song),0);
 	if(this->osdMode==1||(this->osdMode==2&&i->isProperty("rating"))){
 		//this->m_osd->setLinkData(i);
 		//if(i!=IratePlugin::SPL()->current().data()){
@@ -349,7 +350,7 @@ void View::rate(int id) {
 	}
 }
 void View::downloadMessage(const QString& message){
-	this->statusBar()->changeItem(message.left(60),0);
+	//this->statusBar()->changeItem(message.left(60),0);
 }
 void View::totalDownloadSpeed(const QString& speed){
 	this->statusBar()->changeItem(i18n("Total speed %1").arg(speed),1);

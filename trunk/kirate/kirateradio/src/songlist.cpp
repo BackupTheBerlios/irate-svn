@@ -76,7 +76,7 @@ SongList::SongList(View *parent): KListView(parent)/*,DownloadListener() */{
 	this->mPopup->insertItem(this->popDown,8,8);
 	this->mPopup->insertItem(kil->loadIconSet("reload",KIcon::Small,0,false),i18n("Download Again"),9,9);
 	this->mPopup->insertItem(kil->loadIconSet("remove",KIcon::Small,0,false),i18n("Set broken"),10,10);
-	this->mPopup->insertItem(kil->loadIconSet("file_save",KIcon::Small,0,false),i18n("Save playlist..."),11,11);
+	this->mPopup->insertItem(kil->loadIconSet("fileexport",KIcon::Small,0,false),i18n("Save playlist..."),11,11);
 	this->mPopup->insertItem(kil->loadIconSet("editdelete",KIcon::Small,0,false),i18n("Delete files..."),12,12);
 	connect(this->mPopup,SIGNAL(activated(int)),this,SLOT(processPopup(int)));
 	this->header()->installEventFilter(this);
@@ -130,6 +130,7 @@ SongList::~SongList() {
 	delete selector;
 	//KMessageBox::information(0,"TrackDb deleted","Start",QString::null,KMessageBox::AllowLink);
 }
+//The methods where too much things are//TODO clean it
 void SongList::init(const QString &startDir) {
 	QString irateDir=startDir;
 	this->noUnrated=0;
@@ -315,11 +316,12 @@ void SongList::addTrack(TrackInfo* newTrack) {
 }
 
 void SongList::customEvent(QCustomEvent * event) {
-	if(event->type()<1102&&event->type()>1109) {
+	/*if(event->type()<1102&&event->type()>1109) {
 		QObject::customEvent(event);
 		return;
-	}
-	DownloadEvent *de= static_cast<DownloadEvent*>(event);
+	}*/
+	DownloadEvent *de= dynamic_cast<DownloadEvent*>(event);
+	if(!de)return;
 	if(de->isPercentMessage()) {
 		de->getItem()->downloaded(de->getMessage());
 		emit downloadMessage(i18n("Downloading : [%1] %2 %3 ").arg(de->getItem()->property("artist")).arg(de->getItem()->property("title")).arg(de->getItem()->property("percdone")));
@@ -327,12 +329,12 @@ void SongList::customEvent(QCustomEvent * event) {
 		de->getItem()->downloadSpeed(de->getMessage());
 
 	} else if(de->isFinishedMessage()) {
+		//de->getItem()->setProbs(weight,this->totalRating);
+		de->getItem()->downloadFinished(de->getMessage());
 		int weight=this->selector->setSongWeight(de->getItem());
 		this->totalRating+=weight;
 		this->selector->setTotal(this->totalRating);
 		this->updateRating();
-		//de->getItem()->setProbs(weight,this->totalRating);
-		de->getItem()->downloadFinished(de->getMessage());
 	} else if(de->isTotalDownloadSpeedMessage()) {
 		emit totalDownloadSpeed(de->getMessage());
 	} else if(de->isInfoMessage()) {

@@ -166,7 +166,7 @@ bool IratePlugin::listVisible() const {
 }
 
 void IratePlugin::showList() {
-	view->show();
+	view->showNormal();
 }
 
 void IratePlugin::hideList() {
