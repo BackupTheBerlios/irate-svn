@@ -87,9 +87,8 @@ public class Track {
   protected float getRawRating() {
     try {
       String s = elt.getStringAttribute("rating");
-      if (s == null)
-        s = "";
-      return Float.parseFloat(s);
+      if (s != null)
+        return Float.parseFloat(s);
     }
     catch (NumberFormatException e) {
     }
@@ -185,7 +184,10 @@ public class Track {
   }
 
   public void setRating(float rating) {
-    elt.setAttribute("rating", Float.toString(rating));
+    if (Float.isNaN(rating))
+      unSetRating();
+    else
+      elt.setAttribute("rating", Float.toString(rating));
     updateSerial();
   }
 
@@ -194,7 +196,10 @@ public class Track {
   }
 
   public void setWeight(float weight) {
-    elt.setAttribute("weight", Float.toString(weight));
+    if (Float.isNaN(weight))
+      unSetWeight();
+    else
+      elt.setAttribute("weight", Float.toString(weight));
     updateSerial();
   }
 
@@ -204,7 +209,9 @@ public class Track {
 
   public float getWeight() {
     try {
-      return Float.parseFloat(elt.getStringAttribute("weight"));
+      String s = elt.getStringAttribute("weight");
+      if (s != null)
+        return Float.parseFloat(s);
     }
     catch (Exception e) {
     }
