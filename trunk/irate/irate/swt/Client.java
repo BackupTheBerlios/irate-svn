@@ -172,6 +172,19 @@ public class Client extends AbstractClient {
     
   }
 
+  public void quit() {
+    Point closingSize = shell.getSize();
+    Point closingLocation = shell.getLocation();
+    try {
+        Preferences.savePreferenceToFile("shellLength", new Integer(closingSize.x).toString());
+        Preferences.savePreferenceToFile("shellHeight", new Integer(closingSize.y).toString());  
+        Preferences.savePreferenceToFile("shellX",new Integer(closingLocation.x).toString());
+        Preferences.savePreferenceToFile("shellY",new Integer(closingLocation.y).toString());
+        Preferences.savePreferenceToFile("volumeLevel",new Integer(volumeScale.getSelection()).toString());
+    } catch (IOException io) {}
+    super.quit();
+  }
+
 
   public void handleError(String code, String urlString) {
     //actionSetContinuousDownload(false);
@@ -497,15 +510,6 @@ public class Client extends AbstractClient {
     }
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
-        Point closingSize = shell.getSize();
-        Point closingLocation = shell.getLocation();
-        try {
-            Preferences.savePreferenceToFile("shellLength", new Integer(closingSize.x).toString());
-            Preferences.savePreferenceToFile("shellHeight", new Integer(closingSize.y).toString());  
-            Preferences.savePreferenceToFile("shellX",new Integer(closingLocation.x).toString());
-            Preferences.savePreferenceToFile("shellY",new Integer(closingLocation.y).toString());
-            Preferences.savePreferenceToFile("volumeLevel",new Integer(volumeScale.getSelection()).toString());
-        } catch (IOException io) {}
         quit();
       }
     });
