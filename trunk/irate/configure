@@ -53,5 +53,13 @@ foreach my $program (sort(keys(%lookup))){
 				locate_program($program);
 		}
 }
+
+if(defined($lookup{"libswt-gtk2.so"}{"dir"})){
+		my $out = "make.configure";
+		print "\nSetting up for a system-wide libswt in $out\n";
+		open OUT, ">$out" or die ("Couldn't open $out for writing");
+		print OUT "SWT_INCLUDE=".$lookup{"libswt-gtk2.so"}{"dir"}."/libswt-gtk2.jar\n";
+		print OUT "SWT_LIB=-lswt-gtk2\n";
+}
 #my $gcj = 
 #my $make = locate_program("make");

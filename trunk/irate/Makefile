@@ -1,3 +1,5 @@
+include make.configure
+
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
 export GCJ=gcj -g -pipe -O0
@@ -8,24 +10,29 @@ export PLATFORM=linux-motif
 #export PLATFORM=linux-libswt-gtk2
 #export PLATFORM=win32
 PWD=$(shell pwd)
-export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
+export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar
 
 CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
-ifeq ($(PLATFORM),linux-libswt-gtk2)
-CLIENT_LIBS = /usr/lib/libswt-gtk2.so lib/libnanoxml-lite.o 
-else
-CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o 
-endif
-
-#cute hack to see if we can bundle the docs too
-#ifneq ($(shell html2text -help 2> /dev/null),)
-#CLIENT_DEPS += resource_irate_client_*.o
-#endif
+CLIENT_LIBS = lib/libnanoxml-lite.o 
 
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
 IRATE_SERVER=irate-server.exe
+CLIENT_LINKFLAGS=-Dgnu.gcj.runtime.NameFinder.use_addr2line=false -Dgnu.gcj.runtime.NameFinder.demangle=false
 export GCJ=/usr/local/crossgcc/bin/i586-pc-mingw32-gcj -g -pipe -O0
+CLIENT_LIBS += lib/libswt.o
+CLASSPATH:=$(PWD)/lib/swt.jar:$(CLASSPATH)
+else
+
+#configure script can set these in make.configure
+ifdef SWT_INCLUDE
+CLIENT_LINKFLAGS=$(SWT_LIB)
+CLASSPATH:=$(SWT_INCLUDE):$(CLASSPATH)
+else
+CLIENT_LIBS+= lib/libswt.o
+CLASSPATH:=$(PWD)/lib/swt.jar:$(CLASSPATH)
+endif
+
 endif
 
 CLIENT_FILES = \
@@ -45,7 +52,10 @@ CLIENT_FILES = \
 SERVER_DEPS = irate-server.o irate-common.o
 SERVER_LIBS = lib/libnanoxml-lite.o
 
-all: lib $(IRATE_CLIENT) $(IRATE_SERVER)
+all: make.configure lib $(IRATE_CLIENT) $(IRATE_SERVER)
+
+make.configure:
+	touch $@
 
 install: $(IRATE_CLIENT)
 	install -d $(BIN) $(LIB)
@@ -86,7 +96,7 @@ lib/libhttpclient.o:
 	$(MAKE) -C lib/ libhttpclient.o
 	
 $(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS)
-	$(GCJ) $(LFLAGS)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
+	$(GCJ) $(CLIENT_LINKFLAGS)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
 
 
 $(IRATE_SERVER): $(SERVER_LIBS) $(SERVER_DEPS) 
