@@ -126,8 +126,11 @@ public class PluginManager
         // If we wrote the file successfully, then rename the temporary
 	// file to the real name of the configuration file.  This makes
 	// the writing of the new file effectively atomic.
-      if (!getConfigFileTemporary().renameTo(getConfigFile()))
-	throw new IOException("Failed to rename "+getConfigFileTemporary()+" to "+getConfigFile());
+      if (!getConfigFileTemporary().renameTo(getConfigFile())) {
+        getConfigFile().delete();
+	if (!getConfigFileTemporary().renameTo(getConfigFile()))
+	  throw new IOException("Failed to rename "+getConfigFileTemporary()+" to "+getConfigFile());
+      }
     }
     finally {
       if (fw != null)

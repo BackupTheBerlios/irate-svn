@@ -292,8 +292,11 @@ public class TrackDatabase {
 	  // If we wrote the file successfully, then rename the temporary
 	  // file to the real name of the configuration file.  This makes
 	  // the writing of the new file effectively atomic.
-	if (!temporaryFile.renameTo(file))
-	  throw new IOException("Failed to rename "+temporaryFile+" to "+file);
+	if (!temporaryFile.renameTo(file)) {
+	  file.delete();
+	  if (!temporaryFile.renameTo(file))
+	    throw new IOException("Failed to rename "+temporaryFile+" to "+file);
+        }
       }
       finally {
         if (fw != null) try { fw.close(); } catch (IOException e) { e.printStackTrace(); }
