@@ -134,11 +134,36 @@ public class Client extends AbstractClient {
     String yLocation = Preferences.getUserPreference("shellY");
     
     if(xLocation != null && yLocation != null) {
-        shell.setLocation(new Integer(xLocation).intValue(),new Integer(yLocation).intValue());
+      // Make sure the location is onscreen; sizes and positions of screens
+      // may change from one run to the next, particularly on laptops.
+      //
+      // FIXME: Display.getBounds() may return bogus results if there are
+      // multiple screens which do not form an overall rectangle.
+      // SWT 3.0 has a Display.getMonitors() by which we could check
+      // individually; switch to use this if we require 3.0+ later.
+      //
+      // We could pull more gymnastics to keep the window entirely on
+      // screen and sized to fit, but generally it should be enough to 
+      // make sure that the title bar is visible; then the user can move
+      // or size it as they wish.
+      //
+      // FIXME: This does not take into account user-inaccessible areas
+      // of the screen like taskbars, menu bars, panels, docks. It may
+      // still be possible to end up with a position where you can't move
+      // the window.
+      
+      int shellX = new Integer(xLocation).intValue();
+      int shellY = new Integer(yLocation).intValue();
+      Rectangle bounds = display.getBounds();
+      
+      if (bounds.contains(shellX, shellY) ||
+          bounds.contains(shellX + shell.getSize().x, shellY)) {
+        shell.setLocation(shellX, shellY);
       }
+    }
     
     if(maximize != null && maximize.equals("true")) {
-        shell.setMaximized(true);
+      shell.setMaximized(true);
     }
     
       // Set initial volume level in the player.  We have already set it on the volume
