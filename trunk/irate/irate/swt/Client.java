@@ -29,7 +29,8 @@ public class Client implements UpdateListener {
   private PlayListManager playListManager;
   private PlayThread playThread;
   private DownloadThread downloadThread;
-  private String strState = "";
+
+  private String strState = "                                                                     ";
   // private PlayThread playThread;
   
   
@@ -76,15 +77,15 @@ public class Client implements UpdateListener {
         msg.setMessage("Error with url:"+url);
         msg.open();
       }
-    };    
+    };
+    final Client client = this;
     downloadThread.addUpdateListener(new UpdateListener() {
-      private String state = "";
       public void actionPerformed() {
         String state = downloadThread.getState();
-        if (!state.equals(this.state)) {
-          this.state = state;
-          actionPerformed();
+        if (!strState.equals(state)) {
+          strState = state;
         }
+        client.actionPerformed();
       }
     });
     playThread.addUpdateListener(new UpdateListener() {
@@ -103,7 +104,16 @@ public class Client implements UpdateListener {
     TableItem item = (TableItem)hashSongs.get(track);
     tblSongs.select(tblSongs.indexOf(item));
     tblSongs.showItem(item);
-    lblState.setText(strState);
+    int n = downloadThread.getPercentComplete();
+    if(n > 0 && n < 100)
+    {
+      lblState.setText(strState + " "+n +"%");
+      progressBar.setSelection(n);
+    }else
+      lblState.setText(strState);
+    
+    synchronizePlaylist(playListManager, tblSongs);
+    
   }
   
   public void actionPerformed(){
@@ -200,6 +210,7 @@ public class Client implements UpdateListener {
     update();
   }
   
+  /* todo update # of times played */
   void synchronizePlaylist(PlayListManager playListManager, Table tblSongs){
     int itemCount = tblSongs.getItemCount();
     TrackDatabase td = playListManager.getPlayList();
@@ -360,6 +371,7 @@ public class Client implements UpdateListener {
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         setRating(0);
+        playThread.reject();
       }
     });
     
@@ -418,6 +430,7 @@ public class Client implements UpdateListener {
     toolbar.setLayoutData(gridData);
     
     lblState = new Label(shell, SWT.NONE);
+    lblState.setText(strState);
     
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.BEGINNING;
@@ -430,9 +443,17 @@ public class Client implements UpdateListener {
     progressBar.setLayoutData(gridData);
     
     shell.pack();
+    progressBar.setMinimum(0);
+    progressBar.setMaximum(100);
+    progressBar.setSelection(100);
+    
+    
     Rectangle rec = shell.getBounds();
     rec.height = 300;
     shell.setBounds(rec);
+    Point p = progressBar.getSize();
+    lblState.setSize(rec.width - p.x-5, p.y);
+    
     shell.open();
   }
   
