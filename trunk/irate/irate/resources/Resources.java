@@ -6,6 +6,7 @@ package irate.resources;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Hashtable;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -15,8 +16,7 @@ import java.util.ResourceBundle;
 public class Resources {
   
   private static Class cls = new Resources().getClass();
-  private static final String BUNDLE_NAME = "irate.resources.irate"; 
-  private static final ResourceBundle RESOURCE_BUNDLE = ResourceBundle.getBundle(BUNDLE_NAME);
+  private static Hashtable cachedBundles = new Hashtable();
 
   public static URL getResource(String name) {
     return cls.getResource(name);
@@ -29,9 +29,18 @@ public class Resources {
       throw new IOException();
   }
   
-  public static String getString(String key) {
+  
+  public static String getString(String bundleName, String key) {
     try {
-      return RESOURCE_BUNDLE.getString(key);
+      if(cachedBundles.containsKey(bundleName)) {
+        ResourceBundle bundle = (ResourceBundle)cachedBundles.get(bundleName);
+        return bundle.getString(key); 
+      }
+      else {
+        ResourceBundle bundle = ResourceBundle.getBundle(bundleName);
+        cachedBundles.put(bundleName, bundle);
+        return bundle.getString(key);
+      }
     }
     catch (MissingResourceException e) {
       return '!' + key + '!';

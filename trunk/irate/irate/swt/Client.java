@@ -26,14 +26,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/11/30 17:58:31 $
+ * Date Updated: $Date: 2003/12/01 03:00:41 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.117 $
+ * @version $Revision: 1.118 $
  */
 public class Client extends AbstractClient {
 
@@ -61,11 +61,11 @@ public class Client extends AbstractClient {
   private SWTPluginUIFactory uiFactory;
   
   private RatingFunction[] ratingFunctions = new RatingFunction[] {
-    new RatingFunction(0, Resources.getString("button.this_sux"), Resources.getString("button.tooltip.this_sux")),
-    new RatingFunction(2, Resources.getString("button.yawn"), Resources.getString("button.tooltip.yawn")),
-    new RatingFunction(5, Resources.getString("button.not_bad"), Resources.getString("button.tooltip.not_bad")),
-    new RatingFunction(7, Resources.getString("button.cool"), Resources.getString("button.tooltip.cool")),
-    new RatingFunction(10, Resources.getString("button.love_it"), Resources.getString("button.tooltip.love_it"))
+    new RatingFunction(0, Resources.getString("irate.resources.swt","button.this_sux"), Resources.getString("irate.resources.swt","button.tooltip.this_sux")),
+    new RatingFunction(2, Resources.getString("irate.resources.swt","button.yawn"), Resources.getString("irate.resources.swt","button.tooltip.yawn")),
+    new RatingFunction(5, Resources.getString("irate.resources.swt","button.not_bad"), Resources.getString("irate.resources.swt","button.tooltip.not_bad")),
+    new RatingFunction(7, Resources.getString("irate.resources.swt","button.cool"), Resources.getString("irate.resources.swt","button.tooltip.cool")),
+    new RatingFunction(10, Resources.getString("irate.resources.swt","button.love_it"), Resources.getString("irate.resources.swt","button.tooltip.love_it"))
   };
   
   public Client() {
@@ -180,7 +180,7 @@ public class Client extends AbstractClient {
     if (track == null)
       return;
     shell.setText(
-      (track == null ? "" : track.toString() + " - ") + Resources.getString("titlebar.program_name"));
+      (track == null ? "" : track.toString() + " - ") + Resources.getString("irate.resources.swt","titlebar.program_name"));
     volumeScale.setSelection(
       (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
     trackTable.select(track);
@@ -226,11 +226,11 @@ public class Client extends AbstractClient {
       public void run() {
         if (pausedFinal.booleanValue()) {
           pause.setText("|>");
-          pause.setToolTipText(Resources.getString("button.tooltip.unpause"));
+          pause.setToolTipText(Resources.getString("irate.resources.swt","button.tooltip.unpause"));
         }
         else {
           pause.setText("||");
-          pause.setToolTipText(Resources.getString("button.tooltip.pause"));
+          pause.setToolTipText(Resources.getString("irate.resources.swt","button.tooltip.pause"));
         }
       }
     });
@@ -295,7 +295,7 @@ public class Client extends AbstractClient {
 
   public void createShell() {
     shell = new Shell(display);
-    shell.setText(Resources.getString("titlebar.program_name"));
+    shell.setText(Resources.getString("irate.resources.swt","titlebar.program_name"));
 
     try {
       ImageData icon =
@@ -407,7 +407,7 @@ public class Client extends AbstractClient {
     shell.setMenuBar(menubar);
 
     MenuItem item1 = new MenuItem(menubar, SWT.CASCADE);
-    item1.setText(Resources.getString("toolbar.menu_title.action"));
+    item1.setText(Resources.getString("irate.resources.swt","toolbar.menu_title.action"));
 
     Menu menu1 = new Menu(item1);
     //Added for a nicer UI by Allen Tipper 14.9.03
@@ -421,27 +421,27 @@ public class Client extends AbstractClient {
     item1.setMenu(menu1);
 
     MenuItem item1_1 = new MenuItem(menu1, SWT.PUSH);
-    item1_1.setText(Resources.getString("toolbar.menu_item.download"));
+    item1_1.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.download"));
     item1_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         downloadThread.go();
       }
     });
     //Added for a nicer UI by Allen Tipper 16.9.03
-    item1_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.download")));
+    item1_1.addArmListener(new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.download")));
     //end add
 
     MenuItem item_undo = new MenuItem(menu1, SWT.PUSH);
-    item_undo.setText(Resources.getString("toolbar.menu_item.undo"));
+    item_undo.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.undo"));
     item_undo.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         undoLastRating();
       }
     });
-    item_undo.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.undo")));
+    item_undo.addArmListener(new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.undo")));
 
     MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
-    item1_4.setText(Resources.getString("toolbar.menu_item.quit"));
+    item1_4.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.quit"));
     item1_4.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         quit();
@@ -449,11 +449,11 @@ public class Client extends AbstractClient {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item1_4.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.quit")));
+    item1_4.addArmListener(new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.quit")));
     //end add
 
     MenuItem item2 = new MenuItem(menubar, SWT.CASCADE);
-    item2.setText(Resources.getString("toolbar.menu_title.settings"));
+    item2.setText(Resources.getString("irate.resources.swt","toolbar.menu_title.settings"));
 
     Menu mSettings = new Menu(item2);
     //Added for a nicer UI by Allen Tipper 14.9.03
@@ -466,10 +466,10 @@ public class Client extends AbstractClient {
     item2.setMenu(mSettings);
 
     MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
-    mDownload.setText(Resources.getString("toolbar.menu_item.auto_download"));
+    mDownload.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.auto_download"));
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mDownload.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.auto_download")));
+    mDownload.addArmListener(new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.auto_download")));
     //end add
 
     Menu menu2 = new Menu(mDownload);
@@ -481,7 +481,7 @@ public class Client extends AbstractClient {
       MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
       final Integer acount = new Integer(counts[i]);
       final int dummy = 0; // workaround for gcj-3.0.4 bug
-      mTimes.setText(i == 0 ? Resources.getString("toolbar.sub_menu_item.auto_download.disabled") : "< " + acount + " " + Resources.getString("toolbar.sub_menu_item.auto_download.unrated_tracks"));
+      mTimes.setText(i == 0 ? Resources.getString("irate.resources.swt","toolbar.sub_menu_item.auto_download.disabled") : "< " + acount + " " + Resources.getString("irate.resources.swt","toolbar.sub_menu_item.auto_download.unrated_tracks"));
       mTimes.setSelection(acount.intValue() == autoDownload);
       mTimes.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
@@ -497,17 +497,17 @@ public class Client extends AbstractClient {
       //Added for a nicer UI by Allen Tipper 14.9.03
       mTimes.addArmListener(
         new ToolTipArmListener(
-          Resources.getString("toolbar.sub_menu_item.auto_download.tooltip.unrated_tracks")
+          Resources.getString("irate.resources.swt","toolbar.sub_menu_item.auto_download.tooltip.unrated_tracks")
           + " " + acount));
       //end add
 
     }
 
     MenuItem mPlayList = new MenuItem(mSettings, SWT.CASCADE);
-    mPlayList.setText(Resources.getString("toolbar.menu_item.play_list"));
+    mPlayList.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.play_list"));
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mPlayList.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.play_list")));
+    mPlayList.addArmListener(new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.play_list")));
     //end add
 
     Menu menuPlayList = new Menu(mPlayList);
@@ -519,7 +519,7 @@ public class Client extends AbstractClient {
       MenuItem mTimes = new MenuItem(menuPlayList, SWT.CHECK, i);
       final int dummy = 0; // workaround for gcj-3.0.4 bug
       final Integer pcount = new Integer(counts[i]);
-      mTimes.setText(pcount + " " + Resources.getString("toolbar.sub_menu_item.play_list.tracks"));
+      mTimes.setText(pcount + " " + Resources.getString("irate.resources.swt","toolbar.sub_menu_item.play_list.tracks"));
       mTimes.setSelection(pcount.intValue() == playListLength);
       mTimes.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
@@ -532,7 +532,7 @@ public class Client extends AbstractClient {
 
       //Added for a nicer UI by Allen Tipper 14.9.03
       mTimes.addArmListener(
-        new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.play_list.tooltip.tracks") + " " + pcount));
+        new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.sub_menu_item.play_list.tooltip.tracks") + " " + pcount));
       //end add
 
     }
@@ -543,7 +543,7 @@ public class Client extends AbstractClient {
      * Allows the user to select the number of unrated tracks to add to each playlist generation
      */
     MenuItem mNewUnrated = new MenuItem(mSettings, SWT.CASCADE);
-    mNewUnrated.setText(Resources.getString("toolbar.menu_item.unrated"));
+    mNewUnrated.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.unrated"));
     Menu menuNewUnrated = new Menu(mNewUnrated);
     mNewUnrated.setMenu(menuNewUnrated);
 
@@ -567,7 +567,7 @@ public class Client extends AbstractClient {
       //Added for a nicer UI by Allen Tipper 14.9.03
       mRatio.addArmListener(
         new ToolTipArmListener(
-          Resources.getString("toolbar.menu_item.tooltip.unrated") +
+          Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.unrated") +
           " " + ratio + "%."));
       //end add
 
@@ -575,12 +575,12 @@ public class Client extends AbstractClient {
     /****/
 
     MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
-    mPlayers.setText(Resources.getString("toolbar.menu_item.player"));
+    mPlayers.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.player"));
     menu2 = new Menu(mPlayers);
     mPlayers.setMenu(menu2);
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mPlayers.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.player")));
+    mPlayers.addArmListener(new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.player")));
     //end add
 
     Player players[] = playerList.getPlayers();
@@ -603,11 +603,11 @@ public class Client extends AbstractClient {
         }
       });
       mPlayer.addArmListener(
-        new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.tooltip.player") + " " + player));
+        new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.sub_menu_item.tooltip.player") + " " + player));
     }
 
     MenuItem item2_1 = new MenuItem(mSettings, SWT.PUSH);
-    item2_1.setText(Resources.getString("toolbar.menu_item.advanced"));
+    item2_1.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.advanced"));
     item2_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         showSettingDialog(SettingDialog.PLUGIN_PAGE);
@@ -615,11 +615,11 @@ public class Client extends AbstractClient {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item2_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.advanced")));
+    item2_1.addArmListener(new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.advanced")));
     //end add
 
     MenuItem item3 = new MenuItem(menubar, SWT.CASCADE);
-    item3.setText(Resources.getString("toolbar.menu_title.info"));
+    item3.setText(Resources.getString("irate.resources.swt","toolbar.menu_title.info"));
 
     Menu menu3 = new Menu(item3);
 
@@ -632,13 +632,13 @@ public class Client extends AbstractClient {
     item3.setMenu(menu3);
 
     MenuItem item3_1 = new MenuItem(menu3, SWT.PUSH);
-    item3_1.setText(Resources.getString("toolbar.menu_item.credits"));
+    item3_1.setText(Resources.getString("irate.resources.swt","toolbar.menu_item.credits"));
     item3_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         actionAbout();
       }
     });
-    item3_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.credits")));
+    item3_1.addArmListener(new ToolTipArmListener(Resources.getString("irate.resources.swt","toolbar.menu_item.tooltip.credits")));
   }
 
 
@@ -677,7 +677,7 @@ public class Client extends AbstractClient {
     ToolItem item;
     item = new ToolItem(toolbar, SWT.PUSH);
     item.setText("<<");
-    item.setToolTipText(Resources.getString("button.tooltip.previous"));
+    item.setToolTipText(Resources.getString("irate.resources.swt","button.tooltip.previous"));
     item.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         skip(true);
@@ -688,7 +688,7 @@ public class Client extends AbstractClient {
 
     item = new ToolItem(toolbar, SWT.PUSH);
     item.setText(">>");
-    item.setToolTipText(Resources.getString("button.tooltip.skip"));
+    item.setToolTipText(Resources.getString("irate.resources.swt","button.tooltip.skip"));
     item.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         skip();
@@ -698,8 +698,8 @@ public class Client extends AbstractClient {
     new ToolItem(toolbar, SWT.SEPARATOR);
 
     item = new ToolItem(toolbar, SWT.PUSH);
-    item.setText(Resources.getString("button.info"));
-    item.setToolTipText(Resources.getString("button.tooltip.info"));
+    item.setText(Resources.getString("irate.resources.swt","button.info"));
+    item.setToolTipText(Resources.getString("irate.resources.swt","button.tooltip.info"));
     final Client clientToPass = this;
     item.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -717,7 +717,7 @@ public class Client extends AbstractClient {
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(1);
     volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
-    volumeScale.setToolTipText(Resources.getString("slider.tooltip.volume"));
+    volumeScale.setToolTipText(Resources.getString("irate.resources.swt","slider.tooltip.volume"));
     volumeScale.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         setVolume(

@@ -80,7 +80,7 @@ public class ErrorDialog {
   private void createCloseButton() {
     Button close = new Button(shell, SWT.NONE);
     close.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    close.setText(Resources.getString("ErrorDialog.Button.Close")); 
+    close.setText(Resources.getString("irate.resources.swt","ErrorDialog.Button.Close")); 
     close.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         actionClose();

@@ -20,10 +20,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/11/30 17:58:31 $
+ * Date Updated: $Date: 2003/12/01 03:00:40 $
  * @author Creator:	taras
  * @author Updated:	$Author: parlabane $
- * @version $Revision: 1.13 $
+ * @version $Revision: 1.14 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -56,7 +56,7 @@ public class AccountDialog {
       }
     });
 
-    shell.setText(Resources.getString("AccountDialog.Title.Account_Settings"));  
+    shell.setText(Resources.getString("irate.resources.swt", "AccountDialog.Title.Account_Settings"));  
     GridLayout layout = new GridLayout(3, false);
     shell.setLayout(layout);
 
@@ -66,7 +66,7 @@ public class AccountDialog {
   
     createUserInfo();
 
-    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.Password"));  
+    new Label(shell, SWT.NONE).setText(Resources.getString("irate.resources.swt","AccountDialog.Label.Password"));  
     txtPassword = new Text(shell, SWT.SINGLE | SWT.BORDER);
     GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 2;
@@ -74,25 +74,25 @@ public class AccountDialog {
     if (password.length() == 0)
       password = randomString(10);
     txtPassword.setText(password);
-    txtPassword.setToolTipText(Resources.getString("AccountDialog.Text.Tooltip.Password")); 
+    txtPassword.setToolTipText(Resources.getString("irate.resources.swt","AccountDialog.Text.Tooltip.Password")); 
 
-    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.Server"));  
+    new Label(shell, SWT.NONE).setText(Resources.getString("irate.resources.swt","AccountDialog.Label.Server"));  
     txtServer = new Text(shell, SWT.SINGLE | SWT.BORDER);
     data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 2;
     txtServer.setLayoutData(data);
     txtServer.setText(trackDatabase.getHost());
-    txtServer.setToolTipText(Resources.getString("AccountDialog.Text.Tooltip.Server"));  
+    txtServer.setToolTipText(Resources.getString("irate.resources.swt","AccountDialog.Text.Tooltip.Server"));  
 
-    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.Port"));  
+    new Label(shell, SWT.NONE).setText(Resources.getString("irate.resources.swt","AccountDialog.Label.Port"));  
     txtPort = new Text(shell, SWT.SINGLE | SWT.BORDER);
     data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 2;
     txtPort.setLayoutData(data);
     txtPort.setText(Integer.toString(trackDatabase.getPort()));
-    txtPort.setToolTipText(Resources.getString("AccountDialog.Text.Tooltip.Port"));  
+    txtPort.setToolTipText(Resources.getString("irate.resources.swt","AccountDialog.Text.Tooltip.Port"));  
     
-    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.Directory"));  
+    new Label(shell, SWT.NONE).setText(Resources.getString("irate.resources.swt","AccountDialog.Label.Directory"));  
     txtDirectory = new Text(shell, SWT.SINGLE | SWT.BORDER);
     data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 1;
@@ -100,15 +100,15 @@ public class AccountDialog {
     txtDirectory.setEnabled(false);
     txtDirectory.setLayoutData(data);
     txtDirectory.setText(System.getProperties().getProperty("user.home"));  
-    txtDirectory.setToolTipText(Resources.getString("AccountDialog.Text.Tooltip.Directory"));  
+    txtDirectory.setToolTipText(Resources.getString("irate.resources.swt","AccountDialog.Text.Tooltip.Directory"));  
 
     Button btnDirectory = new Button(shell, SWT.NONE);
-    btnDirectory.setText(Resources.getString("AccountDialog.Button.Browse"));  
+    btnDirectory.setText(Resources.getString("irate.resources.swt","AccountDialog.Button.Browse"));  
     btnDirectory.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         DirectoryDialog dialog = new DirectoryDialog (shell);
-        dialog.setMessage(Resources.getString("AccountDialog.Dialog.Message"));  
-        dialog.setText(Resources.getString("AccountDialog.Dialog.Download_Directory"));  
+        dialog.setMessage(Resources.getString("irate.resources.swt","AccountDialog.Dialog.Message"));  
+        dialog.setText(Resources.getString("irate.resources.swt","AccountDialog.Dialog.Download_Directory"));  
         String result = dialog.open();
         if(result != null) {
           txtDirectory.setText(result);
@@ -117,7 +117,7 @@ public class AccountDialog {
     });
     
     Button btnCancel = new Button(shell, SWT.NONE);
-    btnCancel.setText(Resources.getString("AccountDialog.Button.Cancel"));  
+    btnCancel.setText(Resources.getString("irate.resources.swt","AccountDialog.Button.Cancel"));  
     btnCancel.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         done = true;
@@ -151,7 +151,7 @@ public class AccountDialog {
 
   /** Create the user input field. */
   private void createUserInfo() {
-    new Label(shell, SWT.NONE).setText(Resources.getString("AccountDialog.Label.User"));  
+    new Label(shell, SWT.NONE).setText(Resources.getString("irate.resources.swt","AccountDialog.Label.User"));  
     txtUser = new Text(shell, SWT.SINGLE | SWT.BORDER);
     GridData data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     data.horizontalSpan = 2;
@@ -159,13 +159,13 @@ public class AccountDialog {
     if (userName.length() == 0) 
       userName = System.getProperty("user.name");// + " " + randomString(3);   
     txtUser.setText(userName);
-    txtUser.setToolTipText(Resources.getString("AccountDialog.Text.ToolTip.User"));  
+    txtUser.setToolTipText(Resources.getString("irate.resources.swt","AccountDialog.Text.ToolTip.User"));  
   }
  
   /** Create the OK button. */
   private void createAcceptButton() {
     Button btnAccept = new Button(shell, SWT.NONE);
-    btnAccept.setText(Resources.getString("AccountDialog.Button.OK"));  
+    btnAccept.setText(Resources.getString("irate.resources.swt","AccountDialog.Button.OK"));  
   
     btnAccept.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {

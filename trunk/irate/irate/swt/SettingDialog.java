@@ -15,10 +15,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/11/30 17:58:31 $
+ * Date Updated: $Date: 2003/12/01 03:00:38 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.12 $
+ * @version $Revision: 1.13 $
  */
 public class SettingDialog
 {
@@ -70,7 +70,7 @@ public class SettingDialog
   /** Creates widgets */
   private void createWidgets(Display display) {
     shell = new Shell(display);
-    shell.setText(Resources.getString("SettingDialog.Title.Settings")); 
+    shell.setText(Resources.getString("irate.resources.swt","SettingDialog.Title.Settings")); 
     shell.addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           done=true;
@@ -82,15 +82,15 @@ public class SettingDialog
     tabs = new TabFolder(shell, SWT.NONE);
     //Pluginpage
     TabItem tabItem = new TabItem(tabs, SWT.NONE);
-    tabItem.setText(Resources.getString("SettingDialog.TabItem.Plugins")); 
+    tabItem.setText(Resources.getString("irate.resources.swt","SettingDialog.TabItem.Plugins")); 
     tabItem.setControl(createPluginPage(tabs));
     tabItem = new TabItem(tabs, SWT.NONE);
-    tabItem.setText(Resources.getString("SettingDialog.TabItem.Browser")); 
+    tabItem.setText(Resources.getString("irate.resources.swt","SettingDialog.TabItem.Browser")); 
     tabItem.setControl(createBrowserPage(tabs));
     tabs.pack();
 
     Button ok = new Button(shell, SWT.NONE);
-    ok.setText(Resources.getString("SettingDialog.Button.Close")); 
+    ok.setText(Resources.getString("irate.resources.swt","SettingDialog.Button.Close")); 
     
     //gd.horizontalSpan = 2;
     ok.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
@@ -115,7 +115,7 @@ public class SettingDialog
     comp.setLayout(layout);
     
     Label heading = new Label(comp, SWT.NONE);
-    heading.setText(Resources.getString("SettingDialog.Label.PluginHeading")); 
+    heading.setText(Resources.getString("irate.resources.swt","SettingDialog.Label.PluginHeading")); 
     GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
     gd.horizontalSpan = 2;
     heading.setLayoutData(gd);
@@ -136,7 +136,7 @@ public class SettingDialog
           }
         });
       Button configure = new Button(comp, SWT.NONE);
-      configure.setText(Resources.getString("SettingDialog.Button.Configure")); 
+      configure.setText(Resources.getString("irate.resources.swt","SettingDialog.Button.Configure")); 
       configure.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
           app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
@@ -152,7 +152,7 @@ public class SettingDialog
     final Composite comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(1, false);
     comp.setLayout(layout);
-    new Label(comp, SWT.NONE).setText(Resources.getString("SettingDialog.Label.Browser")); 
+    new Label(comp, SWT.NONE).setText(Resources.getString("irate.resources.swt","SettingDialog.Label.Browser")); 
 
     class BrowserButton {
       String description; // Button label
@@ -189,12 +189,12 @@ public class SettingDialog
     final BrowserButton[] browsers = { 
       new BrowserButton("Mozilla/Firebird (Linux/UNIX)", 
                         "mozilla -remote openURL(%u,new-window)", 
-                        Resources.getString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
+                        Resources.getString("irate.resources.swt","SettingDialog.Button.Browser.Tooltip.Mozilla")),  
       new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec",  //$NON-NLS-2$
-                        Resources.getString("SettingDialog.Button.Browser.Tooltip.Konqueror")),  
-      new BrowserButton(Resources.getString("SettingDialog.Button.Browser.WindowsDefault"), 
+                        Resources.getString("irate.resources.swt","SettingDialog.Button.Browser.Tooltip.Konqueror")),  
+      new BrowserButton(Resources.getString("irate.resources.swt","SettingDialog.Button.Browser.WindowsDefault"), 
                         "rundll32 url.dll,FileProtocolHandler", 
-                        Resources.getString("SettingDialog.Button.Browser.Tooltip.WindowsDefault"))}; 
+                        Resources.getString("irate.resources.swt","SettingDialog.Button.Browser.Tooltip.WindowsDefault"))}; 
 
     final Button browserSpecified = new Button(comp, SWT.RADIO);
     final Text browserText = new Text(comp, SWT.NONE);
@@ -240,8 +240,8 @@ public class SettingDialog
       browseButton.setEnabled(false);
     }
 
-    browserSpecified.setText(Resources.getString("SettingDialog.Button.Browser.UserSpecified")); 
-    browserSpecified.setToolTipText(Resources.getString("SettingDialog.Button.Browser.ToolTip.UserSpecified")); 
+    browserSpecified.setText(Resources.getString("irate.resources.swt","SettingDialog.Button.Browser.UserSpecified")); 
+    browserSpecified.setToolTipText(Resources.getString("irate.resources.swt","SettingDialog.Button.Browser.ToolTip.UserSpecified")); 
     browserSpecified.addSelectionListener(sel);
 
     browserText.setText(browser);
@@ -252,12 +252,12 @@ public class SettingDialog
         }
       });
     
-    browseButton.setText(Resources.getString("SettingDialog.Button.Browse")); 
+    browseButton.setText(Resources.getString("irate.resources.swt","SettingDialog.Button.Browse")); 
     
     browseButton.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
           FileDialog fd = new FileDialog(shell, SWT.OPEN);
-          fd.setText(Resources.getString("SettingDialog.FileDialog.Text")); 
+          fd.setText(Resources.getString("irate.resources.swt","SettingDialog.FileDialog.Text")); 
           fd.open();
           if (!fd.getFileName().equals("")) { 
             browserText.setText(fd.getFilterPath() + "/" + fd.getFileName()); 

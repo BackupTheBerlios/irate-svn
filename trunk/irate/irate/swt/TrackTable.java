@@ -59,7 +59,7 @@ public class TrackTable {
 
     TableColumn col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
-    col.setText(Resources.getString("TrackTable.Heading.Artist")); 
+    col.setText(Resources.getString("irate.resources.swt","TrackTable.Heading.Artist")); 
     addColumnListener(col, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getArtist()).compareTo(new MagicString(track1.getArtist()));
@@ -68,7 +68,7 @@ public class TrackTable {
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
-    col.setText(Resources.getString("TrackTable.Heading.Track")); 
+    col.setText(Resources.getString("irate.resources.swt","TrackTable.Heading.Track")); 
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getTitle()).compareTo(new MagicString(track1.getTitle()));
@@ -77,7 +77,7 @@ public class TrackTable {
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(100);
-    col.setText(Resources.getString("TrackTable.Heading.Rating"));
+    col.setText(Resources.getString("irate.resources.swt","TrackTable.Heading.Rating"));
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getState()).compareTo(new MagicString(track1.getState()));
@@ -86,7 +86,7 @@ public class TrackTable {
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(50);
-    col.setText(Resources.getString("TrackTable.Heading.Plays"));
+    col.setText(Resources.getString("irate.resources.swt","TrackTable.Heading.Plays"));
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new Integer(track0.getNoOfTimesPlayed()).compareTo(new Integer(track1.getNoOfTimesPlayed()));
@@ -95,7 +95,7 @@ public class TrackTable {
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(180);
-    col.setText(Resources.getString("TrackTable.Heading.Last")); 
+    col.setText(Resources.getString("irate.resources.swt","TrackTable.Heading.Last")); 
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return track0.getLastPlayed().compareTo(track1.getLastPlayed());
