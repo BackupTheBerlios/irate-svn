@@ -162,7 +162,7 @@ public class DownloadThread extends Thread {
       exception = null;
       done = false;
       //start thread with a task that might timeout
-      new Thread(new Runnable() {
+      Thread t = new Thread() {
         public void run() {
           try {
             TimeoutWorker.this.run();
@@ -173,7 +173,8 @@ public class DownloadThread extends Thread {
           }
           done = true;
         }
-      }).start();
+      };
+      t.start(); // For gcj-3.0.4 we have to go Thread t = new Thread() { ... }; t.start();
       while (timeout > 0) {
         Thread.sleep(step);
         timeout -= step;
