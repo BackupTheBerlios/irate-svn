@@ -75,12 +75,14 @@ public abstract class AbstractClient implements UpdateListener, PluginApplicatio
     downloadThread.addUpdateListener(new UpdateListener() {
       boolean newState = false;
       public void actionPerformed() {
-        setState(downloadThread.getState());        
+        setState(downloadThread.getState());
+        updateTrackTable();     
       }
     });
   }
   
   public abstract void handleError(String code, String urlString);
   public abstract void setState(String state);
+  public abstract void updateTrackTable();
 
 }

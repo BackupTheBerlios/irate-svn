@@ -16,7 +16,7 @@ export PLATFORM=linux-motif
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar
 
-CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
+CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o libmadplayer.o
 CLIENT_LIBS = lib/libnanoxml-lite.o 
 
 JAVA_SWTSRC=irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
@@ -63,7 +63,10 @@ CLIENT_FILES = \
 	irate/client/ExternalPlayer.java \
 	irate/client/MadplayPlayer.java \
 	irate/client/Speech.java \
-	irate/client/Help.java
+	irate/client/Help.java \
+	irate/client/AbstractPlayer.java \
+	irate/client/PlayerListener.java \
+	irate/client/LibMadPlayer.java
 #	irate/client/AudioDevice.java 
 #	irate/client/JavaSoundAudioDevice.java 
 #	irate/client/JavaLayerPlayer.java 
@@ -113,7 +116,7 @@ lib/libhttpclient.o:
 	$(MAKE) -C lib/ libhttpclient.o
 	
 $(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS)
-	$(GCJ) $(CLIENT_LINKFLAGS)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
+	$(GCJ) $(CLIENT_LINKFLAGS) $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
 
 $(IRATE_SERVER): $(SERVER_LIBS) $(SERVER_DEPS) 
 	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o $(IRATE_SERVER) --main=irate.server.Server
@@ -135,6 +138,11 @@ irate-server.o:irate/server/*.java
 
 irate-icon.o: irate/swt/irate.gif
 	$(GCJ) -c --resource $^ $^ -o $@
+
+libmadplayer.o: irate/client/AbstractPlayer.java irate/client/LibMadPlayer.java irate/client/LibMadPlayer.cc
+	gcjh -o irate/client/AbstractPlayer.h irate.client.AbstractPlayer
+	gcjh -o irate/client/LibMadPlayer.h irate.client.LibMadPlayer
+	$(GCJ) -c -I. -o libmadplayer.o irate/client/LibMadPlayer.cc
 
 deb:
 	dpkg-buildpackage -b -rfakeroot

@@ -22,12 +22,14 @@
       <fileset dir="." includes="irate/client/help/*.html"/>
       <fileset dir="." includes="irate/common/*.class"/>
       <fileset dir="." includes="irate/download/*.class"/>
+      <fileset dir="." includes="javazoom/jlGui/*.class"/>
     </jar>
   </target>
     
   <target name="jar" depends="compile,irate-client-swing">
     <jar jarfile="irate-client-swt.jar" manifest="META-INF/manifest.irate-swt-client" compress="true">
       <fileset dir="." includes="irate/swt/*.class"/>
+      <fileset dir="." includes="irate/swt/*.gif"/>
       <fileset dir="." includes="irate/client/*.class"/>
       <fileset dir="." includes="irate/client/help/*.txt"/>
       <fileset dir="." includes="irate/common/*.class"/>
@@ -36,6 +38,7 @@
       <fileset dir="." includes="irate/plugin/*/*.class"/>
       <fileset dir="." includes="irate/swt/plugin/*.class"/>
       <fileset dir="." includes="irate/swt/plugin/*/*.class"/>
+      <fileset dir="." includes="javazoom/jlGui/*.class"/>
     </jar>
 
     <jar jarfile="irate-server.jar" manifest="META-INF/manifest.irate-server" compress="false">

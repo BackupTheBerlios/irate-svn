@@ -5,8 +5,9 @@ package irate.client;
 import java.io.File;
 
 import javazoom.jlGui.BasicPlayer;
+import javazoom.jlGui.BasicPlayerListener;
 
-public class JavaLayerPlayer implements Player {
+public class JavaLayerPlayer extends AbstractPlayer {
 
   private BasicPlayer player;
   private boolean paused;
@@ -54,8 +55,19 @@ public class JavaLayerPlayer implements Player {
   public void play(File file) throws PlayerException {
     try {
       if (player == null)
-        player = new BasicPlayer();
+        player = new BasicPlayer(new BasicPlayerListener() {
+          public void updateCursor(int cursor, int total) {
+            notifyPosition(cursor, total);
+          }
+
+          public void updateMediaData(byte[] data) {
+          }
+
+          public void updateMediaState(String state) {
+          }
+        });
       player.setDataSource(file);
+      notifyBitRate(player.getBitRate());
       player.startPlayback();
       setPlayerVolume(volume);
       if (paused)

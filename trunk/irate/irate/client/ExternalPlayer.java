@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ExternalPlayer implements Player {
+public class ExternalPlayer extends AbstractPlayer {
 
   private String name;
   private String path;
