@@ -12,7 +12,6 @@ IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
 export PLATFORM=linux-motif
 #export PLATFORM=linux-gtk2
-#export PLATFORM=linux-libswt-gtk2
 #export PLATFORM=win32
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:lib/jd3lib.jar
@@ -110,6 +109,7 @@ else
 	install $(IRATE_CLIENT) $(BIN)
 endif
 
+ifeq ($(SWT_LIB),)
 ifeq ($(PLATFORM),linux-motif)	
 	install lib/libswt-gnome-motif-2133.so $(LIB)
 	install lib/libswt-kde-motif-2133.so $(LIB)
@@ -120,11 +120,8 @@ ifeq ($(PLATFORM),linux-gtk2)
 	install lib/libswt-gtk-2135.so $(LIB)
 	install lib/libswt-pi-gtk-2135.so $(LIB)
 else
-ifeq ($(PLATFORM),linux-libswt-gtk2)
-	# Don't need to install anything special for libswt
-else
 	echo Unknown PLATFORM $(PLATFORM), please specify on commandline && exit 1 
-endif	
+endif
 endif
 endif
 
