@@ -12,15 +12,23 @@ public class ExternalPlayer extends AbstractPlayer {
 
   private String name;
   private String path;
-  private final int ACTION_PAUSE = 0;
-  private final int ACTION_PLAY = 1;
-  private final int ACTION_CLOSE = 2;
-  private int action;
+  private boolean playing = false;
   private boolean paused;
   private int volume;
   private Process process;
   private long playTime;
-  
+
+
+  /** Thread from which we are running the external player application.  Be
+   * sure to syncronize access to this field. */
+  private Thread playingThread = null;
+  synchronized Thread getPlayingThread() { return playingThread; }
+  synchronized void setPlayingThread(Thread val) { playingThread = val; }
+
+  /** Set to TRUE if the state of this object has changed since we last
+   * invoked an external player process.  */
+  private boolean stateDirty = true;
+
   public ExternalPlayer(String name, String path) throws FileNotFoundException {
     this(name, new String[] { path });
   }
@@ -61,26 +69,31 @@ public class ExternalPlayer extends AbstractPlayer {
     return name;
   }
 
-  public void setPaused(boolean paused) {
-    this.paused = paused;
-    if (paused && process != null) {
-      action = ACTION_PAUSE;
-      process.destroy();
-      try {
-        Thread.sleep(1000);
-      }
-      catch (InterruptedException e) {
-        e.printStackTrace();
+  /** Notify the player thread (if it exists) of any state changes. */
+  private void notifyPlayThread() {
+    synchronized(this) {
+      stateDirty = true;
+    }
+    // Make a copy, in case the player thread decides to go away.
+    Thread pt = getPlayingThread();
+    if (pt != null) {
+      // We synchronize here to make sure that we don't interrupt the player
+      // thread at an inconvenient time for it.
+      synchronized(this) {
+        pt.interrupt();
       }
     }
+
+  }
+
+  public void setPaused(boolean paused) {
+    this.paused = paused;
+    notifyPlayThread();
   }
 
   public void setVolume(int volume) {
     this.volume = volume;
-    if (!isPaused()) {
-      setPaused(true);
-      setPaused(false);
-    }
+    notifyPlayThread();
   }
   
   public int getVolume() {
@@ -90,6 +103,31 @@ public class ExternalPlayer extends AbstractPlayer {
   public boolean isPaused() {
     return paused;
   }
+
+  /** Stops the external player and shuts down the thread controlling it.*/
+  public void close() {
+    synchronized(this){ playing = false; }
+    notifyPlayThread();
+    
+    // Wait until the external application has stopped before declaring the
+    // close operation a success.
+    Process p = process;
+    if (p != null) {
+      try {
+      p.waitFor();
+      } catch (InterruptedException e) { }
+    }
+    
+    // Wait until the thread exits the play() function.
+    while (getPlayingThread() != null) {
+      try{
+        Thread.sleep(10);
+      } catch (InterruptedException e) {
+
+      }
+    }
+  }
+
 
   public String[] formatResumeArgument()
   {
@@ -127,61 +165,96 @@ public class ExternalPlayer extends AbstractPlayer {
   } 
 
   public void play(File file) throws PlayerException {
+
     playTime = 0;
-    do {
-      try {
-        action = ACTION_PLAY;
-        String[] args = joinArray(new String[][] {
-          new String[] { path },
-          formatResumeArgument(),
-          formatVolumeArgument(),
-          formatOtherArguments(),
-          new String[] { file.getPath() } 
-        });
-//        for (int i = 0 ; i < args.length; i++) 
-//          System.out.print(args[i] + " ");
-//        System.out.println();
-        process = Runtime.getRuntime().exec(args);
-        route(process.getInputStream(), System.out, "player out");
-        route(process.getErrorStream(), System.out, "player err");
+    if (getPlayingThread() != null) {
+      throw new PlayerException(
+        "Tried to play two songs at once");
+    }
+    setPlayingThread(Thread.currentThread());
+    
+    synchronized(this){ playing = true; }
+
+    while (playing) {
+      synchronized(this) {
+        stateDirty = false;
       }
-      catch (IOException e) {
-        e.printStackTrace();
-        throw new PlayerException(e.toString());
-      }
-      long start = System.currentTimeMillis();
-      try {
-        process.waitFor();
-        if (!paused && process.exitValue() != 0)
-          throw new PlayerException(
-            "extern player returned " + process.exitValue());
-      }
-      catch (InterruptedException e) {
-        e.printStackTrace();
-      }
+
       if (paused) {
-        long timePlayed = System.currentTimeMillis() - start;
-        playTime += timePlayed;
-      }
-        while (paused) {
-          try {
-            Thread.sleep(100);
-          }
-          catch (InterruptedException ie) {
-            ie.printStackTrace();
+        try {
+        Thread.sleep(1000); 
+        } catch (InterruptedException e) {
+          synchronized(this) {
+            if (!stateDirty) {
+              setPlayingThread(null);
+              throw new PlayerException(
+                "player thread interrupted without a state change");
+            }
           }
         }
-      if (action == ACTION_CLOSE)
-        throw new PlayerException("extern player closed");
-    }
-    while (action != ACTION_PLAY);
-  }
+      } else {
+        // Not paused -- start up a player process
+        try {
+          String[] args = joinArray(new String[][] {
+            new String[] { path },
+            formatResumeArgument(),
+            formatVolumeArgument(),
+            formatOtherArguments(),
+            new String[] { file.getPath() } 
+          });
+  //        for (int i = 0 ; i < args.length; i++) 
+  //          System.out.print(args[i] + " ");
+  //        System.out.println();
+          // We don't want to be interrupted while we're spawing the
+          // background process.
+          synchronized(this) {
+            process = Runtime.getRuntime().exec(args);
+            route(process.getInputStream(), System.out, "player out");
+            route(process.getErrorStream(), System.out, "player err");
+          }
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+          setPlayingThread(null);
+          throw new PlayerException(e.toString());
+        }
 
-  public void close() {
-    if (process != null) {
-      action = ACTION_CLOSE;
-      process.destroy();
-    }
+        long start = System.currentTimeMillis();
+        try {
+          process.waitFor();
+
+          // If we get here, the player subprocess has gone away.
+          playing = false;
+          if (process.exitValue() != 0) {
+            setPlayingThread(null);
+            throw new PlayerException(
+              "extern player returned " + process.exitValue());
+          }
+        } catch (InterruptedException e) {
+          // We should arrive here when someone changes the internal state of
+          // this ExternalPlayer object.
+          synchronized(this) {
+            if (!stateDirty) {
+              setPlayingThread(null);
+              throw new PlayerException(
+                "player thread interrupted without a state change");
+            }
+          }
+
+          // Bring the state of the player in sync with this object's state.
+          // To do this, we stop the player.
+          try {
+          process.destroy();
+          process.waitFor();
+          } catch (InterruptedException foo) {}
+
+          long timePlayed = System.currentTimeMillis() - start;
+          playTime += timePlayed;
+        }
+      } // End of if-then block
+    } // End of while loop
+
+    setPlayingThread(null);
   }
 
   public void route(final InputStream is, final OutputStream os, String title) {
