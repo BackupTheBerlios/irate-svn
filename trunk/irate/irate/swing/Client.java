@@ -20,7 +20,7 @@ public class Client extends JFrame {
 
   public static void main(String[] args) {
     try {
-    UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+      UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
     }
     catch (Exception e) {
       //e.printStackTrace();
@@ -33,6 +33,8 @@ public class Client extends JFrame {
         }
       };
       client.show();
+      if (client.menuItemAccount.isEnabled())
+        client.actionAccount();
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -56,8 +58,19 @@ public class Client extends JFrame {
     setTitle("iRATE radio");
 
     setSize(640, 400);
+
+    File home = new File(System.getProperties().getProperty("user.home"));
   
+      // Check the current directory for an existing trackdatabase.xml for
+      // compatibility reasons only.    
     File file = new File("trackdatabase.xml");
+    File dir = new File(".");    
+    if (!file.exists()) {
+      dir = new File(home, "irate");
+      if (!dir.exists())
+        dir.mkdir();
+      file = new File(dir, "trackdatabase.xml");
+    }
     try {
       trackDatabase = new TrackDatabase(file);
     }
@@ -183,6 +196,7 @@ public class Client extends JFrame {
     });
     m.add(menuItemDownload);
 
+/*
     menuItemContinuousDownload = new JCheckBoxMenuItem("Continuous download");
     menuItemContinuousDownload.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -190,6 +204,7 @@ public class Client extends JFrame {
       }
     });
     m.add(menuItemContinuousDownload);
+*/
 
     JMenuItem purge = new JMenuItem("Purge");
     purge.addActionListener(new ActionListener() {
@@ -247,6 +262,28 @@ public class Client extends JFrame {
     
     return m;
   }
+
+  public JMenu createPlayListMenu() {
+    int autoDownload = trackDatabase.getPlayListLength(); 
+    
+    JMenu m = new JMenu("Play list");
+    ButtonGroup bg = new ButtonGroup();
+    int[] counts = new int[] { 5, 7, 13, 19, 31 };
+    for (int i = 0; i < counts.length; i++) {
+      final int count = counts[i];
+      JCheckBoxMenuItem mi = new JCheckBoxMenuItem(count + " tracks");
+      mi.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          trackDatabase.setPlayListLength(count);
+        }
+      });
+      bg.add(mi);
+      mi.setState(count == autoDownload);
+      m.add(mi);
+    }
+    
+    return m;
+  }
     
   public JMenu createSettingsMenu() {
     JMenu m = new JMenu("Settings");
@@ -259,15 +296,16 @@ public class Client extends JFrame {
     m.add(menuItemAccount);
     perhapsDisableAccount();
 
-    final JCheckBoxMenuItem roboJock = new JCheckBoxMenuItem("Enable RoboJock");
-    roboJock.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        trackDatabase.setRoboJockEnabled(roboJock.getState());
-      }
-    });
-    roboJock.setState(trackDatabase.isRoboJockEnabled());
-    roboJock.setEnabled(playThread.isSpeechSupported());
-    m.add(roboJock);
+    if (playThread.isSpeechSupported()) {
+      final JCheckBoxMenuItem roboJock = new JCheckBoxMenuItem("Enable RoboJock");
+      roboJock.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          trackDatabase.setRoboJockEnabled(roboJock.getState());
+        }
+      });
+      roboJock.setState(trackDatabase.isRoboJockEnabled());
+      m.add(roboJock);
+    }
     
     /* 
      * Create player selection menu.
@@ -287,6 +325,7 @@ public class Client extends JFrame {
     m.add(player);
 
     m.add(createDownloadMenu());
+    m.add(createPlayListMenu());
 
     return m;
   }
