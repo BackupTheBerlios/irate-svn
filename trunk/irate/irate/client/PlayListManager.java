@@ -75,11 +75,13 @@ public class PlayListManager {
       // tracks because it will likely get one next time around.
     for (int i = playListLength - playList.size(); i > 0; i--) {
       synchronized (trackDatabase) {
-        Track track;
+        Track track = null;
         if (noOfUnrated == 0 && playList.size() != 0)
           track = trackDatabase.chooseUnratedTrack(random, toOmit);
-        else
+
+        if (track == null)
           track = trackDatabase.chooseTrack(random, toOmit);
+        
         if (track != null) {
           if (!track.isRated())
             noOfUnrated++;
