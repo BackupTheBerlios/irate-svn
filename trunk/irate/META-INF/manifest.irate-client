@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: irate.swing.Client
-Class-Path: lib/nanoxml-lite-2.2.3.jar lib/jl030.jar lib/jlGui2.2.jar lib/mp3sp.1.6.jar lib/HTTPClient.jar
+Class-Path: lib/nanoxml-lite-2.2.3.jar lib/jl030.jar lib/jlGui2.2.jar lib/mp3sp.1.6.jar lib/HTTPClient.jar lib/skinlf.jar

@@ -17,13 +17,24 @@ import java.net.*;
 import javax.swing.*;
 //added for UI tweak by Allen Tipper 14.9.03
 import javax.swing.event.*;
+
+import com.l2fprod.gui.plaf.skin.SkinLookAndFeel;
 //end add
 
 public class Client extends JFrame {
 
   public static void main(String[] args) {
     try {
-      UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+      skin: {
+        for (int i = 0; i < args.length - 1; i++) {
+          if (args[i].equals("--skin")) {
+            SkinLookAndFeel.setSkin(SkinLookAndFeel.loadThemePack(args[i + 1]));
+            SkinLookAndFeel.enable();
+            break skin;
+          }
+        }
+        UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+      }
     }
     catch (Exception e) {
       try {
@@ -31,7 +42,7 @@ public class Client extends JFrame {
       } catch (Exception exc) {
         System.err.println("Error loading L&F: " + exc);
       }
-    }
+    } 
     
     try {
       Client client = new Client() {
