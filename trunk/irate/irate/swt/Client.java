@@ -265,8 +265,11 @@ public class Client extends AbstractClient {
     Track track = playThread.getCurrentTrack();
     if (track == null)
       return;
-    shell.setText(track.toString() + " - " + 
-      Resources.getString("titlebar.program_name"));
+    if (isMac())
+      shell.setText(track.toString());
+    else
+      shell.setText(track.toString() + " - " + 
+        Resources.getString("titlebar.program_name"));
     trackLabel.setText(Resources.getString("title.now_playing") + " " + track.getArtist() + " / " + track.getTitle());
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
