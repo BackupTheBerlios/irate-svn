@@ -54,11 +54,6 @@
       <fileset dir="." includes="irate/server/*.class"/>
       <fileset dir="." includes="irate/common/*.class"/>
     </jar>
-    
-    <uptodate property="nsis.notrequired" targetfile="irate-installer.exe">
-      <srcfiles dir="." includes="*.jar"/>
-      <srcfiles dir="." includes="*.html"/>
-    </uptodate>
   </target>
 
   <target name="gzip" depends="jar">
@@ -77,15 +72,6 @@
     </tar>
   </target>
   
-    <!-- Windoze installer -->
-  <target name="nsis" depends="jar" unless="nsis.notrequired">
-    <mkdir dir="lib/swt-win32"/>
-    <unzip src="lib/swt-2.1-win32.zip" dest="lib/swt-win32/"/>
-    <exec executable="makensis.exe">
-      <arg line="irate-client.nsi"/>
-    </exec>
-  </target>
-
     <!-- Debian deb package -->
   <target name="deb">
     <exec executable="dpkg-buildpackage">
@@ -101,7 +87,7 @@
     <copy file="mac/Info.plist" todir="iRATE.app/Contents"/>
     <copy file="mac/PkgInfo" todir="iRATE.app/Contents"/>
     <mkdir dir="iRATE.app/Contents/MacOS"/>
-    <copy file="lib/java_swt"
+    <copy file="lib/swt-macosx/java_swt"
       todir="iRATE.app/Contents/MacOS"
       preservelastmodified="true"/>
     <chmod file="iRATE.app/Contents/MacOS/java_swt" perm="755"/>
@@ -113,11 +99,18 @@
     <copy file="irate-client-swt.jar"
       todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true"/>
     <copy todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true">
-      <fileset dir="lib" includes="*.jar"/>
+      <fileset dir="lib" includes="jd3lib.jar"/>
+      <fileset dir="lib" includes="jl0.4.jar"/>
+      <fileset dir="lib" includes="mp3sp.1.6.jar"/>
+      <fileset dir="lib" includes="nanoxml-lite-2.2.3.jar"/>
+      <fileset dir="lib" includes="swtdock.jar"/>
+    </copy>
+    <copy todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true">
+      <fileset dir="lib/swt-macosx" includes="*.jar"/>
     </copy>
     <mkdir dir="iRATE.app/Contents/Resources/Java/dll"/>
     <copy todir="iRATE.app/Contents/Resources/Java/dll" preservelastmodified="true">
-      <fileset dir="lib" includes="*.jnilib"/>
+      <fileset dir="lib/swt-macosx" includes="*.jnilib"/>
     </copy>
     <mkdir dir="iRATE.app/Contents/Resources Disabled"/>
   </target>
@@ -158,7 +151,7 @@
     </jar>
   </target>
   
-  <target name="all" depends="gzip,nsis">
+  <target name="all" depends="gzip">
   </target>
 
   <target name="timestamp">
@@ -173,7 +166,6 @@
     <delete>
       <fileset dir="." includes="**/*.class"/>
       <fileset file="irate-server.jar"/>
-      <fileset file="irate-client-swing.jar"/>
       <fileset file="irate-client-swt.jar"/>
       <fileset file="irate-client.tar"/>
       <fileset file="irate-client-linux.tar.gz"/>
@@ -186,6 +178,7 @@
       <!-- Old files no longer used -->
       <fileset file="irate-client.jar"/>
       <fileset file="irate-swing-client.jar"/>
+      <fileset file="irate-client-swing.jar"/>
       <fileset file="irate-swt-client.jar"/>
       <fileset file="irate-client.tar.bz2"/>
       <fileset file="irate-client-installer.exe"/>
