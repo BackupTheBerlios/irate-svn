@@ -29,6 +29,7 @@ public class DownloadThread extends Thread {
   private boolean continuous;
   private int contactCount = 0;
   private Vector downloadListeners = new Vector();
+  ExponentialBackoffManager exponentialBackoffManager = new ExponentialBackoffManager();
     
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
@@ -104,7 +105,8 @@ public class DownloadThread extends Thread {
             currentTrack.unSetFile();
             toSave = true;
           }
-          downloadTracks.add(currentTrack);
+          if (!exponentialBackoffManager.isBackedOff(currentTrack.getURL()))
+            downloadTracks.add(currentTrack);
         }
       }
     }
@@ -322,6 +324,7 @@ public class DownloadThread extends Thread {
             }
           }
           succeeded = true;
+          exponentialBackoffManager.succeeded(track.getURL());
         }
         finally {
           os.close();
@@ -343,6 +346,7 @@ public class DownloadThread extends Thread {
         setState("Broken download: " + track.getName()); //$NON-NLS-1$
         track.setBroken();
       } else if (e instanceof IOException) {
+        exponentialBackoffManager.failed(track.getURL());
         setState(getResourceString("DownloadThread.Download_failure")
                  + track.getName());
         track.increaseDownloadAttempts();

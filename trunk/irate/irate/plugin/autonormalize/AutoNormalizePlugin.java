@@ -138,7 +138,7 @@ public class AutoNormalizePlugin
       PipedOutputStream pos = new PipedOutputStream(pis);
       HowLoudThread hlThread = new HowLoudThread(getApp(), "downloaded");
       hlThread.queue(track, pis);
-        // Request this hlThread to terminate once it has empties its queue.
+        // Request this hlThread to terminate once it has emptied its queue.
       hlThread.requestTerminate();
       Object[] objs = new Object[2];
       objs[0] = pos;
@@ -161,12 +161,16 @@ public class AutoNormalizePlugin
     Object[] objs = (Object[]) downloadHash.get(track);
     if (objs != null) {
       PipedOutputStream pos = (PipedOutputStream) objs[0];
+      HowLoudThread hlThread = (HowLoudThread) objs[1];
       try {
         pos.write(buffer, offset, length);
       }
       catch (IOException e) {
         System.err.println("auto-normalize: "+e.toString());
+        hlThread.killProcessing(track);
         downloadHash.remove(track);
+        track.setProperty("loudness", "unknown");
+        getApp().saveTrack(track, false);
         try {pos.close();} catch (IOException e2) {}
       }
     }
@@ -188,25 +192,23 @@ public class AutoNormalizePlugin
       }
 
       String loudness;
-
-        // Block until the loudness has been determined.
-      synchronized (hlThread.getMutex()) {
-        while ((loudness = track.getProperty("loudness")) == null) {
-          try {
-            hlThread.getMutex().wait();
-          }
-          catch (InterruptedException e) {
+      if (!succeeded) {
+        hlThread.killProcessing(track);
+        track.setProperty("loudness", null);
+        getApp().saveTrack(track, false);
+      }
+      else {
+          // Block until the loudness has been determined.
+        synchronized (hlThread.getMutex()) {
+          while ((loudness = track.getProperty("loudness")) == null) {
+            try {
+              hlThread.getMutex().wait();
+            }
+            catch (InterruptedException e) {
+            }
           }
         }
       }
-    }
-    else
-      track.setProperty("loudness", "unknown");
-
-      // If the download didn't succeed, then we blank the track's loudness.
-    if (!succeeded) {
-      track.setProperty("loudness", null);
-      getApp().saveTrack(track, false);
     }
   }
 
