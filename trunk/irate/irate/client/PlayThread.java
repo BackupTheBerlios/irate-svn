@@ -73,7 +73,7 @@ public class PlayThread extends Thread {
       if (currentTrack != null) {
         notifyUpdateListeners();
         File file = currentTrack.getFile();
-        if (file.exists()) {
+        if (file != null && file.exists()) {
           if (speaking) {
             try {
               speech.say(
