@@ -13,7 +13,7 @@ UninstallDisplayIcon={app}\irate-client.exe
 [Files]
 Source: "irate-client.exe"; DestDir: "{app}"
 Source: "bin\madplay.exe"; DestDir: "{app}"
-Source: "swt-win32-2133.dll"; DestDir: "{app}"
+Source: "lib\swt-win32-2133.dll"; DestDir: "{app}"
 ;Source: "irate-client.jar"; DestDir: "{app}"
 
 Source: "README"; DestDir: "{app}"
