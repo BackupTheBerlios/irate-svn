@@ -63,14 +63,19 @@ public class Client extends JFrame {
   
       // Check the current directory for an existing trackdatabase.xml for
       // compatibility reasons only.    
-    File file = new File("trackdatabase.xml");
     File dir = new File(".");    
+    File file = new File(dir, "trackdatabase.xml");
     if (!file.exists()) {
-      dir = new File(home, "irate");
-      if (!dir.exists())
-        dir.mkdir();
-      file = new File(dir, "trackdatabase.xml");
+      File dir = new File("/irate");
+      File file = new File(dir, "trackdatabase.xml");
+      if (!file.exists()) {
+        dir = new File(home, "irate");
+        if (!dir.exists())
+          dir.mkdir();
+        file = new File(dir, "trackdatabase.xml");
+      }
     }
+
     try {
       trackDatabase = new TrackDatabase(file);
     }
