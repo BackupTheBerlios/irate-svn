@@ -211,7 +211,7 @@ public class Client implements UpdateListener {
     }
     hashSongs.clear();
     
-    final int the_column_index =  column_index;
+    final Integer the_column_index = new Integer(column_index);
     
     Comparator c = new Comparator(){
       public int compare(Object o1, Object o2){
@@ -220,7 +220,7 @@ public class Client implements UpdateListener {
         
         String[] s1 = (String[])obj1[1];
         String[] s2 = (String[])obj2[1];
-        return s1[the_column_index].compareTo(s2[the_column_index]);
+        return s1[the_column_index.intValue()].compareTo(s2[the_column_index.intValue()]);
       }
     };
     Collections.sort(v, c);

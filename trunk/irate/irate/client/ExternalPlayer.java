@@ -10,8 +10,11 @@ public class ExternalPlayer implements Player {
 
   private String name;
   private String path;
+  private final int ACTION_PAUSE = 0;
+  private final int ACTION_PLAY = 1;
+  private final int ACTION_CLOSE = 2;
+  private int action;
   private boolean paused;
-  private boolean closed;
   private Process process;
   
   public ExternalPlayer(String name, String path) throws FileNotFoundException {
@@ -41,8 +44,10 @@ public class ExternalPlayer implements Player {
 
   public void setPaused(boolean paused) {
     this.paused = paused;
-    if (paused)
+    if (paused) {
+      action = ACTION_PAUSE;
       process.destroy();
+    }
   }
 
   public boolean isPaused() {
@@ -50,9 +55,9 @@ public class ExternalPlayer implements Player {
   }
 
   public void play(File file) throws PlayerException {
-    closed = false;
-    while (true) {
+    do {
       try {
+        action = ACTION_PLAY;
         process = Runtime.getRuntime().exec(new String[] { path, file.getPath() });
       }
       catch (IOException e) {
@@ -75,14 +80,14 @@ public class ExternalPlayer implements Player {
           ie.printStackTrace();
         }
       }
-      if (closed) 
+      if (action == ACTION_CLOSE) 
         throw new PlayerException("extern player closed");
-    }
+    } while (action != ACTION_PLAY);
   }
 
   public void close() {
     if (process != null) {
-      closed = true;
+      action = ACTION_CLOSE;
       process.destroy();
     }
   }
