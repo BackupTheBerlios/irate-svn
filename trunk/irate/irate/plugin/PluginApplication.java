@@ -121,5 +121,11 @@ public interface PluginApplication
  * @param listener handler for it
  */
 public void addTrackAction(String name, SelectionListener listener);
+
+/**
+ * Play a track
+ * @param track track to play
+ */
+public void playTrack(Track track);
 }
 

@@ -1469,5 +1469,13 @@ public class Client extends AbstractClient {
 		 item.addSelectionListener(listener);
         }
       });
-	}    
+	}
+
+  /* (non-Javadoc)
+   * @see irate.plugin.PluginApplication#playTrack(irate.common.Track)
+   */
+  public void playTrack(final Track track) {
+    setPaused(false);
+    playThread.play(track);
+  }    
 }

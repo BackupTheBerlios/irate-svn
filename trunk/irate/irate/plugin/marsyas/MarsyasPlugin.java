@@ -121,12 +121,18 @@ implements TrackLifeCycleListener
           	return;
         }
         
-        new MarcyasSimilaritySearch(getApp().getTracks(), track);
+        new MarsyasSimilaritySearch(MarsyasPlugin.this, getApp().getTracks(), track);
       }
     });
 
   }
 
+  /** Utility method to let other parts of the plugin play stuff */
+  public void playTrack(Track t) {
+    if(!getApp().getPlayingTrack().equals(t))
+      getApp().playTrack(t);
+  }
+  
   void dbg(String msg) {
     System.err.println("MarsyasSimilaritySearch: "+msg);
   }
