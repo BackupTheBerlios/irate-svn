@@ -1056,7 +1056,14 @@ public class Client extends AbstractClient {
 
   public static void main(String[] args) throws Exception {
     Client client = new Client();
-    InputStream skin = BaseResources.getResourceAsStream("skin.zip");
+    InputStream skin;
+    
+    try {
+        skin = BaseResources.getResourceAsStream("skin.zip");
+    }
+    catch (IOException e) {
+        skin = null;
+    }
     
     if (args.length == 2)
       if (args[0].equals("--skin"))
