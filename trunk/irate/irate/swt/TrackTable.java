@@ -541,7 +541,7 @@ public class TrackTable {
           	return 1;
         }
       }
-      return str0.compareTo(str1);
+      return str0.compareToIgnoreCase(str1);
     }
           
     public abstract int compareTrack(Track track0, Track track1);  
