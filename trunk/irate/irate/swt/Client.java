@@ -900,8 +900,6 @@ public class Client implements UpdateListener, PluginApplication {
   }
 
   public static void main(String[] args) throws Exception{
-			System.setProperty("gnu.gcj.runtime.NameFinder.demangle","false");
-			System.setProperty("gnu.gcj.runtime.NameFinder.use_addr2line","false");
 			new Client().run();
   }
 }

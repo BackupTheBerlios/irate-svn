@@ -182,35 +182,43 @@ public class DownloadThread extends Thread {
             break;
           urlString = urlString.substring(0, index) + " " + urlString.substring(index + 3);
         }
+        
+        long continueOffset = 0;
         File file = new File(downloadDir, urlString);
+        if(file.exists()){
+          //System.out.println("Resuming " +file + " from " + file.length()+ " bytes");
+          continueOffset = file.length();
+        }
 
         setState("Connecting " + track.getName());
 
-        //0 second timeout for the impatient
-        long timeout = 60000;
+        //120 second timeout for the impatient
+        long timeout = 120000;
         URL finalUrl = null; //JDR
         String HTTPProxy = trackDatabase.getHTTPProxy(); //JDR
         if ((HTTPProxy!=null) && (!HTTPProxy.trim().equals("")) ) //JDR
         {//JDR HTTP proxy *is* defined in xml file.
-        	System.out.println("\nUsing HTTPProxy:"+HTTPProxy+"\n"); //JDR
+        	//System.out.println("\nUsing HTTPProxy:"+HTTPProxy+"\n"); //JDR
         	finalUrl = new URL ("http",HTTPProxy,trackDatabase.getHTTPProxyPort(),url.toString());//JDR
         	//JDR The URL constructor created this way will cause the URL to go through the proxy.
         	//JDR port -1 = protocol port default (example http uses port 80 unless otherwise specified).
         } else //JDR
         {//JDR HTTP proxy is *not* defined in xml file.
-        	System.out.println("\nNo HTTP proxy in use.\n"); //JDR
+        	//System.out.println("\nNo HTTP proxy in use.\n"); //JDR
         	finalUrl = url; //JDR
         } //JDR
-        
-//JDR        TimeoutWorker worker = new TimeoutWorker((Object) url) {
-        TimeoutWorker worker = new TimeoutWorker((Object) finalUrl) { //JDR
+
+        final long offset = continueOffset;
+        TimeoutWorker worker = new TimeoutWorker((Object) finalUrl) {
           public void run() {
             try {
               URLConnection conn = ((URL) input).openConnection();
+              if (offset != 0);
+                conn.setRequestProperty("Range", "bytes=" + offset + "-");
               conn.connect();
               Vector v = new Vector();
               v.add(conn);
-              v.add(new Integer(conn.getContentLength()));
+              v.add(new Integer(conn.getContentLength()+((int)offset)));
               setOutput(v);
             }
             catch (IOException e) {
@@ -242,9 +250,10 @@ public class DownloadThread extends Thread {
         int contentLength = intContentLength.intValue();
         setState("Downloading " + track.getName());
         final InputStream is = conn.getInputStream();
-        OutputStream os = new FileOutputStream(file);
+        //open the file for append
+        OutputStream os = new FileOutputStream(file.toString(), true);
         final byte buf[] = new byte[128000];
-        int totalBytes = 0;
+        int totalBytes = (int)continueOffset;
         worker = new TimeoutWorker((Object) is){
           public void run() {
             int n;

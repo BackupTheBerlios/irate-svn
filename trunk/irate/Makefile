@@ -67,7 +67,7 @@ lib/libhttpclient.o:
 	$(MAKE) -C lib/ libhttpclient.o
 	
 $(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS)
-	$(GCJ)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
+	$(GCJ) $(LFLAGS)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
 
 
 $(IRATE_SERVER): $(SERVER_LIBS) $(SERVER_DEPS) 
