@@ -61,10 +61,11 @@ public class BaseResources {
    */
   public static File getResourceAsFile(String name) throws IOException {
     File myTempFile;
+    Object existingFile;
     
     // Check if resource has already been extracted
-    if (temporaryFiles.get(name) != null)
-      return new File((String)temporaryFiles.get(name));
+    if ((existingFile = temporaryFiles.get(name)) != null)
+      return (File)existingFile;
     
     if(getResource(name) != null) {
       // Create temp file
@@ -88,7 +89,7 @@ public class BaseResources {
       out.close();
       
       // Add file to filelist
-      temporaryFiles.put(name, myTempFile.getPath());
+      temporaryFiles.put(name, myTempFile);
       
       return myTempFile;
     }
