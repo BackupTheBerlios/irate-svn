@@ -87,7 +87,7 @@ public class TrackDatabase {
     synchronized (this) {
       Track copy;
       if ((copy = getTrack(track)) == null) {
-        copy = new FastTrack(track);
+        copy = new Track(track);
         copy.setDownloadDir(downloadDir);
         docElt.addChild(copy.getElement());
         tracks.add(copy);
@@ -331,7 +331,7 @@ public class TrackDatabase {
         XMLElement elt = (XMLElement)e.nextElement();
         if(!elt.getName().equals(trackElementName)) continue;
         //System.out.println(elt.toString());
-        Track track = new FastTrack(elt, downloadDir);
+        Track track = new Track(elt, downloadDir);
         tracks.add(track);
         //System.out.println("key="+track.getKey());
         hash.put(track.getKey(), track);

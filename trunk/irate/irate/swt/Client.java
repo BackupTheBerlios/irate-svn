@@ -28,6 +28,7 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
@@ -65,7 +66,7 @@ public class Client extends AbstractClient {
   private AboutDialog aboutDialog;
   private Composite trackGroup = null;  
   private Composite ratingGroup = null;
-  private Button expandButton = null;
+  //private Button expandButton = null;
   
   //  private SettingDialog settingDialog;
   private Object strStateLock = new Object();
@@ -282,11 +283,11 @@ public class Client extends AbstractClient {
       shell.setText(track.toString() + " - " + 
         Resources.getString("titlebar.program_name"));
     trackLabel.setText(Resources.getString("title.now_playing") + " " + track.getArtist() + " / " + track.getTitle());
-//    for (int i = 0; i < ratingFunctions.length; i++) {
-//      RatingFunction rf = ratingFunctions[i];
-//      ThreeModeButton item = rf.getItem();
-//      item.setSelection(i != 0 && track.isRated() && rf.getValue() <= track.getRating());
-//    }
+    for (int i = 0; i < ratingFunctions.length; i++) {
+      RatingFunction rf = ratingFunctions[i];
+      ThreeModeButton item = rf.getItem();
+      item.setSelection(i != 0 && track.isRated() && rf.getValue() <= track.getRating());
+    }
 //    volumeScale.setSelection(
 //      (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
     trackTable.select(track);
@@ -948,20 +949,25 @@ public class Client extends AbstractClient {
     gridData.horizontalSpan = 1;
     gridData.horizontalIndent = 10;
     trackGroup.setLayoutData(gridData);    
-    trackGroup.setLayout(new GridLayout(2, false));
+    {
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginHeight = 0;
+        trackGroup.setLayout(layout);
+    }
     
-
-    
+    /*
     expandButton = new Button(trackGroup, SWT.ARROW|SWT.RIGHT);
     gridData = new GridData();
     gridData.horizontalSpan = 1;
     expandButton.setLayoutData(gridData);
+    */
     
     trackLabel = new AlphaLabel(trackGroup, SWT.CENTER);
     skinManager.add(trackLabel, "label.track");
-    gridData = new GridData(GridData.FILL_BOTH|GridData.GRAB_HORIZONTAL);
+    gridData = new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL);
     trackLabel.setLayoutData(gridData);
  
+    /*
     expandButton.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent arg0) {
           if(expandButton.getAlignment() == SWT.RIGHT) {
@@ -972,48 +978,58 @@ public class Client extends AbstractClient {
           }
         }    
       });
+      */
     
-//    Composite trackToolbar = new Composite(trackGroup, SWT.FLAT);
-//    skinManager.addControl(trackToolbar, "panel.trackToolbar");
-//    trackToolbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));    
-//    trackToolbar.setLayout(new GridLayout(6, true));
-//    final ThreeModeButton[] ratingButtons = new ThreeModeButton[ratingFunctions.length];
-//    for (int i = 0; i < ratingFunctions.length; i++) {
-//      RatingFunction rf = ratingFunctions[i];
-//      ThreeModeButton button = ratingButtons[i] = new ThreeModeButton(trackToolbar, SWT.FLAT);
-//      button.setLayoutData(new GridData(GridData.FILL_BOTH));
-//      final int value = rf.getValue();
-//      button.addSelectionListener(new SelectionAdapter() {
-//        public void widgetSelected(SelectionEvent e) {
-//          for (int i = 0; i < ratingButtons.length; i++) {
-//            ThreeModeButton button = ratingButtons[i];
-//            button.setSelection(button == e.widget);
-//          }
-//          setRating(getSelectedTrack(), value);
-//        }
-//      });
-//      rf.setItem(button);
-//      skinManager.add(button, rf.getName());
-//    }
+    Composite trackToolbar = new Composite(trackGroup, SWT.FLAT);
+    skinManager.addControl(trackToolbar, "panel.trackToolbar");
+    {
+        GridData gd = new GridData();
+        gd.horizontalAlignment = GridData.END;
+        trackToolbar.setLayoutData(gd);    
+    }
+    {
+        GridLayout layout = new GridLayout(7, false);
+        layout.horizontalSpacing = 3;
+        layout.marginHeight = 0;
+        trackToolbar.setLayout(layout);
+    }
+    final ThreeModeButton[] ratingButtons = new ThreeModeButton[ratingFunctions.length];
+    for (int i = 0; i < ratingFunctions.length; i++) {
+      RatingFunction rf = ratingFunctions[i];
+      ThreeModeButton button = ratingButtons[i] = new ThreeModeButton(trackToolbar, SWT.FLAT);
+      button.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+      final int value = rf.getValue();
+      button.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          for (int i = 0; i < ratingButtons.length; i++) {
+            ThreeModeButton button = ratingButtons[i];
+            button.setSelection(button == e.widget);
+          }
+          Track track = getSelectedTrack();
+          if (track != null)
+              setRating(track, value);
+        }
+      });
+      rf.setItem(button);
+      skinManager.add(button, i == 0 ? rf.getName() : "button.star");
+    }
   
-//    new ToolItem(trackToolbar, SWT.SEPARATOR);
+    new AlphaLabel(trackToolbar, SWT.CENTER).setText("  ");
 
-    ThreeModeButton info = new ThreeModeButton(topPanel, SWT.NONE);
-//    gridData = new GridData();
-//    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
-//    info.setLayoutData(gridData);
-//    final Client clientToPass = this;
-//    info.addSelectionListener(new SelectionAdapter() {
-//      public void widgetSelected(SelectionEvent e) {
-//        Track track = getSelectedTrack();
-//        if (track == null)
-//          return;
-//        
-//        TrackInfoDialog trackInfoDialog = new TrackInfoDialog(display, shell);
-//        trackInfoDialog.displayTrackInfo(track, clientToPass);   
-//      }
-//    });
-//    skinManager.add(info, "button.info");
+    ThreeModeButton info = new ThreeModeButton(trackToolbar, SWT.FLAT);
+    info.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+    final Client clientToPass = this;
+    info.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        Track track = getSelectedTrack();
+        if (track == null)
+          return;
+        
+        TrackInfoDialog trackInfoDialog = new TrackInfoDialog(display, shell);
+        trackInfoDialog.displayTrackInfo(track, clientToPass);   
+      }
+    });
+    skinManager.add(info, "button.info");
 
 //    volumeScale = new Scale(trackGroup, SWT.HORIZONTAL | SWT.FLAT);
 //    volumeScale.setIncrement(1);
@@ -1088,6 +1104,7 @@ public class Client extends AbstractClient {
   }
   
   
+  /*
   public void expandRatingMenu() {
       expandButton.setAlignment(SWT.DOWN);
       if(ratingGroup == null || ratingGroup.isDisposed()) {
@@ -1139,7 +1156,9 @@ public class Client extends AbstractClient {
       trackGroup.layout(true); 
       }
   }
+  */
   
+  /*
   // Collapses the 
   public void collapseRatingMenu() {
       expandButton.setAlignment(SWT.RIGHT);
@@ -1151,6 +1170,7 @@ public class Client extends AbstractClient {
           trackGroup.layout(true);  
       }
   }
+  */
   
   
   
@@ -1429,7 +1449,7 @@ public class Client extends AbstractClient {
     
     private int value;
     private String name;
-//    private ThreeModeButton item;
+    private ThreeModeButton item;
     
     public RatingFunction(int value, String name) {
       this.value = value;
@@ -1439,8 +1459,8 @@ public class Client extends AbstractClient {
     public int getValue() { return value; }
     public String getName() { return name; }
     
-//    public void setItem(ThreeModeButton item) { this.item = item; }
-//    public ThreeModeButton getItem() { return item; }    
+    public void setItem(ThreeModeButton item) { this.item = item; }
+    public ThreeModeButton getItem() { return item; }    
   }
   /**
    * This method is called whenever the track time changes, and it

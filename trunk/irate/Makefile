@@ -86,6 +86,8 @@ JAVA_CLIENT = \
 	irate/client/TrackLifeCycleListener.java \
 	irate/client/VolumePolicy.java \
 	irate/client/VolumeMeister.java \
+	irate/client/AbstractStatus.java \
+	irate/client/MutableString.java \
 	irate/plugin/*.java \
 	irate/plugin/*/*.java
 #	irate/client/LibMadPlayer.java

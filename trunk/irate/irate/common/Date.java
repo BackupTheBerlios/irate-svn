@@ -3,7 +3,6 @@
  */
 package irate.common;
 
-import java.lang.ref.SoftReference;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Locale;
@@ -27,7 +26,7 @@ public class Date {
     }
   }
   
-  private SoftReference cacheString;
+  private String cacheString;
   
   private Calendar c;
   
@@ -36,12 +35,9 @@ public class Date {
   }
   
   public String toString() {
-    String s = cacheString == null ? null : (String) cacheString.get();
-    if (s == null) {
-      s = createString();
-      cacheString = new SoftReference(s);
-    }
-    return s;
+    if (cacheString == null)
+      cacheString = createString();
+    return cacheString;
   }
 
   public String createString() {
