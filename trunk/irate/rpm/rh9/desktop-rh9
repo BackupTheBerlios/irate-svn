@@ -1,7 +1,7 @@
 [Desktop Entry]
 Encoding=UTF-8
 Name=iRATE Client
-Comment=Download and rate MP3
+Comment=Download and rate MP3's
 Exec=irate-client-gtk
 Icon=irate-client-gtk.png
 Terminal=false

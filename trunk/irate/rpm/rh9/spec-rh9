@@ -1,19 +1,23 @@
 Name: irate-client-gtk
 Summary: The iRATE music database client
-Version: snapshot1
-Release: 20031108
+Version: 0.3pre
+Release: 20031115
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
 BuildRoot: /tmp/build-%{name}
 Source: irate-src.tar.gz
-Requires: madplay
+Requires: madplay, libswt-gtk2, libgcj
+BuildRequires: gcc-java
 
 %description
 iRATE radio is a collaborative filtering mp3 player/downloader. The client logs into
 an iRATE server containing a large database of legally downloadable music. You rate 
 downloaded tracks and the server matches your ratings with those of other people to 
 provide you with music you'll like. 
+
+This package is built from a developer's snapshot of iRATE. As such, it may
+exhibit instability, bugs, or other undesirable behavior. Caveat emptor.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
@@ -22,11 +26,14 @@ mkdir $RPM_BUILD_ROOT
 %setup -n irate
 
 %build
-make PLATFORM=linux-gtk2 irate-client
+./configure
+PLATFORM=linux-libswt-gtk2 make
 
 %install
-make PLATFORM=linux-gtk2 DESTDIR=$RPM_BUILD_ROOT install
+make PLATFORM=linux-libswt-gtk2 DESTDIR=$RPM_BUILD_ROOT install
 mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
+
+rmdir $RPM_BUILD_ROOT/usr/lib
 
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications/
 cp rpm/rh9/desktop-rh9 $RPM_BUILD_ROOT/usr/share/applications/irate-client-gtk.desktop
@@ -46,12 +53,17 @@ rm -rf $RPM_BUILD_DIR/irate
 %defattr(-,root,root)
 %doc README COPYING
 /usr/bin
-/usr/lib
 /usr/share/applications
 /usr/share/man
 /usr/share/pixmaps
 
 %changelog
+* Sat Nov 15 2003 Todd Pytel <tppytel@sophrosune.org> 0.3pre-20031115
+- Added dependency on libswt-gtk2
+- Added more detailed Requires and BuildRequires
+- Added caveat to description
+- Changed versioning to match Anthony's debs
+
 * Sat Nov 08 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031108
 - Added icon
 
