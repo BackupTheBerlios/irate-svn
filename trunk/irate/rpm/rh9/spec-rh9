@@ -1,7 +1,7 @@
 Name: irate-client-gtk
 Summary: The iRATE music database client
-Version: 0.3pre
-Release: 20031115
+Version: 0.3
+Release: rc2
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
@@ -16,8 +16,8 @@ an iRATE server containing a large database of legally downloadable music. You r
 downloaded tracks and the server matches your ratings with those of other people to 
 provide you with music you'll like. 
 
-This package is built from a developer's snapshot of iRATE. As such, it may
-exhibit instability, bugs, or other undesirable behavior. Caveat emptor.
+#This package is built from a developer's snapshot of iRATE. As such, it may
+#exhibit instability, bugs, or other undesirable behavior. Caveat emptor.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
@@ -27,10 +27,10 @@ mkdir $RPM_BUILD_ROOT
 
 %build
 ./configure
-PLATFORM=linux-libswt-gtk2 make
+env PLATFORM=linux-libswt-gtk2 make -e
 
 %install
-make PLATFORM=linux-libswt-gtk2 DESTDIR=$RPM_BUILD_ROOT install
+env PLATFORM=linux-libswt-gtk2 DESTDIR=$RPM_BUILD_ROOT make -e install
 mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
 
 rmdir $RPM_BUILD_ROOT/usr/lib
@@ -58,6 +58,9 @@ rm -rf $RPM_BUILD_DIR/irate
 /usr/share/pixmaps
 
 %changelog
+* Tue Jan 27 2004 Todd Pytel <tppytel@sophrosune.org> 0.3-rc2
+- Used make -e to set PLATFORM
+
 * Sat Nov 15 2003 Todd Pytel <tppytel@sophrosune.org> 0.3pre-20031115
 - Added dependency on libswt-gtk2
 - Added more detailed Requires and BuildRequires
