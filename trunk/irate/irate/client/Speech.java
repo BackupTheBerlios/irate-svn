@@ -9,6 +9,7 @@ public class Speech {
   private Process synthProcess;
   private InputStream is;
   private OutputStream os;
+  private boolean first = true;
   
   public Speech() {
     supported = new File(synthPath).exists();
@@ -18,6 +19,18 @@ public class Speech {
     return supported;
   }
 
+  public void say(String text) throws IOException {
+    if (!supported)
+      return;
+
+    if (first) {
+      festival("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt 8.0))))");
+      festival("(Parameter.set 'Duration_Stretch 1.5)");
+      first = false;
+    }
+    festival("(SayText \"" + text.replace('"', ' ') + "\")");
+  }
+  
   private char getch() throws IOException {
     int ch = is.read();
     if (ch < 0)
@@ -25,8 +38,8 @@ public class Speech {
     System.out.print((char) ch);
     return (char) ch;
   }
-  
-  public void say(String text) throws Exception {
+
+  private void festival(String s) throws IOException {
       // Do nothing if there's no speech executable.
     if (!supported)
       return;
@@ -43,9 +56,8 @@ public class Speech {
     while (is.available() > 0)
       getch();
     
-    String s = "(SayText \"" + text.replace('"', ' ') + "\")\n";
     System.out.println(s);
-    os.write(s.getBytes());
+    os.write((s + "\n").getBytes());
     os.flush();
 
     while (true)

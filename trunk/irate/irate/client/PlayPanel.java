@@ -10,7 +10,7 @@ public class PlayPanel extends JPanel {
 
   private PlayListManager playListManager;
   private PlayThread playThread;
-  private JLabel currentSongLabel = new JLabel(" ");
+  private JLabel currentSongLabel = new JLabel("<nothing playing>");
 //  privatAe JList list = new JList();
 //  private Track[] tracks;
   private TrackTable trackTable;
