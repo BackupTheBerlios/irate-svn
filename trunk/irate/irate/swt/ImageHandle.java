@@ -20,7 +20,13 @@ public class ImageHandle {
     return image;
   }
 
+  /*
+   * This finalize() method was causing the user interface to hang frequently.
+   * Now it probably leaks memory, but since Anthony is planning to revisit the
+   * whole image-caching issue, I didn't think it was worth going to trouble
+   * over this. -- Stephen Blackheath
   protected void finalize() throws Throwable {
     image.dispose();
   }
+  */
 }
