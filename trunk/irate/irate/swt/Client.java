@@ -26,13 +26,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/26 15:22:36 $
+ * Date Updated: $Date: 2003/11/27 00:32:55 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.109 $
+ * @version $Revision: 1.110 $
  */
 public class Client extends AbstractClient {
 
@@ -463,16 +463,17 @@ public class Client extends AbstractClient {
     int autoDownload = trackDatabase.getAutoDownload();
     for (int i = 0; i < counts.length; i++) {
       MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
-      final int count = counts[i];
-      mTimes.setText(i == 0 ? "Disabled" : "< " + count + " unrated tracks");
-      mTimes.setSelection(count == autoDownload);
+      final Integer acount = new Integer(counts[i]);
+      final int dummy = 0; // workaround for gcj-3.0.4 bug
+      mTimes.setText(i == 0 ? "Disabled" : "< " + acount + " unrated tracks");
+      mTimes.setSelection(acount.intValue() == autoDownload);
       mTimes.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
           //stupid trick to make self the only selected item
           MenuItem self = (MenuItem) e.getSource();
           uncheckSiblingMenuItems(self);
           self.setSelection(true);
-          trackDatabase.setAutoDownload(count);
+          trackDatabase.setAutoDownload(acount.intValue());
           downloadThread.checkAutoDownload();
         }
       });
@@ -481,7 +482,7 @@ public class Client extends AbstractClient {
       mTimes.addArmListener(
         new ToolTipArmListener(
           "Automatically download when the number of unrated tracks is less than "
-            + count));
+            + acount));
       //end add
 
     }
@@ -500,21 +501,22 @@ public class Client extends AbstractClient {
     int playListLength = trackDatabase.getPlayListLength();
     for (int i = 0; i < counts.length; i++) {
       MenuItem mTimes = new MenuItem(menuPlayList, SWT.CHECK, i);
-      final int count = counts[i];
-      mTimes.setText(count + " tracks");
-      mTimes.setSelection(count == playListLength);
+      final int dummy = 0; // workaround for gcj-3.0.4 bug
+      final Integer pcount = new Integer(counts[i]);
+      mTimes.setText(pcount + " tracks");
+      mTimes.setSelection(pcount.intValue() == playListLength);
       mTimes.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
           MenuItem self = (MenuItem) e.getSource();
           uncheckSiblingMenuItems(self);
           self.setSelection(true);
-          trackDatabase.setPlayListLength(count);
+          trackDatabase.setPlayListLength(pcount.intValue());
         }
       });
 
       //Added for a nicer UI by Allen Tipper 14.9.03
       mTimes.addArmListener(
-        new ToolTipArmListener("Set songs in playlist to " + count));
+        new ToolTipArmListener("Set songs in playlist to " + pcount));
       //end add
 
     }

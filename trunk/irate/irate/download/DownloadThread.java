@@ -219,7 +219,7 @@ public class DownloadThread extends Thread {
       URLConnection conn;
       int contentLength;
       long continueOffset;
-      final InputStream inputStream;
+      final InputStream inputStream = null;
       try {
         // These values are returned by the Timeout Worker.
         final URLConnection[] urlConnectionArray = new URLConnection[1];
