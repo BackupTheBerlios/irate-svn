@@ -26,13 +26,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/22 21:56:06 $
+ * Date Updated: $Date: 2003/11/22 23:51:15 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.105 $
+ * @version $Revision: 1.106 $
  */
 public class Client extends AbstractClient {
 
@@ -410,6 +410,13 @@ public class Client extends AbstractClient {
         downloadThread.go();
       }
     });
+    MenuItem item_undo = new MenuItem(menu1, SWT.PUSH);
+    item_undo.setText("Undo Last Rating");
+    item_undo.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        undoLastRating();
+      }
+      });
 
     //Added for a nicer UI by Allen Tipper 16.9.03
     item1_1.addArmListener(new ToolTipArmListener("Download a new track"));
@@ -612,6 +619,8 @@ public class Client extends AbstractClient {
     });
     item3_1.addArmListener(new ToolTipArmListener("Show the Credits"));
   }
+
+
 
   public void createToolBar() {
     ToolBar toolbar = new ToolBar(shell, SWT.FLAT);
@@ -867,6 +876,17 @@ public class Client extends AbstractClient {
    */
   protected void createNewAccount() {
     showAccountDialog();
+  }
+  
+  /**
+   * Undo the last rating and update the track table to show that it has been undone.
+   */
+  public void undoLastRating() {
+    super.undoLastRating();
+    display.asyncExec(new Runnable() {
+      public void run() {
+        trackTable.updateTable();
+      }});
   }
 
 }

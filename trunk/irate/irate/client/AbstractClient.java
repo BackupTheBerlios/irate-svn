@@ -27,9 +27,15 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
   protected PluginManager pluginManager;
   protected Preferences userPreferences;
   
+  private Track lastTrackRanked;
+  private int lastTrackPreviousRank;
+  
   public AbstractClient() {
     
     userPreferences = new Preferences();
+    
+    lastTrackRanked = null;
+    lastTrackPreviousRank = -1;
     
     File home = new File(System.getProperties().getProperty("user.home"));
     File dir = null;
@@ -128,7 +134,13 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
 	 */
 	public void setRating(final Track track, int rating) {
 		final Integer ratingInt = new Integer(rating);
-			
+		
+    lastTrackRanked = track;	
+    lastTrackPreviousRank = -1;
+    if(track.isRated()) {
+      lastTrackPreviousRank = (int)track.getRating();
+    }
+      
 		// Update the Track Rating
 		track.setRating(ratingInt.intValue());
 		 
@@ -144,6 +156,31 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
 			e.printStackTrace();
 		}
 	}
+  
+  /**
+   * Switch the last track that was ranked back to its previous ranking.
+   */
+  public void undoLastRating() {
+    
+    if(lastTrackRanked == null) {
+      return;
+    }
+    
+    if(lastTrackPreviousRank != -1) {
+      lastTrackRanked.setRating(lastTrackPreviousRank);
+    }
+    else {  
+      lastTrackRanked.unSetRating();
+    }
+    
+    //  Save the database with the updated rating
+    try {
+      trackDatabase.save();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
 	
 	public void setVolume(final int volume) {
 		
