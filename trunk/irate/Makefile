@@ -5,16 +5,14 @@ export GCJ=gcj -g -pipe -O0
 IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
 export PLATFORM=linux-motif
+#export PLATFORM=linux-gtk2
+#export PLATFORM=win32
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
 
 
 CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
 CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o 
-
-ifeq ($(PLATFORM),linux-gtk2)
-CLIENT_LIBS += lib/libswt-pi.o
-endif
 
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
@@ -54,9 +52,6 @@ lib:
 
 lib/libswt.o:
 	$(MAKE) -C lib/ libswt.o
-
-lib/libswt-pi.o:
-	$(MAKE) -C lib/ libswt-pi.o
 
 lib/libnanoxml-lite.o:
 
