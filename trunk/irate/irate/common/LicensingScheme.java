@@ -33,7 +33,8 @@ Resources.getString("LicensingScheme.No_Copyright_Information_Available"), "");
       if(urlFound != null && !urlFound.equals("")) { //$NON-NLS-1$
         nameFound = findNameInURL(urlFound);	
         try {
-          initializeLicensingScheme(new URL(urlFound), nameFound, copyrightData, (String)imageTable.get(nameFound));
+          if (nameFound != null)
+            initializeLicensingScheme(new URL(urlFound), nameFound, copyrightData, (String)imageTable.get(nameFound));
         }
         catch(Exception e) {
           e.printStackTrace();	
