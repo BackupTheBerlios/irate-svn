@@ -190,4 +190,25 @@ public class PlayListManager {
     for (int i = 0; i < trackLifeCycleListeners.size(); i++)
       ((TrackLifeCycleListener)trackLifeCycleListeners.get(i)).removedFromPlayList(track);
   }
+
+  /** Tests the playlist manager from the command line */
+  public static void main(String[] args) throws Exception {
+    if (args.length != 1) {
+      throw new Exception("USAGE: PlayListManager trackdatabase.xml");
+    }
+    TrackDatabase td = new TrackDatabase(new java.io.File(args[0]));
+    PlayListManager pm = new PlayListManager(td);
+    java.util.HashSet played = new java.util.HashSet();
+    int count = 0;
+    while (true) {
+      Track t = pm.chooseTrack();
+      count++;
+      System.err.println("Chose: " + t);
+      if (played.contains(t)) {
+        System.err.println("Repeat track after " + count + " tracks");
+        System.exit(0);
+      }
+      played.add(t);
+    }
+  }
 }
