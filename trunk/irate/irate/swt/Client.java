@@ -295,6 +295,8 @@ public class Client implements UpdateListener, PluginApplication {
     display.asyncExec(new Runnable() {
       public void run() {
         track.setRating(ratingInt.intValue());
+        if (ratingInt.intValue() == 0 && track == getSelectedTrack())
+          playThread.reject();
     
         TableItem ti = (TableItem) hashSongs.get(track);
         track2TableItem(track, ti);
@@ -696,7 +698,6 @@ public class Client implements UpdateListener, PluginApplication {
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         setRating(getSelectedTrack(), 0);
-        playThread.reject();
       }
     });
     
