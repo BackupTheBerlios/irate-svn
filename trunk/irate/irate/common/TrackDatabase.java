@@ -379,6 +379,19 @@ public class TrackDatabase {
     return docElt.toString();
   }
 
+  public String toSerialString() {
+    String str = "<TrackDatabase>";
+    int serial = getSerial();
+    str += getElement("User")+"\n";
+    Track tracks[] = getTracks();
+    for(int i=0;i<tracks.length;i++){
+      if(tracks[i].getSerial() >= serial)
+        str+=tracks[i].getElement().toString();
+    }
+    str += "</TrackDatabase>";
+    return str;
+  }
+  
   public Track getTrack(String key) {
     return (Track) hash.get(key);
   }

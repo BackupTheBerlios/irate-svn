@@ -20,7 +20,8 @@ public class DownloadThread extends Thread {
   private int percentComplete;
   private boolean ready;
   private boolean continuous;
-
+  private int contactCount = 0;
+    
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
     downloadDir = trackDatabase.getDownloadDirectory();
@@ -316,9 +317,17 @@ public class DownloadThread extends Thread {
       InputStream is = socket.getInputStream();
       setState("Sending server request");
       OutputStream os = socket.getOutputStream();
-      //System.out.println("Request:");
-      //System.out.println(trackDatabase.toString());
-      byte[] buf = trackDatabase.toString().getBytes();
+      String str;
+      
+      if(contactCount++ > 0)
+        str = trackDatabase.toSerialString();
+      //send full db on first connect
+      else
+        str = trackDatabase.toString();
+      
+      System.out.println("Request:");
+      System.out.println(str);
+      byte[] buf = str.getBytes();
       os.write(("Content-Length: " + Integer.toString(buf.length) + "\r\n\r\n").getBytes());
       os.write(buf);
       os.flush();
@@ -329,12 +338,14 @@ public class DownloadThread extends Thread {
       System.out.println("reply: ");
       System.out.println(reply.toString());
       trackDatabase.add(reply);
-      trackDatabase.incrementSerial();
       trackDatabase.save();
 
       String errorCode = reply.getErrorCode();
       if (errorCode.length() != 0)
         handleError(errorCode, reply.getErrorURLString());
+      else//if no error incrmement serial
+        trackDatabase.incrementSerial();
+
     }
     catch (UnknownHostException uhe) {
       handleError("nohost", "hostnotfound.html");

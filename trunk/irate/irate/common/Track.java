@@ -51,6 +51,13 @@ public class Track {
     elt.setAttribute("serial", ""+(trackDatabase.getSerial()+1));
   }
 
+  public int getSerial() {
+    String str = elt.getStringAttribute("serial");
+    if(str == null)
+      return 0;
+    return Integer.parseInt(str);
+  }
+  
   public void setDownloadDir(File dir) {
     this.dir = dir;
   }
