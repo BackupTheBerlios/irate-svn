@@ -143,7 +143,8 @@ implements TrackLifeCycleListener
       public void widgetSelected(SelectionEvent e) {
         try {
           checkPrereqs();
-        } catch (final Exception e1) {
+        } catch (Exception ex) {
+          final Exception e1 = ex;
           final Display d = Display.findDisplay(Thread.currentThread());
           d.asyncExec(new Runnable() {
             public void run() {
