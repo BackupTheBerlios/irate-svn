@@ -780,10 +780,13 @@ public class Client extends AbstractClient {
     Menu mView = new Menu(view);
     view.setMenu(mView);
     
+    
+   
+    
     MenuItem mSortArtist = new MenuItem(mView, SWT.PUSH);
     mSortArtist.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        trackTable.setSortColumn(0);
+        trackTable.setSortColumn(AbstractClient.isWindows() ? 1 : 0);
       }
     });
     skinManager.addItem(mSortArtist, "TrackTable.Heading.Artist");
@@ -791,7 +794,7 @@ public class Client extends AbstractClient {
     MenuItem mSortTrack = new MenuItem(mView, SWT.PUSH);
     mSortTrack.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        trackTable.setSortColumn(1);
+        trackTable.setSortColumn(AbstractClient.isWindows() ? 2 : 1);
       }
     });
     skinManager.addItem(mSortTrack, "TrackTable.Heading.Track");
@@ -799,7 +802,7 @@ public class Client extends AbstractClient {
     MenuItem mSortRating = new MenuItem(mView, SWT.PUSH);
     mSortRating.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        trackTable.setSortColumn(2);
+        trackTable.setSortColumn(AbstractClient.isWindows() ? 3 : 2);
       }
     });
     skinManager.addItem(mSortRating, "TrackTable.Heading.Rating");
@@ -807,7 +810,7 @@ public class Client extends AbstractClient {
     MenuItem mSortPlays = new MenuItem(mView, SWT.PUSH);
     mSortPlays.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        trackTable.setSortColumn(3);
+        trackTable.setSortColumn(AbstractClient.isWindows() ? 4 : 3);
       }
     });
     skinManager.addItem(mSortPlays, "TrackTable.Heading.Plays");
@@ -815,7 +818,7 @@ public class Client extends AbstractClient {
     MenuItem mSortLast = new MenuItem(mView, SWT.PUSH);
     mSortLast.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        trackTable.setSortColumn(4);
+        trackTable.setSortColumn(AbstractClient.isWindows() ? 5 : 4);
       }
     });
     skinManager.addItem(mSortLast, "TrackTable.Heading.Last");
