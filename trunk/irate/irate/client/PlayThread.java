@@ -4,6 +4,7 @@ import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
 
+import java.lang.reflect.*;
 import java.io.*;
 import java.util.*;
 import javax.sound.sampled.*;
@@ -23,7 +24,13 @@ public class PlayThread extends Thread {
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
-    player = new JavaLayerPlayer();
+    //player = new JavaLayerPlayer();
+    try{
+    player = (Player)Class.forName("JavaLayerPlayer").newInstance();
+    }catch(Exception e)
+    {
+      e.printStackTrace();
+    }
     externalPlayer = "";
   }
 
