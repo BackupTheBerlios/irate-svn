@@ -1,4 +1,7 @@
-SWTMessages.o
-libswt.o
-swt-win32-2133.dll
-swt.jar
+swt*.jar
+swt*.zip
+*.so
+*.dll
+cpl-v10.html
+mpl-v11.txt
+lgpl-v21.txt
