@@ -11,6 +11,14 @@ import java.util.Hashtable;
 import nanoxml.XMLElement;
 
 
+/**
+ * <code>Preferences</code> stores persistent user settings between
+ * sessions. The preferences are saved as an XML file. Currently the
+ * settings XML file is written every time a preference is set, and
+ * read every time a preference value is looked up.
+ *
+ * @version $Revision: 1.8 $
+ */
 public class Preferences {
 
   private static File home;
@@ -49,6 +57,11 @@ public class Preferences {
     return getUserPreference("downloadDir");
   }
   
+  /**
+   * Sets the name of the user's preferred player plugin.
+   *
+   * @param player the player plugin name
+   */
   public static void setPlayer(String player) {
     setUserPreference("Player", player);
   }
@@ -111,9 +124,9 @@ public class Preferences {
 
   /**
    * Sets a user preference. This convenience method catches any
-   * IOException during preference saving (the preference will only
-   * last for the duration of the session).  If you don't like this
-   * behaviour, use updateWithChild or savePreferenceToFile directly.
+   * IOException during preference saving and dumps the stack trace.
+   * If you don't like this behaviour, use updateWithChild or
+   * savePreferenceToFile directly.
    *
    * @param prefName the preference name
    * @param value the preference value.
@@ -122,7 +135,7 @@ public class Preferences {
     try {
       savePreferenceToFile(prefName, value);
     } catch (IOException ioe) {
-      ioe.printStackTrace(); // Preference will only last for this session
+      ioe.printStackTrace();
     }
   }
 
