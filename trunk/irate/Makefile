@@ -34,7 +34,7 @@ IMAGES_PNG = $(wildcard irate/resources/*.png)
 CLIENT_DEPS += $(IMAGES_GIF:.gif=.gifres.o)
 CLIENT_DEPS += $(IMAGES_PNG:.png=.pngres.o)
 LOCALES = \
-  $(shell find irate/ -name '*.properties')
+  $(shell find irate/ -name 'locale*.properties')
 CLIENT_DEPS += $(LOCALES:.properties=.props.o)  
 TXT_RESOURCES = \
   irate/common/timestamp.txt \
