@@ -48,6 +48,8 @@ public class TrackInfoDialog {
     GridLayout layout = new GridLayout();
     layout.numColumns = 1;
     shell.setLayout(layout);    
+    shell.setText(getResourceString("TrackInfoDialog.Title") + ": "
+                  + currentTrack.getTitle());
     try {
       ImageData icon =
         new ImageData(BaseResources.getResourceAsStream("icon.gif")); 
