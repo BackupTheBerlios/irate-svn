@@ -68,11 +68,11 @@ Resources.getString("LicensingScheme.No_Copyright_Information_Available"), "");
   }
 
   private String findURLInText(String copyrightData) {
-			
     int urlStart = copyrightData.indexOf("http://"); //$NON-NLS-1$
-    int urlEnd = -1;
-    if(copyrightData.indexOf("http://") != -1) { //$NON-NLS-1$
-      urlEnd = copyrightData.indexOf(" ", urlStart); //$NON-NLS-1$
+    if(urlStart != -1) { //$NON-NLS-1$
+      int urlEnd = copyrightData.indexOf(" ", urlStart); //$NON-NLS-1$
+		  if(urlEnd == -1)
+		    urlEnd = copyrightData.length();
       return copyrightData.substring(urlStart, urlEnd);
     }
     return null;
