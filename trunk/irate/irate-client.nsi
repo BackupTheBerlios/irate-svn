@@ -7,7 +7,7 @@
 ;
 
 ; The name of the installer
-Name "iRATE radio 0.1"
+Name "iRATE radio 0.2"
 
 ; The file to write
 OutFile "irate-client-installer.exe"
@@ -29,8 +29,10 @@ Section "iRATE radio"
   ; Put file there
   File "irate-client.jar"
   CreateDirectory "$INSTDIR\lib"
-  File "lib\jl020.jar"
-  File "lib\nanoxml-lite-2.2.3.jar"
+  File /oname="lib\jl020.jar"              "lib\jl020.jar"
+  File /oname="lib\nanoxml-lite-2.2.3.jar" "lib\nanoxml-lite-2.2.3.jar"
+  File /oname="lib\swt.jar"                "lib\swt-win32.jar"
+  File /oname="lib\swt-win32-3011.dll"     "lib\swt-win32-3011.dll"
   
   CreateDirectory "$SMPROGRAMS\iRATE radio"
   CreateShortCut "$SMPROGRAMS\iRate radio\iRATE radio.lnk" "$INSTDIR\irate-client.jar" ""
@@ -48,6 +50,8 @@ Section "Uninstall"
   Delete "$INSTDIR\uninstall.exe"
   Delete "$INSTDIR\lib\jl020.jar"
   Delete "$INSTDIR\lib\nanoxml-lite-2.2.3.jar"
+  Delete "$INSTDIR\lib\swt.jar"
+  Delete "$INSTDIR\lib\swt-win32-3011.dll"
   RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\download"
   RMDir "$INSTDIR"
