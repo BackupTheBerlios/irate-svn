@@ -36,7 +36,7 @@ public class Client implements UpdateListener {
   private DownloadThread downloadThread;
   private ToolItem pause;
   private Track previousTrack;
-	
+  
   private String strState = "";
   // private PlayThread playThread;
   
@@ -44,36 +44,35 @@ public class Client implements UpdateListener {
   public Client() {
    
     File file = new File("trackdatabase.xml");
-	
+  
     try {
       trackDatabase = new TrackDatabase(file);
-      trackDatabase.purge();
     }
     catch (IOException e) {
-		e.printStackTrace();
+      e.printStackTrace();
     }
-	
-	playerList = new PlayerList();
+  
+  playerList = new PlayerList();
     //try to do a nice initial experience for theuser
-   	//do as much handholding as possible
-	if(!file.exists())
-	{
-		new AccountDialog(display, trackDatabase);
-		Player players[] = playerList.getPlayers();
-		trackDatabase.setAutoDownload(2);
-		if(players.length > 0)
-			trackDatabase.setPlayer(players[0].getName());
-			
-	}
+    //do as much handholding as possible
+  if(!file.exists())
+  {
+    new AccountDialog(display, trackDatabase);
+    Player players[] = playerList.getPlayers();
+    trackDatabase.setAutoDownload(2);
+    if(players.length > 0)
+      trackDatabase.setPlayer(players[0].getName());
+      
+  }
     playListManager = new PlayListManager(trackDatabase);
-	playThread = new PlayThread(playListManager, playerList);
+  playThread = new PlayThread(playListManager, playerList);
  
-	initGUI();
-	if(playerList.getPlayers().length == 0){
-		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR);
-		msg.setMessage("Couldn't locate a commandline mp3 player. Please install madplay, mpg321 or mpg123 into /usr/bin or /usr/local/bin.\n iRate will be unable to play mp3s.");
-		msg.open();
-	}
+  initGUI();
+  if(playerList.getPlayers().length == 0){
+    MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR);
+    msg.setMessage("Couldn't locate a commandline mp3 player. Please install madplay, mpg321 or mpg123 into /usr/bin or /usr/local/bin.\n iRate will be unable to play mp3s.");
+    msg.open();
+  }
 
     playThread.addUpdateListener(this);
     playThread.start();
@@ -122,26 +121,26 @@ public class Client implements UpdateListener {
             {
               lblState.setText(strState + " "+n +"%");
               progressBar.setSelection(n);
-			  if(!barVisible)
-				progressBar.setVisible(true);
+        if(!barVisible)
+        progressBar.setVisible(true);
             }else 
             {
               lblState.setText(strState);            
-			  if(barVisible)
-				progressBar.setVisible(false);
+        if(barVisible)
+        progressBar.setVisible(false);
             }
             lblState.pack();
             if(newState)
-            	synchronizePlaylist(playListManager, tblSongs);
+              synchronizePlaylist(playListManager, tblSongs);
           }
         });
       }
     });
     downloadThread.start();
   
-  	//if this is the first run of irate do that
-  	if(!file.exists())
-  		downloadThread.go();
+    //if this is the first run of irate do that
+    if(!file.exists())
+      downloadThread.go();
 
   }
   
@@ -155,11 +154,11 @@ public class Client implements UpdateListener {
     //just in case :)
     track2TableItem(track, item);
     
-	if(track != previousTrack) {
-		if(previousTrack != null)
-			track2TableItem(previousTrack, (TableItem)hashSongs.get(previousTrack));
-		previousTrack = track;
-	}
+  if(track != previousTrack) {
+    if(previousTrack != null)
+      track2TableItem(previousTrack, (TableItem)hashSongs.get(previousTrack));
+    previousTrack = track;
+  }
     downloadThread.checkAutoDownload();   
   }
   
@@ -187,12 +186,12 @@ public class Client implements UpdateListener {
   }
   
   void track2TableItem(Track track, TableItem tableItem) {
-	String[] data = {track.getArtist(),
-	track.getTitle(),
-	track.getState(),
-	String.valueOf(track.getNoOfTimesPlayed()),
-	track.getLastPlayed() };
-	tableItem.setText(data);	
+  String[] data = {track.getArtist(),
+  track.getTitle(),
+  track.getState(),
+  String.valueOf(track.getNoOfTimesPlayed()),
+  track.getLastPlayed() };
+  tableItem.setText(data);  
   }
   
   public void setRating(int rating) {
@@ -210,9 +209,9 @@ public class Client implements UpdateListener {
     update();
     //save the precious ratings :)
     try{
-    	trackDatabase.save();
+      trackDatabase.save();
     }catch(Exception e){
-    	e.printStackTrace();
+      e.printStackTrace();
     }
   } 
  
@@ -281,13 +280,13 @@ public class Client implements UpdateListener {
     td.sort();
     Track tracks[] = td.getTracks();
     for(int i=0;i<tracks.length;i++){
-	TableItem item;
+      TableItem item;
       if(hashSongs.containsKey(tracks[i])) {
-      	item = (TableItem)hashSongs.get(tracks[i]);
+        item = (TableItem)hashSongs.get(tracks[i]);
       }
       else{
-      	item = new TableItem(tblSongs,SWT.NULL);
-		hashSongs.put(tracks[i], item);
+        item = new TableItem(tblSongs,SWT.NULL);
+        hashSongs.put(tracks[i], item);
       }
       track2TableItem(tracks[i], item);
     }
@@ -307,10 +306,10 @@ public class Client implements UpdateListener {
   }
   
   void uncheckSiblingMenuItems(MenuItem self) {
-	Menu parent = self.getParent();
-	MenuItem items[] = parent.getItems();
-	for(int i = 0;i< parent.getItemCount();i++)
-		parent.getItem(i).setSelection(false);
+  Menu parent = self.getParent();
+  MenuItem items[] = parent.getItems();
+  for(int i = 0;i< parent.getItemCount();i++)
+    parent.getItem(i).setSelection(false);
   }
   
   void initGUI(){
@@ -349,14 +348,14 @@ public class Client implements UpdateListener {
     
     MenuItem item1_2 = new MenuItem(menu1,SWT.PUSH);
     item1_2.setText("Purge");
-	item1_2.addSelectionListener(new SelectionAdapter(){
-	  public void widgetSelected(SelectionEvent e){
-		trackDatabase.purge();
-		update();
-	  }
-	});    
+  item1_2.addSelectionListener(new SelectionAdapter(){
+    public void widgetSelected(SelectionEvent e){
+    trackDatabase.purge();
+    update();
+    }
+  });    
     
-    //	MenuItem item1_3 = new MenuItem(menu1,SWT.SEPARATOR);
+    //  MenuItem item1_3 = new MenuItem(menu1,SWT.SEPARATOR);
     
     MenuItem item1_4 = new MenuItem(menu1,SWT.PUSH);
     item1_4.setText("Quit");
@@ -378,56 +377,56 @@ public class Client implements UpdateListener {
     //item2_1.setText("Account");
     
     MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
-	mDownload.setText("Auto Download");
-	Menu menu2 = new Menu(mDownload);
-	mDownload.setMenu(menu2);
-	
-	int counts[] = new int[] {0,2, 5, 11, 17, 23, 29};
-	int autoDownload = trackDatabase.getAutoDownload(); 
-	for(int i=0;i< counts.length;i++){
+  mDownload.setText("Auto Download");
+  Menu menu2 = new Menu(mDownload);
+  mDownload.setMenu(menu2);
+  
+  int counts[] = new int[] {0,2, 5, 11, 17, 23, 29};
+  int autoDownload = trackDatabase.getAutoDownload(); 
+  for(int i=0;i< counts.length;i++){
         MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
-		final int count = counts[i];
-		mTimes.setText(i==0?"Disabled":"Every " + count + " times" );
-		mTimes.setSelection(count == autoDownload);
-		mTimes.addSelectionListener(new SelectionAdapter(){
-		public void widgetSelected(SelectionEvent e){
-			//stupid trick to make self the only selected item
-			MenuItem self = (MenuItem)e.getSource();
-			uncheckSiblingMenuItems(self);
-			self.setSelection(true);
-			
-			trackDatabase.setAutoDownload(count);
-			downloadThread.checkAutoDownload();
-		}
-		});
-	}
+    final int count = counts[i];
+    mTimes.setText(i==0?"Disabled":"Every " + count + " times" );
+    mTimes.setSelection(count == autoDownload);
+    mTimes.addSelectionListener(new SelectionAdapter(){
+    public void widgetSelected(SelectionEvent e){
+      //stupid trick to make self the only selected item
+      MenuItem self = (MenuItem)e.getSource();
+      uncheckSiblingMenuItems(self);
+      self.setSelection(true);
+      
+      trackDatabase.setAutoDownload(count);
+      downloadThread.checkAutoDownload();
+    }
+    });
+  }
     
-	MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
-	mPlayers.setText("Player");
-	menu2 = new Menu(mPlayers);
-	mPlayers.setMenu(menu2);
-	
-	Player players[] = playerList.getPlayers();
-	for(int i=0;i<players.length;i++)
-	{
-		final String player = players[i].getName();
-		
-		MenuItem mPlayer = new MenuItem(menu2, SWT.CHECK, i);
-		mPlayer.setText(player);
-		if(trackDatabase.getPlayer().equals(player))
-			mPlayer.setSelection(true);
-		mPlayer.addSelectionListener(new SelectionAdapter(){
-			public void widgetSelected(SelectionEvent e){
-				//stupid trick to make self the only selected item
-				MenuItem self = (MenuItem)e.getSource();
-				uncheckSiblingMenuItems(self);
-				self.setSelection(true);
-			
-				trackDatabase.setPlayer(player);
-				downloadThread.checkAutoDownload();
-			}
-		});
-	}
+  MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
+  mPlayers.setText("Player");
+  menu2 = new Menu(mPlayers);
+  mPlayers.setMenu(menu2);
+  
+  Player players[] = playerList.getPlayers();
+  for(int i=0;i<players.length;i++)
+  {
+    final String player = players[i].getName();
+    
+    MenuItem mPlayer = new MenuItem(menu2, SWT.CHECK, i);
+    mPlayer.setText(player);
+    if(trackDatabase.getPlayer().equals(player))
+      mPlayer.setSelection(true);
+    mPlayer.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        //stupid trick to make self the only selected item
+        MenuItem self = (MenuItem)e.getSource();
+        uncheckSiblingMenuItems(self);
+        self.setSelection(true);
+      
+        trackDatabase.setPlayer(player);
+        downloadThread.checkAutoDownload();
+      }
+    });
+  }
 
     
     lblTitle = new Label(shell, SWT.NONE);
@@ -441,7 +440,7 @@ public class Client implements UpdateListener {
     
     
     TableColumn col = new TableColumn(tblSongs,SWT.LEFT);
-    col.setWidth(100);
+    col.setWidth(200);
     col.setText("Artist");
     col.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event e) {
@@ -450,7 +449,7 @@ public class Client implements UpdateListener {
     });
     
     col = new TableColumn(tblSongs,SWT.LEFT);
-    col.setWidth(100);
+    col.setWidth(200);
     col.setText("Track");
     col.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event e) {
@@ -462,22 +461,22 @@ public class Client implements UpdateListener {
     col.setWidth(100);
     col.setText("Rating");
     col = new TableColumn(tblSongs,SWT.LEFT);
-    col.setWidth(100);
+    col.setWidth(50);
     col.setText("Plays");
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Last");
-    //col.setWidth(50);
+    col.setWidth(150);
     tblSongs.setHeaderVisible(true);
     synchronizePlaylist(playListManager, tblSongs);
     tblSongs.addSelectionListener(new SelectionAdapter(){
     public void widgetSelected(SelectionEvent e){
-		playThread.play(getTrackByTableItem(tblSongs.getSelection()[0]));
-	}
+    playThread.play(getTrackByTableItem(tblSongs.getSelection()[0]));
+  }
    });
     
-    for(int i = 0;i< tblSongs.getColumns().length;i++)
-      tblSongs.getColumns()[i].pack();
+//    for(int i = 0;i< tblSongs.getColumns().length;i++)
+//      tblSongs.getColumns()[i].pack();
     
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
@@ -488,7 +487,7 @@ public class Client implements UpdateListener {
     tblSongs.setLayoutData(gridData);
     tblSongs.pack();
   
-	ToolBar toolbar = new ToolBar(shell,SWT.FLAT);
+  ToolBar toolbar = new ToolBar(shell,SWT.FLAT);
     ToolItem item;
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText("This sux");
@@ -533,13 +532,13 @@ public class Client implements UpdateListener {
 
     new ToolItem(toolbar,SWT.SEPARATOR);    
     
-	pause = new ToolItem(toolbar,SWT.PUSH);
-	pause.setText("||");
-	pause.addSelectionListener(new SelectionAdapter(){
-		public void widgetSelected(SelectionEvent e){
-			setPaused(!playThread.isPaused());
-		}
-	});
+  pause = new ToolItem(toolbar,SWT.PUSH);
+  pause.setText("||");
+  pause.addSelectionListener(new SelectionAdapter(){
+    public void widgetSelected(SelectionEvent e){
+      setPaused(!playThread.isPaused());
+    }
+  });
  
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText(">>");
@@ -547,7 +546,7 @@ public class Client implements UpdateListener {
       public void widgetSelected(SelectionEvent e){
         setPaused(false);
         playThread.reject();
-		downloadThread.checkAutoDownload();
+    downloadThread.checkAutoDownload();
       }
     });
 
@@ -574,20 +573,20 @@ public class Client implements UpdateListener {
     progressBar.setMinimum(0);
     progressBar.setMaximum(100);
 
-	shell.pack();
+  shell.pack();
     
     Rectangle rec = shell.getBounds();
     rec.height = 300;
     shell.setBounds(rec);
  
- 	progressBar.setVisible(false);
+  progressBar.setVisible(false);
     shell.open();
   }
   
   public void run(){
     while (true) {
       if (!display.readAndDispatch()) display.sleep();
-    }		
+    }   
   }
   
   
