@@ -10,7 +10,7 @@
 Name "iRATE radio 0.2"
 
 ; The file to write
-OutFile "irate-client-installer.exe"
+OutFile "irate-client-win32.exe"
 
 ; The default installation directory
 InstallDir "$PROGRAMFILES\iRATE radio"
@@ -28,11 +28,13 @@ Section "iRATE radio"
   SetOutPath $INSTDIR
   ; Put file there
   File "irate-client.jar"
+  File "COPYING"
+  File "README"
   CreateDirectory "$INSTDIR\lib"
   File /oname="lib\jl020.jar"              "lib\jl020.jar"
   File /oname="lib\nanoxml-lite-2.2.3.jar" "lib\nanoxml-lite-2.2.3.jar"
-  File /oname="lib\swt.jar"                "lib\swt-win32.jar"
-  File /oname="lib\swt-win32-3011.dll"     "lib\swt-win32-3011.dll"
+  File /oname="lib\swt.jar"                "lib\swt-win32\swt.jar"
+  File /oname="lib\swt-win32-3011.dll"     "lib\swt-win32\swt-win32-3011.dll"
   
   CreateDirectory "$SMPROGRAMS\iRATE radio"
   CreateShortCut "$SMPROGRAMS\iRate radio\iRATE radio.lnk" "$INSTDIR\irate-client.jar" ""
