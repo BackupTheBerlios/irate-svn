@@ -16,6 +16,8 @@ public class PlayListManager {
   private List playList;
   private int playListIndex;
   
+  private Track lastPlayedTrack;
+  
   public PlayListManager(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
     this.playList = new Vector();
@@ -67,11 +69,21 @@ public class PlayListManager {
     if (playList.size() == 0)
       return null;
     
-    if (++playListIndex >= size) {
-      playListIndex = 0;
-//      randomise(playList);
-    }
+    //
+    // Make sure the track you select isn't the same as the track
+    // that was previously played
+    //
+    
+    Track selectedTrack;
+    do {
+      if (++playListIndex >= size) {
+        playListIndex = 0;
+      }
+      selectedTrack = (Track) playList.get(playListIndex);
+    }  while (selectedTrack == lastPlayedTrack);
 
+    lastPlayedTrack = selectedTrack;
+    
     System.out.println("---Play list---");
     for (int i = 0; i < playList.size(); i++) {
       Track track = (Track) playList.get(i);
@@ -80,7 +92,7 @@ public class PlayListManager {
       System.out.println(track.toString());
     }
     
-    return (Track) playList.get(playListIndex);
+    return selectedTrack;
   }
   
   private void randomise(List playList) {
