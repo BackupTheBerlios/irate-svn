@@ -24,10 +24,10 @@ import java.net.*;
 /**
  * 
  * Date Created: Sep 13, 2003
- * Date Updated: $Date: 2003/09/17 20:13:03 $
+ * Date Updated: $Date: 2003/09/18 17:37:33 $
  * @author Creator:	Eric Dalquist
- * @author Updated:	$Author: ebdalqui $
- * @version $Revision: 1.73 $
+ * @author Updated:	$Author: ajones $
+ * @version $Revision: 1.74 $
  */
 public class Client implements UpdateListener, PluginApplication {
   
@@ -343,10 +343,10 @@ public class Client implements UpdateListener, PluginApplication {
   public void setVolume(final int volume) {
       // We have to delegate to the SWT event thread, because we might be
       // called from a thread other than it, such as the remote control thread.
-//    final Integer volumeInt = new Integer(volume);
+    final Integer volumeInt = new Integer(volume);
     display.asyncExec(new Runnable() {
       public void run() {
-        playThread.setVolume(volume);
+        playThread.setVolume(volumeInt.intValue());
 
         //save the updated volume
         try {
