@@ -5,7 +5,6 @@ import java.io.*;
 import java.util.*;
 import javax.sound.sampled.*;
 import irate.common.*;
-//import javazoom.jl.player.Player;
 
 public class PlayThread extends Thread {
  
@@ -19,6 +18,7 @@ public class PlayThread extends Thread {
   private Speech speech = new Speech();
   private boolean speaking;
   private boolean toKeepPlaying;
+  private AudioDevice audioDevice;
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
@@ -47,7 +47,7 @@ public class PlayThread extends Thread {
     }
     else {
       player = new Player(new BufferedInputStream(
-          new FileInputStream(file), 2048));
+          new FileInputStream(file), 2048), new AudioDevice());
       try {
 	player.play();
       }
