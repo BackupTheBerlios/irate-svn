@@ -4,6 +4,8 @@ import java.awt.event.*;
 import java.io.*;
 import java.util.*;
 import javax.sound.sampled.*;
+import javazoom.jl.decoder.BitstreamException;
+
 import irate.common.*;
 
 public class PlayThread extends Thread {
@@ -50,6 +52,9 @@ public class PlayThread extends Thread {
           new FileInputStream(file), 2048), new AudioDevice());
       try {
 	player.play();
+      }
+      catch (BitstreamException e) {
+        e.printStackTrace();
       }
       finally {
 	  // Without this, RoboJock can't talk because it fights with the
