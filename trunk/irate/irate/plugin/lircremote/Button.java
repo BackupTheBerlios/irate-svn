@@ -2,9 +2,9 @@
 
 package irate.plugin.lircremote;
 
-import irate.plugin.*;
-import nanoxml.*;
 import java.util.Hashtable;
+
+import nanoxml.XMLElement;
 
 public class Button
 {

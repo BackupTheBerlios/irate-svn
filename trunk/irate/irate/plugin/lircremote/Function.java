@@ -2,15 +2,10 @@
 
 package irate.plugin.lircremote;
 
-import irate.plugin.*;
-import irate.common.Track;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
-import java.net.Socket;
-import java.net.SocketException;
-import java.io.*;
 import nanoxml.*;
 
 public abstract class Function

@@ -6,12 +6,9 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.Point;
-import irate.common.*;
 import irate.plugin.*;
 import irate.plugin.lircremote.LircRemoteControlPlugin;
 import irate.plugin.lircremote.LircRemoteControlListener;
-import irate.plugin.lircremote.Button;
 import irate.plugin.lircremote.Function;
 
 /**

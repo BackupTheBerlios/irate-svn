@@ -2,10 +2,6 @@
 
 package irate.plugin.lircremote;
 
-import irate.plugin.*;
-import irate.common.Track;
-import java.util.Hashtable;
-
 /**
  * Event listener interface for plugin for remote control based on lircd (Linux/Unix).
  *

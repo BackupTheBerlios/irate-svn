@@ -7,7 +7,6 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.SWT;
 import java.io.IOException;
-import irate.common.*;
 import irate.plugin.*;
 
 /**
