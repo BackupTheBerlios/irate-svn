@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+
+<project name="iRATE radio" default="jar">
+  <target name="compile">
+    <javac srcdir="." debug="true" debuglevel="lines,vars,source">
+      <classpath>
+        <pathelement path="xercesImpl.jar"/>
+        <pathelement path="xmlParserAPIs.jar"/>
+        <pathelement path="jl020.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="irate-client.jar" manifest="META-INF/manifest.irate-client" compress="false">
+      <fileset dir="." includes="irate/client/*.class"/>
+      <fileset dir="." includes="irate/client/help/*.html"/>
+      <fileset dir="." includes="irate/common/*.class"/>
+      <fileset dir="." includes="irate/download/*.class"/>
+      <fileset dir="." includes="MAD/*.class"/>
+    </jar>
+    
+    <jar jarfile="irate-server.jar" manifest="META-INF/manifest.irate-server" compress="false">
+      <fileset dir="." includes="irate/server/*.class"/>
+      <fileset dir="." includes="irate/common/*.class"/>
+    </jar>
+    
+    <uptodate property="nsis.notrequired" targetfile="irate-installer.exe">
+      <srcfiles dir="." includes="*.jar"/>
+      <srcfiles dir="." includes="*.html"/>
+    </uptodate>
+  </target>
+
+  <target name="tar" depends="jar">
+    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/xercesImpl.jar,irate/xmlParserAPIs.jar,irate/MAD/libs/linux-i386/madplay.so,irate/MAD/libs/sunos-sparc/madplay.so"/>
+  </target>
+
+  <target name="gzip" depends="tar">
+    <gzip src="irate-client.tar" zipfile="irate-client.tar.gz"/>
+  </target>
+  
+  <target name="bzip2" depends="tar">
+    <bzip2 src="irate-client.tar" zipfile="irate-client.tar.bz2"/>
+  </target>
+  
+    <!-- Windoze installer -->
+  <target name="nsis" depends="jar" unless="nsis.notrequired">
+    <exec executable="makensis.exe">
+      <arg line="irate-client.nsi"/>
+    </exec>
+  </target>
+
+  <target name="all" depends="gzip,bzip2,nsis">
+  </target>
+
+  <target name="clean">
+    <delete>
+      <fileset dir="." includes="**/*.class"/>
+      <fileset file="irate-server.jar"/>
+      <fileset file="irate-client.jar"/>
+      <fileset file="irate-client.tar"/>
+      <fileset file="irate-client.tar.gz"/>
+      <fileset file="irate-client.tar.bz2"/>
+      <fileset file="irate-client-installer.exe"/>
+    </delete>
+  </target>
+</project>

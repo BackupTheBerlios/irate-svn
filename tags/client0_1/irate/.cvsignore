@@ -1,0 +1,9 @@
+irate-server.jar
+irate-client.jar
+irate-client.tar
+irate-client.tar.gz
+irate-client.tar.bz2
+trackdatabase.xml
+*.swp
+users
+download
