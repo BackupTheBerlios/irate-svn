@@ -1,4 +1,4 @@
-# This spec can build directly from a CVS pull by defining a IRATE_SRC
+# This spec can build directly from a CVS pull by defining an IRATE_SRC
 # environment variable. It will still require an irate-src.tar.gz
 # tarball in the SOURCES directory, even though that file will not be
 # used.
@@ -6,7 +6,7 @@
 Name: irate-client-gtk
 Summary: The iRATE music database client
 Version: snapshot1
-Release: 20031011
+Release: 20031108
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
@@ -55,6 +55,9 @@ mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
 cp debian/irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1
 ln -s irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1/irate-client-gtk.1
 
+mkdir -p $RPM_BUILD_ROOT/usr/share/icons
+cp irate/swt/irate.png $RPM_BUILD_ROOT/usr/share/icons/irate-client-gtk.png
+
 # Building from a CVS pull breaks the traditional doc directive, so
 # we need to copy docs explicitly and use a docdir below
 #
@@ -83,8 +86,12 @@ rm -rf $RPM_BUILD_DIR/irate
 /usr/bin
 /usr/lib
 /usr/share/man
+/usr/share/icons
 
 %changelog
+* Sat Nov 08 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031108
+- Added icon
+
 * Sat Oct 11 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031011
 - Added checks for $IRATE_SRC to allow builds direct from a CVS directory
 - Explicitly copied the doc files and specified a docdir

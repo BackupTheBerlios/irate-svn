@@ -1,1 +1,1 @@
-?package(irate-client-gtk):  needs="x11"  section="Multimedia/Sound"  title="iRATE"  longtitle="Download and rate MP3's"  command="irate-client-gtk"
+?package(irate-client-gtk):  needs="x11"  section="Multimedia/Sound"  title="iRATE"  longtitle="Download and rate MP3's"  command="irate-client-gtk"  icon="/usr/share/icons/irate-client-gtk.png"
