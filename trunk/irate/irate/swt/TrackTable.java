@@ -42,7 +42,6 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
-import org.eclipse.swt.widgets.Control;
 
 /**
  * @author Creator: Anthony Jones
@@ -404,43 +403,48 @@ public class TrackTable
     if (selected != null)
       select(selected, true);
   }
-  
+
   private Image getStateImage(Color background, String state) {
-  	Image image = (Image) imageHash.get(state);
-  	if (image == null) 
-  	{
-  	  System.out.println("Creating image " + state);
+    Image image = (Image) imageHash.get(state);
+    if (image == null) 
+    {
+      System.out.println("Creating image " + state);
       ImageData stateImageData = basicSkinable.getImageData(state);
       if (stateImageData != null) {
         ImageData mergedImageData = imageMerger.merge(background, stateImageData);
         image = new Image(display, mergedImageData);
       }
       else {
-        /* We need to generate an image for the text */
-        GC gc = new GC(table);      
-        Point size = gc.stringExtent(state);
-        Font font = gc.getFont();
-
-        int x = 80;
-        int y = 20;
-        if(size.x > x) {
-          // Shrink to fit! The downloading messages
-          // are too big on Mac OS X at least.
-          FontData fd = gc.getFont().getFontData()[0];
-          font = new Font(display, fd.getName(), fd.getHeight() * x / size.x, fd.getStyle());
-          gc.setFont(font);
-          size = gc.stringExtent(state);
+        final int width = 80;
+        final int height = 20;
+        image = new Image(display, width, height);     
+        GC gc = new GC(image);
+        if (state.startsWith("%")) {
+          int percent = Integer.parseInt(state.substring(1));
+          int barY = height / 4;
+          int barHeight = height / 2;
+          gc.drawRectangle(0, barY, width - 1, barHeight - 1);
+          gc.fillRectangle(0, barY, width * percent / 100 - 1, barHeight - 1);
         }
-        gc.dispose();
+        else {
+          /* We need to generate an image for the text */
+          Point size = gc.stringExtent(state);
 
-        image = new Image(display, x, y);     
-        gc = new GC(image);
-        gc.setFont(font);
-        gc.drawText(state, (x - size.x) / 2, (y - size.y) / 2, true);
+          if (size.x > width) {
+            // Shrink to fit! The downloading messages
+            // are too big on Mac OS X at least.
+            FontData fd = gc.getFont().getFontData()[0];
+            Font font = new Font(display, fd.getName(), fd.getHeight() * width / size.x, fd.getStyle());
+            gc.setFont(font);
+            size = gc.stringExtent(state);
+          }
+
+          gc.drawText(state, (width - size.x) / 2, (height - size.y) / 2, true);
+        }
         gc.dispose();
       }
       imageHash.put(state, image);
-  	}
+    }
     return image;
   }
   

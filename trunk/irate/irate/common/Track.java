@@ -18,7 +18,7 @@ public class Track implements TrackDetails {
   private File dir;
   private TrackDatabase trackDatabase;
   private int downloadAttempts = 0;
-  private int percent_complete = -1;
+  private int percentComplete = -1;
 
   public Track(XMLElement elt, File dir) {
     this.elt = elt;
@@ -468,8 +468,8 @@ public class Track implements TrackDetails {
       return Resources.getString("track.rating.broken");
     File file = getFile();
     if (isNotDownloaded()) {
-      if(percent_complete != -1)
-        return Resources.getString("track.rating.downloading") + " " + percent_complete + "%";
+      if(percentComplete != -1)
+        return "%" + percentComplete;
       return Resources.getString("track.rating.notdownloaded");
     }
     String isDeleted = elt.getStringAttribute("deleted");
@@ -684,10 +684,16 @@ public class Track implements TrackDetails {
   }
 
   /**
+   * Set the download percent complete to display in the track table.
+   * 
    * @param percent
+   * @return true if the value has changed, false if it hasn't changed.
    */
-  public void setPercentComplete(int percent) {
-    percent_complete = percent;
+  public boolean setPercentComplete(int percent) {
+    if (percentComplete == percent)
+      return false;
+    percentComplete = percent;
+    return true;
   }
 
   /**
