@@ -162,6 +162,10 @@ public class TrackDatabase {
     setAttribute(userElementName, "port", Integer.toString(port));
   }
 
+  public void setFile(File file) {
+    this.file = file;
+  }
+
   private void createDOM() throws ParserConfigurationException {
     if (dbf == null) { 
       dbf = DocumentBuilderFactory.newInstance();

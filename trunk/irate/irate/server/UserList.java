@@ -32,7 +32,22 @@ public class UserList {
     return null;
   }
 
+  public ServerDatabase createUser(String name, String password) {
+    ServerDatabase user = new ServerDatabase();
+    user.setFile(new File(userDir, name));
+    user.setUserName(name);
+    user.setPassword(password);
+    users.add(user);
+    return user;
+  }
+  
   public ServerDatabase[] getUsers() {
     return (ServerDatabase[]) users.toArray(new ServerDatabase[users.size()]);
+  }
+  
+  public ServerDatabase randomUser(Random random) {
+    if (users.size() == 0) 
+      return null; 
+    return (ServerDatabase) users.elementAt((random.nextInt() & 0x7fffffff) % users.size());
   }
 }

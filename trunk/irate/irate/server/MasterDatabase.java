@@ -7,11 +7,14 @@ import java.util.*;
 
 public class MasterDatabase extends ServerDatabase {
 
-    // Add an orphan track one time in n.
+    /** Add an orphan track one time in n. */
   private final int orphanChance = 5;
 
-    // Add a random track one time in n.
+    /** Add a random track one time in n. */
   private final int randomChance = 10;
+
+    /** The number of initial tracks to start with. */
+  private final int initialTracks = 6;
   
   private UserList userList;
   private Random random = new Random();
@@ -29,14 +32,19 @@ public class MasterDatabase extends ServerDatabase {
   public ServerDatabase processRequest(ServerDatabase request) {
     ServerDatabase reply = new ServerDatabase();
 
-    System.out.println("User " + request.getUserName() + " Password " + request.getPassword());
+    System.out.println("User " + request.getUserName());
+//    System.out.println("User " + request.getUserName() + " Password " + request.getPassword());
     ServerDatabase user = userList.getUser(request.getUserName());
 
       // If the user doesn't exist or the password is incorrect the return a 
       // blank response.
     if (user == null) {
-      reply.setError("user", "user.html");
-      return reply;
+        // If the user already has tracks
+      if (request.getNoOfTracks() != 0 || request.getUserName().length() == 0 || request.getPassword().length() == 0) {
+        reply.setError("user", "user.html");
+        return reply;
+      }
+      user = userList.createUser(request.getUserName(), request.getPassword());
     }
 
     if (!user.getPassword().equals(request.getPassword())) {
@@ -60,29 +68,41 @@ public class MasterDatabase extends ServerDatabase {
       if (track != null) {
         System.out.println("Orphan: " + track.getName());
     
-        user.add(track);
         reply.add(track);
         orphans.remove(track);
       }
     }
 
-      // See if we can correlate a track
-    ServerDatabase corel = getBest(user);
-    Track track = corel.chooseTrack(random);
-    if (track != null) {
-      System.out.println("Correlation: " + track.getName() + " " + track.getRating());
-      user.add(track);
-      reply.add(track);
+    if (user.getNoOfTracks() == 0) {
+      for (int i = 0; i < initialTracks; i++) {
+        ServerDatabase peer = userList.randomUser(random);
+        if (peer != null) {
+          System.out.println("Peer: " + peer.getUserName());
+          Track track = peer.chooseTrack(random);
+          if (track != null) {
+            System.out.println("Initial: " + track.getName() + " " + track.getRating());
+            reply.add(track);
+          }
+        }
+      }
+    }
+    else {
+        // See if we can correlate a track
+      ServerDatabase corel = getBest(user);
+      Track track = corel.chooseTrack(random);
+      if (track != null) {
+        System.out.println("Correlation: " + track.getName() + " " + track.getRating());
+        reply.add(track);
+      }
     }
 
       // Do this randomly or if we couldn't correlate
-    if (track == null || (random.nextInt() % randomChance) == 0) {
+    if (reply.getNoOfTracks() == 0 || (random.nextInt() % randomChance) == 0) {
         // Just pick any random track that we don't already have
       ServerDatabase spares = getSpares(user);
-      track = spares.randomTrack(random);
+      Track track = spares.randomTrack(random);
       if (track != null) {
         System.out.println("Random: " + track.getName());
-        user.add(track);
         reply.add(track);
       }
     }
@@ -93,6 +113,7 @@ public class MasterDatabase extends ServerDatabase {
     
       // Save the user database
     try {
+      user.add(reply);
       user.save();
     }
     catch (IOException e) {

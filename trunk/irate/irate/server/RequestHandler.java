@@ -60,7 +60,8 @@ public class RequestHandler {
   }
   
   public void process(Socket socket) {
-    System.out.println("Accepted connection from " + socket.getInetAddress());
+    InetAddress ia = socket.getInetAddress();
+    System.out.println("Accepted connection from " + ia.getHostAddress() + " " + ia.getHostName());
     InputStream is = null;
     OutputStream os = null;
     try {
