@@ -22,6 +22,7 @@ configure-stamp:
 	dh_testdir
 	# Add here commands to configure the package.
 
+	./configure
 	touch configure-stamp
 
 

@@ -1,3 +1,9 @@
+irate (0.3-0pre2) unstable; urgency=low
+
+  * Now runs configure script.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Tue, 23 Sep 2003 17:38:04 +0800
+
 irate (0.3-0pre1) unstable; urgency=low
 
   * Prerelease version 0.3.
