@@ -679,8 +679,8 @@ public class Client extends AbstractClient {
     
     ToolBar toolbar = new ToolBar(composite, SWT.FLAT);
     gridData = new GridData();
-    gridData.horizontalAlignment = GridData.FILL;
-    gridData.grabExcessHorizontalSpace = false;
+    gridData.horizontalAlignment = GridData.CENTER;
+    gridData.grabExcessHorizontalSpace = true;
     gridData.horizontalSpan = 1;
     toolbar.setLayoutData(gridData);
 
