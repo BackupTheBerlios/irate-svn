@@ -12,32 +12,32 @@ import irate.plugin.*;
 /**
  * @author Stephen Blackheath
  */
-public class PluginDialog
+public class SettingDialog
 {
+	public static final int PLUGIN_PAGE = 0;
+	
   private PluginManager pluginManager;
   private boolean done = false;
 	private Shell shell;
   private PluginApplication app;
-		
-	public PluginDialog(Display display, PluginManager pluginManager, final PluginApplication app)
-  {
+  private TabFolder tabs;
+    
+	public SettingDialog(Display display, PluginManager pluginManager, PluginApplication app) {
     this.pluginManager = pluginManager;
 		this.app = app;
-    shell = new Shell(display);
-    shell.setText("Settings");
-    shell.addShellListener(new ShellAdapter()
-    {
-      public void shellClosed(ShellEvent e){
-        done=true;
-      }
-    });
-		TabFolder tabs = new TabFolder(shell, SWT.NONE);
-		TabItem tabItem = new TabItem(tabs, SWT.NONE);
-		tabItem.setText("Plugins");
-		tabItem.setControl(createPluginPage(tabs));
-		tabs.pack();
-		
-    shell.pack();    
+    
+    createWidgets(display);
+    
+  }
+  
+  /** Ask for a specific setting */
+  public void setPage(int page) {
+    tabs.setSelection(page);
+  }
+  
+  /** Show prefs window 
+  @param display swt display */
+  public void open(Display display) {
     shell.open();
     while (!done) {
       if (!display.readAndDispatch()) display.sleep();
@@ -49,11 +49,30 @@ public class PluginDialog
         // @todo Handle error better
       e.printStackTrace();
     }
-    shell.dispose();
+    //should do dispose in a finalyzer
+    //shell.dispose();
+
   }
-	
-	public Composite createPluginPage(Composite parent) 
-	{
+	/** Creates widgets */
+	private void createWidgets(Display display) {
+    shell = new Shell(display);
+    shell.setText("Settings");
+    shell.addShellListener(new ShellAdapter() {
+      public void shellClosed(ShellEvent e){
+        done=true;
+      }
+    });
+		tabs = new TabFolder(shell, SWT.NONE);
+		//Pluginpage
+    TabItem tabItem = new TabItem(tabs, SWT.NONE);
+    tabItem.setText("Plugins");
+		tabItem.setControl(createPluginPage(tabs));
+		tabs.pack();
+		
+    shell.pack();    
+  }
+  
+	private Composite createPluginPage(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(2, false);
     comp.setLayout(layout);
@@ -71,21 +90,21 @@ public class PluginDialog
       checkbox.setText(plugin.getDescription());
       checkbox.setSelection(plugin.isAttached());
       checkbox.addSelectionListener(new SelectionAdapter(){
-	public void widgetSelected(SelectionEvent e){
-	  if (checkbox.getSelection())
-	    plugin.attach(PluginDialog.this.pluginManager.getApp());
-          else
-	    plugin.detach();
-	}
+				public void widgetSelected(SelectionEvent e){
+					if (checkbox.getSelection())
+						plugin.attach(pluginManager.getApp());
+								else
+						plugin.detach();
+				}
       });
       Button configure = new Button(comp, SWT.NONE);
       configure.setText("Configure");
       configure.addSelectionListener(new SelectionAdapter(){
-	public void widgetSelected(SelectionEvent e){
-	  app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
-	}
-      });
-    }
+        public void widgetSelected(SelectionEvent e){
+          app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
+        }
+			});
+		}
 
     Button ok = new Button(comp, SWT.NONE);
     ok.setText("OK");

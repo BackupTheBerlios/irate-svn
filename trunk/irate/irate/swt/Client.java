@@ -20,13 +20,13 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/23 08:35:56 $
+ * Date Updated: $Date: 2003/10/25 07:17:39 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.87 $
+ * @version $Revision: 1.88 $
  */
 public class Client extends AbstractClient {
 
@@ -47,9 +47,10 @@ public class Client extends AbstractClient {
   private Track previousTrack;
   private Help help = new Help();
   private ErrorDialog errorDialog;
-
+	private SettingDialog settingDialog;
   private String strState = "";
 
+	
   private SWTPluginUIFactory uiFactory;
 
   public Client() {
@@ -70,6 +71,7 @@ public class Client extends AbstractClient {
     });
   }
 
+	
   public void handleError(String code, String urlString) {
     //actionSetContinuousDownload(false);
     Reader r;
@@ -751,12 +753,9 @@ public class Client extends AbstractClient {
     item2_1.setText("Plug-ins");
     item2_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        new PluginDialog(
-          display,
-          pluginManager,
-          (PluginApplication) Client.this);
-      }
-    });
+        showSettingDialog(SettingDialog.PLUGIN_PAGE);
+			}
+		});
 
     //Added for a nicer UI by Allen Tipper 14.9.03
     item2_1.addArmListener(new ToolTipArmListener("Select Plugins"));
@@ -934,6 +933,21 @@ public class Client extends AbstractClient {
     return uiFactory;
   }
 
+  /** Display a preference
+  @page duh
+  */
+	public void showSettingDialog(int page) {
+    if(settingDialog == null) {
+      settingDialog = new SettingDialog(
+          display,
+          pluginManager,
+          (PluginApplication) Client.this);
+		}
+    settingDialog.setPage(page);
+    settingDialog.open(display);
+	}
+	
+	/** Class to show tooltips in the statusbar */
   class ToolTipArmListener implements ArmListener {
     private String str;
     public ToolTipArmListener(String str) {
