@@ -16,6 +16,7 @@ import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
@@ -97,18 +98,38 @@ public class AlphaLabel extends Canvas implements Skinable {
         return;
       
       /* Get the background image. */
-      newImage = new Image(label.getDisplay(), backgroundData);
+      GC gc;
+      if (backgroundData == null)
+      {
+        Rectangle bounds = getBounds();
+        newImage = new Image(label.getDisplay(), bounds.width, bounds.height);
+        gc = new GC(newImage);
+        gc.setBackground(getBackground());
+        gc.fillRectangle(0, 0, bounds.width, bounds.height);
+      }
+      else {
+        newImage = new Image(label.getDisplay(), backgroundData);
+        gc = new GC(newImage);
+      }
       
       /* Draw the text onto it. */
-      GC imageGc = new GC(newImage);
-      imageGc.drawText(text, 0, 0, true);
-      imageGc.dispose();
+      gc.drawText(text, 0, 0, true);
+      gc.dispose();
       System.out.println("Text: " + text);
     }
     else {
-      int x = (backgroundData.width - imageData.width) / 2;
-      int y = (backgroundData.height - imageData.height) / 2;
-      ImageData mergedImageData = imageMerger.merge(backgroundData, x, y, imageData);
+      ImageData mergedImageData;
+      if (backgroundData == null) {
+        Rectangle bounds = getBounds();
+        int x = (bounds.width - imageData.width) / 2;
+        int y = (bounds.height - imageData.height) / 2;
+        mergedImageData = imageMerger.merge(getBackground(), imageData); 
+      }
+      else {
+        int x = (backgroundData.width - imageData.width) / 2;
+        int y = (backgroundData.height - imageData.height) / 2;
+        mergedImageData = imageMerger.merge(backgroundData, x, y, imageData);
+      }
       newImage = new Image(label.getDisplay(), mergedImageData);
     }
     
