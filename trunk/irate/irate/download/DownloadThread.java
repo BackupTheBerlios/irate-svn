@@ -119,7 +119,7 @@ public class DownloadThread extends Thread {
   	return null;
   }
 
-  private abstract class TimeoutWorker implements Runnable{
+  private abstract class TimeoutWorker implements Runnable {
 	protected Object input;
   	private Object output;
 	private Thread timeoutThread;
@@ -142,29 +142,29 @@ public class DownloadThread extends Thread {
 
 	public abstract void run();
 
-	public Object runOrTimeout(long timeout) throws Exception {
-		//running thread
-		timeoutThread = Thread.currentThread();
-		//increment..the bigger the less cpu we use...but slower downloads
-		int step = 100;
-		//reset outputs
-		exception = null;
-		output = null;
-		//start thread with a task that might timeout
-		Thread th = new Thread(this);
-		th.start();
-		while(timeout > 0){
-			Thread.sleep(step);
-			timeout -= step;
-			if(exception != null)
-				throw exception;
-			else if(output != null)
-				return output;
-		}
-		//should probably mark th somehow so it doesn't try to set any values once it times out
-		th = null;
-		throw new IOException("Timeout exceeded");
-	}
+    public Object runOrTimeout(long timeout) throws Exception {
+      //running thread
+      timeoutThread = Thread.currentThread();
+      //increment..the bigger the less cpu we use...but slower downloads
+      int step = 100;
+      //reset outputs
+      exception = null;
+      output = null;
+      //start thread with a task that might timeout
+      Thread th = new Thread(this);
+      th.start();
+      while (timeout > 0) {
+        Thread.sleep(step);
+        timeout -= step;
+        if (exception != null)
+          throw exception;
+        else if (output != null)
+          return output;
+      }
+      //should probably mark th somehow so it doesn't try to set any values once it times out
+      th = null;
+      throw new IOException("Timeout exceeded");
+    }
   }
 
 
@@ -190,18 +190,19 @@ public class DownloadThread extends Thread {
         //0 second timeout for the impatient
         long timeout = 60000;
         TimeoutWorker worker = new TimeoutWorker((Object) url) {
-        	public void run() {
-        		try {
-        			URLConnection conn = ((URL)input).openConnection();
-        			conn.connect();
-        			Vector v = new Vector();
-        			v.add(conn);
-        			v.add(new Integer(conn.getContentLength()));
-					setOutput(v);
-        		} catch(IOException e) {
-        			setException(e);
-        		}
-        	}
+          public void run() {
+            try {
+              URLConnection conn = ((URL) input).openConnection();
+              conn.connect();
+              Vector v = new Vector();
+              v.add(conn);
+              v.add(new Integer(conn.getContentLength()));
+              setOutput(v);
+            }
+            catch (IOException e) {
+              setException(e);
+            }
+          }
         };
         URLConnection conn;
         Integer intContentLength;
@@ -216,11 +217,11 @@ public class DownloadThread extends Thread {
         }
         //get rid of the problem where tracks are downloaded but in reality they are 404 messages or some other html crud
 		String contentType = conn.getContentType();
-		if(contentType.indexOf("text") != -1) {
-			track.setBroken();
-			track.setRating(0);
-			return;
-		}
+        if (contentType.indexOf("text") != -1) {
+          track.setBroken();
+          track.setRating(0);
+          return;
+        }
 
         worker = null;
         int contentLength = intContentLength.intValue();
@@ -356,6 +357,6 @@ public class DownloadThread extends Thread {
     if (noOfUnrated >= autoDownload) 
       setState(noOfUnrated + " unrated track" + (noOfUnrated == 1 ? "" : "s"));
     else
-      go();      
+      go();
   }
 }

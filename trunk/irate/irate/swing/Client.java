@@ -132,7 +132,6 @@ public class Client extends JFrame {
         downloadThread.checkAutoDownload();
       }
     });
-    downloadThread.start();
     getContentPane().add(downloadPanel, BorderLayout.SOUTH);
 
       // Add a close action listener.
@@ -143,6 +142,7 @@ public class Client extends JFrame {
     });
 
     setJMenuBar(createMenuBar());
+    downloadThread.start();
   }
 
   public URL getResource(String s) {
@@ -157,7 +157,21 @@ public class Client extends JFrame {
   }
 
   public void actionDownload() {
-    downloadThread.go();
+    if (trackDatabase.hasRatedEnoughTracks())
+      downloadThread.go();
+    else
+      errorDialog.showURL(getResource("help/notenoughratings.html"));
+  }
+
+  public void actionSetContinuousDownload(boolean state) {
+    if (trackDatabase.hasRatedEnoughTracks()) {
+      menuItemContinuousDownload.setState(state);
+      downloadThread.setContinuous(state);
+      downloadThread.go();
+    }
+    else {
+      errorDialog.showURL(getResource("help/notenoughratings.html"));
+    }
   }
 
   public void actionClose() {
@@ -182,12 +196,6 @@ public class Client extends JFrame {
 
   public void actionAbout() {
     errorDialog.showURL(getResource("help/about.html"));
-  }
-
-  public void actionSetContinuousDownload(boolean state) {
-    menuItemContinuousDownload.setState(state);
-    downloadThread.setContinuous(state);
-    downloadThread.go();
   }
 
   public JMenu createActionMenu() {
@@ -248,10 +256,10 @@ public class Client extends JFrame {
     
     JMenu m = new JMenu("Auto download");
     ButtonGroup bg = new ButtonGroup();
-    int counts[] = new int[] {0, 5, 11, 17, 23, 29};
+    int counts[] = new int[] {0, 3, 5, 11};
     for (int i = 0; i < counts.length; i++) {
       final int count = counts[i];
-      JCheckBoxMenuItem mi = new JCheckBoxMenuItem(count == 0 ? "Disabled" : "Every " + count + " plays");
+      JCheckBoxMenuItem mi = new JCheckBoxMenuItem(count == 0 ? "Disabled" : "< " + count + " unrated tracks");
       mi.addActionListener(new ActionListener() {
         public void actionPerformed(ActionEvent e) {
           trackDatabase.setAutoDownload(count);

@@ -7,8 +7,16 @@ import java.util.*;
 import nanoxml.XMLElement;
 
 public class TrackDatabase {
+
+  /** The maximum number of tracks a user is allowed to download before rating 
+   * the minimum number of tracks. */
+  public static final int MAX_NO_OF_UNRATED = 10;
   
-  private int MAX_RATING = 10;
+  /** The minimum number of tacks that need to be rated. */
+  public static final int MIN_NO_OF_RATED = 3;
+  
+  /** The highest allowable rating. */
+  public static final int MAX_RATING = 10;
   
   private final String docElementName = "TrackDatabase";
   private final String trackElementName = "Track";
@@ -448,12 +456,20 @@ public class TrackDatabase {
   
   public int getNoOfUnrated() {
     Track[] tracks = getTracks();
-    List list = new Vector();
     int noOfUnrated = 0;
     for (int i = 0; i < tracks.length; i++)
       if (!tracks[i].isRated())
         noOfUnrated++;  
     return noOfUnrated;  
+  }
+  
+  public int getNoOfRated() {
+    Track[] tracks = getTracks();
+    int noOfRated = 0;
+    for (int i = 0; i < tracks.length; i++)
+      if (tracks[i].isRated())
+        noOfRated++;  
+    return noOfRated;  
   }
   
   private int compare(Track track0, Track track1) {
@@ -466,5 +482,9 @@ public class TrackDatabase {
       if (track.isHidden()) 
         track.erase();
     }
+  }
+  
+  public boolean hasRatedEnoughTracks() {
+    return getNoOfTracks() < MAX_NO_OF_UNRATED || getNoOfRated() >= MIN_NO_OF_RATED;
   }
 }

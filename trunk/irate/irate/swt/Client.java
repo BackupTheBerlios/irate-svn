@@ -577,7 +577,10 @@ public class Client implements UpdateListener, PluginApplication {
     item1_1.setText("Download");
     item1_1.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        downloadThread.go();
+        if (trackDatabase.hasRatedEnoughTracks())
+          downloadThread.go();
+        else
+          errorDialog.show(getResource("help/notenoughratings.html"));
       }
     });    
     
