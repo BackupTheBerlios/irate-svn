@@ -124,6 +124,9 @@ public class DownloadThread extends Thread {
         percentComplete = 0;
       }
     }
+    catch (FileNotFoundException fnfe) {
+      currentTrack.setBroken();
+    }
     catch (IOException e) {
       e.printStackTrace();
     }
@@ -154,6 +157,17 @@ public class DownloadThread extends Thread {
       String errorCode = reply.getErrorCode();
       if (errorCode.length() != 0)
         handleError(errorCode, reply.getErrorURLString());
+    }
+    catch (UnknownHostException uhe) {
+      handleError("nohost", "hostnotfound.html");
+    }
+    catch (ConnectException ce) {
+      if (ce.getMessage().equals("Connection timed out"))
+        handleError("conntimeout", "connectiontimeout.html");
+      else if (ce.getMessage().equals("Connection refused"))
+        handleError("connrefused", "connectionrefused.html");
+      else
+        handleError("conntimeout", "connectionfailed.html");
     }
     catch (IOException e) {
       e.printStackTrace();
