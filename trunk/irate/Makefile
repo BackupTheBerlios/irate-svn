@@ -88,6 +88,13 @@ irate-server.o:irate/server/*.java
 deb:
 	dpkg-buildpackage -b -rfakeroot
 
+setup.exe: $(IRATE_CLIENT)
+	iscc irate-client.iss
+	mv Output/setup.exe .
+
+tarball: $(IRATE_CLIENT)
+	bin/mktarball.sh
+
 clean:
-	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o
+	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o setup.exe -R irate-linux-i586*
 	$(MAKE) -C lib clean
