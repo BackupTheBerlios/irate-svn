@@ -15,6 +15,7 @@ public class MarsyasPlugin
   extends Plugin
   implements TrackLifeCycleListener
 {
+  private boolean scannedTracks = false;
   /**
    * Get a short identifier for this Plugin.
    */
@@ -90,20 +91,24 @@ public class MarsyasPlugin
       // If robo-jock is running, it will be calculating during robo-jock's
       // announcement.
     check(track);
+    
+    //once everything is loaded, crunch through the trackdb
+    if(!scannedTracks) {
+    	Track t[] = getApp().getTracks();
+    	for(int i=0;i<t.length;i++) {
+    		check(t[i]); 			
+    	}
+    }
   }
 
+  /** CHeck if the track needs to be processed by marsyas */
   private void check(Track track)
   {
-  	System.err.println("Checking "+track);
+  	//System.err.println("Checking "+track);
       // If we don't know how loud it is, queue it to be processed.
-  /*  if (track.getProperty("loudness") == null) {
-      try {
-        bgHowLoud.queue(track);
-      }
-      catch (FileNotFoundException e) {
-        System.err.println("auto-normalize: Warning - File not found when trying to determine loudness of "+track);
-      }
-    }*/
+    if (track.isRated() && track.getProperty("marsyas") == null) {
+      MarsyasExtractor.processTrack(track);
+    }
   }
 
   

@@ -85,6 +85,11 @@ public interface PluginApplication
    */
   public void saveTrack(Track track, boolean immediate);
 
+  /** 
+   * Get the complete list of tracks
+   * @return array of tracks
+   */
+  public Track[] getTracks();
   /**
    * Add a policy for determining how loud tracks should be played.
    * See VolumeMeister class for more details.

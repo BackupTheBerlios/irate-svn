@@ -476,4 +476,9 @@ public abstract class AbstractClient
   public static boolean isMac() {
     return System.getProperty("os.name").toLowerCase().startsWith("mac os x");
   }
+  
+  /** For providing plugins with track list */
+  public Track[] getTracks() {
+  	return trackDatabase.getTracks();
+  }
 }
