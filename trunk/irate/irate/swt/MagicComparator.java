@@ -40,7 +40,7 @@ class MagicString {
   public int compareTo(MagicString ms) {
     if (f == null) {
       if (ms.f == null)
-        return s.compareTo(ms.s);
+        return s.compareToIgnoreCase(ms.s);
       return 1; 
     }
     if (ms.f == null)
