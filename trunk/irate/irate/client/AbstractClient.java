@@ -497,7 +497,7 @@ public abstract class AbstractClient
   }
   
   public static boolean isWindows() {
-      return System.getProperty("os.name").toLowerCase().startsWith("windows xp");
+      return System.getProperty("os.name").toLowerCase().startsWith("windows");
   }
   
   /** For providing plugins with track list */
