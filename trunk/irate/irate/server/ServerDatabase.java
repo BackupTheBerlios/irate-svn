@@ -20,6 +20,13 @@ public class ServerDatabase extends TrackDatabase {
     super(is);
   }
 
+  public float getProbability(Track track) {
+    if (track.isRated()) 
+      return track.getRating();
+    return 0;
+  }
+  
+/*
   private int getAverageRating() {
     Track[] tracks = getTracks();
     int total = 0;
@@ -44,6 +51,7 @@ public class ServerDatabase extends TrackDatabase {
     }
     return sum;
   }
+*/
 
   public Track randomTrack(Random random) {
     Track[] tracks = getTracks();
@@ -51,5 +59,4 @@ public class ServerDatabase extends TrackDatabase {
       return null;
     return tracks[(random.nextInt() & 0x7fffffff) % tracks.length];
   }
-
 }

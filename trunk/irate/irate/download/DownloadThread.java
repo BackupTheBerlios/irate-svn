@@ -56,7 +56,7 @@ public class DownloadThread extends Thread {
     }
   }
 
-  public void handleError(String code, URL url) {
+  public void handleError(String code, String urlString) {
     System.out.println("Server error: " + code);
   }
 
@@ -143,7 +143,7 @@ public class DownloadThread extends Thread {
 
       String errorCode = reply.getErrorCode();
       if (errorCode.length() != 0)
-        handleError(errorCode, reply.getErrorURL());
+        handleError(errorCode, reply.getErrorURLString());
     }
     catch (IOException e) {
       e.printStackTrace();

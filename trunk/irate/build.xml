@@ -14,6 +14,7 @@
   <target name="jar" depends="compile">
     <jar jarfile="irate-client.jar" manifest="META-INF/manifest.irate-client" compress="false">
       <fileset dir="." includes="irate/client/*.class"/>
+      <fileset dir="." includes="irate/client/help/*.html"/>
       <fileset dir="." includes="irate/common/*.class"/>
       <fileset dir="." includes="irate/download/*.class"/>
     </jar>
@@ -30,7 +31,7 @@
   </target>
 
   <target name="tar" depends="jar">
-    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/xercesImpl.jar,irate/xmlParserAPIs.jar,irate/help/*.html"/>
+    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/xercesImpl.jar,irate/xmlParserAPIs.jar"/>
   </target>
 
   <target name="gzip" depends="tar">
@@ -52,9 +53,14 @@
   </target>
 
   <target name="clean">
-    <delete file="**/*.class"/>
-    <delete file="irate-server.jar"/>
-    <delete file="irate-client.jar"/>
-    <delete file="irate-client-installer.exe"/>
+    <delete>
+      <fileset dir="." includes="**/*.class"/>
+      <fileset file="irate-server.jar"/>
+      <fileset file="irate-client.jar"/>
+      <fileset file="irate-client.tar"/>
+      <fileset file="irate-client.tar.gz"/>
+      <fileset file="irate-client.tar.bz2"/>
+      <fileset file="irate-client-installer.exe"/>
+    </delete>
   </target>
 </project>

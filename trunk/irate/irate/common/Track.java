@@ -6,48 +6,53 @@ import org.w3c.dom.*;
 
 public class Track {
 
-  private Element elt;
-
   private final int DEFAULT_RATING = 5;
+  
+  private Element elt;
   
   public Track(Element elt) {
     this.elt = elt;
   }
 
   public String toString() {
-    int ratingValue = getRawRating();
-    String ratingStr = ratingValue < 0 ? "UNRATED" : Integer.toString(getRating());
-    String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ")";
+    String ratingStr = isRated() ? Integer.toString((int) getRating()) : "UNRATED";
+    String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ") ";
+    return getName() + rating;
+  }
+
+  public String getName() {
     String artist = getArtist();
     String title = getTitle();
     if (artist.length() == 0) { 
       if (title.length() == 0)
-        return "?" + rating;
-      return title + rating;
+        return "?";
+      return title;
     }
     if (title.length() == 0)
-      return artist + rating;
-    return artist + " / " + title + rating;
+      return artist;
+    return artist + " / " + title;
   }
 
   /**
    * Return the rating with -1 meaning that it hasn't been rated.
    */
-  private int getRawRating() {
+  private float getRawRating() {
     try {
-      return Integer.parseInt(elt.getAttribute("rating"));
+      return Float.parseFloat(elt.getAttribute("rating"));
     }
     catch (NumberFormatException e) {
     }
-    return -1;
+    return Float.NaN;
   }
 
-  public int getRating() {
-    int rating = getRawRating();
-    if (rating < 0)
-	return DEFAULT_RATING;
-    else
-	return rating;
+  public boolean isRated() {
+    return !Float.isNaN(getRawRating());
+  }
+
+  public float getRating() {
+    if (isRated())
+      return getRawRating();
+    return DEFAULT_RATING;
   }
 
   public int getNoOfTimesPlayed() {
@@ -59,8 +64,12 @@ public class Track {
     return 0;
   }
 
-  public void setRating(int rating) {
-    elt.setAttribute("rating", Integer.toString(rating));
+  public void setRating(float rating) {
+    elt.setAttribute("rating", Float.toString(rating));
+  }
+
+  public void setUnrated() {
+    elt.setAttribute("rating", "");
   }
 
   public void incNoOfTimesPlayed() {
@@ -106,8 +115,8 @@ public class Track {
     elt.setAttribute("file", file.getPath());
   }
 
-  public int getProbability() {
-    int prob = 1000000 * getRating() / (1 + getNoOfTimesPlayed());
+  public float getProbability() {
+    float prob = getRating() / (1 + getNoOfTimesPlayed());
     if (prob < 0)
       return 0;
     return prob;

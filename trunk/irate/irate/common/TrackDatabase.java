@@ -61,13 +61,15 @@ public class TrackDatabase {
     }
   }
 
-  public void add(Track track) {
-    if (getTrack(track) == null) {
-      Track copy = new Track((Element) doc.importNode(track.getElement(), false));
+  public Track add(Track track) {
+    Track copy;
+    if ((copy = getTrack(track)) == null) {
+      copy = new Track((Element) doc.importNode(track.getElement(), false));
       docElt.appendChild(copy.getElement());
       tracks.add(copy);
       hash.put(copy.getKey(), copy);
     }
+    return copy;
   }
 
   public void remove(Track track) {
@@ -231,13 +233,39 @@ public class TrackDatabase {
     return getAttribute("Error", "code");
   }
 
-  public URL getErrorURL() {
-    try {
-      return new URL(getAttribute("Error", "url"));
-    }
-    catch (MalformedURLException e) {
-      e.printStackTrace();
-    }
-    return null;
+  public String getErrorURLString() {
+    return getAttribute("Error", "url");
   }
+  
+  public float getProbability(Track track) {
+    if (track.getFile() == null)
+      return 0;
+    return track.getProbability();
+  }
+      
+  public Track chooseTrack(Random random) {
+    Track[] tracks = getTracks();
+    float[] probs = new float[tracks.length]; 
+
+    float totalProb = 0;
+    for (int i = 0; i < tracks.length; i++) {
+      totalProb += getProbability(tracks[i]);
+      probs[i] = totalProb;
+//      System.out.println(Float.toString(totalProb) + tracks[i]);
+    }
+
+    if (totalProb == 0)
+      return null;
+
+    float rand = Math.abs(random.nextFloat()) * totalProb;
+//    System.out.println("r=" + Float.toString(rand));
+
+    int i;
+    for (i = 0; i < tracks.length - 1; i++) 
+      if (rand < probs[i])
+        break;
+
+    return tracks[i];
+  }
+  
 }

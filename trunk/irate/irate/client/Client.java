@@ -34,6 +34,7 @@ public class Client extends JFrame {
   private DownloadThread downloadThread;
   private DownloadPanel downloadPanel;
   private JMenuItem menuItemDownload;
+  private JMenuItem menuItemAccount;
   private ErrorDialog errorDialog;
  
   public Client() throws Exception {
@@ -45,6 +46,7 @@ public class Client extends JFrame {
     File file = new File("trackdatabase.xml");
     try {
       trackDatabase = new TrackDatabase(file);
+      perhapsDisableAccount();
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -62,10 +64,22 @@ public class Client extends JFrame {
       public void process() {
         menuItemDownload.setEnabled(false);
         super.process();
+        perhapsDisableAccount();
         menuItemDownload.setEnabled(true);
       }
 
-      public void handleError(String code, URL url) {
+      public void handleError(String code, String urlString) {
+        URL url;
+        if (urlString.indexOf(':') < 0)
+          url = getClass().getResource("help/" + urlString);
+        else 
+          try {
+            url = new URL(urlString);
+          }
+          catch (MalformedURLException e) {
+            e.printStackTrace();
+            url = getClass().getResource("help/malformedurl.html");
+          }
         errorDialog.showURL(url);
       }
     };
@@ -91,6 +105,13 @@ public class Client extends JFrame {
     });
   }
 
+  /** Disable the 'Account' settings if the number of tracks is non-zero.
+   * The server gets confused if you already have tracks and you try to create 
+   * access a different account name. */  
+  private void perhapsDisableAccount() {
+    menuItemAccount.setEnabled(trackDatabase.getNoOfTracks() == 0);
+  }
+
   public void actionDownload() {
     downloadThread.go();
   }
@@ -111,13 +132,12 @@ public class Client extends JFrame {
     accountDialog.show();
   }
 
+  public void actionGettingStarted() {
+    errorDialog.showURL(getClass().getResource("help/gettingstarted.html"));
+  }
+
   public void actionAbout() {
-    try {
-      errorDialog.showURL(new URL("file:help/about.html"));
-    }
-    catch (MalformedURLException e) {
-      e.printStackTrace();
-    }
+    errorDialog.showURL(getClass().getResource("help/about.html"));
   }
 
   public JMenu createActionMenu() {
@@ -143,18 +163,25 @@ public class Client extends JFrame {
 
   public JMenu createSettingsMenu() {
     JMenu m = new JMenu("Settings");
-    JMenuItem account = new JMenuItem("Account");
-    account.addActionListener(new ActionListener() {
+    menuItemAccount = new JMenuItem("Account");
+    menuItemAccount.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         actionAccount();
       }
     });
-    m.add(account);
+    m.add(menuItemAccount);
     return m;
   }
 
   public JMenu createInfoMenu() {
     JMenu m = new JMenu("Info");
+    JMenuItem gettingStarted = new JMenuItem("Getting started");
+    gettingStarted.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        actionGettingStarted();
+      }
+    });
+    m.add(gettingStarted);
     JMenuItem about = new JMenuItem("About");
     about.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {

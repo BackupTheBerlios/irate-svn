@@ -7,6 +7,12 @@ import java.util.*;
 
 public class MasterDatabase extends ServerDatabase {
 
+    // Add an orphan track one time in n.
+  private final int orphanChance = 10;
+
+    // Add a random track one time in n.
+  private final int randomChance = 25;
+  
   private UserList userList;
   private Random random = new Random();
   private ServerDatabase orphans;
@@ -29,12 +35,12 @@ public class MasterDatabase extends ServerDatabase {
       // If the user doesn't exist or the password is incorrect the return a 
       // blank response.
     if (user == null) {
-      reply.setError("user", "file:help/user.html");
+      reply.setError("user", "user.html");
       return reply;
     }
 
     if (!user.getPassword().equals(request.getPassword())) {
-      reply.setError("password", "file:help/password.html");
+      reply.setError("password", "password.html");
       return reply;
     }
 
@@ -42,34 +48,49 @@ public class MasterDatabase extends ServerDatabase {
     user.update(request);
 
     if (user.getNoOfTracks() * userRate >= getNoOfTracks()) {
-      reply.setError("gotnone", "file:help/getstuffed.html");
+      reply.setError("gotnone", "getstuffed.html");
       return reply;
     }
+
+    if ((random.nextInt() % orphanChance) == 0) {
         // If there are any orphans then we add one here
-    if (orphans == null)
-      orphans = findOrphans();
-    Track track = orphans.randomTrack(random);
-    if (track != null) {
-      System.out.print("Orphan: " + track.toString());
-  
-      user.add(track);
-      reply.add(track);
-      orphans.remove(track);
-    }
-    else { // No orphans so we need to get any track which the user doesn't already have.
-      ServerDatabase spares = getSpares(user);
-      track = spares.randomTrack(random);
+      if (orphans == null)
+        orphans = findOrphans();
+      Track track = orphans.randomTrack(random);
       if (track != null) {
-        System.out.println("Spare: " + track.toString());
+        System.out.println("Orphan: " + track.getName());
+    
         user.add(track);
         reply.add(track);
-      }
-      else {
-        reply.setError("empty", "file:help/empty.html");
-        return reply;
+        orphans.remove(track);
       }
     }
 
+      // See if we can correlate a track
+    ServerDatabase corel = getBest(user);
+    Track track = corel.randomTrack(random);
+    if (track != null) {
+      System.out.println("Correlation: " + track.getName() + " " + track.getRating());
+      user.add(track);
+      reply.add(track);
+    }
+
+      // Do this randomly or if we couldn't correlate
+    if (track == null || (random.nextInt() % randomChance) == 0) {
+        // Just pick any random track that we don't already have
+      ServerDatabase spares = getSpares(user);
+      track = spares.chooseTrack(random);
+      if (track != null) {
+        System.out.println("Random: " + track.getName());
+        user.add(track);
+        reply.add(track);
+      }
+    }
+
+      // If we couldn't find any tracks to add then show a dialog.
+    if (reply.getNoOfTracks() == 0)
+      reply.setError("empty", "empty.html");
+    
       // Save the user database
     try {
       user.save();
@@ -77,7 +98,8 @@ public class MasterDatabase extends ServerDatabase {
     catch (IOException e) {
       e.printStackTrace();
     }
-
+    
+    purge(reply);
     return reply;
   } 
   
@@ -103,5 +125,28 @@ public class MasterDatabase extends ServerDatabase {
       if (user.getTrack(tracks[i]) == null)
         spares.add(tracks[i]);
     return spares;
+  }
+
+  public ServerDatabase getBest(ServerDatabase user) {
+    ServerDatabase best = new ServerDatabase();
+    ServerDatabase[] users = userList.getUsers();
+    TrackAverageRating tar = new TrackAverageRating();
+    for (int i = 0; i < users.length; i++) {
+      if (user != users[i]) {
+        DatabaseCorrelator dc = new DatabaseCorrelator(user, users[i]);
+        dc.process();
+        if (dc.getCorrelation() > 0) {
+          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation());
+          tar.add(dc.getSpares());
+        }
+      }
+    }
+    return tar.getAverages();
+  }
+  
+  public void purge(ServerDatabase db) {
+    Track[] tracks = db.getTracks();
+    for (int i = 0; i < tracks.length; i++) 
+      tracks[i].setUnrated();
   }
 }
