@@ -82,8 +82,8 @@ irate-client.o: $(CLIENT_FILES)
 irate-download.o: irate/download/*.java
 	$(GCJ) -c irate/download/*.java -o irate-download.o
 	
-irate-common.o:irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java
-	$(GCJ) -c irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java -o irate-common.o
+irate-common.o:irate/common/FastTrack.java irate/common/TrackDatabase.java irate/common/Track.java irate/common/UpdateListener.java irate/plugin/*.java irate/plugin/*/*.java
+	$(GCJ) -c $^ -o irate-common.o
 
 irate-server.o:irate/server/*.java
 	$(GCJ) -c irate/server/*.java -o irate-server.o
