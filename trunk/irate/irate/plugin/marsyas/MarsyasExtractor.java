@@ -52,6 +52,10 @@ public class MarsyasExtractor extends Thread{
     
     while(queue.size() > 0) {
       Track track = (Track)queue.remove(0);
+      if(track.getProperty("marsyas") != null) {
+        dbg(track+" already has features in it. skipping");
+        continue;
+      }
       dbg("Extracting features from "+ track+ ". "+queue.size() + " left");
       File wav = new File(path+"out.wav");
       //make sure we arent using a stale file
