@@ -1,5 +1,4 @@
 package irate.client;
-
 /**
  * <p>This handles the contents of the status bar. It has three levels of
  * status messages:</p>
@@ -18,7 +17,7 @@ package irate.client;
  *
  * @author Creator: Robin Sheat
  *
- * $Id: AbstractStatus.java,v 1.2 2004/08/28 11:46:03 blackh Exp $
+ * $Id: AbstractStatus.java,v 1.3 2004/08/31 12:16:44 eythian Exp $
  */
 public abstract class AbstractStatus {
 

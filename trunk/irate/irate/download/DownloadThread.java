@@ -14,6 +14,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
+import java.util.ArrayList;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -32,6 +33,8 @@ public class DownloadThread extends Thread {
   private Vector downloadListeners = new Vector();
   ExponentialBackoffManager exponentialBackoffManager = 
     new ExponentialBackoffManager();
+  private int numThreads=0; // Counts the num of download threads running
+  private ArrayList messageList; // Stores the messages from the threads
     
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
@@ -494,6 +497,47 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
     }
   }
   
+  /**
+   * Registers a new thread starting up, and gives it a unique number
+   * that is used to identify who the status messages are coming
+   * from. The numbers will be reused, but not until
+   * <code>noteDeadThread()</code> is called with that number first.
+   *
+   * @return a unique thread ID number
+   */
+  private int noteNewThread() {
+    int loc=-1;
+    if (messageList == null)
+      messageList = new ArrayList();
+    if (numThreads < messageList.size()) {
+      // Find an empty spot to avoid adding on to it.
+      for (int i=0; i<messageList.size(); i++)
+        if (messageList.get(i) == null) {
+          loc = i;
+          break;
+        }
+      messageList.set(loc,"");
+    } else {
+      messageList.add("");
+      loc = messageList.size()-1;
+    }
+    numThreads++;
+    return loc;
+  }
+
+  /**
+   * Removes a thread from the list of status messages.
+   *
+   * @param t the thread's number to remove
+   */
+  private void noteDeadThread(int t) {
+    messageList.set(t,null);
+    numThreads--;
+    if (numThreads == 0) {
+      messageList = null;
+    }
+  }
+
   /**
    * Get a resource string from the properties file associated with this 
    * class.
