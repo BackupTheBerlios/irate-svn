@@ -547,7 +547,7 @@ public class Track {
     catch (Exception e) {
       e.printStackTrace();
     }		
-    return null;
+    return "";
   }
 
   /**
@@ -578,7 +578,7 @@ public class Track {
     catch (Exception e) {
       e.printStackTrace();
     }		
-    return null;
+    return "";
   }
 
   /**
