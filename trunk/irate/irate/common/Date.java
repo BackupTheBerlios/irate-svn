@@ -3,6 +3,7 @@
  */
 package irate.common;
 
+import java.lang.ref.SoftReference;
 import java.text.DateFormat;
 import java.util.Calendar;
 
@@ -15,13 +16,24 @@ public class Date {
   
   static DateFormat dateFormat = DateFormat.getDateTimeInstance();
   
+  private SoftReference cacheString;
+  
   private Calendar c;
   
   public Date(Calendar c) {
     this.c = c;
   }
-
+  
   public String toString() {
+    String s = cacheString == null ? null : (String) cacheString.get();
+    if (s == null) {
+      s = createString();
+      cacheString = new SoftReference(s);
+    }
+    return s;
+  }
+
+  public String createString() {
     if (c != null) 
       try {
         return dateFormat.format(c.getTime());
