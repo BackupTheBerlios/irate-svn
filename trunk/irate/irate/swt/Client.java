@@ -138,9 +138,8 @@ public class Client extends AbstractClient {
     
     String volumeLevel = Preferences.getUserPreference("volumeLevel");
     if(volumeLevel != null) {
-       volumeScale.setSelection(new Integer(volumeLevel).intValue());
-    setPlayerVolume(
-            VOLUME_OFFSET - volumeScale.getSelection() * VOLUME_RESOLUTION);
+      setVolumeSlider(new Integer(volumeLevel).intValue());
+      setPlayerVolume(getVolumeSlider());
     }
     
     shell.open();
@@ -180,7 +179,7 @@ public class Client extends AbstractClient {
         Preferences.savePreferenceToFile("shellHeight", new Integer(closingSize.y).toString());  
         Preferences.savePreferenceToFile("shellX",new Integer(closingLocation.x).toString());
         Preferences.savePreferenceToFile("shellY",new Integer(closingLocation.y).toString());
-        Preferences.savePreferenceToFile("volumeLevel",new Integer(volumeScale.getSelection()).toString());
+        Preferences.savePreferenceToFile("volumeLevel",new Integer(getVolumeSlider()).toString());
     } catch (IOException io) {}
     super.quit();
   }
@@ -1158,12 +1157,11 @@ public class Client extends AbstractClient {
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(2);
     volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
-    volumeScale.setSelection(VOLUME_OFFSET / VOLUME_RESOLUTION);
+    setVolumeSlider(0);
     volumeScale.setToolTipText(Resources.getString("slider.volume.tooltip"));
     volumeScale.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        setPlayerVolume(
-          VOLUME_OFFSET - volumeScale.getSelection() * VOLUME_RESOLUTION);
+        setPlayerVolume(getVolumeSlider());
       }
     });
     gridData = new GridData();
@@ -1243,8 +1241,23 @@ public class Client extends AbstractClient {
   */
   
   
+  public int getVolumeSlider() {
+    int volume;
+    if (isMac())
+      volume = VOLUME_OFFSET - (VOLUME_SPAN - volumeScale.getSelection()) * VOLUME_RESOLUTION;
+    else
+      volume = VOLUME_OFFSET - volumeScale.getSelection() * VOLUME_RESOLUTION;
+    //System.out.println("getVolumeSlider: " + volume + " dB");
+    return volume;
+  }
 
- 
+  public void setVolumeSlider(int volume) {
+    //System.out.println("setVolumeSlider: " + volume + " dB");
+    if (isMac())
+      volumeScale.setSelection((VOLUME_SPAN - VOLUME_OFFSET + volume) / VOLUME_RESOLUTION);
+    else
+      volumeScale.setSelection((VOLUME_OFFSET - volume) / VOLUME_RESOLUTION);
+  }
   
   
   public void createTrayItem() {
