@@ -82,12 +82,16 @@ public class TrackDatabase {
     }
   }
 
-  public void remove(Track track) {
+  public boolean remove(Track track) {
+    track = getTrack(track);
+    if (track == null)
+      return false;
     synchronized (this) {
       docElt.removeChild(track.getElement());
       tracks.remove(track);
       hash.remove(track.getKey());
     }
+    return true;
   }
   
   public Track[] getTracks() {
@@ -317,10 +321,12 @@ public class TrackDatabase {
       add(tracks[i]);
   }
 
-  public void remove(TrackDatabase trackDatabase) {
+  public boolean remove(TrackDatabase trackDatabase) {
+    boolean removed = false;
     Track[] tracks = trackDatabase.getTracks();
     for (int i = 0; i < tracks.length; i++) 
-      remove(tracks[i]);
+      removed |= remove(tracks[i]);
+    return false;
   }
 
   public void setPlayer(String path) {

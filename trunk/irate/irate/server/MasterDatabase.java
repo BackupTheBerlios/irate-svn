@@ -19,7 +19,7 @@ public class MasterDatabase extends ServerDatabase {
   private final int correlateNoOfTracks = 4;
 
     /** The number of peer tracks to start with. */
-  private final int initialPeerTracks = 7;
+  private final int initialPeerTracks = 8;
 
     /** The number of peer tracks to download before switching to random. */
   private final int peerThreshhold = 14;
@@ -47,6 +47,7 @@ public class MasterDatabase extends ServerDatabase {
       // Find the orphans
     System.out.println("Finding orphans");
     orphans = findOrphans();
+    System.out.println(orphans.getNoOfTracks() + " orphans");
   }
   
   public ServerDatabase processRequest(ServerDatabase request) {
@@ -102,7 +103,7 @@ public class MasterDatabase extends ServerDatabase {
 
         // See if we can correlate a track
       ServerDatabase corel = getBest(user);
-      for (int i = reply.getNoOfTracks(); i < correlateNoOfTracks; i++) {
+      for (int i = 0; i < correlateNoOfTracks; i++) {
         Track track = corel.chooseTrack(random);
         if (track != null) {
           System.out.println("Correlation: " + track.getName() + " " + track.getRating());
@@ -129,15 +130,28 @@ public class MasterDatabase extends ServerDatabase {
         
       // Do this randomly or if we couldn't correlate
     if (reply.getNoOfTracks() == 0 || (random.nextInt() % randomChance) == 0) {
-        // Just pick any random track that we don't already have
-      ServerDatabase spares = getSpares(user);
-      Track track = spares.randomTrack(random);
+      Track track = randomTrack(random);
+      if (track == null || user.getTrack(track) != null) {
+          // Just pick any random track that we don't already have
+        ServerDatabase spares = getSpares(user);
+        track = spares.randomTrack(random);
+      }
       if (track != null) {
         System.out.println("Random: " + track.getName());
         reply.add(track);
       }
     }
 
+      // Search for tracks which the user hasn't downloaded
+    {
+      Track[] tracks = user.getTracks();
+      for (int i = 0; i < tracks.length; i++) {
+        Track track = tracks[i];
+        if (!track.isRated() && track.getFile() != null && !track.isBroken())
+          reply.add(track);
+      }
+    }
+    
       // If we couldn't find any tracks to add then show a dialog.
     if (reply.getNoOfTracks() == 0)
       reply.setError("empty", "empty.html");
@@ -152,13 +166,17 @@ public class MasterDatabase extends ServerDatabase {
       e.printStackTrace();
     }
     
-    orphans.remove(reply);
-    
     return reply;
   } 
   
   public ServerDatabase findOrphans() {
-    ServerDatabase orphans = new ServerDatabase();
+    ServerDatabase orphans = null;
+    try {
+      orphans = new ServerDatabase(new File("orphans.xml"));
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
     Track[] tracks = getTracks();
     ServerDatabase[] users = userList.getUsers();
     for (int i = 0; i < tracks.length; i++) {
@@ -190,7 +208,7 @@ public class MasterDatabase extends ServerDatabase {
         DatabaseCorrelator dc = new DatabaseCorrelator(user, users[i]);
         dc.process();
         if (dc.getCorrelation() > 0) {
-          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation());
+//          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation());
           tar.add(dc.getSpares());
         }
       }

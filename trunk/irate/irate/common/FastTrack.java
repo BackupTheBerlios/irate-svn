@@ -6,19 +6,19 @@ import nanoxml.XMLElement;
 
 public class FastTrack extends Track {
   
-  private URL url;
+  private String key;
   private float rating;
   
   public FastTrack(XMLElement elt, File dir) {
     super(elt, dir);
-    url = super.getURL();
+    key = super.getKey();
     rating = super.getRawRating();
   }
-  
-  public URL getURL() {
-    return url;
-  }
 
+  public String key() {
+    return key;
+  }
+  
   public float getRawRating() {
     return rating;
   }
