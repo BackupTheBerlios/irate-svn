@@ -17,7 +17,7 @@ import nanoxml.XMLElement;
  * settings XML file is written every time a preference is set, and
  * read every time a preference value is looked up.
  *
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class Preferences {
 
@@ -67,7 +67,10 @@ public class Preferences {
   }
 
   public static String getPlayer() {
-    return getUserPreference("Player");
+    String player = getUserPreference("Player");
+    if (player == null)
+      return "";
+    return player;
   }
 
   public static boolean isRoboJockEnabled() {
