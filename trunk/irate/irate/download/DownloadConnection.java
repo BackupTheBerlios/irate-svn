@@ -1,7 +1,6 @@
 /* DownloadConnection.java
- * Intended to be used in DownloadThread, but not used yet.
  *
- * $Id: DownloadConnection.java,v 1.1 2004/02/01 19:51:57 enz Exp $
+ * $Id: DownloadConnection.java,v 1.2 2004/02/12 22:08:09 enz Exp $
  * $Source: /tmp/irate/irate/irate/download/DownloadConnection.java,v $
  */
 
@@ -16,7 +15,7 @@ import java.net.*;
  *  If a timeout happens once, all future function calls will
  *  immediately timeout.
  */
-class DownloadConnection {
+public class DownloadConnection {
 
   public class ResumeNotSupportedException extends IOException {
   }

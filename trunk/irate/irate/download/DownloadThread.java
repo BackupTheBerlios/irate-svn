@@ -129,65 +129,6 @@ public class DownloadThread extends Thread {
     return null;
   }
 
-  private class ChildException extends Exception {
-
-    private Exception e;
-    
-    public ChildException(Exception e) {
-      super(e.toString());
-      this.e = e;
-    }
-
-    public Exception getParent() {
-      return e;
-    }
-  }
-
-  private abstract class TimeoutWorker {
-    private Thread timeoutThread;
-    private Exception exception;
-    private boolean done;
-
-    public TimeoutWorker() {
-    }
-
-    public abstract void run() throws Exception;
-
-    public void runOrTimeout(long timeout) throws Exception {
-      //running thread
-      timeoutThread = Thread.currentThread();
-      //increment..the bigger the less cpu we use...but slower downloads
-      int step = 100;
-      //reset outputs
-      exception = null;
-      done = false;
-      //start thread with a task that might timeout
-      Thread t = new Thread() {
-        public void run() {
-          try {
-            TimeoutWorker.this.run();
-          }
-          catch (Exception e) {
-            e.printStackTrace();
-            TimeoutWorker.this.exception = e;
-          }
-          done = true;
-        }
-      };
-      t.start(); // For gcj-3.0.4 we have to go Thread t = new Thread() { ... }; t.start();
-      while (timeout > 0) {
-        Thread.sleep(step);
-        timeout -= step;
-        if (exception != null)
-          throw new ChildException(exception);
-        if (done)
-          return;
-      }
-      //should probably mark th somehow so it doesn't try to set any values once it times out
-      throw new IOException("Timeout exceeded"); //$NON-NLS-1$
-    }
-  }
-  
   /**
    * Get the file name associated with the given URL. 
    */
@@ -223,154 +164,95 @@ public class DownloadThread extends Thread {
   public void download(final Track track) throws IOException {
     final URL url = getProxyURL(track.getURL());
     System.out.println(url);
-
     final File file = getFileName(url);
-    setState(getResourceString("DownloadThread.Connecting_to") + url.getHost()); //$NON-NLS-1$
-
-    //120 second timeout for the impatient
-    long timeout = 120000;
-      
+    setState(getResourceString("DownloadThread.Connecting_to")
+             + url.getHost());
     try {
-      /*
-       * Open the connection and get the content length.
-       */
-      URLConnection conn;
-      int contentLength;
-      long continueOffset;
-      InputStream inputStream;
-      boolean timedOut = false;
-      try {
-        // These values are returned by the Timeout Worker.
-        final URLConnection[] urlConnectionArray = new URLConnection[1];
-        final Integer[] contentLengthArray = new Integer[1];
-        final Long[] continueOffsetArray = new Long[1];
-        final InputStream[] inputStreamArray = new InputStream[1];
-        new TimeoutWorker() {
-          public void run() throws Exception {
-            URLConnection conn = url.openConnection();
-            conn.connect();
-            contentLengthArray[0] = new Integer(conn.getContentLength());
-            
-            long continueOffset = file.exists() ? file.length() : 0;
-            if (continueOffset != 0) {
-              try {
-                URLConnection resumeConn = url.openConnection();
-                resumeConn.setRequestProperty("Range", "bytes=" + continueOffset + "-"); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-                resumeConn.connect();
-                inputStreamArray[0] = resumeConn.getInputStream();
-                urlConnectionArray[0] = resumeConn;
-                continueOffsetArray[0] = new Long(continueOffset);
-                return;
-              }
-              catch (IOException e) {
-                e.printStackTrace();
-              }
-            }
-              
-            conn = url.openConnection();
-            conn.connect();
-            inputStreamArray[0] = conn.getInputStream();
-            urlConnectionArray[0] = conn;
-            continueOffsetArray[0] = new Long(0);
-          }
-        }.runOrTimeout(timeout);
-        conn = urlConnectionArray[0];
-        contentLength = contentLengthArray[0].intValue();
-        continueOffset = continueOffsetArray[0].longValue();
-        inputStream = inputStreamArray[0];
-      }
-      catch (Exception e) {
-        throw new ChildException(e);
-      }
-      
-      /*
-       * If the file isn't already the right length, then we need to download.
-       */
-      try {
-        /* 
-         * Get rid of the problem where tracks are downloaded but in reality 
-         * they are 404 messages or some other html crud.
-         */
-        String contentType = conn.getContentType();
-        if (contentType.indexOf("text") != -1) //$NON-NLS-1$
-          throw new FileNotFoundException("Content type is Text"); //$NON-NLS-1$
-
-        if (continueOffset != contentLength) {
-          setState(getResourceString("DownloadThread.Downloading") + track.getName()); //$NON-NLS-1$
-          // If the continue offset is non-zero then we open the file in
-          // append mode. If the file on the server is shorter than the one 
-          // we have on disk then we just start again.
-          OutputStream os = new FileOutputStream(file.toString(), continueOffset != 0);
-          final byte buf[] = new byte[128000];
-          int totalBytes = (int)continueOffset;
-          
+      long timeout = 120000;      
+      DownloadConnection connection = new DownloadConnection(url);
+      connection.connect(0, timeout);
+      // Get rid of the problem where tracks are downloaded but in reality
+      // they are 404 messages or some other html crud.
+      String contentType = connection.getContentType();
+      if (contentType.indexOf("text") != -1)
+        throw new FileNotFoundException("Content type is Text");
+      int contentLength = connection.getContentLength();
+      long continueOffset = file.exists() ? file.length() : 0;
+      // If the file isn't already the right length, then we need to download
+      if (continueOffset != contentLength) {
+        boolean resume = false;
+        if (continueOffset > 0) {
+          resume = true;
+          DownloadConnection resumeConnection = null;
           try {
-            final Integer[] nbytesArray = new Integer[1];
-            final InputStream finalInputStream = inputStream;
-            while (true) {
-              try {
-                new TimeoutWorker() {
-                  public void run() throws Exception {
-                    nbytesArray[0] = new Integer(finalInputStream.read(buf));
-                  }
-                }.runOrTimeout(timeout);
-              }
-              catch (Exception e) {
-                timedOut = true;
-                throw new IOException(e.toString());
-              }
-    
-              int nbytes = nbytesArray[0].intValue();
-              if (nbytes < 0)
-                break;
-              os.write(buf, 0, nbytes);
-    
-              if (contentLength >= 0) {
-                totalBytes += nbytes;
-                int percent = totalBytes * 100 / contentLength;
-                if (percent != percentComplete) {
-                  percentComplete = percent;
-                  notifyUpdateListeners();
-                }
+            resumeConnection = new DownloadConnection(url);
+            resumeConnection.connect(continueOffset, timeout);
+            System.out.println("Resuming download (offset="
+                               + continueOffset + ")");
+          }
+          catch (DownloadConnection.ResumeNotSupportedException exception) {
+            System.out.println("Server does not support resuming downloads");
+            resume = false;
+          }
+          if (resume) {
+            try {
+              connection.close(timeout);
+            }
+            catch (IOException e) {
+            }
+            connection = resumeConnection;
+          }
+        }
+        setState(getResourceString("DownloadThread.Downloading")
+                 + track.getName());
+        // If the continue offset is non-zero then we open the file in
+        // append mode. If the file on the server is shorter than the one 
+        // we have on disk then we just start again.
+        OutputStream os = new FileOutputStream(file.toString(), resume);
+        try {
+          final byte buf[] = new byte[128000];
+          int totalBytes = (int)continueOffset;          
+          while (true) {
+            int nbytes = connection.read(buf, timeout);
+            if (nbytes < 0)
+              break;
+            os.write(buf, 0, nbytes);
+            if (contentLength >= 0) {
+              totalBytes += nbytes;
+              int percent = totalBytes * 100 / contentLength;
+              if (percent != percentComplete) {
+                percentComplete = percent;
+                notifyUpdateListeners();
               }
             }
           }
-          finally {
-            os.close();
+        }
+        finally {
+          os.close();
+          try {
+            connection.close(timeout);
           }
-        }
-      }
-      finally {
-        // Seems to be an ugly Java bug in the URLConnection.
-        // If a connection times out (connection lost) and then we attempt to 
-        // close the stream, it blocks -- forever.  Or, until data is available, anyway.
-        // So, in this case, lets not close the stream, as ugly as that is.  It shouldn't happen
-        // all that often.
-        if(!timedOut) {
-          inputStream.close();
-        }
-        else {
-          timedOut = false;
+          catch (IOException exception) {
+          }
         }
       }
       track.setFile(file);
       trackDatabase.save();
     }
     catch (Exception e) {
-      while (e instanceof ChildException) 
-        e = ((ChildException) e).getParent();
       e.printStackTrace();
       if (e instanceof FileNotFoundException) {
         setState("Broken download: " + track.getName()); //$NON-NLS-1$
         currentTrack.setBroken();
       } else
-      if (e instanceof IOException) {
-        setState(getResourceString("DownloadThread.Download_failure") + track.getName()); //$NON-NLS-1$
-        currentTrack.increaseDownloadAttempts();
-      }
-      else {
-        System.out.println("Exception not handled");
-      }
+        if (e instanceof IOException) {
+          setState(getResourceString("DownloadThread.Download_failure")
+                   + track.getName());
+          currentTrack.increaseDownloadAttempts();
+        }
+        else {
+          System.out.println("Exception not handled");
+        }
     }
     finally {
       percentComplete = 0;
