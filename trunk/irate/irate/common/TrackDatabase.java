@@ -430,7 +430,7 @@ public class TrackDatabase {
     List list = new Vector();
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
-      if (!track.isRated() && (toOmit == null || !toOmit.containsKey(track)))
+      if (!track.isRated() && (toOmit == null || !toOmit.containsKey(track)) && track.getFile() != null)
         list.add(track);
     }
     int rand = Math.round(Math.abs(random.nextFloat()) * list.size());
