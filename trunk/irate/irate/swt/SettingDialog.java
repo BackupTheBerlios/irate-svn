@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/05 07:15:58 $
+ * Date Updated: $Date: 2004/01/07 00:02:32 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.15 $
+ * @version $Revision: 1.16 $
  */
 public class SettingDialog
 {
@@ -25,7 +25,7 @@ public class SettingDialog
   public static final int BROWSER_PAGE = 1;	
   private PluginManager pluginManager;
   private boolean done = false;
-  private Shell shell;
+  private BaseDialog dialog;
   private PluginApplication app;
   private TabFolder tabs;
   
@@ -50,7 +50,7 @@ public class SettingDialog
   /** Show prefs window 
   @param display swt display */
   public void open(Display display) {
-    shell.open();
+    dialog.open();
     while (!done) {
       if (!display.readAndDispatch()) display.sleep();
     }
@@ -62,23 +62,23 @@ public class SettingDialog
       e.printStackTrace();
     }
     //should do dispose in a finalyzer
-    shell.dispose();
+    dialog.dispose();
 
   }
 
   /** Creates widgets */
   private void createWidgets(Display display) {
-    shell = new Shell(display);
-    shell.setText(getResourceString("SettingDialog.Title.Settings")); 
-    shell.addShellListener(new ShellAdapter() {
+    String title = getResourceString("SettingDialog.Title.Settings"); 
+    dialog = new BaseDialog(display, title);
+    dialog.addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           done=true;
         }
       });
     GridLayout layout = new GridLayout(1, false);
-    shell.setLayout(layout);
+    dialog.mainComposite.setLayout(layout);
     
-    tabs = new TabFolder(shell, SWT.NONE);
+    tabs = new TabFolder(dialog.mainComposite, SWT.NONE);
     //Pluginpage
     TabItem tabItem = new TabItem(tabs, SWT.NONE);
     tabItem.setText(getResourceString("SettingDialog.TabItem.Plugins")); 
@@ -88,24 +88,21 @@ public class SettingDialog
     tabItem.setControl(createBrowserPage(tabs));
     tabs.pack();
 
-    Button ok = new Button(shell, SWT.NONE);
-    ok.setText(getResourceString("SettingDialog.Button.Close")); 
-    
-    //gd.horizontalSpan = 2;
-    ok.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+    Button ok =
+      dialog.addButton(getResourceString("SettingDialog.Button.Close"));
     ok.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
           try {
             Preferences.savePreferenceToFile("browser", browser); 
           } catch (IOException ioe) {
             ioe.printStackTrace();
-            shell.close();
+            dialog.close();
           }
-          shell.close();
+          dialog.close();
         }
       });
     
-    shell.pack();    
+    dialog.pack();    
   }
   
   private Composite createPluginPage(Composite parent) {
@@ -255,7 +252,7 @@ public class SettingDialog
     
     browseButton.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
-          FileDialog fd = new FileDialog(shell, SWT.OPEN);
+          FileDialog fd = new FileDialog(dialog, SWT.OPEN);
           fd.setText(getResourceString("SettingDialog.FileDialog.Text")); 
           fd.open();
           if (!fd.getFileName().equals("")) { 
@@ -278,3 +275,10 @@ public class SettingDialog
   }
  
 }
+
+// Local Variables:
+// c-file-style:"gnu"
+// c-basic-offset:2
+// indent-tabs-mode:nil
+// tab-width:4
+// End:
