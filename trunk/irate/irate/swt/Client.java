@@ -345,7 +345,8 @@ public class Client extends AbstractClient {
 
     try {
       shell.setImage(Resources.getIconImage(display));
-    } catch(Exception e) {
+    } 
+    catch(IOException e) {
       System.out.println("Couldn't load the silly Icon");
     }
       shell.addShellListener(new ShellAdapter() {

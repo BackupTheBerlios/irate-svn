@@ -12,6 +12,7 @@ import java.util.Random;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.*;
@@ -20,10 +21,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/01/22 02:08:08 $
+ * Date Updated: $Date: 2004/02/02 06:26:26 $
  * @author Creator:	taras
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -59,7 +60,12 @@ public class AccountDialog {
     this.downloadThread = downloadThread;
     this.display = display;
 
-    shell.setImage(Resources.getIconImage(display));
+    try {
+      shell.setImage(Resources.getIconImage(display));
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
     shell.setText(getResourceString( "AccountDialog.Title.Account_Settings"));
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
@@ -76,7 +82,14 @@ public class AccountDialog {
     group.setText("Introduction");
     group.setLayout(new GridLayout(2, false));
     Label lblIcon = new Label(group, SWT.NONE);
-    lblIcon.setImage(Resources.getIconImage(display));
+    try {
+      Image image = Resources.getIconImage(display);
+      image.setBackground(lblIcon.getBackground());
+      lblIcon.setImage(image);
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
     Label label = new Label(group, SWT.NONE);
 //    txt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL));
     label.setText(getResourceString("AccountDialog.Intro"));
@@ -193,7 +206,14 @@ public class AccountDialog {
   private void createStatus(Composite composite) {
     composite.setLayout(new GridLayout(2, false));
     Label lblIcon = new Label(composite, SWT.NONE);
-    lblIcon.setImage(Resources.getIconImage(display));
+    try {
+      Image image = Resources.getIconImage(display);
+      image.setBackground(lblIcon.getBackground());
+      lblIcon.setImage(image);
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
     lblStatus = new Label(composite, SWT.NONE);
     lblStatus.setText("status goes here");
   }

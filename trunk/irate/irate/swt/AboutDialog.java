@@ -46,13 +46,12 @@ public class AboutDialog {
   }
 
   private void createIcon() {
-    icon = null;
     try {
-      InputStream stream = BaseResources.getResourceAsStream("icon.gif");
-      ImageData imageData = new ImageData(stream); 
+      ImageData imageData = Resources.getIconImageData(); 
       icon = new Image(display, imageData.scaledTo(32, 32));
     }
     catch (IOException e) {
+      e.printStackTrace();
     }
   }
   
