@@ -95,6 +95,18 @@ It's XML-RPC (www.xmlrpc.org). There are libraries for
 almost every language out there, so we'll hopefully see
 new irate-enabled software, websites, whatever.
 
+The protocol reference has been moved to :
+
+http://www.kallisti.net.nz/IrateDev/XmlRpc
+
+A sample implementation is available in SVN in the module
+irate-webclient.
+
+
+
+--outdated--
+
+
 A pseudo-code client is included at the end of the README.
 
 

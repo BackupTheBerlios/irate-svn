@@ -45,7 +45,7 @@ function irate_server($options="") {
 
 
  if (DB::isError($this->db)) {
-  die ($this->db->getMessage());
+  $this->error(1,$this->db->getMessage());
  }
 			 
 
@@ -64,12 +64,18 @@ function irate_server($options="") {
 
  $this->xmlrpc=new XML_RPC_Server($DispMap, 0);
 
- $this->db->query("");
+}
+
+
+// for use in irate.extended.php
+function extendedService() {
 
 }
 
 
 function service() {
+
+ $this->extendedService();
 
  if (empty($this->VARS["m"])) {
   $this->xmlrpc->service();
@@ -96,17 +102,41 @@ function service() {
 
 
 
-function error($code) {
+function error($code,$desc="") {
 
  global $XML_RPC_erruser; // import user errcode value
 
- $error= new XML_RPC_Response(0, $XML_RPC_erruser+1, // user error 1
-            $code);
+
+ //definition of error strings
+ $str=array(
+  1=>$desc,
+  2=>"MUST_LOGIN",
+  3=>"UNKNOWN_USER",
+  4=>"USER_NOT_ADMIN",
+  5=>"WRONG_PASSWORD", 
+  6=>"USER_ALREADY_EXISTS",
+  7=>"REGISTERING_NOT_ALLOWED",
+  10=>"TRACK_NOT_FOUND",
+  11=>"RATING_MISSING",
+  12=>"BAD_INPUT"
+
+ );
+
+
+
+
+
+
+
+
+
+ $error= new XML_RPC_Response(0, $XML_RPC_erruser+$code,$str[$code]);
 
 
   //quite dirty todo
  $payload = "<?xml version=\"1.0\"?>\n" .
             $error->serialize();
+
         header('Content-Length: ' . strlen($payload));
         header('Content-Type: text/xml');
         print $payload; 
@@ -193,7 +223,7 @@ function getNew($number,$include_random=true,$min_old_weight=1) {
 function requireAdmin() {
  
  if ($this->user["user"]=!"admin") {
-  $this->error("USER_NOT_ADMIN");
+  $this->error(4);
  }
 
 }
@@ -202,24 +232,24 @@ function requireAdmin() {
 function requireAuth() {
 
 
- $u=$this->VARS["u"];
- $h=$this->VARS["h"];
+ $u=$_SERVER["PHP_AUTH_USER"];
+ $h=$_SERVER["PHP_AUTH_PW"];
 
  if (empty($u) OR empty($h)) {
-  $this->error("MUST_LOGIN");
+  $this->error(2);
  }
  
  $user=$this->db->getRow("SELECT * FROM irate_users WHERE user=?",array($u));
 
  if (empty($user)) {
-  $this->error("UNKNOWN_USER");
+  $this->error(3);
  }
 
  if (sha1("irate".sha1($user["pass"]))==$h) {
   $this->user=$user;
   $this->db->query("UPDATE irate_users SET datelastlogin=now() WHERE user=?",array($u));
  } else {
-  $this->error("WRONG_PASSWORD");
+  $this->error(4);
  }
 
 }
@@ -277,8 +307,13 @@ function findTrackID($params) {
   if (!empty($params["hash_sha1"])) {
    $params["id"]=$this->db->getOne("SELECT trackid FROM irate_distributions WHERE hash_sha1=!",array($params["hash_sha1"]));
   }
+  
+//todo link+protocol
 
+ }
 
+ if (empty($params["id"])) {
+  $this->error(10);
  }
 
  return $params;
@@ -291,10 +326,6 @@ function findTrackID($params) {
 function unrateOne($params) {
 
  $params=$this->findTrackID($params);
-
- if (empty($params["id"])) {
-  $this->error("TRACK_NOT_FOUND");
- }
 
  $this->db->query("DELETE FROM irate_ratings WHERE userid=? AND trackid=?",array($this->user["id"],$params["id"]));
 
@@ -309,12 +340,8 @@ function rateOne($params) {
   $params=$this->findTrackID($params);
 
 
- //if still no ID, bark.
- if (empty($params["id"])) {
-  $this->error("TRACK_NOT_FOUND");
- }
  if (empty($params["rating"])) {
-  $this->error("RATING_MISSING");
+  $this->error(11);
  }
  if (empty($params["weight"])) {
   $params["weight"]=1;
@@ -379,11 +406,30 @@ function addTrack($data) {
   $id=($id*10)+1; //-1 for server-specific
 
  }
-  
+
+ if ($this->db->query("SELECT 1 FROM irate_tracks WHERE id=!",array($id))) {
+  $this->updateTrack($id,$data);
+ } else {
+
   $q=$this->db->query("INSERT INTO irate_tracks(id,artistname,duration,pubdate,albumname,license,trackname,adddate,crediturl) VALUES (?,?,?,?,?,?,?,now(),?)",array($id,$data["artistname"],$data["duration"],$data["pubdate"],$data["albumname"],$data["license"],$data["trackname"],$data["crediturl"]));
+}
 
   return $id;
  
+
+}
+
+function updateTrack($id,$data) {
+
+ $this->db->query("UPDATE irate_tracks SET artistname=?,duration=?,pubdate=?,albumname=?,license=?,trackname=?,crediturl=? WHERE id=!",array(
+ $data["artistname"],
+ $data["duration"],
+ $data["pubdate"],
+ $data["albumname"],
+ $data["license"],
+ $data["trackname"],
+ $data["crediturl"],
+ $id));
 
 }
 
@@ -479,6 +525,17 @@ function getTrackXMLRPC($params) {
 
 }
 
+function getTrackXMLRPCbyArray($arr) {
+
+ $a=array();
+ for ($i=0;$i<count($arr);$i++) {
+  $a[$i]=$this->getTrackXMLRPC($arr[$i]);
+ }
+
+ return new XML_RPC_Value($a,"array");
+
+}
+
 function getTrackXMLRPCbyIDs($ids) {
 
  $a=array();
@@ -564,7 +621,7 @@ if ($cfg["allow_registering"]) {
 
 
 if ($IRS->db->getOne("SELECT 1 FROM irate_users WHERE user=?",array($username->scalarval()))) {
- $IRS->error("USER_ALREADY_EXISTS");
+ $IRS->error(6);
 }
 
 
@@ -573,7 +630,7 @@ $IRS->db->query("INSERT INTO irate_users(id,user,pass,dateinscr,datelastlogin,ip
 return new XML_RPC_Response(new XML_RPC_Value("OK", "string"));
 
 } else {
-$IRS->error("REGISTERING_NOT_ALLOWED");
+$IRS->error(7);
 }
 
 
@@ -632,20 +689,16 @@ function IRS_xmlrpc_rate($params) {
 
 
 function IRS_xmlrpc_getInfo($params) {
+ global $IRS;
 
  $IRS->requireAuth();
 
  $p=$params->getParam(0);
 
- $ids=array();
+ $r1=XML_RPC_PLN::xmlrpc2php($p);
 
-
- $r2=array();
- while (list($k,$v)=$p->structeach()) {
-  $r2[$k]=$v->scalarval();
- }
-	  
- return new XML_RPC_Response($IRS->getTrackXMLRPC($r2));
+ return new XML_RPC_Response($IRS->getTrackXMLRPCbyArray($r1));
+ 
 
 }
 
@@ -684,7 +737,7 @@ function IRS_xmlrpc_getNew($params) {
  $num=$p->structmem("n");
 
  if (empty($num) OR !preg_match("/^[0-9]+$/",$num->scalarval())) {
-  $IRS->error("BAD_INPUT");
+  $IRS->error(12);
  }
  
  $ids=$IRS->getNew($num->scalarval());
