@@ -165,13 +165,13 @@ public class TrackTable {
       if (!track.isHidden()) 
         listOfTracks.add(track);
     }
+    comparator.setDirection(!comparator.direction);
     load();
   }
   
   /** Sorts the table and loads it into the Table (displays it). */
   private void load() {
     // Sort first
-    comparator.setDirection(!comparator.direction);
     Collections.sort(listOfTracks, comparator);
     
     System.out.println("TrackTable: Resizing"); //$NON-NLS-1$
