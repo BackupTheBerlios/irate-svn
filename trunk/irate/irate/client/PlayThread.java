@@ -44,7 +44,7 @@ public class PlayThread extends Thread {
   }
 
   private void playFile(File file) throws Exception {
-    player = playerList.getPlayer(playListManager.getTrackDatabase().getPlayer());
+    player = playerList.getPlayer(Preferences.getPlayer());
     try {
       player.setVolume(netVolume);
       player.play(file);
