@@ -87,7 +87,8 @@ public class TrackDatabase {
         docElt.addChild(copy.getElement());
         tracks.add(copy);
         hash.put(copy.getKey(), copy);
-	copy.setTrackDatabase(this);
+        /*anthony, should we be doing serial stuff to tracks done through this?*/
+        //copy.setTrackDatabase(this);
       }
       return copy;
     }
@@ -340,6 +341,7 @@ public class TrackDatabase {
         tracks.add(track);
         //System.out.println("key="+track.getKey());
         hash.put(track.getKey(), track);
+        track.setTrackDatabase(this);
       }
     }
   }
