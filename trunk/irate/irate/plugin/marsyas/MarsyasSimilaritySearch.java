@@ -26,6 +26,7 @@ import java.util.Vector;
 
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 
 import irate.common.Track;
 import irate.common.TrackDatabase;
@@ -47,6 +48,7 @@ public class MarsyasSimilaritySearch extends Thread  {
   private MarsyasPlugin plugin;
   private MarsyasResultDialog resultDialog = null;
   private String username;
+  private String tmpString;
   LinkedList serverTracks;
   Display display = Display.findDisplay(Thread.currentThread());
   Comparator trackComparator = new Comparator() {
@@ -200,6 +202,17 @@ public class MarsyasSimilaritySearch extends Thread  {
       String line = br.readLine();
       if(!line.substring(0,2).equals("OK")){
         System.err.println("Fatal error on the server: "+line);
+        tmpString = line;
+        display.asyncExec(new Runnable() {
+          public void run() {
+            Shell fake = new Shell(display);
+            MessageBox m = new MessageBox(fake);
+            m.setText("Similarity search failed");
+            m.setMessage("Error on the server:\r\n"+tmpString);
+            m.open();
+          }
+        });        
+        return;
       }
       serverTracks = new LinkedList();
       while((line=br.readLine()) != null){

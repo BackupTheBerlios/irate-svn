@@ -19,8 +19,8 @@ import irate.common.Track;
  */
 public class MarsyasExtractor extends Thread{
   private static MarsyasExtractor me = new MarsyasExtractor();
-  final private String extractCMD = "extract";
-  final private String featureName = "GENRE";
+  final private String extractCMD = "/usr/local/bin/extract";
+  final private String featureName = "SVMFCC";
   private Vector queue = new Vector();
   
   private MarsyasExtractor() {
@@ -59,13 +59,17 @@ public class MarsyasExtractor extends Thread{
       
       try {
         Process p = Runtime.getRuntime().exec(new String[]{"madplay","--mono","--sample-rate","22050","--output","wav:" + wav.getAbsolutePath(), track.getFile().getAbsolutePath()});
-        p.waitFor();
+        int ret = p.waitFor();
+        if(ret != 0) {
+          dbg("Madplay failed to convert "+track + " with code "+ret);
+          return;
+        }
       } catch (Exception e) {
         err("Failed to convert "+track+" mp3 to wav");
         e.printStackTrace();
         return;
       }
-      
+      dbg("Madplay produced "+wav);
       if(!wav.exists()) {
         err("Madplay didn't listen to me");
         continue;
@@ -73,35 +77,25 @@ public class MarsyasExtractor extends Thread{
       
       try {
         //run extract GENRE out.wav
-        String line;
-        Process p = Runtime.getRuntime().exec(new String[]{extractCMD, featureName, wav.getAbsolutePath()}, null, dir);
+        Process p = Runtime.getRuntime().exec(new String[]{extractCMD,"-e",featureName, wav.getAbsolutePath()}, null, dir);
         BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        //consume output...stupid java doesn't let extract finish otherwise 
-        while(null != (line=br.readLine())) {
-          if(line.substring(0,7).equals("Problem")) {
-            err("Detected a problem with the feature extractor");
-            p.destroy();
-            continue;
-          }
+        String features = br.readLine();
+        br.close();
+//      replace tabs with commas and remove trailing comma
+        if(features.length()!=0) {	
+          features = features.replace('\t',',');
+          features = features.substring(0,features.length()-1);
         }
         
-        File genreFile = new File(path + "out.GENRE.mff");
-        LineNumberReader ln = new LineNumberReader(new FileReader(genreFile));
-        
-        //line #7 of the feature file contains the needed data
-        while(null != (line=ln.readLine())){
-          if(ln.getLineNumber()==7)
-            break;
+        int ret = p.waitFor();
+        if(ret != 0)
+        {
+          dbg("extract failed for "+track+" with error code "+ret + "and output '"+features+"'");
+          return;
         }
-        ln.close();
-        genreFile.delete();
-        //replace tabs with commas and remove trailing comma
-        if(line.length()!=0) {	
-          line = line.replace('\t',',');
-          line = line.substring(0,line.length()-1);
-        }
-        dbg("Features are:"+line);
-        track.setProperty("marsyas",line);
+        dbg("Features are:"+features);
+        track.setProperty("marsyas", features);
+     
       } catch (Exception e) {
         err("Failed to process "+track);
         track.setProperty("marsyas","failed");
@@ -109,7 +103,6 @@ public class MarsyasExtractor extends Thread{
         
         return;
       }
-      
       wav.delete();
     }
     
