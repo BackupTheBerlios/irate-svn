@@ -58,21 +58,27 @@ public class Speech {
     if (!supported)
       return;
     
-    startSynthProcess();
+    try {
+      startSynthProcess();
 
-    while (is.available() > 0)
-      getch();
-    
-//    System.out.println(s);
-    os.write((s + "\n").getBytes());
-    os.flush();
+      while (is.available() > 0)
+	getch();
+      
+  //    System.out.println(s);
+      os.write((s + "\n").getBytes());
+      os.flush();
 
-    while (true)
-      if (getch() == '>')
-        if (getch() == ' ')
-          break;
-   
-//    System.out.println();
+      while (true)
+	if (getch() == '>')
+	  if (getch() == ' ')
+	    break;
+     
+  //    System.out.println();
+    }
+    catch (IOException e) {
+      abort();
+      throw e;
+    }
   }
 
   public synchronized void abort() {
