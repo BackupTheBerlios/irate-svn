@@ -1,23 +1,34 @@
-GCJ = gcj
-all: libswt.a libnanoxml-lite.a 
-export CLASSPATH=libswt-pi.jar
+GCJ=gcj -g -pipe -march=i586 -mcpu=i586 -O2
+
+all: libswt.o libnanoxml-lite.o 
 
 #libswt.so:libswt.o
 #	gcj -shared -o libswt.so libswt.o
 #libswt-pi.a:libswt-pi.o 
 #	ar -rcs libswt-pi.a libswt-pi.o
-libswt.a:libswt.o 
-	ar -rcs libswt.a libswt.o
-libswt.o: swt.jar  libswt-pi.o
-	$(GCJ) -classpath swt-pi.jar -fjni -o libswt.o -march=i586 -mcpu=i586 -Os -pipe -c  swt.jar 
+#libswt.a:libswt.o 
+#	ar -rcs libswt.a libswt.o
+swt.jar:
+ifeq ($(PLATFORM),linux-motif)
+	unzip swt-2.1-motif-linux.zip		
+else
+	echo Unknown PLATFORM $(PLATFORM), please specify on commandline && exit 1 
+endif
+
+swt-pi.jar:
+ifeq ($(PLATFORM),linux-gtk2)
+	unzip swt-2.1.1-linux-gtk.zip
+else
+	echo Unknown PLATFORM $(PLATFORM), please specify on commandline && exit 1 
+endif
+
+libswt.o: swt.jar
+	$(GCJ) -classpath swt-pi.jar -fjni -o libswt.o -c  swt.jar 
 libswt-pi.o: swt-pi.jar
-	$(GCJ) -classpath swt.jar -fjni -o libswt-pi.o -march=i586 -mcpu=i586 -Os -pipe -c  swt-pi.jar
-#	$(GCJ) -classpath swt-pi.jar -fjni -o libswt.o -march=i586 -mcpu=i586 -Os -pipe -c  swt.jar 
-#libswt-pi.o: swt-pi.jar
-#	$(GCJ)  -fjni -o libswt-pi.o -march=i586 -mcpu=i586 -Os -pipe -c swt-pi.jar
+	$(GCJ) -classpath swt.jar -o libswt-pi.o -c  swt-pi.jar
 libnanoxml-lite.o: nanoxml-lite-2.2.3.jar
 	$(GCJ) -o libnanoxml-lite.o -c nanoxml-lite-2.2.3.jar
-libnanoxml-lite.a: libnanoxml-lite.o
-	ar rcs libnanoxml-lite.a libnanoxml-lite.o
+#libnanoxml-lite.a: libnanoxml-lite.o
+#	ar rcs libnanoxml-lite.a libnanoxml-lite.o
 clean:
-	rm -f libswt.so libswt.o libswt.a libnanoxml-lite.o libnanoxml-lite.a
+	rm -f libswt.so libswt.o libswt.a libnanoxml-lite.o libnanoxml-lite.a *.o *.a
