@@ -11,8 +11,8 @@ export GCJ=gcj -g -pipe -O2
 IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
 #export PLATFORM=linux-motif
-#export PLATFORM=linux-gtk2
-export PLATFORM=win32
+export PLATFORM=linux-gtk2
+#export PLATFORM=win32
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:lib/jd3lib.jar
 
@@ -34,10 +34,8 @@ IMAGES_PNG = $(wildcard irate/resources/*.png)
 CLIENT_DEPS += $(IMAGES_GIF:.gif=.gifres.o)
 CLIENT_DEPS += $(IMAGES_PNG:.png=.pngres.o)
 LOCALES = \
-  $(wildcard irate/common/locale*.properties) \
-  $(wildcard irate/download/locale*.properties) \
-  $(wildcard irate/swt/locale*.properties)
-CLIENT_DEPS += $(LOCALES:.properties=.properties.o)  
+  $(shell find irate/ -name '*.properties')
+CLIENT_DEPS += $(LOCALES:.properties=.props.o)  
 TXT_RESOURCES = \
   irate/common/timestamp.txt \
   irate/common/version.txt
@@ -192,7 +190,7 @@ irate-server.o:irate/server/*.java
 %.pngres.o: %.png
 	$(GCJ) -c --resource $^ $^ -o $@
 
-%.properties.o: %.properties	
+%.props.o: %.properties	
 	$(GCJ) -c --resource $^ $^ -o $@
 
 %.txt.o: %.txt
