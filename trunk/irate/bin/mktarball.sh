@@ -1,6 +1,6 @@
 OUT_DIR=irate-linux-i586
 LIB_DIR=$OUT_DIR/lib
-DEPS=`ldd irate-client | sed 's/.* \//\//' | sed 's/ .*//'`
+DEPS=`ldd irate-client | grep libgcj | sed 's/.* \//\//' | sed 's/ .*//'`
 #DOC_DIR=irate/client/help
 #DOCS=`find $DOC_DIR -name '*.txt'`
 
@@ -8,6 +8,7 @@ rm -fR $OUT_DIR
 mkdir -vp $LIB_DIR
 #mkdir -vp $OUT_DIR/$DOC_DIR 
 
+cp -v lib/*so* $LIB_DIR
 cp -v irate-client $LIB_DIR
 for file in $DEPS; do 
 	cp -v $file $LIB_DIR
