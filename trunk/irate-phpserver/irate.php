@@ -307,7 +307,9 @@ function findTrackID($params) {
    $params["id"]=$this->db->getOne("SELECT trackid FROM irate_distributions WHERE hash_sha1=!",array($params["hash_sha1"]));
   }
   
-//todo link+protocol
+  if (!empty($params["protocol"]) AND !empty($params["link"])) {
+   $params["id"]=$this->db->getOne("SELECT irate_distributions.trackid FROM irate_distributions,irate_sources WHERE irate_sources.link=? AND irate_sources.protocol=?",array($params["link"],$params["protocol"]));
+  }
 
  }
 

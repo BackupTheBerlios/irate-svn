@@ -47,6 +47,7 @@ Then you'll need to install some PEAR PHP modules :
 
 # pear install -o XML_RPC DB
 
+allow_url_fopen should also be turned on in php.ini
 
 Copy config.php.SAMPLE to config.php
 
@@ -55,10 +56,6 @@ Then edit config.php, and fix the DSN with your database password.
 You need to put your irate-phpserver somewhere in your apache webroot.
 Additionally, you should have an apache vhost linked to the
 irate-phpserver directory, so that the URL of the server is simple.
-
-
-Then log in as admin to create the admin account.
-
 
 
 
@@ -103,115 +100,19 @@ A sample implementation is available in SVN in the module
 irate-webclient.
 
 
-
---outdated--
-
-
-A pseudo-code client is included at the end of the README.
-
-
-Here are the main things you can do with irate-phpserver :
-
-
-* Connecting
-------------
-
-Just connect to the host where the irate-phpserver is installed.
-
-For instance : 
- server : localhost ; path : myprojects/irate-phpserver/
-
-The port is 80.
-
-
-* Registering
--------------
-
-Of course, registering doesn't need auth. (so don't include ?u=...&h=.... in the address
-for this query, see "Logging in")
-
-XMLRPC function : irate.register
-XMLRPC params : 
- * struct 
-    - username => .....  (irate username)
-    - password => .....  (clear password)
-
-
-The function will return "OK" or an error.
-
-
-
-* Logging in
-------------
-
-The login isn't done via xmlrpc to simplify the protocol.
-
-You have to send the username and a hash of the password.
-
-The hash is : sha1( "irate" . sha1 ( $password ) );
-
-So to connect to irate server, just query the XMLRPC location :
-
-  localhost/myprojects/irate-phpserver/?u=[username]&h=[sha1_hash]
-
-If the login failed, an XMLRPC error will be thrown.
-
-All of the XMLRPC queries have to include these credentials in
-the path of the XMLRPC interface.
-
-
-
-
-* Asking for new tracks
------------------------
-
-
-
-XMLRPC function : irate.getNew
-XMLRPC params :
- * struct
-    - n => 6      (the number of new tracks you want)
-
-
-The function will return an array of new tracks, with a
-struct for each one, describing it and where it can be downloaded,
-and some metadata (artistname, title, crediturl, irate ID, ..)
-
-
-A returned struct will look like this :
-
-
-struct (
- artistname => ... (all strings are UTF8)
- trackname => ...
- license => ...
- albumname => ...
- pubdate => ... (publishing date)
- id => ... (the iRATE ID of the track)
- duration => ... (seconds)
- crediturl => ...
- Distributions => array(
-  0 => struct(
-   codec => ...
-   crediturl => ...
-   filesize => ...
-   hash_sha1 => ...
-   Sources => array(
-    0 => struct(
-     crediturl => ...
-     protocol => ... ("http" mostly)
-     link => ... (download url)
-    )
-   )
-  )
- )
-)
+**********
+Tracks, Distributions and Sources
+*****************
 
 
 
 So we have 3 hierarchical elements : track, distribution and source.
 
+A track is a song. A distribution is a file. A source is a couple (protocol,link).
 
+A track can have multiple distributions (different encodings).
+
+A distribution can have multiple sources (http mirrors, bittorent links, ...)
 
 Each track is given an irate ID by the server.
 
@@ -237,109 +138,13 @@ distribution and then track.
 
 
 
-* Rating tracks
----------------
-
-You can rate multiple track with only one XMLRPC query.
-
-XMLRPC function : irate.rate
-XMLRPC params :
- * array
-    - {rating 1}
-    - {rating 2}
-    - etc....
-
-Each {rating X} is a struct with the following elements :
- - rating => integer (0-10)
- - weight => double (0-1), defaults to 1
- - id => irate ID of the track (optional)
- - hash_sha1 => sha1 hash of the track (optional)
- - protocol => string (http, bittorrent,...) (optional)
- - link => string (where the track was downloaded : http://www.iuma.com/mp3/...) (optional)
-
-
-Please note that id,hash_sha1,protocol and link are needed
-to identify the track you're rating.
-
-id SHOULD be given if you have it.
-
-If you don't (iRATE <0.4 clients), the advice is to send
- protocol="http" and link="http://..."
-
-
-
-
-* Unrating tracks
------------------
-
-You can unset ratings you've done previously.
-
-XMLRPC function : irate.unrate
-XMLRPC params :
- * array
-  - {rating 1}
-  - {rating 2}
-  - etc....
-
-each {rating} is the same as before with irate.rate, but of course
-"rating" and "weight" are not to be set.
-
-
-
-
-* Getting all the ratings back to the client
---------------------------------------------
-
-Get all the ratings the client has already done
-
-XMLRPC function : irate.getRatings
-XMLRPC params : none
-
-
-The server will return an array containing one struct for
-each rating. The struct will be :
-
-struct(
- id => ...
- rating => ...
- weight => ...
-)
-
-
-
-* Errors
---------
-
-The errors will be thrown as XMLRPC errors, with
-a minimal key as description (for instance, "MUST_LOGIN")
-
-
-
-
-* Admin actions
----------------
-
-The user named "admin" is the admin of the server (not kidding)
-
- - To grab all new tracks from LibreDB :
-   Request "?u=admin&h=...&m=grab"
-
-
-
-
-
-
-
-
-
 ****
 Where to test my implementation ?
 *********************************
 
 There's an irate-phpserver running at irate.jamendo.com
 
-irate registration is turned off so you'll need to register at www.jamendo.com (free, easy & quick)
-
+irate registration is turned off so you'll need to register at www.jamendo.com (free, easy & quick) (or use demo/demo)
 
 
 
@@ -355,5 +160,3 @@ feel free to contact the right man, that's to say :
  * irate@jamendo.com : For iRATE-phpserver specific stuff
  * root@localhost : For personal stuff.
 
-
-Ok, EOF :)

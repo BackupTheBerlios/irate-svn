@@ -1,13 +1,13 @@
 -- phpMyAdmin SQL Dump
--- version 2.6.0-pl2
+-- version 2.6.1-rc1
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generation Time: Jan 11, 2005 at 11:48 PM
+-- Generation Time: Feb 27, 2005 at 12:33 PM
 -- Server version: 4.0.22
--- PHP Version: 4.3.9
+-- PHP Version: 4.3.10
 -- 
--- Database: `irate`
+-- Database: `jamendo_live`
 -- 
 
 -- --------------------------------------------------------
@@ -17,8 +17,8 @@
 -- 
 
 CREATE TABLE `irate_distributions` (
-  `trackid` bigint(16) NOT NULL default '0',
-  `id` bigint(16) NOT NULL default '0',
+  `trackid` bigint(16) unsigned NOT NULL default '0',
+  `id` bigint(16) unsigned NOT NULL default '0',
   `codec` varchar(16) NOT NULL default '',
   `crediturl` text NOT NULL,
   `adddate` date NOT NULL default '0000-00-00',
@@ -43,12 +43,27 @@ CREATE TABLE `irate_distributions_seq` (
 -- --------------------------------------------------------
 
 -- 
+-- Table structure for table `irate_items_links`
+-- 
+
+CREATE TABLE `irate_items_links` (
+  `id_from` int(16) unsigned NOT NULL default '0',
+  `id_to` int(16) unsigned NOT NULL default '0',
+  `value` float NOT NULL default '0',
+  KEY `id_from` (`id_from`),
+  KEY `id_to` (`id_to`),
+  KEY `value` (`value`)
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+-- 
 -- Table structure for table `irate_prepare`
 -- 
 
 CREATE TABLE `irate_prepare` (
-  `userid` int(12) NOT NULL default '0',
-  `trackid` bigint(16) NOT NULL default '0',
+  `userid` int(12) unsigned NOT NULL default '0',
+  `trackid` bigint(16) unsigned NOT NULL default '0',
   `date` datetime NOT NULL default '0000-00-00 00:00:00',
   KEY `userid` (`userid`),
   KEY `date` (`date`)
@@ -61,9 +76,9 @@ CREATE TABLE `irate_prepare` (
 -- 
 
 CREATE TABLE `irate_ratings` (
-  `id` int(12) NOT NULL default '0',
-  `trackid` bigint(16) NOT NULL default '0',
-  `userid` int(12) NOT NULL default '0',
+  `id` int(12) unsigned NOT NULL default '0',
+  `trackid` bigint(16) unsigned NOT NULL default '0',
+  `userid` int(12) unsigned NOT NULL default '0',
   `rating` int(2) NOT NULL default '0',
   `ratingdate` datetime NOT NULL default '0000-00-00 00:00:00',
   `ratingnum` int(4) NOT NULL default '0',
@@ -71,7 +86,8 @@ CREATE TABLE `irate_ratings` (
   PRIMARY KEY  (`id`),
   KEY `trackid` (`trackid`),
   KEY `userid` (`userid`),
-  KEY `rating` (`rating`)
+  KEY `rating` (`rating`),
+  KEY `weight` (`weight`)
 ) TYPE=MyISAM;
 
 -- --------------------------------------------------------
@@ -92,8 +108,8 @@ CREATE TABLE `irate_ratings_seq` (
 -- 
 
 CREATE TABLE `irate_sources` (
-  `id` int(12) NOT NULL default '0',
-  `distribid` bigint(16) NOT NULL default '0',
+  `id` int(12) unsigned NOT NULL default '0',
+  `distribid` bigint(16) unsigned NOT NULL default '0',
   `media` tinyint(3) NOT NULL default '0',
   `protocol` varchar(32) NOT NULL default '',
   `link` text NOT NULL,
@@ -126,7 +142,7 @@ CREATE TABLE `irate_tracks` (
   `license` varchar(255) NOT NULL default '',
   `albumname` text NOT NULL,
   `pubdate` date NOT NULL default '0000-00-00',
-  `id` bigint(16) NOT NULL default '0',
+  `id` bigint(16) unsigned NOT NULL default '0',
   `duration` int(4) NOT NULL default '0',
   `adddate` date NOT NULL default '0000-00-00',
   `crediturl` text NOT NULL,
@@ -151,7 +167,7 @@ CREATE TABLE `irate_tracks_seq` (
 -- 
 
 CREATE TABLE `irate_users` (
-  `id` int(12) NOT NULL default '0',
+  `id` int(12) unsigned NOT NULL default '0',
   `user` varchar(32) NOT NULL default '',
   `pass` varchar(32) NOT NULL default '',
   `dateinscr` datetime NOT NULL default '0000-00-00 00:00:00',
@@ -159,7 +175,7 @@ CREATE TABLE `irate_users` (
   `datelastprepare` datetime NOT NULL default '0000-00-00 00:00:00',
   `ipinscr` varchar(15) NOT NULL default '',
   PRIMARY KEY  (`id`),
-  KEY `user` (`user`),
+  UNIQUE KEY `user` (`user`),
   KEY `datelastlogin` (`datelastlogin`),
   KEY `datelastprepare` (`datelastprepare`)
 ) TYPE=MyISAM;
@@ -174,3 +190,4 @@ CREATE TABLE `irate_users_seq` (
   `id` int(10) unsigned NOT NULL auto_increment,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM;
+        
