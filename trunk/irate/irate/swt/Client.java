@@ -167,23 +167,27 @@ public class Client implements UpdateListener, PluginApplication {
   }
 
   public void update(){    
-    //synchronizePlaylist(playListManager, tblSongs);
-    Track track = playThread.getCurrentTrack();
-    String s = track.toString();
-//    lblTitle.setText(s);
-    shell.setText("iRATE radio - " + s);
-    TableItem item = (TableItem)hashSongs.get(track);
-    tblSongs.select(tblSongs.indexOf(item));
-    tblSongs.showItem(item);    
-    //just in case :)
-    track2TableItem(track, item);
-    
-    if(track != previousTrack) {
-      if(previousTrack != null)
-        track2TableItem(previousTrack, (TableItem)hashSongs.get(previousTrack));
-      previousTrack = track;
-    }
-    downloadThread.checkAutoDownload();   
+    display.asyncExec(new Runnable() {
+      public void run() {
+        //synchronizePlaylist(playListManager, tblSongs);
+        Track track = playThread.getCurrentTrack();
+        String s = track.toString();
+    //    lblTitle.setText(s);
+        shell.setText("iRATE radio - " + s);
+        TableItem item = (TableItem)hashSongs.get(track);
+        tblSongs.select(tblSongs.indexOf(item));
+        tblSongs.showItem(item);    
+        //just in case :)
+        track2TableItem(track, item);
+        
+        if(track != previousTrack) {
+          if(previousTrack != null)
+            track2TableItem(previousTrack, (TableItem)hashSongs.get(previousTrack));
+          previousTrack = track;
+        }
+        downloadThread.checkAutoDownload();
+      }
+    });
   }
   
   //called from playThread.addUpdateListener(this);
@@ -235,30 +239,64 @@ public class Client implements UpdateListener, PluginApplication {
    */
   public Track getSelectedTrack()
   {
-    int index = tblSongs.getSelectionIndex();
-    Track track; 
-    if (index < 0)
-      return getPlayingTrack();
-    else
-      return getTrackByTableItem(tblSongs.getItems()[index]);
+    final Track[] answer = new Track[1];
+    final Object[] monitor = new Object[1];
+    Runnable r = new Runnable() {
+      public void run() {
+        try {
+          int index = tblSongs.getSelectionIndex();
+          Track track; 
+          if (index < 0)
+            answer[0] = getPlayingTrack();
+          else
+            answer[0] = getTrackByTableItem(tblSongs.getItems()[index]);
+        }
+        finally {
+          if (monitor[0] != null)
+            synchronized (monitor[0]) {
+              monitor[0].notify();
+            }
+        }
+      }
+    };
+    if (display.isValidThread())
+      r.run();
+    else {
+        // If this isn't the SWT event thread, then we must delegate to it,
+        // because we might be called from a thread other than it, such as
+        // the remote control thread.
+      monitor[0] = new Object();
+      synchronized (monitor[0]) {
+        display.asyncExec(r);
+        try {monitor[0].wait();} catch (InterruptedException e) {};
+      }
+    }
+    return answer[0];
   }
 
   /**
    * PluginApplication interface:
    * Set rating for the specified track.
    */
-  public void setRating(Track track, int rating) {
-    track.setRating(rating);
-
-    TableItem ti = (TableItem) hashSongs.get(track);
-    track2TableItem(track, ti);
-    update();
-    //save the precious ratings :)
-    try{
-      trackDatabase.save();
-    }catch(Exception e){
-      e.printStackTrace();
-    }
+  public void setRating(final Track track, int rating) {
+      // We have to delegate to the SWT event thread, because we might be
+      // called from a thread other than it, such as the remote control thread.
+    final Integer ratingInt = new Integer(rating);
+    display.asyncExec(new Runnable() {
+      public void run() {
+        track.setRating(ratingInt.intValue());
+    
+        TableItem ti = (TableItem) hashSongs.get(track);
+        track2TableItem(track, ti);
+        update();
+        //save the precious ratings :)
+        try{
+          trackDatabase.save();
+        }catch(Exception e){
+          e.printStackTrace();
+        }
+      }
+    });
   }
 
   /**
@@ -277,6 +315,8 @@ public class Client implements UpdateListener, PluginApplication {
   public void setPaused(boolean paused) {
     playThread.setPaused(paused);
     final Boolean pausedFinal = new Boolean(paused);
+      // We have to delegate to the SWT event thread, because we might be
+      // called from a thread other than it, such as the remote control thread.
     display.asyncExec(new Runnable() {
       public void run() {
         pause.setText(pausedFinal.booleanValue() ? "|>" : "||");
