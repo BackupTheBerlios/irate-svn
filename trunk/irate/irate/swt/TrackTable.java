@@ -29,15 +29,37 @@ import org.eclipse.swt.widgets.TableItem;
  */
 public class TrackTable {
   
+  /** The SWT display object associated with the Shell and Table. */
   private Display display;
+  
+  /** The database containing the list of tracks to display in this table. */ 
   private TrackDatabase trackDatabase;
+  
+  /** The actual table widget.*/
   private Table table;
+  
+  /** The list of tracks grabbed out of the TrackDatabase and sorted. */
   private List listOfTracks;
+  
+  /** A hash table which finds the TableItem associated with a given Track. */
   private Hashtable hashByTrack;
+  
+  /** A hash table which finds the Track associated with a given TableItem. */
   private Hashtable hashByTableItem;
+  
+  /** The current comparitor used to sort the table. */
   private Comparator comparator;
+  
+  /** The currently selected track. */
   private Track selected;
   
+  /** Constructor to create a table contained in the given Shell where the
+   * tracks are updated from the given TrackDatabase. 
+   * @param shell         The Shell to add the Table to.
+   * @param trackDatabase The database containing the list of tracks. Track
+   *                      listings are automatically updated from this
+   *                      database.
+   */ 
   public TrackTable(Shell shell, TrackDatabase trackDatabase) {
     this.display = shell.getDisplay();
     this.trackDatabase = trackDatabase;
@@ -101,22 +123,23 @@ public class TrackTable {
     table.pack();
   }
   
-  private void addColumnListener(TableColumn col, final Comparator c) {
+  /** Used to create a listener which sorts using the given Comparator.
+   * @param column     The table column to add the column listener to.
+   * @param comparator The comparator used to sort by the specified column.
+   */
+  private void addColumnListener(TableColumn column, final Comparator comparator) {
     //final Integer colNo = new Integer(columnNumber);
-    col.addListener(SWT.Selection, new Listener() {
+    column.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event e) {
-        sortBy(c);
+        if (TrackTable.this.comparator != comparator) {
+          TrackTable.this.comparator = comparator;
+          updateTable();
+        }
       } 
     });
   }
   
-  public void sortBy(Comparator comparator) {
-    if (this.comparator != comparator) {
-      this.comparator = comparator;
-      updateTable();
-    }
-  }
-
+  /** Reads the table from the TrackDatabase, sorts it and displays it. */
   public void updateTable() {
     // Get the list of tracks
     Track[] tracks = trackDatabase.getTracks();
@@ -129,6 +152,7 @@ public class TrackTable {
     load();
   }
   
+  /** Sorts the table and loads it into the Table (displays it). */
   private void load() {
     // Sort first
     Collections.sort(listOfTracks, comparator);
@@ -157,7 +181,8 @@ public class TrackTable {
       select(selected);
   }
   
-  public void updateTableItem(TableItem tableItem, Track track) {
+  /** Loads the Track into the TableItem. */
+  private void updateTableItem(TableItem tableItem, Track track) {
     tableItem.setText(new String[] {
       track.getArtist(),
       track.getTitle(),
@@ -167,6 +192,7 @@ public class TrackTable {
     });
   }
   
+  /** Updates a single track. */
   public void updateTrack(Track track) {
     TableItem tableItem = (TableItem) hashByTrack.get(track);
     if (tableItem != null) {
@@ -186,14 +212,17 @@ public class TrackTable {
         if (comparator.compare(track, nextTrack) > 0)
           load();
       }
-      
     }
   }
 
+  /** Add a lsitener which is notified when a TableItem is selected. The 
+   * listener will need to call #getSelectedTrack() to find out which track
+   * was selected. */
   public void addSelectionListener(SelectionListener selectionListener) {
     table.addSelectionListener(selectionListener);
   }
   
+  /** Select a specified Track. */
   public void select(Track track) {
     this.selected = track;
     TableItem tableItem = (TableItem) hashByTrack.get(track);
@@ -206,6 +235,7 @@ public class TrackTable {
     }
   }  
  
+  /** Get the currently selected track. */
   public Track getSelectedTrack() {
     final Track[] track = new Track[1];
     final Object[] monitor = new Object[1];
@@ -243,6 +273,8 @@ public class TrackTable {
     return track[0];
   }
 
+  /** A helper class used to make it easy to write clean track comparators
+   * without too much casting. */
   private abstract class TrackComparator implements Comparator {
     public int compare(Object o0, Object o1) {
       return compareTrack((Track) o0, (Track) o1);
