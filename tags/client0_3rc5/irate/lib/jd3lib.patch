@@ -1,0 +1,82 @@
+diff -u -r ../jd3lib.org/helliker/id3/ID3v1Tag.java ./helliker/id3/ID3v1Tag.java
+--- ../jd3lib.org/helliker/id3/ID3v1Tag.java	Wed Oct 23 00:19:00 2002
++++ ./helliker/id3/ID3v1Tag.java	Sat Nov  8 07:22:32 2003
+@@ -282,6 +282,8 @@
+      * @exception IOException if an error occurs
+      */
+     public void removeTag() throws FileNotFoundException, IOException {
++      throw new RuntimeException("Not implemented");
++/*      
+   if (headerExists) {
+       RandomAccessFile raf = null;
+ 
+@@ -307,6 +309,7 @@
+ 
+       headerExists = false;
+   }
++*/
+     }
+ 
+     /** Return the genre name based on the ID3/Nullsoft standards.  If the genre
+diff -u -r ../jd3lib.org/helliker/id3/ID3v2Tag.java ./helliker/id3/ID3v2Tag.java
+--- ../jd3lib.org/helliker/id3/ID3v2Tag.java	Wed Oct 23 23:22:10 2002
++++ ./helliker/id3/ID3v2Tag.java	Sat Nov  8 07:25:15 2003
+@@ -253,6 +253,8 @@
+    *@exception IOException            if an error occurs
+    */
+   public void writeTag() throws FileNotFoundException, IOException {
++      throw new RuntimeException("Not implemented");
++/*      
+     RandomAccessFile raf = null;
+     int curSize = getTotalSize();
+     head.setTagSize(getSize());
+@@ -292,6 +294,7 @@
+     writtenTagSize = curSize;
+     writtenPadding = padding;
+     exists = true;
++*/    
+   }
+ 
+ 
+@@ -302,6 +305,8 @@
+    *@exception IOException            if an error occurs
+    */
+   public void removeTag() throws FileNotFoundException, IOException {
++      throw new RuntimeException("Not implemented");
++/*      
+     if (exists) {
+       RandomAccessFile raf = null;
+       int fullTagSize = writtenTagSize + head.getHeaderSize();
+@@ -334,6 +339,7 @@
+ 
+       exists = false;
+     }
++*/    
+   }
+ 
+ 
+@@ -486,9 +492,9 @@
+       byte[] b = new byte[description.length() + comment.length() + 5];
+       int bytesCopied = 0;
+       b[bytesCopied++] = 0;
+-      b[bytesCopied++] = 'e';
+-      b[bytesCopied++] = 'n';
+-      b[bytesCopied++] = 'g';
++      b[bytesCopied++] = (byte) 'e';
++      b[bytesCopied++] = (byte) 'n';
++      b[bytesCopied++] = (byte) 'g';
+       System.arraycopy(description.getBytes(ENC_TYPE), 0, b,
+         bytesCopied, description.length());
+       bytesCopied += description.length();
+diff -u -r ../jd3lib.org/helliker/id3/MP3FileFilter.java ./helliker/id3/MP3FileFilter.java
+--- ../jd3lib.org/helliker/id3/MP3FileFilter.java	Wed Oct 23 23:39:08 2002
++++ ./helliker/id3/MP3FileFilter.java	Sat Nov  8 07:24:10 2003
+@@ -37,7 +37,7 @@
+  * @version 2.0
+  */
+ 
+-public class MP3FileFilter extends javax.swing.filechooser.FileFilter
++public class MP3FileFilter /*extends javax.swing.filechooser.FileFilter*/
+                            implements java.io.FileFilter {
+ 
+   /**allows Directories
