@@ -142,7 +142,7 @@ public class HowLoudThread
   {
     synchronized (getMutex()) {
       removeFromQueue(track);
-      while (beingProcessed.equals(track)) {
+      while (beingProcessed != null && beingProcessed.equals(track)) {
         toKillProcessing = true;
         try {getMutex().wait();} catch (InterruptedException e) {}
       }
