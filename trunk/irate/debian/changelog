@@ -1,3 +1,10 @@
+irate (0.3-0pre6) unstable; urgency=low
+
+  * Track information window.
+  * Other bug fixes.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Thu, 11 Dec 2003 11:46:28 +0800
+
 irate (0.3-0pre5) unstable; urgency=low
 
   * Added drag and drop.
