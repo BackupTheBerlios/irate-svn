@@ -10,6 +10,10 @@ import java.io.OutputStream;
 
 public class ExternalPlayer extends AbstractPlayer {
 
+  /** Fudge factor (in ms) that we add to the playing time when restarting 
+   * a track.  Compensates for time spent starting and stopping the player. */
+  private static final long TIME_PLAYED_FUDGE_FACTOR_MS = 150;
+
   private String name;
   private String path;
   private boolean playing = false;
@@ -268,7 +272,8 @@ public class ExternalPlayer extends AbstractPlayer {
             }
           }
 
-          long timePlayed = System.currentTimeMillis() - start;
+          long timePlayed = System.currentTimeMillis() - start
+              + TIME_PLAYED_FUDGE_FACTOR_MS;
           playTime += timePlayed;
         }
       } // End of if-then block
