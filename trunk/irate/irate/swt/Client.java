@@ -64,7 +64,9 @@ public class Client extends AbstractClient {
   private ErrorDialog errorDialog;
   private AboutDialog aboutDialog;
   private Composite trackGroup = null;  
-
+  private Composite ratingGroup = null;
+  private Button expandButton = null;
+  
   //  private SettingDialog settingDialog;
   private Object strStateLock = new Object();
   private String strState = null;
@@ -948,11 +950,30 @@ public class Client extends AbstractClient {
     trackGroup.setLayoutData(gridData);    
     trackGroup.setLayout(new GridLayout(2, false));
     
+
+    
+    expandButton = new Button(trackGroup, SWT.ARROW|SWT.RIGHT);
+    gridData = new GridData();
+    gridData.horizontalSpan = 1;
+    expandButton.setLayoutData(gridData);
+    
     trackLabel = new AlphaLabel(trackGroup, SWT.CENTER);
     skinManager.add(trackLabel, "label.track");
-    gridData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
-    gridData.horizontalSpan = 2;
+    gridData = new GridData(GridData.FILL_BOTH|GridData.GRAB_HORIZONTAL);
     trackLabel.setLayoutData(gridData);
+ 
+    expandButton.addMouseListener(new MouseListener() {
+        public void mouseDoubleClick(MouseEvent arg0) {}
+        public void mouseDown(MouseEvent arg0) {}
+        public void mouseUp(MouseEvent arg0) {
+          if(expandButton.getAlignment() == SWT.RIGHT) {
+              expandRatingMenu();
+          }
+          else {
+              collapseRatingMenu();
+          }
+        }    
+      });
     
 //    Composite trackToolbar = new Composite(trackGroup, SWT.FLAT);
 //    skinManager.addControl(trackToolbar, "panel.trackToolbar");
@@ -1065,8 +1086,75 @@ public class Client extends AbstractClient {
     
     
     
-//    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
+    //songProgressBar = new TrackProgressBar(shell, SWT.NONE);
   }
+  
+  
+  public void expandRatingMenu() {
+      expandButton.setAlignment(SWT.DOWN);
+      if(ratingGroup == null || ratingGroup.isDisposed()) {
+          ratingGroup = new Composite(trackGroup,SWT.NONE);
+          GridData gridData = new GridData();
+          gridData.grabExcessHorizontalSpace = true;
+          gridData.horizontalSpan = 2;
+          gridData.horizontalIndent = 0;
+          ratingGroup.setLayoutData(gridData);    
+          ratingGroup.setLayout(new GridLayout(5, false));            
+
+      gridData = new GridData();
+      gridData.widthHint = 100;
+          
+      Button thisSux = new Button(ratingGroup,SWT.FLAT);
+      thisSux.setLayoutData(gridData);
+      thisSux.setText("This Sux");
+      
+      gridData = new GridData();
+      gridData.widthHint = 100;
+      
+      Button yawn = new Button(ratingGroup,SWT.FLAT);
+      yawn.setText("Yawn");
+      yawn.setLayoutData(gridData);
+      
+      gridData = new GridData();
+      gridData.widthHint = 100;
+      
+      Button notBad = new Button(ratingGroup,SWT.FLAT);
+      notBad.setText("Not Bad");
+      notBad.setLayoutData(gridData);
+      
+      gridData = new GridData();
+      gridData.widthHint = 100;
+      
+      Button cool = new Button(ratingGroup,SWT.FLAT);
+      cool.setText("Cool");
+      cool.setLayoutData(gridData);
+      
+      gridData = new GridData();
+      gridData.widthHint = 100;
+      
+      Button excellent = new Button(ratingGroup,SWT.FLAT);
+      excellent.setText("Excellent");
+      excellent.setLayoutData(gridData);
+      
+      shell.layout(true);
+      topPanel.layout(true);
+      trackGroup.layout(true); 
+      }
+  }
+  
+  // Collapses the 
+  public void collapseRatingMenu() {
+      expandButton.setAlignment(SWT.RIGHT);
+      if(!ratingGroup.isDisposed()) 
+      {
+          ratingGroup.dispose();
+          shell.layout(true);
+          topPanel.layout(true);
+          trackGroup.layout(true);  
+      }
+  }
+  
+  
   
   /**
    * Creates the menu that is presented when a track is right-clicked on.
