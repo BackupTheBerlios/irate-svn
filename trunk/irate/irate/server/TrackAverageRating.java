@@ -33,18 +33,18 @@ public class TrackAverageRating {
   class Rating {
     private Track track;
     private float sum;
-    private int count;
+    private float weight;
 
     public Rating(Track track) {
       this.track = averages.add(track);
       sum = track.getRating();
-      count = 1;
+      weight = track.getWeight();
     }
 
     public void add(Track track) {
       sum += track.getRating();
-      count++;
-      track.setRating(sum / count);
+      weight += track.getWeight();
+      track.setRating(sum / weight);
     }
   }
 }

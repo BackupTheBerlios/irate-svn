@@ -146,7 +146,11 @@ public class MasterDatabase extends ServerDatabase {
   
   public void purge(ServerDatabase db) {
     Track[] tracks = db.getTracks();
-    for (int i = 0; i < tracks.length; i++) 
-      tracks[i].setUnrated();
+    for (int i = 0; i < tracks.length; i++) {
+      Track track = tracks[i];
+      track.unSetRating();
+      track.unSetFile();
+      track.unSetWeight();
+    }
   }
 }

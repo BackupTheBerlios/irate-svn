@@ -68,8 +68,25 @@ public class Track {
     elt.setAttribute("rating", Float.toString(rating));
   }
 
-  public void setUnrated() {
+  public void unSetRating() {
     elt.setAttribute("rating", "");
+  }
+
+  public void setWeight(float weight) {
+    elt.setAttribute("weight", Float.toString(weight));
+  }
+
+  public void unSetWeight() {
+    elt.setAttribute("weight", "");
+  }
+
+  public float getWeight() {
+    try {
+      return Integer.parseInt(elt.getAttribute("weight"));
+    }
+    catch (NumberFormatException e) {
+    }
+    return Float.NaN;
   }
 
   public void incNoOfTimesPlayed() {
@@ -113,6 +130,10 @@ public class Track {
 
   public void setFile(File file) {
     elt.setAttribute("file", file.getPath());
+  }
+
+  public void unSetFile() {
+    elt.setAttribute("file", "");
   }
 
   public float getProbability() {

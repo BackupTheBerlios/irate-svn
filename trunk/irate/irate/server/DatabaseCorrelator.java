@@ -71,7 +71,7 @@ public class DatabaseCorrelator {
     for (int i = 0; i < spares.size(); i++) {
       Track track = (Track) spares.elementAt(i);
       track = sparesDatabase.add(track);
-      track.setRating(correlation * track.getRating());
+      track.setWeight(correlation);
     }
   }
 
