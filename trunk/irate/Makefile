@@ -149,7 +149,7 @@ irate-server.o:irate/server/*.java
 %.gifres.o: %.gif
 	$(GCJ) -c --resource $^ $^ -o $@
 
-%.properties.o: $.properties	
+%.properties.o: %.properties	
 	$(GCJ) -c --resource $^ $^ -o $@
 
 libmadplayer.o: irate/client/AbstractPlayer.java irate/client/LibMadPlayer.java irate/client/LibMadPlayer.cc
