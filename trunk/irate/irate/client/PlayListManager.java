@@ -18,7 +18,7 @@ public class PlayListManager {
   
   public PlayListManager(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
-    this.playList = createPlayList();
+    this.playList = new Vector();
     playListIndex = 0;
   }
   
@@ -34,7 +34,7 @@ public class PlayListManager {
     
     for (int i = 0; i < playList.size(); i++) {
       Track track = (Track) playList.get(i);
-      if (!isOnPlayList(track)) {
+      if (!track.isOnPlayList()) {
         playList.remove(i);
         if (i < playListIndex)
           --playListIndex;
@@ -82,11 +82,6 @@ public class PlayListManager {
     
     return (Track) playList.get(playListIndex);
   }
-
-  private boolean isOnPlayList(Track track) {
-    float rating = track.getRating();
-    return rating != 0 && (track.getNoOfTimesPlayed() % Math.round(rating)) != 0;
-  }
   
   private void randomise(List playList) {
     for (int i = 0; i < playList.size(); i++) {
@@ -97,19 +92,6 @@ public class PlayListManager {
         playList.set(swap, o);
       }
     }
-  }
-
-  private List createPlayList() {
-    List playList = new Vector();
-    Track[] tracks = trackDatabase.getTracks();
-    for (int i = 0; i < tracks.length; i++) {
-      Track track = tracks[i];
-      if (isOnPlayList(track))
-        playList.add(track);
-    }
-    randomise(playList);
-    
-    return playList;
   }
 
 }

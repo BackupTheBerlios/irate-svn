@@ -229,6 +229,11 @@ public class Track {
   public void unSetFile() {
     elt.setAttribute("file", "");
   }
+  
+  public boolean isOnPlayList() {
+    float rating = getRating();
+    return rating != 0 && (getNoOfTimesPlayed() % rating) != 0;      
+  }
 
   public float getProbability() {
     int noOfTimesPlayed = getNoOfTimesPlayed();
@@ -237,14 +242,12 @@ public class Track {
     if (prob < 0)
       return 0;
 
-/*
-      // Make it 1/10th of the chance of being played if the number of times 
+      // Make it 1/1000th of the chance of being played if the number of times 
       // played is a multiple of the rating. This means that a track will get
       // played in chunks proportional to the number of times it has been 
       // played.
-    if (noOfTimesPlayed != 0 && (noOfTimesPlayed % rating) == 0)
-      prob /= 10;
-*/
+    if (isOnPlayList())
+      prob *= 1000;
       
     return prob;
   }
