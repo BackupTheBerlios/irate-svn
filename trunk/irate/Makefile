@@ -7,6 +7,8 @@ CLIENT_FILES = \
 	irate/client/PlayerException.java \
 	irate/client/PlayListManager.java \
 	irate/client/Player.java \
+	irate/client/PlayerList.java \
+	irate/client/ExternalPlayer.java \
 	irate/client/Speech.java
 #	irate/client/AudioDevice.java 
 #	irate/client/JavaSoundAudioDevice.java 
