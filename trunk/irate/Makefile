@@ -68,7 +68,7 @@ irate-common.a:irate-common.o
 	ar rcs irate-common.a irate-common.o
 	 
 irate-common.o:irate/common/*.java
-	gcj -c irate/common/*.java -o irate-common.o
+	gcj -c irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java -o irate-common.o
 
 irate-server.o:irate/server/*.java
 	gcj -c irate/server/*.java -o irate-server.o
@@ -79,6 +79,8 @@ win32:
 	$(CLIENT_FILES) \
 	irate/swt/*.java \
 	irate/common/*.java \
+	irate/plugin/*.java \
+	irate/plugin/*/*.java \
 	irate/download/*.java \
 	thisiscool-gcc/swt/win32/lib/libswt.a \
 	lib/nanoxml-lite-2.2.3.jar \

@@ -7,6 +7,8 @@ import irate.common.Track;
 import irate.common.UpdateListener;
 import irate.client.*;
 import irate.download.DownloadThread;
+import irate.plugin.PluginApplication;
+import irate.plugin.PluginManager;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
@@ -17,7 +19,7 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
-public class Client implements UpdateListener {
+public class Client implements UpdateListener, PluginApplication {
   
 //  static Label lblTitle;
   static Label lblState;
@@ -35,6 +37,7 @@ public class Client implements UpdateListener {
   private ToolItem pause;
   private Track previousTrack;
   private ErrorDialog errorDialog;
+  private PluginManager pluginManager;
   private Help help = new Help();
   
   private String strState = "";
@@ -45,14 +48,15 @@ public class Client implements UpdateListener {
 
       // Check the current directory for an existing trackdatabase.xml for
       // compatibility reasons only.    
-    File file = new File("trackdatabase.xml");    
+    File file = new File("trackdatabase.xml");
+    File dir = new File(".");    
     if (!file.exists()) {
-      File dir = new File(home, "irate");
+      dir = new File(home, "irate");
       if (!dir.exists())
         dir.mkdir();
       file = new File(dir, "trackdatabase.xml");
     }
-  
+
     try {
       trackDatabase = new TrackDatabase(file);
     }
@@ -74,7 +78,9 @@ public class Client implements UpdateListener {
     }
     playListManager = new PlayListManager(trackDatabase);
     playThread = new PlayThread(playListManager, playerList);
- 
+
+    pluginManager = new PluginManager(this, dir);
+
     initGUI();
     errorDialog = new ErrorDialog(display, shell);
     
@@ -158,7 +164,6 @@ public class Client implements UpdateListener {
     //if this is the first run of irate do that
     if(!file.exists())
       downloadThread.go();
-
   }
 
   public void update(){    
@@ -214,17 +219,37 @@ public class Client implements UpdateListener {
     };
     tableItem.setText(data);
   }
-  
-  public void setRating(int rating) {
-  //    int index = list.getSelectedIndex();
+
+  /**
+   * PluginApplication interface:
+   * Get the track that is currently being played.
+   */
+  public Track getPlayingTrack()
+  {
+      return playThread.getCurrentTrack();
+  }
+
+  /**
+   * PluginApplication interface:
+   * Get the track that is currently selected.
+   */
+  public Track getSelectedTrack()
+  {
     int index = tblSongs.getSelectionIndex();
     Track track; 
     if (index < 0)
-      track = playThread.getCurrentTrack();
+      return getPlayingTrack();
     else
-      track = getTrackByTableItem(tblSongs.getItems()[index]);
+      return getTrackByTableItem(tblSongs.getItems()[index]);
+  }
+
+  /**
+   * PluginApplication interface:
+   * Set rating for the specified track.
+   */
+  public void setRating(Track track, int rating) {
     track.setRating(rating);
-    
+
     TableItem ti = (TableItem) hashSongs.get(track);
     track2TableItem(track, ti);
     update();
@@ -234,13 +259,37 @@ public class Client implements UpdateListener {
     }catch(Exception e){
       e.printStackTrace();
     }
-  } 
- 
+  }
+
+  /**
+   * PluginApplication interface:
+   * Return true if music play is paused.
+   */
+  public boolean isPaused()
+  {
+    return playThread.isPaused();
+  }
+
+  /**
+   * PluginApplication interface:
+   * Pause or unpause music play.
+   */
   public void setPaused(boolean paused) {
     playThread.setPaused(paused);
     pause.setText(paused ? "|>" : "||");
   }
-  
+
+  /**
+   * PluginApplication interface:
+   * Skip to the next song.
+   */
+  public void skip()
+  {
+    setPaused(false);
+    playThread.reject();
+    downloadThread.checkAutoDownload();
+  }
+
   void sortTable(Table table, Comparator c)
   {
     //problem with code below is that it loses track/tableitem relationship
@@ -555,6 +604,14 @@ public class Client implements UpdateListener {
       });
     }
 
+    MenuItem item2_1 = new MenuItem(menu2,SWT.PUSH);
+    item2_1.setText("Plug-ins");
+    item2_1.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        new PluginDialog(display, pluginManager);
+      }
+    });
+
     MenuItem item3 = new MenuItem(menubar,SWT.CASCADE);
     item3.setText("Info");
     
@@ -568,7 +625,6 @@ public class Client implements UpdateListener {
         actionAbout();
       }
     });    
-    
   }
 
   public void createToolBar() {
@@ -584,7 +640,7 @@ public class Client implements UpdateListener {
     item.setText("This sux");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setRating(0);
+        setRating(getSelectedTrack(), 0);
         playThread.reject();
       }
     });
@@ -593,7 +649,7 @@ public class Client implements UpdateListener {
     item.setText("Yawn");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setRating(2);
+        setRating(getSelectedTrack(), 2);
       }
     });
 
@@ -601,7 +657,7 @@ public class Client implements UpdateListener {
     item.setText("Not bad");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setRating(5);
+        setRating(getSelectedTrack(), 5);
       }
     });
 
@@ -609,7 +665,7 @@ public class Client implements UpdateListener {
     item.setText("Cool");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setRating(7);
+        setRating(getSelectedTrack(), 7);
       }
     });
 
@@ -617,7 +673,7 @@ public class Client implements UpdateListener {
     item.setText("Love it");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setRating(10);
+        setRating(getSelectedTrack(), 10);
       }
     });
 
@@ -627,7 +683,7 @@ public class Client implements UpdateListener {
     pause.setText("||");
     pause.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setPaused(!playThread.isPaused());
+        setPaused(!isPaused());
       }
     });
  
@@ -635,9 +691,7 @@ public class Client implements UpdateListener {
     item.setText(">>");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setPaused(false);
-        playThread.reject();
-        downloadThread.checkAutoDownload();
+        skip();
       }
     });
   }
