@@ -149,7 +149,18 @@ public class Client extends AbstractClient {
     
     shell.open();
    
-
+    // Remember the sort order of the track table.  This has to be here.
+    // The shell needs to be open before the sort will work propertly.
+    String sortColumn = Preferences.getUserPreference("sortColumn");
+    String sortDirection = Preferences.getUserPreference("sortDirection");
+    
+    if(sortDirection == null) {
+        sortDirection = "true";
+    }
+    
+    if(sortColumn != null) {
+        trackTable.setSortColumn(new Integer(sortColumn).intValue(),new Boolean(sortDirection).booleanValue());
+    }
     
     downloadThread.start();
     trackTable.addSelectionListener(new SelectionAdapter() {
@@ -191,8 +202,10 @@ public class Client extends AbstractClient {
         }
         
         Preferences.savePreferenceToFile("volumeLevel",new Integer(getVolumeSlider()).toString());
-        
+        Preferences.savePreferenceToFile("sortColumn",new Integer(trackTable.getSortColumn()).toString());
+        Preferences.savePreferenceToFile("sortDirection", new Boolean(trackTable.getSortDirection()).toString());
     } catch (IOException io) {}
+    
     super.quit();
   }
 
@@ -477,7 +490,9 @@ public class Client extends AbstractClient {
     //    createTitle();
     trackTable = new TrackTable(shell, trackDatabase, skinManager);
     trackTable.setMenu(new TrackTableMenu(shell, skinManager, this, ratingFunctions));
+    
 
+  
     bottomPanel = new Composite(shell, SWT.FLAT);
     skinManager.addControl(bottomPanel, "panel.status");
     
@@ -507,7 +522,6 @@ public class Client extends AbstractClient {
     progressBar.setVisible(false);
     
     createTrayItem();
-
   }
 
   public void createShell() {

@@ -103,6 +103,9 @@ public class TrackTable
   
   private static int columnAdjustTime = 0;
   
+  private int currentSortColumn = 0;
+  private boolean currentSortDirection = true;
+  
   /** Constructor to create a table contained in the given Shell where the
    * tracks are updated from the given TrackDatabase. 
    * @param composite     The Composite to add the Table to.
@@ -119,30 +122,36 @@ public class TrackTable
     table = new Table(composite, SWT.FULL_SELECTION);
     table.setEnabled(false);
 
-    TableColumn col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(200);
-    addColumnListener(col, comparator = new TrackComparator() {
+    final TableColumn artistCol = new TableColumn(table, SWT.LEFT);
+    artistCol.setWidth(200);
+    addColumnListener(artistCol, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
+        currentSortColumn = table.indexOf(artistCol);
+        currentSortDirection = !this.getDirection();
         return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
-    skinManager.addItem(col, "TrackTable.Heading.Artist"); 
+    skinManager.addItem(artistCol, "TrackTable.Heading.Artist"); 
 
-    col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(200);
-    addColumnListener(col, new TrackComparator() {
+    final TableColumn trackCol = new TableColumn(table, SWT.LEFT);
+    trackCol.setWidth(200);
+    addColumnListener(trackCol, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
+        currentSortColumn = table.indexOf(trackCol);
+        currentSortDirection = !this.getDirection();
         return magicStringCompare(track0.getTitle(), track1.getTitle());
       }        
     });
-    skinManager.addItem(col, "TrackTable.Heading.Track"); 
+    skinManager.addItem(trackCol, "TrackTable.Heading.Track"); 
 
-    col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(90);
+    final TableColumn ratingCol = new TableColumn(table, SWT.LEFT);
+    ratingCol.setWidth(90);
     // Setting the alighnment to left doesn't seem to make a difference for images on GTK
-    col.setAlignment(SWT.LEFT);
-    addColumnListener(col, new TrackComparator() {
+    ratingCol.setAlignment(SWT.LEFT);
+    addColumnListener(ratingCol, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
+        currentSortColumn = table.indexOf(ratingCol);
+        currentSortDirection = !this.getDirection();
         String state0 = track0.getState();
         String state1 = track1.getState();
         if (!state0.startsWith("%") || !state1.startsWith("%")) {
@@ -153,13 +162,15 @@ public class TrackTable
         return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
-    skinManager.addItem(col, "TrackTable.Heading.Rating");
+    skinManager.addItem(ratingCol, "TrackTable.Heading.Rating");
 
-    col = new TableColumn(table, SWT.LEFT);
-    col.setAlignment(SWT.LEFT);
-    col.setWidth(50);
-    addColumnListener(col, new TrackComparator() {
+    final TableColumn playsCol = new TableColumn(table, SWT.LEFT);
+    playsCol.setAlignment(SWT.LEFT);
+    playsCol.setWidth(50);
+    addColumnListener(playsCol, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
+        currentSortColumn = table.indexOf(playsCol);
+        currentSortDirection = !this.getDirection();
         int plays0 = track0.getNoOfTimesPlayed();
         int plays1 = track1.getNoOfTimesPlayed();
         if (plays0 < plays1) return -1;
@@ -167,29 +178,33 @@ public class TrackTable
         return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
-    skinManager.addItem(col, "TrackTable.Heading.Plays");
+    skinManager.addItem(playsCol, "TrackTable.Heading.Plays");
 
-    col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(120);
-    addColumnListener(col, new TrackComparator() {
+    final TableColumn lastPlayedCol = new TableColumn(table, SWT.LEFT);
+    lastPlayedCol.setWidth(120);
+    addColumnListener(lastPlayedCol, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
+        currentSortColumn = table.indexOf(lastPlayedCol);
+        currentSortDirection = !this.getDirection();
         return track0.getLastPlayed().compareTo(track1.getLastPlayed());
       }        
     });
     table.setHeaderVisible(true);
-    skinManager.addItem(col, "TrackTable.Heading.Last"); 
+    skinManager.addItem(lastPlayedCol, "TrackTable.Heading.Last"); 
 
-    col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(60);
-    addColumnListener(col, new TrackComparator() {
+    final TableColumn licenseCol = new TableColumn(table, SWT.LEFT);
+    licenseCol.setWidth(60);
+    addColumnListener(licenseCol, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
+        currentSortColumn = table.indexOf(licenseCol);
+        currentSortDirection = !this.getDirection();
         int compare = licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
         if (compare != 0)
           return compare;
         return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
-    skinManager.addItem(col, "TrackTable.Heading.License");
+    skinManager.addItem(licenseCol, "TrackTable.Heading.License");
     skinManager.add(basicSkinable, "TrackTable");
 
     GridData gridData = new GridData();
@@ -652,6 +667,10 @@ public class TrackTable
     
     private boolean direction = true;
     
+    public boolean getDirection() {
+        return direction;
+    }
+    
     public void setDirection(boolean direction) {
       this.direction = direction; 
     }
@@ -765,12 +784,32 @@ public class TrackTable
     col.notifyListeners(SWT.Selection, new Event());
     sort();
   }
+  
+  public void setSortColumn(int colnum, boolean direction) {
+      TableColumn col = table.getColumn(colnum); 
+      
+      col.notifyListeners(SWT.Selection, new Event());
+ 
+      if(direction) {
+          col.notifyListeners(SWT.Selection, new Event());
+      }
+      
+      sort();
+    }
 
   /**
    * @return context menu for this table
    */
   public Menu getMenu() {
     return popupMenu.getMenu();
+  }
+  
+  public int getSortColumn() {
+      return currentSortColumn;
+  }
+  
+  public boolean getSortDirection() {
+      return currentSortDirection;
   }
 
 }
