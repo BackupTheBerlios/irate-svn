@@ -144,9 +144,9 @@ public class Track {
         Calendar c = new GregorianCalendar(UTC);
         elt.setAttribute("last",
           format(c.get(Calendar.YEAR), 4) +
-          format(c.get(Calendar.MONTH), 2) +
+          format(c.get(Calendar.MONTH) + 1, 2) +
           format(c.get(Calendar.DAY_OF_MONTH), 2) +
-          format(c.get(Calendar.HOUR), 2) +
+          format(c.get(Calendar.HOUR_OF_DAY), 2) +
           format(c.get(Calendar.MINUTE), 2) +
           format(c.get(Calendar.SECOND), 2)
         );
