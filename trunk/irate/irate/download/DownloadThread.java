@@ -157,7 +157,7 @@ public class DownloadThread extends Thread {
 				return output;
 		}
     //th.stop();
-    th.destroy();
+    //th.destroy();
 		throw new IOException("Timeout exceeded");
 	}
   }
