@@ -75,6 +75,6 @@ clean:
 	rm -f libswt.so libswt.o libswt.a libnanoxml-lite.o libnanoxml-lite.a *.o *.a
 # Remove the files created during the unzip process.
 # gtk2 zip file
-	rm -f swt.jar swt-pi.jar swtsrc.zip swt-pisrc.zip about.html cpl-v10.html lgpl-v21.txt libswt-gnome-gtk-2135.so libswt-gtk-2135.so libswt-pi-gtk-2135.so
+	rm -f swt.jar swt-pi.jar swtsrc.zip swt-pisrc.zip about.html cpl-v10.html lgpl-v21.txt libswt-gnome-gtk-2135.so libswt-gtk-2135.so libswt-pi-gtk-2135.so swt-mozilla.jar swt-mozillasrc.zip mpl-v11.txt
 # motif zip file
 	rm -f libswt-gnome-motif-2133.so libswt-gnome-motif-2133.so  libswt-kde-motif-2133.so libswt-motif-2133.so libXm.so libXm.so.2 libXm.so.2.1 swt.jar
