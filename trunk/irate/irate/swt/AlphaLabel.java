@@ -5,7 +5,6 @@ package irate.swt;
 
 import java.util.Hashtable;
 
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.DisposeEvent;
