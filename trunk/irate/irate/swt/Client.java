@@ -457,21 +457,22 @@ public class Client implements UpdateListener, PluginApplication {
   void quit()
   {
     shell.setVisible(false);
-    try {
+		try {
       trackDatabase.save();
     }
     catch (IOException ee) {
       ee.printStackTrace();
     }
+    trackDatabase.purge();
     playThread.reject();
     System.exit(0);
   }
 
   void uncheckSiblingMenuItems(MenuItem self) {
-  Menu parent = self.getParent();
-  MenuItem items[] = parent.getItems();
-  for(int i = 0;i< parent.getItemCount();i++)
-    parent.getItem(i).setSelection(false);
+    Menu parent = self.getParent();
+		MenuItem items[] = parent.getItems();
+		for(int i = 0;i< parent.getItemCount();i++)
+      parent.getItem(i).setSelection(false);
   }
 
   void initGUI(){
@@ -607,14 +608,14 @@ public class Client implements UpdateListener, PluginApplication {
       }
     });
 
-    MenuItem item1_2 = new MenuItem(menu1,SWT.PUSH);
+/*    MenuItem item1_2 = new MenuItem(menu1,SWT.PUSH);
     item1_2.setText("Purge");
     item1_2.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         trackDatabase.purge();
         update();
       }
-    });
+    });*/
 
     //  MenuItem item1_3 = new MenuItem(menu1,SWT.SEPARATOR);
 
