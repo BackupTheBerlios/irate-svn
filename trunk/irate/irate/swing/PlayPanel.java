@@ -130,10 +130,21 @@ public class PlayPanel extends JPanel {
   public void setRating(int rating) {
 //    int index = list.getSelectedIndex();
     int index = table.getSelectedRow();
-    if (index < 0)
+    if (index < 0) {
       playThread.getCurrentTrack().setRating(rating);
+      if (rating == 0)
+        playThread.reject();
+    }
     else
       trackTable.getTrack(index).setRating(rating);
+
+    //save the precious ratings :)
+    try{
+      playListManager.getTrackDatabase().save();
+    }catch(Exception e){
+      e.printStackTrace();
+    }
+
     update();
   }
 
@@ -141,6 +152,6 @@ public class PlayPanel extends JPanel {
     Track currentTrack = playThread.getCurrentTrack();
     currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
     trackTable.notifyListeners();
-    pauseButton.setText(playThread.isPaused() ? ">" : "||");
+    pauseButton.setText(playThread.isPaused() ? "|>" : "||");
   }
 }

@@ -201,7 +201,6 @@ public class Client extends JFrame {
     });
     m.add(menuItemDownload);
 
-/*
     menuItemContinuousDownload = new JCheckBoxMenuItem("Continuous download");
     menuItemContinuousDownload.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
@@ -209,7 +208,6 @@ public class Client extends JFrame {
       }
     });
     m.add(menuItemContinuousDownload);
-*/
 
     JMenuItem purge = new JMenuItem("Purge");
     purge.addActionListener(new ActionListener() {

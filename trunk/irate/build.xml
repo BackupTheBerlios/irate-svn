@@ -48,7 +48,29 @@
   </target>
 
   <target name="gzip" depends="jar">
-    <tar destfile="irate-client.tar.gz" basedir=".." includes="irate/irate-swt-client.jar,lib/irate/jl030.jar,irate/lib/nanoxml-lite-2.2.3.jar,irate/lib/swt.jar,irate/lib/libswt-*motif-3009.so" compression="gzip"/>
+    <tar destfile="irate-client-swt.tar.gz" compression="gzip">
+      <tarfileset dir=".." mode="755">
+        <include name="irate/irate-client-swt.sh"/>
+        <include name="irate/lib/libswt-*motif-3009.so"/>
+        <include name="irate/lib/libXm.so.2"/>
+      </tarfileset>
+      <tarfileset dir="..">
+        <include name="irate/irate-client-swt.jar"/>
+        <include name="irate/lib/jl030.jar"/>
+        <include name="irate/lib/nanoxml-lite-2.2.3.jar"/>
+        <include name="irate/lib/swt.jar"/>
+      </tarfileset>
+    </tar>
+    <tar destfile="irate-client-swing.tar.gz" compression="gzip">
+      <tarfileset dir=".." mode="755">
+        <include name="irate/irate-client-swing.sh"/>
+      </tarfileset>
+      <tarfileset dir="..">
+        <include name="irate/irate-client-swing.jar"/>
+        <include name="irate/lib/jl030.jar"/>
+        <include name="irate/lib/nanoxml-lite-2.2.3.jar"/>
+      </tarfileset>
+    </tar>
   </target>
   
     <!-- Windoze installer -->
