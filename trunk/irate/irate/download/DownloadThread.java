@@ -345,7 +345,7 @@ public class DownloadThread extends Thread {
     catch (Exception e) {
       e.printStackTrace();
       if (e instanceof FileNotFoundException) {
-        setState("Broken download: " + track.getName()); //$NON-NLS-1$
+        setState(getResourceString("DownloadThread.Download_broken") + track.getName());
         track.setBroken();
       } else if (e instanceof IOException) {
         exponentialBackoffManager.failed(track.getURL());
