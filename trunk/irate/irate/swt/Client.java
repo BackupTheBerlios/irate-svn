@@ -244,6 +244,9 @@ public class Client extends AbstractClient {
     display.asyncExec(new Runnable() {
       public void run() {
         update();
+        Track track = playThread.getCurrentTrack();
+        if (track != null)
+          trackTable.updateTrack(track);
       }
     });
   }

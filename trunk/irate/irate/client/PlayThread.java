@@ -71,6 +71,7 @@ public class PlayThread extends Thread {
       }
 
       if (currentTrack != null) {
+        currentTrack.updateTimeStamp();
         notifyUpdateListeners();
         File file = currentTrack.getFile();
         if (file != null && file.exists()) {
@@ -90,7 +91,6 @@ public class PlayThread extends Thread {
             }
           }
           if (toKeepPlaying) {
-            
             playFile(file, currentTrack.getVolume());
             if(!reverse){
               history.add(currentTrack);
