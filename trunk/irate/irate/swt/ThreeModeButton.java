@@ -16,6 +16,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
   private ImageMerger imageMerger;
 
   private Hashtable imageDataHash = new Hashtable();
+  private Hashtable imageCache = new Hashtable();
 
   private String normalText, pressedText;
 
@@ -243,9 +244,19 @@ public class ThreeModeButton extends Canvas implements Skinable {
         }
       }
       try {
-        Image image = createTransparentImage(key);
+        Image image = null;
+        if(imageCache.containsKey(key)) {
+            image = (Image)imageCache.get(key);
+        }
+        else {
+            image = createTransparentImage(key); 
+            if(image != null) {
+                imageCache.put(key, image);
+            }
+        }
+        
         gc.drawImage(image, 0, 0);
-        image.dispose();
+        //image.dispose();
       }
       catch (Exception ex) {
         ex.printStackTrace();
