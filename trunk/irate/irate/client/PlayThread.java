@@ -37,7 +37,7 @@ public class PlayThread extends Thread {
   }
 
   private void playFile(File file) throws Exception {
-    if (externalPlayer.length() != 0) {
+    if (externalPlayer != null) {
       playerProcess = Runtime.getRuntime().exec(new String[] { externalPlayer, file.getPath() });
       try {
         playerProcess.waitFor();

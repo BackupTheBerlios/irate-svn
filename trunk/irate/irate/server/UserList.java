@@ -13,10 +13,12 @@ public class UserList {
     if (!userDir.exists())
       userDir.mkdir();
     File[] files = userDir.listFiles();
+    System.out.println("Loading users");
     for (int i = 0; i < files.length; i++)
       if (files[i].getName().toLowerCase().endsWith(".xml")) 
         try {
           users.add(new ServerDatabase(files[i]));
+          System.out.println("  " + files[i]);
         }
         catch (IOException e) {
           e.printStackTrace();
@@ -34,7 +36,7 @@ public class UserList {
 
   public ServerDatabase createUser(String name, String password) {
     ServerDatabase user = new ServerDatabase();
-    user.setFile(new File(userDir, name));
+    user.setFile(new File(userDir, name + ".xml"));
     user.setUserName(name);
     user.setPassword(password);
     users.add(user);
