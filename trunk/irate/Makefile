@@ -37,7 +37,8 @@ endif
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
 IRATE_SERVER=irate-server.exe
-CLIENT_LINKFLAGS=-Dgnu.gcj.runtime.NameFinder.use_addr2line=false -Dgnu.gcj.runtime.NameFinder.demangle=false
+#turn on below thing for error messages
+#CLIENT_LINKFLAGS=-Dgnu.gcj.runtime.NameFinder.use_addr2line=false -Dgnu.gcj.runtime.NameFinder.demangle=false
 export GCJ=/usr/local/crossgcc/bin/i586-pc-mingw32-gcj -g -pipe -O0
 CLIENT_LIBS += lib/libswt.o
 CLASSPATH:=$(PWD)/lib/swt.jar:$(CLASSPATH)
