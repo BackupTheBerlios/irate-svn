@@ -186,8 +186,8 @@ implements TrackLifeCycleListener
   private void check(Track track)
   {
     // If we don't know how loud it is, queue it to be processed.
-    if ( !track.isHidden() && !track.isNotDownloaded() && track.getProperty("marsyas") == null) {
-      System.err.println("Checking "+track);
+    if ( !track.isHidden() && !track.isNotDownloaded() && (track.getProperty("marsyas") == null || "failed".equals(track.getProperty("marsyas")))) {
+      dbg("Checking "+track);
       //extract doesn't like files over 3MB
 //      if(track.getFile().length() > 3*1000*1000)
   //      return;
