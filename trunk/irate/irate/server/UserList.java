@@ -5,6 +5,8 @@ package irate.server;
 import java.io.*;
 import java.util.*;
 
+import nanoxml.XMLElement;
+
 public class UserList {
 
   private File userDir;
@@ -19,7 +21,7 @@ public class UserList {
     for (int i = 0; i < files.length; i++)
       if (files[i].getName().toLowerCase().endsWith(".xml")) 
         try {
-          DatabaseReference ref = new DatabaseReference(files[i]);
+          DatabaseReference ref = new DatabaseReference(this, files[i]);
           users.add(ref);
           if ((i % 100) == 0)
             System.out.print(".");
@@ -32,11 +34,20 @@ public class UserList {
     System.out.println(users.size() + " users");
   }
 
+  public DatabaseReference getUser(XMLElement elt) {
+    return getUser(DatabaseReference.getUserName(elt));
+  }
+
   public DatabaseReference getUser(String name) {
     for (int i = 0; i < users.size(); i++) {
       DatabaseReference user = (DatabaseReference) users.elementAt(i);
-      if (name.equals(user.getUserName()))
-        return user;
+      try {
+        if (name.equals(user.getUserName()))
+          return user;
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
     }
     return null;
   }
@@ -48,8 +59,9 @@ public class UserList {
     user.setUserName(name);
     user.setPassword(password);
     user.save();    
-    users.add(user);
-    return new DatabaseReference(file);
+    DatabaseReference ref = new DatabaseReference(this, file);
+    users.add(ref);
+    return ref;
   }
   
   public DatabaseReference[] getUsers() {
@@ -63,7 +75,7 @@ public class UserList {
       return null;
     
     while (true) {
-      DatabaseReference peer = (DatabaseReference) users.elementAt((random.nextInt() & 0x7fffffff) % users.size());
+      DatabaseReference peer = (DatabaseReference) users.elementAt(random.nextInt(users.size()));
       if (!peer.refersTo(user)) 
         return peer;
     }
@@ -73,5 +85,17 @@ public class UserList {
     DatabaseReference[] users = getUsers();
     for (int i = 0; i < users.length; i++)
       users[i].discard();
+  }
+  
+  public Set getRandomUserSet(Random random, ServerDatabase user, int noOfUsers) {
+    Set randomUsers = new HashSet();
+    for (int i = 0; i < noOfUsers; i++) {
+      DatabaseReference ref = randomUser(random, user);
+      if (ref == null)
+        break; 
+      randomUsers.add(ref);
+    }
+ 
+    return randomUsers;
   }
 }

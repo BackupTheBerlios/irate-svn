@@ -4,19 +4,24 @@ package irate.server;
 
 import irate.common.*;
 
+import java.io.IOException;
 import java.util.*;
 
 public class DatabaseCorrelator {
 
   private ServerDatabase db0;
-  private Track[] tracks1;
+  private DatabaseReference ref;
   private ServerDatabase sparesDatabase;
   private Vector spares;
   private float correlation;
   
-  public DatabaseCorrelator(ServerDatabase db0, ServerDatabase db1) {
+  public DatabaseCorrelator(ServerDatabase db0, DatabaseReference ref) {
     this.db0 = db0;
-    tracks1 = db1.getTracks();
+    this.ref = ref;
+  }
+  
+  public DatabaseReference getDatabaseReference() {
+    return ref;
   }
 
   private boolean isRatingValid(Track track) {
@@ -29,7 +34,10 @@ public class DatabaseCorrelator {
         rating == 10.0F;
   }
 
-  public void process() {
+  public void process() throws IOException {
+    ServerDatabase db1 = ref.getServerDatabase();
+    Track[] tracks1 = db1.getTracks();
+
     Vector spares = new Vector();
     sparesDatabase = new ServerDatabase();
     correlation = 0;
@@ -99,6 +107,7 @@ public class DatabaseCorrelator {
       track = sparesDatabase.add(track);
       track.setWeight(correlation);
     }
+    ref.discard();
   }
 
   public float getCorrelation() {

@@ -80,7 +80,7 @@ public class RequestHandler {
 //      System.out.println("Request:");
 //      System.out.println(new String(buf));
       
-      ServerDatabase request = new ServerDatabase(new ByteArrayInputStream(buf));
+      ServerDatabase request = new ServerDatabase(null, new ByteArrayInputStream(buf));
       ServerDatabase reply = masterDatabase.processRequest(request);
 
 //      System.out.println("Reply:");

@@ -27,6 +27,9 @@ public class MasterDatabase extends ServerDatabase {
     /** The number of times it will pick a user in order to get a random track. */
   private final int peerRetries = 30;
   
+    /** The numebr of users to compare each user to. */
+  private final int noOfUsersToCompare = ServerDatabase.noOfFriendsToRecord * 5;
+  
   private UserList userList;
   private Random random = new Random();
   private ServerDatabase orphans;
@@ -37,7 +40,7 @@ public class MasterDatabase extends ServerDatabase {
   private int userRate = 5;
   
   public MasterDatabase(File file, UserList userList) throws IOException {
-    super(file);
+    super(userList, file);
     this.userList = userList;
     
       // Find the compulsory tracks
@@ -69,6 +72,8 @@ public class MasterDatabase extends ServerDatabase {
     DatabaseReference userRef = userList.getUser(request.getUserName());
     ServerDatabase user = null;
     try {
+      if (userRef == null)
+        userRef = userList.createUser(request.getUserName(), request.getPassword());
       user = userRef.getServerDatabase();
     }
     catch (IOException e) {
@@ -139,7 +144,7 @@ public class MasterDatabase extends ServerDatabase {
       for (int i = 0; i < correlateNoOfTracks; i++) {
         Track track = corel.chooseTrack(random);
         if (track != null) {
-          System.out.println("Correlation: " + track.getName() + " " + track.getRating() + " " + track.getWeight());
+          System.out.println("Correlation: " + track.getName() + " " + track.getRating() + " " + (int) track.getWeight());
           reply.add(track);
           corel.remove(track);
         }
@@ -242,7 +247,11 @@ public class MasterDatabase extends ServerDatabase {
   }
 
   public ServerDatabase getBest(ServerDatabase user) {
-    DatabaseReference[] users = userList.getUsers();
+    Set users = new HashSet();
+    users.addAll(user.getFriendSet());
+    System.out.println("No. of friends: " + users.size());
+    users.addAll(userList.getRandomUserSet(random, user, noOfUsersToCompare - users.size()));
+    
     TrackAverageRating tar = new TrackAverageRating();
     TreeMap treeMap = new TreeMap(new Comparator() {
       public int compare(Object o0, Object o1) {
@@ -253,32 +262,32 @@ public class MasterDatabase extends ServerDatabase {
         return 1;
       }
     });
-    for (int i = 0; i < users.length; i++) {
+    for (Iterator itr = users.iterator(); itr.hasNext(); ) {
       try {
-        if (!users[i].refersTo(user)) {
-          ServerDatabase sd = users[i].getServerDatabase();
-          DatabaseCorrelator dc = new DatabaseCorrelator(user, sd);
-          dc.process();
-          float correlation = dc.getCorrelation();
-          if (correlation > 0) {
-  //          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation() + " " + dc.getSpares().getNoOfTracks());
-            treeMap.put(dc, dc);
-  //          tar.add(dc.getSpares(), correlation);
-          }
-          users[i].discard();
-        }        
+        DatabaseReference peer = (DatabaseReference) itr.next();
+        DatabaseCorrelator dc = new DatabaseCorrelator(user, peer);
+        dc.process();
+        float correlation = dc.getCorrelation();
+        if (correlation > 0) {
+//          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation() + " " + dc.getSpares().getNoOfTracks());
+          treeMap.put(dc, dc);
+        }
       }
       catch (IOException e) {
         e.printStackTrace();
       }
     }
-    int count = treeMap.size() / 10;
-    for (Iterator itr = treeMap.values().iterator(); count >= 0 && itr.hasNext(); count--) {
+    Set friends = new HashSet();
+    int count = noOfFriendsToRecord;
+    for (Iterator itr = treeMap.values().iterator(); count > 0 && itr.hasNext(); count--) {
       DatabaseCorrelator dc = (DatabaseCorrelator) itr.next();
+      friends.add(dc.getDatabaseReference());
       tar.add(dc.getSpares(), dc.getCorrelation());
 //      if (dc.getSpares().getNoOfTracks() != 0)
 //        System.out.println("Friend: " + dc.getCorrelation() + " " + dc.getSpares().getNoOfTracks());
     }
+    System.out.println("Saving friends: " + friends.size());
+    user.setFriendSet(friends);
     return tar.getAverages();
   }
   

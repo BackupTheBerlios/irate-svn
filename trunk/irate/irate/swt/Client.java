@@ -709,7 +709,7 @@ public class Client implements UpdateListener, PluginApplication {
       //Added for a nicer UI by Allen Tipper 14.9.03
       mTimes.addArmListener(new ArmListener(){
               public void widgetArmed(ArmEvent e){
-                  strState = "Set number of unrated songs on list to stop automatically downloading at to " + count;
+                  strState = "Automatically download when the number of unrated tracks is less than " + count;
                   lblState.setText(strState);
                   lblState.pack();
               }

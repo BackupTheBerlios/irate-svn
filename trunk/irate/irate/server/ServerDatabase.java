@@ -2,24 +2,55 @@
 
 package irate.server;
 
-import irate.common.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
+import java.util.Vector;
 
-import java.io.*;
-import java.util.*;
+import nanoxml.XMLElement;
+
+import irate.common.Track;
+import irate.common.TrackDatabase;
 
 public class ServerDatabase extends TrackDatabase {
   
+  public static final int noOfFriendsToRecord = 100;
+  
   private final int ratingScale = 1000;
+  private Set friends;
+  private UserList userList;
   
   public ServerDatabase() {
   }
   
-  public ServerDatabase(File file) throws IOException {
+  public ServerDatabase(UserList userList, File file) throws IOException {
     super(file);
+    this.userList = userList;
   }
 
-  public ServerDatabase(InputStream is) throws IOException {
+  public ServerDatabase(UserList userList, InputStream is) throws IOException {
     super(is);
+    this.userList = userList;
+  }
+  
+  protected void load() {
+    if (friends == null) {
+      friends = new HashSet();
+      XMLElement docElt = getDocElement();
+      Enumeration enum = docElt.enumerateChildren();
+      while(enum.hasMoreElements()) {
+        XMLElement elt = (XMLElement)enum.nextElement();
+        if (elt.getName().equals("Friend")) {
+          DatabaseReference friend = userList.getUser(elt);
+          friends.add(friend);
+        }
+      }
+    }
   }
 
   public float getProbability(Track track) {
@@ -27,9 +58,8 @@ public class ServerDatabase extends TrackDatabase {
       float rating = track.getRating();
       
         // This will mean that a track is only recommended to a user if the
-        // rating is strictly above 5. That means that there has to be at least
-        // one person who think's it's better than just alright.
-      if (rating >= 6.5F) {
+        // rating is high enough.
+      if (rating >= 6.0F) {
         float prob = rating * rating;
         float weight = track.getWeight();
         if (!Float.isNaN(weight))
@@ -46,4 +76,45 @@ public class ServerDatabase extends TrackDatabase {
       return null; 
     return tracks[(random.nextInt() & 0x7fffffff) % tracks.length];
   }
+
+  public void addFriend(DatabaseReference friend) {
+    load();
+    if (!friends.contains(friend)) {
+      friends.add(friend);
+      getDocElement().addChild(friend.getElement());
+    }
+  }
+
+  public void removeFriend(DatabaseReference friend) {
+    load();
+    if (friends.contains(friend)) {
+      friends.remove(friend);
+      getDocElement().removeChild(friend.getElement());
+    }
+  }
+
+  public void setFriendSet(Set newFriends) {
+    XMLElement docElt = getDocElement();
+    Enumeration enum = docElt.enumerateChildren();
+    Vector v = new Vector();
+    while(enum.hasMoreElements()) {      
+      XMLElement elt = (XMLElement)enum.nextElement();
+      if (elt.getName().equals("Friend"))
+        v.add(elt);
+    }
+    for (Iterator itr = v.iterator(); itr.hasNext(); )
+      docElt.removeChild((XMLElement) itr.next());
+      
+    friends = new HashSet(newFriends);
+    for (Iterator itr = friends.iterator(); itr.hasNext(); ) {
+      DatabaseReference friend = (DatabaseReference) itr.next();
+      getDocElement().addChild(friend.getElement());
+    }
+//    System.out.println("Friend size:: " + friends.size());
+  }
+  
+  public Set getFriendSet() {
+    load();
+    return friends;
+  }  
 }

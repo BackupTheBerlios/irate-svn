@@ -59,6 +59,10 @@ public class TrackDatabase {
     }
   }
 
+  protected XMLElement getDocElement() {
+    return docElt;
+  }
+
   private void create() {
     try {
       tracks = new TreeSet(new Comparator() {
