@@ -308,7 +308,7 @@ public class TrackTable {
           // Shrink to fit! The downloading messages
           // are too big on Mac OS X at least.
           FontData fd = gc.getFont().getFontData()[0];
-          font = new Font(display, fd.name, (int)(fd.height * x / size.x), fd.style);
+          font = new Font(display, fd.getName(), fd.getHeight() * x / size.x, fd.getStyle());
           gc.setFont(font);
           size = gc.stringExtent(state);
         }
