@@ -84,7 +84,7 @@ public class LircRemoteControlPlugin
     functions = new Vector();
     functions.add(new Function() {
       public String getName() {return "Rate as 'This sux'";}
-      public void perform() {getApp().setRating(getApp().getSelectedTrack(), 0);}
+      public void perform() {getApp().setRating(getApp().getSelectedTrack(), 0); getApp().skip();}
     });
     functions.add(new Function() {
       public String getName() {return "Rate as 'Yawn'";}
