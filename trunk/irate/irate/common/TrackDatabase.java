@@ -448,7 +448,7 @@ public class TrackDatabase {
     return getAttribute("Error", "url");
   }
 
-  public float getProbability(Track track) {
+  public int getProbability(Track track) {
     if (!track.exists())
       return 0;
     return track.getProbability();
@@ -466,15 +466,15 @@ public class TrackDatabase {
   public Track chooseTrack(Random random, Set toOmit) {
     Track[] tracks = getTracks();
     while (true) {
-      float[] probs = new float[tracks.length];
+      int[] probs = new int[tracks.length];
 
         // Choose a minimum probability
       float minRating = (MAX_RATING - 2) * Math.abs(random.nextFloat());
 
-      float totalProb = 0;
+      int totalProb = 0;
       for (int i = 0; i < tracks.length; i++) {
         Track track = tracks[i];
-          float rating = track.getRating();
+        float rating = track.getRating();
 
         if (rating >= minRating && (toOmit == null || !toOmit.contains(track)))
           totalProb += getProbability(track);
@@ -488,11 +488,11 @@ public class TrackDatabase {
       }
       else {
         while (true) {
-          float rand = Math.abs(random.nextFloat()) * totalProb;
+          int rand = random.nextInt(totalProb);
           for (int i = 0; i < tracks.length; i++) {
             if (toOmit != null && toOmit.contains(tracks[i]))
               continue;
-            if (rand <= probs[i])
+            if (rand < probs[i])
               return tracks[i];
           }
         }

@@ -53,7 +53,7 @@ public class ServerDatabase extends TrackDatabase {
     }
   }
 
-  public float getProbability(Track track) {
+  public int getProbability(Track track) {
     if (track.isRated()) {
       float rating = track.getRating();
       
@@ -63,8 +63,8 @@ public class ServerDatabase extends TrackDatabase {
         float prob = rating * rating;
         float weight = track.getWeight();
         if (!Float.isNaN(weight))
-          return prob * weight;
-        return prob;
+          return Math.round(prob * weight * 1000);
+        return Math.round(prob * 1000);
       }
     }
     return 0;

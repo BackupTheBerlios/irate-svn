@@ -421,7 +421,7 @@ public class Track implements TrackDetails {
     return mod != 0 && mod != (rating / 2);
   }
 
-  public float getProbability() {
+  public int getProbability() {
     int noOfTimesPlayed = getNoOfTimesPlayed();
     float rating = getRating(1);
     float prob = /* rating * */ rating / (1 + noOfTimesPlayed);
@@ -435,7 +435,7 @@ public class Track implements TrackDetails {
     if (isOnPlayList())
       prob *= 1000;
       
-    return prob;
+    return Math.round(prob * 1000);
   }
 
   public String getState() {
