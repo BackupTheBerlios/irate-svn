@@ -109,8 +109,14 @@ public class DownloadThread extends Thread {
     }
   }
 
+  /** Prints error to System out and pauses execution for 5seconds */
   public void handleError(String code, String urlString) {
     System.out.println("Server error: " + code);
+    //prevent quick reconnects
+    try {
+      Thread.sleep(5000);
+    }
+    catch(InterruptedException ie) {}
   }
 
   URLConnection openConnection(URL u) throws IOException{
@@ -385,7 +391,6 @@ System.out.println("DownloadThread.java:326: " + errorCode);
   
   //Made public for UI Tweak by Allen Tipper 14.9.03
   //Can we have more reasons here?
-  //and next time please dont back out other people's hard work
   public void setState(String state) {
     this.state = state;
     notifyUpdateListeners();
