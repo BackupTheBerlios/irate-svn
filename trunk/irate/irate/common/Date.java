@@ -6,6 +6,7 @@ package irate.common;
 import java.lang.ref.SoftReference;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Locale;
 
 /** A wrapper for java.util.Calendar which supports a simple toString
  * opration.
@@ -14,7 +15,7 @@ import java.util.Calendar;
  */
 public class Date {
   
-  static DateFormat dateFormat = DateFormat.getDateTimeInstance();
+  static DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
   
   private SoftReference cacheString;
   

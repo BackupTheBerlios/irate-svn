@@ -223,13 +223,14 @@ public class Track {
     String s = elt.getStringAttribute("last");
     if (s != null && s.length() == 14)
       try {
-        return new Date(new GregorianCalendar(
-          Integer.parseInt(s.substring(0, 4)), // year
-          Integer.parseInt(s.substring(4, 6)) - 1, // month
-          Integer.parseInt(s.substring(6, 8)), // day
-          Integer.parseInt(s.substring(8, 10)), // hour
-          Integer.parseInt(s.substring(10, 12)), // minute
-          Integer.parseInt(s.substring(12, 14)))); // second        
+        Calendar c = new GregorianCalendar(UTC);
+        c.set(Calendar.YEAR, Integer.parseInt(s.substring(0, 4)));
+        c.set(Calendar.MONTH, Integer.parseInt(s.substring(4, 6)) - 1);
+        c.set(Calendar.DAY_OF_MONTH, Integer.parseInt(s.substring(6, 8)));
+        c.set(Calendar.HOUR_OF_DAY, Integer.parseInt(s.substring(8, 10)));
+        c.set(Calendar.MINUTE, Integer.parseInt(s.substring(10, 12)));
+        c.set(Calendar.SECOND, Integer.parseInt(s.substring(12, 14)));
+        return new Date(c);
       }
       catch (NumberFormatException e) { 
       }
