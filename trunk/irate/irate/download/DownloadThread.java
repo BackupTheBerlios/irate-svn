@@ -99,7 +99,7 @@ public class DownloadThread extends Thread {
     Hashtable downloadThreads = new Hashtable();
     boolean toSave = false;
       // The maximum number of files that can be downloaded simultaneously
-    final int MAX_SIMULTANEOUS_DOWNLOADS = 4;
+    final int MAX_SIMULTANEOUS_DOWNLOADS = 6;
     
     for (int i = 0; i < tracks.length; i++) {
       Track currentTrack = tracks[i];
@@ -324,11 +324,12 @@ public class DownloadThread extends Thread {
               int percent = totalBytes * 100 / contentLength;
               if (percent != percentComplete) {
                 percentComplete = percent;
-                track.setPercentComplete(percent);
-                notifyUpdateListeners(track);
-                for (Iterator iter = downloadListeners.iterator(); iter.hasNext();) {
-                  DownloadListener d = (DownloadListener) iter.next();
-                  d.downloadProgressed(track, percent, Resources.getString("DownloadThread.Downloading_Tracks"));
+                if (track.setPercentComplete(percent)) {
+                  notifyUpdateListeners(track);
+                  for (Iterator iter = downloadListeners.iterator(); iter.hasNext();) {
+                    DownloadListener d = (DownloadListener) iter.next();
+                    d.downloadProgressed(track, percent, Resources.getString("DownloadThread.Downloading_Tracks"));
+                  }
                 }
               }
             }
@@ -497,7 +498,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
     int noOfRated = trackDatabase.getNoOfRated();
     int noOfUnrated = trackDatabase.getNoOfUnrated();
     int noOfUnratedOnPlaylist = trackDatabase.getNoOfUnratedOnPlaylist();
-    if (noOfRated >= noOfUnrated / 2 && noOfUnrated < noOfUnratedOnPlaylist)
+    if ((noOfRated > 3 && noOfUnrated < noOfUnratedOnPlaylist) || noOfUnrated < 5)
       go();
   }
   
