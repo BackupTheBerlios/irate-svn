@@ -26,13 +26,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/27 03:34:06 $
+ * Date Updated: $Date: 2003/11/27 04:32:56 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.111 $
+ * @version $Revision: 1.112 $
  */
 public class Client extends AbstractClient {
 
@@ -168,7 +168,7 @@ public class Client extends AbstractClient {
     downloadThread.checkAutoDownload();
     previous.setEnabled(playThread.hasHistory());
   }
-
+  
   //called from playThread.addUpdateListener(this);
   public void actionPerformed() {
     display.asyncExec(new Runnable() {
@@ -188,20 +188,7 @@ public class Client extends AbstractClient {
     return playThread.getCurrentTrack();
   }
 
-  /**
-   * PluginApplication interface:
-   * Set rating for the specified track.
-   * Override the base class so that we can update the GUI after the rating
-   * has been changed.
-   */
-  public void setRating(final Track track, int rating) {
-    // Return if there's no track to rate.
-    if (track == null)
-      return;
-
-    // Call the super method to deal with updating the track and DB.    
-    super.setRating(track, rating);
-
+  public void updateTrack(Track track) {
     // Update the SWT GUI
     trackTable.updateTrack(track);
     update();
@@ -413,17 +400,18 @@ public class Client extends AbstractClient {
         downloadThread.go();
       }
     });
+    //Added for a nicer UI by Allen Tipper 16.9.03
+    item1_1.addArmListener(new ToolTipArmListener("Download a new track"));
+    //end add
+
     MenuItem item_undo = new MenuItem(menu1, SWT.PUSH);
-    item_undo.setText("Undo Last Rating");
+    item_undo.setText("Undo last rating");
     item_undo.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         undoLastRating();
       }
-      });
-
-    //Added for a nicer UI by Allen Tipper 16.9.03
-    item1_1.addArmListener(new ToolTipArmListener("Download a new track"));
-    //end add
+    });
+    item_undo.addArmListener(new ToolTipArmListener("Undo the last change made to a rating"));
 
     MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
     item1_4.setText("Quit");
@@ -883,15 +871,4 @@ public class Client extends AbstractClient {
     showAccountDialog();
   }
   
-  /**
-   * Undo the last rating and update the track table to show that it has been undone.
-   */
-  public void undoLastRating() {
-    super.undoLastRating();
-    display.asyncExec(new Runnable() {
-      public void run() {
-        trackTable.updateTable();
-      }});
-  }
-
 }

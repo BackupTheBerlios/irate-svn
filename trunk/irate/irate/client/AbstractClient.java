@@ -17,8 +17,9 @@ import irate.common.Preferences;
 /**
  * @author Anthony Jones
  */
-public abstract class AbstractClient implements UpdateListener, PlayerListener, PluginApplication {
-  
+public abstract class AbstractClient
+  implements UpdateListener, PlayerListener, PluginApplication {
+
   protected TrackDatabase trackDatabase;
   protected PlayListManager playListManager;
   protected PlayerList playerList;
@@ -26,41 +27,42 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
   protected DownloadThread downloadThread;
   protected PluginManager pluginManager;
   protected Preferences userPreferences;
-  
-  private Track lastTrackRanked;
+
+  private Track lastRatedTrack;
   private int lastTrackPreviousRank;
-  
+
   public AbstractClient() {
-    
+
     userPreferences = new Preferences();
-    
-    lastTrackRanked = null;
+
+    lastRatedTrack = null;
     lastTrackPreviousRank = -1;
-    
+
     File home = new File(System.getProperties().getProperty("user.home"));
     File dir = null;
     File file = null;
-    
+
     // Check to see if the iRATE directory exists in the user's home.
     // This needs to be there.
     dir = new File(home, "/irate");
-    if(!dir.exists()){
+    if (!dir.exists()) {
       dir.mkdir();
     }
-    
+
     // Check to see if the user has a track database directory set in the
     // irate.xml file.  If so, this directory should point to the trackdatabase.xml
     // file.
-      String preference = Preferences.getUserDownloadDirectoryPreference();
-      if (preference != null) {
-        file = new File(preference);
-      } else {
-          // If they don't have one set, fall back on the home directory.
-          // If it doesn't exist in either location, then the user will need to fill in the
-          // registration information.
-          dir = new File(home, "irate");
-          file = new File(dir, "trackdatabase.xml");
-      }
+    String preference = Preferences.getUserDownloadDirectoryPreference();
+    if (preference != null) {
+      file = new File(preference);
+    }
+    else {
+      // If they don't have one set, fall back on the home directory.
+      // If it doesn't exist in either location, then the user will need to fill in the
+      // registration information.
+      dir = new File(home, "irate");
+      file = new File(dir, "trackdatabase.xml");
+    }
 
     try {
       trackDatabase = new TrackDatabase(file);
@@ -68,18 +70,16 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
     catch (IOException e) {
       e.printStackTrace();
     }
-    
 
     playerList = new PlayerList();
-    
+
     // Add the client as a player listener on each player.
     // If this doesn't make sense in the future, we'll have to look
     // at doing this another way.
-    for(int i=0; i<playerList.getPlayers().length; ++i)
-    {
+    for (int i = 0; i < playerList.getPlayers().length; ++i) {
       playerList.getPlayers()[i].addPlayerListener(this);
     }
-    
+
     playListManager = new PlayListManager(trackDatabase);
     playThread = new PlayThread(playListManager, playerList);
 
@@ -105,75 +105,49 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
       boolean newState = false;
       public void actionPerformed() {
         setState(downloadThread.getState());
-        if(downloadThread.getPercentComplete()==100)
-          updateTrackTable();     
+        if (downloadThread.getPercentComplete() == 100)
+          updateTrackTable();
       }
     });
-    
+
     // If a track database couldn't be loaded from the file system, then we
     // need to create a new account.
-    if(trackDatabase.getNoOfTracks() ==0) {
+    if (trackDatabase.getNoOfTracks() == 0) {
       createNewAccount();
     }
-    
+
   }
-  
-
 
   /**
-	 * PluginApplication interface:
-	 * Get the track that is currently being played.
-	 */
-	public Track getPlayingTrack() {
-		return playThread.getCurrentTrack();
-	}
-	
-	/**
-	 * PluginApplication interface:
-	 * Set rating for the specified track.
-	 */
-	public void setRating(final Track track, int rating) {
-		final Integer ratingInt = new Integer(rating);
-		
-    lastTrackRanked = track;	
-    lastTrackPreviousRank = -1;
-    if(track.isRated()) {
-      lastTrackPreviousRank = (int)track.getRating();
-    }
-      
-		// Update the Track Rating
-		track.setRating(ratingInt.intValue());
-		 
-		if (ratingInt.intValue() == 0 && track == getSelectedTrack()) {
-			playThread.reject();
-		}
-
-	  // Save the database with the updated rating
-		try {
-			trackDatabase.save();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-  
-  /**
-   * Switch the last track that was ranked back to its previous ranking.
+   * PluginApplication interface:
+   * Get the track that is currently being played.
    */
-  public void undoLastRating() {
-    
-    if(lastTrackRanked == null) {
-      return;
+  public Track getPlayingTrack() {
+    return playThread.getCurrentTrack();
+  }
+
+  /**
+   * PluginApplication interface:
+   * Set rating for the specified track.
+   */
+  public void setRating(final Track track, int rating) {
+    final Integer ratingInt = new Integer(rating);
+
+    lastRatedTrack = track;
+    lastTrackPreviousRank = -1;
+    if (track.isRated()) {
+      lastTrackPreviousRank = (int) track.getRating();
+      updateTrack(track);
     }
-    
-    if(lastTrackPreviousRank != -1) {
-      lastTrackRanked.setRating(lastTrackPreviousRank);
+
+    // Update the Track Rating
+    track.setRating(ratingInt.intValue());
+
+    if (ratingInt.intValue() == 0 && track == getSelectedTrack()) {
+      playThread.reject();
     }
-    else {  
-      lastTrackRanked.unSetRating();
-    }
-    
-    //  Save the database with the updated rating
+
+    // Save the database with the updated rating
     try {
       trackDatabase.save();
     }
@@ -181,63 +155,95 @@ public abstract class AbstractClient implements UpdateListener, PlayerListener, 
       e.printStackTrace();
     }
   }
-	
-	public void setVolume(final int volume) {
-		
-		final Integer volumeInt = new Integer(volume);
 
-		playThread.setVolume(volumeInt.intValue());
+  /**
+   * Switch the last track that was ranked back to its previous ranking.
+   */
+  public void undoLastRating() {
 
-		//save the updated volume
-		try {
-			trackDatabase.save();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * PluginApplication interface:
-	 * Return true if music play is paused.
-	 */
-	public boolean isPaused() {
-		return playThread.isPaused();
-	}
-	
-	/**
-	 * PluginApplication interface:
-	 * Pause or unpause music play.
-	 */
-	public void setPaused(boolean paused) {
-		playThread.setPaused(paused);
-	}
-	
-	/**
-	 * PluginApplication interface:
-	 * Skip to the next song.
-	 */
-	public void skip() {
-		skip(false);
-	}
+    if (lastRatedTrack == null) {
+      return;
+    }
 
-	public void skip(boolean reverse) {
-		setPaused(false);
-		if (!reverse) {
-			playThread.reject();
-			downloadThread.checkAutoDownload();
-		}
-	}
-	
-	public void quit() {
-		trackDatabase.purge();
-		playThread.reject();
-	}
-	
+    if (lastTrackPreviousRank != -1) {
+      lastRatedTrack.setRating(lastTrackPreviousRank);
+    }
+    else {
+      lastRatedTrack.unSetRating();
+    }
+
+    //  Save the database with the updated rating
+    try {
+      trackDatabase.save();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    updateTrack(lastRatedTrack);
+  }
+
+  public void setVolume(final int volume) {
+
+    final Integer volumeInt = new Integer(volume);
+
+    playThread.setVolume(volumeInt.intValue());
+
+    //save the updated volume
+    try {
+      trackDatabase.save();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  /**
+   * PluginApplication interface:
+   * Return true if music play is paused.
+   */
+  public boolean isPaused() {
+    return playThread.isPaused();
+  }
+
+  /**
+   * PluginApplication interface:
+   * Pause or unpause music play.
+   */
+  public void setPaused(boolean paused) {
+    playThread.setPaused(paused);
+  }
+
+  /**
+   * PluginApplication interface:
+   * Skip to the next song.
+   */
+  public void skip() {
+    skip(false);
+  }
+
+  public void skip(boolean reverse) {
+    setPaused(false);
+    if (!reverse) {
+      playThread.reject();
+      downloadThread.checkAutoDownload();
+    }
+  }
+
+  public void quit() {
+    trackDatabase.purge();
+    playThread.reject();
+  }
+
   protected abstract void createNewAccount();
-	public abstract Track getSelectedTrack();
+  public abstract Track getSelectedTrack();
   public abstract void handleError(String code, String urlString);
   public abstract void setState(String state);
+
+  /** Update the display of all tracks. */
   public abstract void updateTrackTable();
+
+  /** Update the display of only one track. */
+  public abstract void updateTrack(Track track);
 
 }
