@@ -26,7 +26,7 @@ public class FunctionSetup
   {
     this.display = display_;
     final Shell shell = new Shell(display);
-    shell.setText("Set up "+func.getName());
+    shell.setText(func.getName()+" - "+Resources.getString("set_up"));
     shell.addShellListener(new ShellAdapter()
     {
       public void shellClosed(ShellEvent e){
