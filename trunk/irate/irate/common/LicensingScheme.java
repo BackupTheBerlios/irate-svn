@@ -25,7 +25,8 @@ public class LicensingScheme {
   public LicensingScheme(String copyrightData) {
     buildImageTable();
     if(copyrightData == null || copyrightData.equals("")) { //$NON-NLS-1$
-      initializeLicensingScheme(null, "", "No copyright available", "");
+      initializeLicensingScheme(null, "",
+Resources.getString("LicensingScheme.No_Copyright_Information_Available"), "");
     }
     else {	
       String urlFound = findURLInText(copyrightData);

@@ -24,7 +24,7 @@ public class MadPlayer {
     public native int nativeMain(String[] args);
 
     private int returnValue;
-    public static final boolean debug = true;
+    public static final boolean debug = false;
     private boolean stopped;
     private boolean running = false;
     private String[] args;
