@@ -3,26 +3,32 @@ package irate.swt;
 import irate.common.TrackDatabase;
 import irate.common.Track;
 import irate.client.*;
+import irate.download.DownloadThread;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
-
+import org.eclipse.swt.graphics.*;
 import java.io.*;
 import java.util.*;
+import java.net.*;
+
 
 public class Client implements UpdateListener{
   static Label lblTitle;
+  static Label lblState;
   static Table tblSongs;
   static Display display;
   static Shell shell;
-  
+  static ProgressBar progressBar;
 
   private Hashtable hashSongs = new Hashtable();
   private TrackDatabase trackDatabase;
   private PlayListManager playListManager;
   private PlayThread playThread;
+  private DownloadThread downloadThread;
+  private String strState = "";
   // private PlayThread playThread;
   
   
@@ -43,10 +49,51 @@ public class Client implements UpdateListener{
     
     playThread.addUpdateListener(this);
     playThread.start();
-    // playThread = new PlayThread(playListManager);
-    //playPanel = new PlayPanel(playListManager, playThread);
-    // playThread.start();
     
+    
+    
+    downloadThread = new DownloadThread(trackDatabase) {
+      public void process() {
+        super.process();
+       // perhapsDisableAccount();
+      }
+
+      public void handleError(String code, String urlString) {
+        //actionSetContinuousDownload(false);
+        URL url;
+        if (urlString.indexOf(':') < 0)
+          url = getClass().getResource("help/" + urlString);
+        else 
+          try {
+            url = new URL(urlString);
+          }
+          catch (MalformedURLException e) {
+            e.printStackTrace();
+            url = getClass().getResource("help/malformedurl.html");
+          }
+        MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR);
+        msg.setMessage("Error with url:"+url);
+        msg.open();
+      }
+    };    
+    downloadThread.addUpdateListener(new UpdateListener() {
+      private String state = "";
+      public void actionPerformed() {
+        String state = downloadThread.getState();
+        if (!state.equals(this.state)) {
+          this.state = state;
+          actionPerformed();
+        }
+      }
+    });
+    playThread.addUpdateListener(new UpdateListener() {
+      public void actionPerformed() {
+        downloadThread.checkAutoDownload();
+      }
+    });
+    downloadThread.start();
+  
+
   }
   
   public void update(){    
@@ -55,6 +102,7 @@ public class Client implements UpdateListener{
     TableItem item = (TableItem)hashSongs.get(track);
     tblSongs.select(tblSongs.indexOf(item));
     tblSongs.showItem(item);
+    lblState.setText(strState);
   }
   
   public void actionPerformed(){
@@ -168,9 +216,8 @@ public class Client implements UpdateListener{
       item.setText(data);
       hashSongs.put(tracks[i], item);
     }
-  
-  
   }
+  
   void quit()
   {
     shell.setVisible(false);
@@ -194,9 +241,10 @@ public class Client implements UpdateListener{
         quit();
       }
     });
-    // Create the layout.
-    GridLayout layout = new GridLayout(3, true);
-    layout.numColumns = 1;
+    //probly should use filllayout..but i dont wanna figure it out
+    //gridlayout is overkill for this
+    GridLayout layout = new GridLayout(2, false);
+    layout.horizontalSpacing = 0;
     // Set the layout into the composite.
     shell.setLayout(layout);
     // Create the children of the composite.
@@ -211,7 +259,13 @@ public class Client implements UpdateListener{
     item1.setMenu(menu1);
     
     MenuItem item1_1 = new MenuItem(menu1,SWT.PUSH);
-    item1_1.setText("Download");
+    item1_1.setText("Download More");
+    item1_1.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        System.out.println("DOwnload more");
+        downloadThread.go();
+      }
+    });    
     
     MenuItem item1_2 = new MenuItem(menu1,SWT.PUSH);
     item1_2.setText("Purge");
@@ -220,6 +274,11 @@ public class Client implements UpdateListener{
     
     MenuItem item1_4 = new MenuItem(menu1,SWT.PUSH);
     item1_4.setText("Quit");
+    item1_4.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        quit();
+      }
+    });    
     
     
     
@@ -237,21 +296,13 @@ public class Client implements UpdateListener{
     lblTitle.setText("Current song goes here");
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
-    gridData.horizontalSpan = 7;
+    gridData.horizontalSpan = 2;
     lblTitle.setLayoutData(gridData);
     
     tblSongs = new Table(shell, SWT.NONE);
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.FILL;
-    gridData.grabExcessHorizontalSpace = true;
-    gridData.verticalAlignment = GridData.FILL;
-    gridData.grabExcessVerticalSpace = true;
-    gridData.horizontalSpan = 7;
-    tblSongs.setLayoutData(gridData);
     
     
-    TableColumn col;
-    col = new TableColumn(tblSongs,SWT.LEFT);
+    TableColumn col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Artist");
     col.addListener(SWT.Selection, new Listener() {
@@ -282,7 +333,17 @@ public class Client implements UpdateListener{
     tblSongs.setHeaderVisible(true);
     synchronizePlaylist(playListManager, tblSongs);
     
+    for(int i = 0;i< tblSongs.getColumns().length;i++)
+      tblSongs.getColumns()[i].pack();
     
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = true;
+    gridData.verticalAlignment = GridData.FILL;
+    gridData.grabExcessVerticalSpace = true;
+    gridData.horizontalSpan = 2;
+    tblSongs.setLayoutData(gridData);
+    tblSongs.pack();
   /*  new Button(shell, SWT.PUSH).setText("This sux");
     new Button(shell, SWT.PUSH).setText("Yawn");
     new Button(shell, SWT.PUSH).setText("Not bad");
@@ -297,9 +358,6 @@ public class Client implements UpdateListener{
     item.setText("This sux");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        //MessageBox mesBox = new MessageBox(shell);
-        //mesBox.setMessage("ボタンがクリックされました");
-        //mesBox.open();
         setRating(0);
       }
     });
@@ -308,9 +366,6 @@ public class Client implements UpdateListener{
     item.setText("Yawn");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        //MessageBox mesBox = new MessageBox(shell);
-        //mesBox.setMessage("ボタンがクリックされました");
-        //mesBox.open();
         setRating(2);
       }
     });
@@ -319,9 +374,6 @@ public class Client implements UpdateListener{
     item.setText("Not bad");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        //MessageBox mesBox = new MessageBox(shell);
-        //mesBox.setMessage("ボタンがクリックされました");
-        //mesBox.open();
         setRating(5);
       }
     });
@@ -330,9 +382,6 @@ public class Client implements UpdateListener{
     item.setText("Cool");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        //MessageBox mesBox = new MessageBox(shell);
-        //mesBox.setMessage("ボタンがクリックされました");
-        //mesBox.open();
         setRating(7);
       }
     });
@@ -341,21 +390,20 @@ public class Client implements UpdateListener{
     item.setText("Love it");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        //MessageBox mesBox = new MessageBox(shell);
-        //mesBox.setMessage("ボタンがクリックされました");
-        //mesBox.open();
         setRating(10);
       }
     });
 
-    new ToolItem(toolbar,SWT.PUSH).setText("||");
+    new ToolItem(toolbar,SWT.SEPARATOR);    
+    
+    item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText("||");
+    item.setEnabled(false);
+    
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText(">>");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        //MessageBox mesBox = new MessageBox(shell);
-        //mesBox.setMessage("ボタンがクリックされました");
-        //mesBox.open();
         playThread.reject();
       }
     });
@@ -365,10 +413,25 @@ public class Client implements UpdateListener{
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
-    //gridData.horizontalSpan = 7;
+    gridData.horizontalSpan = 2;
     toolbar.setLayoutData(gridData);
-        
+    
+    lblState = new Label(shell, SWT.NONE);
+    
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.BEGINNING;
+    gridData.grabExcessHorizontalSpace = true;
+    lblState.setLayoutData(gridData);
+
+    progressBar = new ProgressBar(shell, SWT.HORIZONTAL);
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.END;
+    progressBar.setLayoutData(gridData);
+    
     shell.pack();
+    Rectangle rec = shell.getBounds();
+    rec.height = 300;
+    shell.setBounds(rec);
     shell.open();
   }
   
