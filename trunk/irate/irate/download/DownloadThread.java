@@ -1,4 +1,4 @@
-// Copyright 2003 Anthony Jones
+// Copyright 2003 Anthony Jones, Taras Glek
 
 package irate.download;
 

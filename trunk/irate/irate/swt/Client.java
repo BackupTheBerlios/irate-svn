@@ -1,4 +1,4 @@
-// Copyright 2003 Anthony Jones, Taras
+// Copyright 2003 Anthony Jones, Taras Glek
 
 package irate.swt;
 
