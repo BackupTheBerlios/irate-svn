@@ -113,6 +113,53 @@ public class DownloadThread extends Thread {
     System.out.println("Server error: " + code);
   }
 
+  URLConnection openConnection(URL u) throws IOException{
+  	final URL url = u;
+  	
+  	return null;
+  }
+  
+  private abstract class Worker implements Runnable{
+	protected Object input;
+  	private Object output;
+	private Thread timeoutThread;
+	private Exception exception;
+	
+	public Worker(Object input) {
+	  this.input = input;
+	}
+	
+	protected void setOutput(Object output) {
+		this.output = output;
+		timeoutThread.interrupt();
+	}
+		
+	protected void setException(Exception exception) {
+		this.exception = exception;
+		timeoutThread.interrupt();
+	}
+		
+	public abstract void run();
+	
+	public Object runOrTimeout(long timeout) throws Exception {
+		//running thread
+		timeoutThread = Thread.currentThread();
+		//thread with a task that might timeout
+		Thread th = new Thread(this);
+		th.start();
+		try {
+			Thread.sleep(timeout);
+		} catch(InterruptedException ie) {
+			if(exception != null)
+				throw exception;
+			else
+				return output;
+		}
+		throw new IOException("Timeout exceeded");
+	}
+  }
+ 
+  
   public void download(Track track) throws IOException {
     try {
       OutputStream os = null;
@@ -133,16 +180,70 @@ public class DownloadThread extends Thread {
         File file = new File(downloadDir, urlString);
 
         setState("Connecting " + track.getName());
-        URLConnection conn = url.openConnection();
-        conn.connect();
-        int contentLength = conn.getContentLength();
+        
+        //30 second timeout for the impatient
+        long timeout = 60000;
+        Worker worker = new Worker(url) {
+        	public void run() {
+        		try {
+        			URLConnection conn = ((URL)input).openConnection();
+        			conn.connect();
+        			Vector v = new Vector();
+        			v.add(conn);
+        			v.add(new Integer(conn.getContentLength()));
+					setOutput(v);
+        		} catch(IOException e) {
+        			setException(e);
+        		}
+        	}
+        };
+		URLConnection conn;
+		Integer intContentLength; 
+        try{
+			Vector v =  (Vector) worker.runOrTimeout(timeout);
+			conn = (URLConnection) v.elementAt(0);
+			intContentLength = (Integer) v.elementAt(1);
+        }catch(Exception e) {
+        	setState("Could not connect: "+ e);
+        	return;
+        }
+        worker = null;
+        int contentLength = intContentLength.intValue();
         setState("Downloading " + track.getName());
         is = conn.getInputStream();
         os = new FileOutputStream(file);
-        byte buf[] = new byte[128000];
+        byte buf[];// = new byte[128000];
         int totalBytes = 0;
+        
+		worker = new Worker(is){
+			public void run() {
+				InputStream is = (InputStream) input;
+				byte buf[] = new byte[128000];
+				int n;
+				try {
+					n = is.read(buf);
+				} catch(Exception e) {
+					setException(e);
+					return;
+				}
+				Vector v= new Vector();
+				v.add(buf);
+				v.add(new Integer(n));
+				setOutput(v);
+			}
+		};
+        
         while (true) {
-          int nbytes = is.read(buf);
+			int nbytes;
+	    	try {
+	    		Vector v = (Vector) worker.runOrTimeout(timeout);
+	    		buf = (byte[]) v.elementAt(0);
+	    		nbytes = ((Integer) v.elementAt(1)).intValue();
+	    	} catch(Exception e) {
+	    		e.printStackTrace();
+	    		return;
+	    	}
+	    	
           if (nbytes < 0)
             break;
           os.write(buf, 0, nbytes);
