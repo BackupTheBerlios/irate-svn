@@ -1,0 +1,181 @@
+iRATE server v0.1
+GPL licensed
+PeerMajor.org
+
+
+
+
+INSTALL
+
+
+outdated !!
+
+Database :
+
+CREATE TABLE `users` (
+  `id` int(12) NOT NULL default '0',
+  `user` varchar(32) NOT NULL default '',
+  `pass` varchar(32) NOT NULL default '',
+  `dateinscr` datetime NOT NULL default '0000-00-00 00:00:00',
+  `datelastlogin` datetime NOT NULL default '0000-00-00 00:00:00',
+  `ipinscr` varchar(15) NOT NULL default '',
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+
+CREATE TABLE `tracks` (
+  `artistname` varchar(64) NOT NULL default '',
+  `trackname` varchar(64) NOT NULL default '',
+  `license` varchar(128) NOT NULL default '',
+  `albumname` varchar(64) NOT NULL default '',
+  `pubdate` date NOT NULL default '0000-00-00',
+  `id` int(16) NOT NULL default '0',
+  `duration` int(4) NOT NULL default '0',
+  `adddate` date NOT NULL default '0000-00-00',
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+
+CREATE TABLE `distributions` (
+  `trackid` int(16) NOT NULL default '0',
+  `id` varchar(40) NOT NULL default '',
+  `codec` varchar(16) NOT NULL default '',
+  `averagebitrate` int(4) NOT NULL default '0',
+  `crediturl` varchar(128) NOT NULL default '',
+  `adddate` date NOT NULL default '0000-00-00'
+) TYPE=MyISAM;
+
+CREATE TABLE `ratings` (
+  `id` int(12) NOT NULL default '0',
+  `trackid` int(12) NOT NULL default '0',
+  `userid` int(12) NOT NULL default '0',
+  `rating` int(2) NOT NULL default '0',
+  `ratingdate` datetime NOT NULL default '0000-00-00 00:00:00',
+  `ratingnum` int(4) NOT NULL default '0'
+) TYPE=MyISAM;
+    
+CREATE TABLE `sources` (
+  `id` int(12) NOT NULL default '0',
+  `distribid` int(12) NOT NULL default '0',
+  `trackid` int(16) NOT NULL default '0',
+  `protocol` varchar(32) NOT NULL default '',
+  `link` varchar(128) NOT NULL default '',
+  `crediturl` varchar(64) NOT NULL default '',
+  `adddate` date NOT NULL default '0000-00-00',
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+  
+
+!! Draft of the new HTTP iRATE protocol
+
+! Logging in
+
+Client : GET http://irate.server.org/?u=myuser&p=mypass
+
+"u=myuser&p=mypass" : The client connects with login/pass : myuser/mypass . If the user "myuser" doesn't exists, it'll be automatically created with the given password.
+
+After the first login, the client will only send a hash of this password to the server.
+
+! Computing the hash
+
+SHA1("irate".$password)
+
+! Asking for new tracks
+
+Client : GET http://../?u=myuser&h=HASH&do=getnew&n=5
+
+"do=getnew&n=5" : The client asks for 5 new tracks.
+
+Server reply : \\
+ (HTTP Headers) \\
+ \\
+ <tracks> \\
+  <track> \\
+  <id>XXXX</id> \\
+  <artistname>XXXX</artistname> \\
+  <albumname>XXXX</albumname> \\
+  <distribution>
+   <id>SHA1</id> \\
+   <codec>VORBIS</codec> \\
+   <averagebitrate>128</averagebitrate> \\
+   <crediturl>http://www.magnatune.com/artists/XXXX</crediturl> \\
+   <source> \\
+    <protocol>http</protocol> \\
+    <link>http://../XXX.mp3</link> \\
+   </source> \\
+   <source> \\
+    ... \\
+   </source> \\
+  </distribution> \\
+  <distribution> \\
+   ... \\
+  </distribution> \\
+ </track> \\
+ \\
+ <track> \\
+  ... \\
+ </track> \\
+ \\
+ ... 3 more times .... \\
+</tracks>
+
+! Fields for a track
+
+* id : ldbid -0,  -1 : server specific (12 digit - 3digit - 2digit mod 97, -0/1)
+* artistname : string
+* albumname : string
+* trackname : string
+* duration : int (length in seconds)
+* license
+* crediturl : string
+
+! Fields for a distribution
+
+* crediturl : string
+* codec : string (http://www.matroska.org/technical/specs/codecid/)
+* averagebitrate : int (indicative)
+* hash_sha1 : string(40)
+* filesize : int
+
+! Fields for a source
+
+* protocol : string (eg. "http" or "bittorrent" or whatever)
+* link : string
+* crediturl : string
+
+
+The shown crediturl should be the first available from source, distribution and then track.
+
+
+! Rating tracks
+
+Client : GET http://../?u=myuser&h=HASH&do=rate&rate=XX:6,YY:9
+
+"do=rate&t=99:6,33:9" : Rate the tracks XX and YY to 6/10 and 9/10 
+
+Replace XX and YY by track IDs like 1043-001-34-0
+
+
+! Getting all the ratings back to the client
+
+Client : GET http://../&u=myuser&h=HASH&do=getratings
+
+"do=getratings" : the client asks for its previous ratings
+
+Server replu : \\
+(HTTP Headers) \\
+\\
+<ratings>XX:6,YY:3</ratings>
+
+The client had previously done 2 ratings : it rated the track with ID XX to 6/10, and the track YY to 3/10
+
+
+! Errors
+
+The server returns an error like this :
+
+Server reply : \\
+<error>ERROR_CODE</error>
+
+The error codes can be :
+* WRONG_PASSWORD : The password doesn't match for the user.
+* MUST_LOGIN : The username or the password wasn't given
+  
