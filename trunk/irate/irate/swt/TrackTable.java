@@ -236,13 +236,17 @@ public class TrackTable
     table.addMouseListener(new MouseAdapter() {
       public void mouseDown(MouseEvent e) 
       {
-        int colZeroWidth = table.getColumn(0).getWidth();
-        int colOneWidth = table.getColumn(1).getWidth();
-        int colTwoWidth = table.getColumn(2).getWidth();
+        // Carbon tables have some extra column margin width.
+        // Table.EXTRA_WIDTH is hardcoded to 24, and of course not public.
+        // There seems to be one extra pixel in there too.
+        final int margin = Client.isMac() ? 25 : 0;
+        int colZeroWidth = table.getColumn(0).getWidth() + margin;
+        int colOneWidth = table.getColumn(1).getWidth() + margin;
+        int colTwoWidth = table.getColumn(2).getWidth() + margin;
         
-        int colTwoX = colZeroWidth + colOneWidth;
+        int colTwoX = (margin / 2) + colZeroWidth + colOneWidth;
         
-        TableItem item = table.getItem(new Point(0, e.y));
+        TableItem item = table.getItem(new Point(margin, e.y));
         if (item == null)
           clickedTrack = null;
         else
@@ -250,6 +254,9 @@ public class TrackTable
           // If the user clicked on the rating column, then bring up the
           // pop-up menu.
           // NOTE: WIDTH OF RATING ICON IS HARD-CODED HERE!
+        System.out.println("mouseDown: " + e.x + "," + e.y +
+          "  widths " + colZeroWidth + "," + colOneWidth + "," + colTwoWidth +
+          "  colTwoX " + colTwoX);
         if (e.x >= colTwoX && e.x < (colTwoX+colTwoWidth) && e.x < (colTwoX+80)) {
           if (popupMenu != null && clickedTrack != null) {
             menuSelectedTrack = clickedTrack;
