@@ -2,9 +2,10 @@
 
 package irate.client;
 
+
+import irate.common.Preferences;
 import irate.common.Track;
 import irate.common.UpdateListener;
-
 import java.io.*;
 import java.util.*;
 
@@ -66,7 +67,7 @@ public class PlayThread extends Thread {
   private void playTrack() {
     try {
       synchronized (this) {
-        speaking = playListManager.getTrackDatabase().isRoboJockEnabled();
+        speaking = Preferences.isRoboJockEnabled();
         // If a next track has been chosen by the user, use that, otherwise
         // pick one intelligently.
         currentTrack =
