@@ -8,8 +8,8 @@ all: libswt.o libnanoxml-lite.o
 #libswt.a:libswt.o 
 #	ar -rcs libswt.a libswt.o
 ifeq ($(PLATFORM),linux-motif)
-swt.jar: swt-2.1-linux-motif.zip
-	unzip swt-2.1-linux-motif.zip
+swt.jar: swt-2.1.2-linux-motif.zip
+	unzip swt-2.1.2-linux-motif.zip
 else
 
 ifeq ($(PLATFORM),win32)
@@ -39,9 +39,9 @@ endif
 
 endif
 
-swt-2.1-linux-motif.zip:
-	wget http://download.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-linux-motif.zip
-	
+swt-2.1.2-linux-motif.zip:
+	wget http://download.eclipse.org/downloads/drops/R-2.1.2-200311030802/swt-2.1.2-linux-motif.zip
+
 swt-2.1-win32.zip:
 	wget http://download2.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-win32.zip
 
