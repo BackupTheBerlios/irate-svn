@@ -257,14 +257,19 @@ public class LircRemoteControlPlugin
       while (!terminating) {
 	long connectStart = System.currentTimeMillis();
 	try {
-	  s = new Socket(host, port);
+          if (host.startsWith("/"))
+              s = null;
+          else {
+              s = new Socket(host, port);
+              s.setSoTimeout(10000);
+          }
 	    // This makes the thread wake up occasionally, which will allow any
 	    // dead threads to be cleaned up.  This can result from disconnect()
 	    // being called at a bad time.
             // Note that setSoTimeout does NOT work on GCJ (version 3.0).
-	  s.setSoTimeout(10000);
 	  try {
-	    BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
+            InputStream is = s == null ? new FileInputStream(host) : s.getInputStream();
+	    BufferedReader r = new BufferedReader(new InputStreamReader(is));
 	    try {
 	      connectStatus = true;
 	      notifyConnectStatusChanged();
@@ -295,7 +300,8 @@ public class LircRemoteControlPlugin
 	    }
 	  }
 	  finally {
-	    try {s.close();} catch (IOException e) {
+            if (s != null)
+              try {s.close();} catch (IOException e) {
           // Ignoring this.
         }
 	    s = null;

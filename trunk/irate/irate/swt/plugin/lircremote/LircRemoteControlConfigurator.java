@@ -52,7 +52,7 @@ public class LircRemoteControlConfigurator
     GridLayout layout = new GridLayout(2, false);
     shell.setLayout(layout);
 
-    new Label(shell, SWT.NONE).setText("Host");
+    new Label(shell, SWT.NONE).setText("Host or device");
     host = new Text(shell, SWT.SINGLE | SWT.BORDER);
     host.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));;
     host.setText(plugin.getHost());
@@ -63,7 +63,7 @@ public class LircRemoteControlConfigurator
     };
     host.addModifyListener(callSetup);
 
-    new Label(shell, SWT.NONE).setText("Port");
+    new Label(shell, SWT.NONE).setText("Port (if host specified)");
     port = new Text(shell, SWT.SINGLE | SWT.BORDER);
     port.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));;
     port.setText(Integer.toString(plugin.getPort()));
