@@ -618,6 +618,7 @@ public class TrackTable
   
   /** Select a specified Track. */
   public void select(Track track, boolean scrollToIt) {
+    table.forceFocus();   
     this.selected = track;
 
       // If the pop-up menu is active, then we select that track instead. 
