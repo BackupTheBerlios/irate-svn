@@ -1,6 +1,6 @@
 // Copyright 2003 Stephen Blackheath
 
-// Modified for the external control plugin by Robin Sheat
+// Modified for the external control plugin by Robin
 // <robin@kallisti.net.nz>
 
 package irate.swt.plugin.externalcontrol;
@@ -15,7 +15,11 @@ import irate.plugin.externalcontrol.ExternalControlPlugin;
 /**
  * SWT version of the configurator for the external control plugin
  *
- * @author Robin Sheat
+ * Date Created: 18/9/2003
+ * Date Updated: $$Date: 2003/09/20 11:49:08 $$
+ * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
+ * @author Updated:	$$Author: eythian $$
+ * @version $$Revision: 1.3 $$
  */
 public class ExternalControlConfigurator {
   private Display display;

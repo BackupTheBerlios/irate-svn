@@ -14,10 +14,10 @@ import nanoxml.*;
  *  connections can be handled by different instances.
  *
  * Date Created: 20/9/2003
- * Date Updated: $$Date: 2003/09/20 10:13:25 $$
- * @author Creator:	Robin <robin@kallisti.net.nz>
+ * Date Updated: $$Date: 2003/09/20 11:49:08 $$
+ * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.1 $$
+ * @version $$Revision: 1.2 $$
  */
 
 public class ExternalControlCommunicator

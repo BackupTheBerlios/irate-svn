@@ -14,7 +14,11 @@ import nanoxml.*;
  * Plugin to allow external control of the iRATE client through a
  * network socket.
  *
- * @author Robin Sheat <robin@kallisti.net.nz>
+ * Date Created: 18/9/2003
+ * Date Updated: $$Date: 2003/09/20 11:49:08 $$
+ * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
+ * @author Updated:	$$Author: eythian $$
+ * @version $$Revision: 1.7 $$
  */
 
 public class ExternalControlPlugin 
@@ -167,6 +171,7 @@ public class ExternalControlPlugin
           comm.start();
         } catch (InterruptedIOException e) {
         } catch (IOException e) {
+          prepareToDie();
         }
       }
     } // run()

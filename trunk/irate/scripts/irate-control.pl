@@ -11,7 +11,9 @@
 # Copyright (C) 2003 Robin Sheat <robin@kallisti.net.nz>
 # Released under the GNU General Public License
 
-# Version 0.01 - 18/9/2003
+# Version 0.02 - 18/9/2003
+
+# $Id: irate-control.pl,v 1.3 2003/09/20 11:49:08 eythian Exp $
 
 use XML::Simple;
 use IO::Socket;
@@ -57,7 +59,7 @@ while (!$finished) {
     print "Plays:\t$result{rating}\n";
     print "Rate:\t$result{state}\n\n";
 
-    print "[S]kip\t\t[P]ause\t\t[U]npause\n";
+    print "[S]kip\t\t[P]ause/unpause\n";
     print "[1] This sux\t[2] Yawn\t[3] Not bad\n";
     print "[4] Cool\t[5] Love it\n";
     print "[W]hats playing\t[Q]uit\n";
@@ -73,9 +75,7 @@ while (!$finished) {
         %command = ( 'type' => 'skip' );
         $poke = 1;
     } elsif ($input =~ /p/i) {
-        %command = ( 'type' => 'pause' );
-    } elsif ($input =~ /u/i) {
-        %command = ( 'type' => 'unpause' );
+        %command = ( 'type' => 'invert-pause' );
     } elsif ($input =~ /q/i) {
         %command = ( 'type' => 'disconnect' );
         $finished = 1;
