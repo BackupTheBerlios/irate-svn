@@ -81,6 +81,7 @@ CLIENT_FILES = \
 	irate/client/AbstractPlayer.java \
 	irate/client/PlayerListener.java \
 	irate/client/Resources.java \
+	irate/client/StreamPlayer.java \
 	irate/client/SoundEventPlayer.java
 #	irate/client/LibMadPlayer.java
 #	irate/client/AudioDevice.java 
