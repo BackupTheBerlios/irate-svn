@@ -16,6 +16,7 @@ import irate.swt.plugin.SWTPluginUIFactory;
 
 import java.io.*;
 import java.util.List;
+import java.util.StringTokenizer;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -478,40 +479,46 @@ public class Client extends AbstractClient {
     catch (Exception e) {
       System.out.println("JNLP:" + e);
 
-      String cmd;
+      String wholeCmd;
       Runtime r = Runtime.getRuntime();
-      try {
-        // Check the browser preference. 
-        cmd = Preferences.getUserPreference("browser");
-  
-        // If it's blank then try the KDE default and if that fails then we
-        // try the Windows default.
-        if (cmd == null || cmd.length() == 0) {
-          try {
-            cmd = "kfmclient exec " + url;
-            System.out.println(cmd);
-            r.exec(cmd);
-            return;
-          }
-          catch (Exception ex) {
-          }
-          cmd = "rundll32 url.dll,FileProtocolHandler";
-        }
-        // If '%u' is in the cmd, then we replace it with the
-        // URL. Otherwise we just append the URL.
+      // Check the browser preference. 
+      wholeCmd = Preferences.getUserPreference("browser");
+
+      // If it's blank then try the KDE default and if that fails then we
+      // try the Windows default.
+      if (wholeCmd == null || wholeCmd.length() == 0)
+        wholeCmd = "kfmclient exec " + url + "|" + "rundll32 url.dll,FileProtocolHandler";
+        // Go through the list of possible commands (separated by |)
+      StringTokenizer st = new StringTokenizer(wholeCmd, "|");
+      while (st.hasMoreTokens()) {
+        String cmd = st.nextToken();
+          // We detach the last command in the list, that is, we don't wait for
+          // its success or failure to be reported.
+        boolean detach = !st.hasMoreTokens();
         int insertPt = cmd.indexOf("%u");
+          // If '%u' is in the cmd, then we replace it with the
+          // URL. Otherwise we just append the URL.
         if (insertPt != -1) {
           String leftBit = cmd.substring(0,insertPt);
           String rightBit = cmd.substring(insertPt+2);
           cmd = leftBit + url + rightBit;
         } else {
-          cmd += " " + url;
+          cmd += " "+url;
         }
-        System.out.println(cmd);
-        r.exec(cmd);
-      }
-      catch (Exception ee) {
-        System.err.println(ee.toString());
+        System.out.println("Executing: "+cmd);
+        try {
+          Process p = r.exec(cmd);
+          if (detach)
+            break;
+          int returnCode = p.waitFor();
+            // If it succeeded, then stop looping.
+          if (returnCode == 0)
+            break;
+          System.out.println("While executing, got return value "+returnCode);
+        }
+        catch (Exception ee) {
+          System.out.println("While executing, got exception "+ee.toString());
+        }
       }
     }
   }

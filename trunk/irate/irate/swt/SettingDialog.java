@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/06/15 11:53:09 $
+ * Date Updated: $Date: 2004/07/19 05:50:24 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.24 $
+ * @version $Revision: 1.25 $
  */
 public class SettingDialog
 {
@@ -164,8 +164,11 @@ public class SettingDialog
     new Label(comp, SWT.NONE).setText(getResourceString("SettingDialog.Label.Browser")); 
 
     browsers = new BrowserButton[]{ 
-      new BrowserButton("Mozilla/Firebird (Linux/UNIX)", 
-                        "mozilla -remote openURL(%u,new-window)", 
+      new BrowserButton("Mozilla (Linux/UNIX)", 
+                        "mozilla -remote openURL(%u,new-window)|mozilla", 
+                        getResourceString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
+      new BrowserButton("Mozilla-Firefox (Linux/UNIX)", 
+                        "firefox -remote openURL(%u,new-window)|firefox", 
                         getResourceString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
       new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec",  //$NON-NLS-2$
                         getResourceString("SettingDialog.Button.Browser.Tooltip.Konqueror")),  
