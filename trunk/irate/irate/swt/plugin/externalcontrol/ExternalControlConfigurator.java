@@ -11,15 +11,16 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.SWT;
 import irate.plugin.*;
 import irate.plugin.externalcontrol.ExternalControlPlugin;
+import irate.plugin.externalcontrol.Resources;
 
 /**
  * SWT version of the configurator for the external control plugin
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2004/06/15 12:13:19 $$
- * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
- * @author Updated:	$$Author: blackh $$
- * @version $$Revision: 1.7 $$
+ * Date Updated: $$Date: 2004/07/22 06:12:42 $$
+ * @author Creator:	Robin <robin@kallisti.net.nz> (eythian)
+ * @author Updated:	$$Author: eythian $$
+ * @version $$Revision: 1.8 $$
  */
 public class ExternalControlConfigurator {
   private Display display;
@@ -38,7 +39,7 @@ public class ExternalControlConfigurator {
     this.plugin = (ExternalControlPlugin) plugin_;
 
     final Shell shell = new Shell(display);
-    shell.setText("External control configuration");
+    shell.setText(Resources.getString("configuration"));
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e){
         done=true;
@@ -63,38 +64,38 @@ public class ExternalControlConfigurator {
       }
     };
       
-    new Label(shell, SWT.NONE).setText("Port");
+    new Label(shell, SWT.NONE).setText(Resources.getString("port"));
     port = new Text(shell, SWT.SINGLE | SWT.BORDER);
     port.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     port.setText(Integer.toString(plugin.getPort()));
     port.addModifyListener(callSetup);
 
-    new Label(shell, SWT.NONE).setText("Simultaneous connections");
+    new Label(shell, SWT.NONE).setText(Resources.getString("sim_connections"));
     simConn = new Text(shell, SWT.SINGLE | SWT.BORDER);
     simConn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     simConn.setText(Integer.toString(plugin.getSimConnections()));
     simConn.addModifyListener(callSetup);
 
-    new Label(shell, SWT.NONE).setText("Localhost only");
+    new Label(shell, SWT.NONE).setText(Resources.getString("local_only"));
     localhostOnly = new Button(shell, SWT.CHECK);
     localhostOnly.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     localhostOnly.setSelection(plugin.getLocalhostOnly());
     localhostOnly.addSelectionListener(buttonSelected);
 
-    new Label(shell, SWT.NONE).setText("Require password");
+    new Label(shell, SWT.NONE).setText(Resources.getString("require_password"));
     requirePassword = new Button(shell, SWT.CHECK);
     requirePassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     requirePassword.setSelection(plugin.getRequirePassword());
     requirePassword.addSelectionListener(buttonSelected);
     
-    new Label(shell, SWT.NONE).setText("Password");
+    new Label(shell, SWT.NONE).setText(Resources.getString("password"));
     password = new Text(shell, SWT.SINGLE | SWT.BORDER);
     password.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     password.setText(plugin.getPassword());
     password.addModifyListener(callSetup);
 
     org.eclipse.swt.widgets.Button ok = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
-    ok.setText("OK");
+    ok.setText(Resources.getString("button.OK"));
     GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
     gd.horizontalSpan = 2;
     ok.setLayoutData(gd);
