@@ -16,6 +16,12 @@ public class Client extends JFrame {
 
   public static void main(String[] args) {
     try {
+    UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+    }
+    catch (Exception e) {
+      //e.printStackTrace();
+    }
+    try {
       Client client = new Client() {
         public void actionClose() {
           super.actionClose();
