@@ -1,0 +1,4 @@
+ echo $TARGET $BUILD 
+ mingw32 i686-pc-linux-gnu
+ $GCC_SRC_DIR/configure --disable-shared --enable-libgcj --prefix=$PREFIX     --build=$BUILD --host=$HOST --target=$TARGET     --disable-nls --disable-shared --disable-debug --enable-threads=win32     --with-gcc --with-gnu-as --with-gnu-ld ; make  BOOT_CFLAGS='-O2 -pipe -g0'     CFLAGS='-O2 -pipe -g0' CXXFLAGS='-O2 -pipe -g0'     LIBCFLAGS='-O2 -pipe -g0'     LIBCXXFLAGS='-O2 -pipe -g0 -fno-implicit-templates'     DEBUG_FLAGS='-g0' LIBGCC2_DEBUG_CFLAGS='-g0'     JCFLAGS='-pipe -g0' GCJFLAGS='-O2 -pipe -g0'     LIBGCJ_CFLAGS='-O2 -pipe -g0'     LIBGCJ_CXXFLAGS='-O2 -pipe -g0 -fno-implicit-templates'     LDFLAGS='-s'  -j2
+
