@@ -22,13 +22,13 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/02 03:43:11 $
+ * Date Updated: $Date: 2003/10/02 06:19:21 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.79 $
+ * @version $Revision: 1.80 $
  */
 public class Client extends AbstractClient {
 
@@ -492,9 +492,8 @@ public class Client extends AbstractClient {
     addColumnListener(col, new MagicComparator(3));
 
     col = new TableColumn(tblSongs, SWT.LEFT);
-    col.setWidth(100);
-    col.setText("Last");
     col.setWidth(150);
+    col.setText("Last");
     tblSongs.setHeaderVisible(true);
     synchronizePlaylist(playListManager, tblSongs);
     tblSongs.addSelectionListener(new SelectionAdapter() {

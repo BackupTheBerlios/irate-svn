@@ -101,8 +101,6 @@ lib/swt.jar:
 	$(MAKE) -C lib/ swt.jar
 
 lib/libnanoxml-lite.o:
-
-lib/libnanoxml-lite.o:
 	$(MAKE) -C lib/ libnanoxml-lite.o
 
 lib/libhttpclient.o:
