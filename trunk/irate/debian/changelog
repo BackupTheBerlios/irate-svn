@@ -1,3 +1,9 @@
+irate (0.2-3) unstable; urgency=low
+
+  * Fixed a problem with the infra red remote configuration.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Wed, 13 Aug 2003 10:57:23 +0800
+
 irate (0.2-2) unstable; urgency=low
 
   * Added missing dependencies.
