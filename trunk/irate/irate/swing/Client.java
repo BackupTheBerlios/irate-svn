@@ -352,16 +352,16 @@ public class Client extends JFrame {
     JMenu m = new JMenu("Auto download");
     //Added by Allen Tipper for UI niceness 14.9.03
     m.addMenuListener(new MenuListener() {
-      public void menuSelected(MenuEvent e){
-        downloadThread.setState("Set number of unrated tracks to stop automatic downloading");
-      }
-      public void menuDeselected(MenuEvent e){
-	downloadThread.doCheckAutoDownload();
-      }
-      public void menuCanceled(MenuEvent e){
-	downloadThread.doCheckAutoDownload();
-      }
-    });
+        public void menuSelected(MenuEvent e){
+          downloadThread.setState("Set number of unrated tracks to stop automatic downloading");
+        }
+        public void menuDeselected(MenuEvent e){
+          downloadThread.doCheckAutoDownload();
+        }
+        public void menuCanceled(MenuEvent e){
+          downloadThread.doCheckAutoDownload();
+        }
+      });
     //end add
     ButtonGroup bg = new ButtonGroup();
     int counts[] = new int[] {0, 3, 5, 11};
@@ -403,16 +403,16 @@ public class Client extends JFrame {
     JMenu m = new JMenu("Play list");
     //Added by Allen Tipper for UI niceness 14.9.03
     m.addMenuListener(new MenuListener() {
-      public void menuSelected(MenuEvent e){
-      	downloadThread.setState("Set number of tracks in playlist");
-      }
-      public void menuDeselected(MenuEvent e){
-       	downloadThread.doCheckAutoDownload();
-      }
-      public void menuCanceled(MenuEvent e){
-       	downloadThread.doCheckAutoDownload();
-      }
-    });
+        public void menuSelected(MenuEvent e){
+          downloadThread.setState("Set number of tracks in playlist");
+        }
+        public void menuDeselected(MenuEvent e){
+          downloadThread.doCheckAutoDownload();
+        }
+        public void menuCanceled(MenuEvent e){
+          downloadThread.doCheckAutoDownload();
+        }
+      });
     //end add
     ButtonGroup bg = new ButtonGroup();
     int[] counts = new int[] { 5, 7, 13, 19, 31 };
@@ -420,24 +420,24 @@ public class Client extends JFrame {
       final int count = counts[i];
       JCheckBoxMenuItem mi = new JCheckBoxMenuItem(count + " tracks");
       mi.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          trackDatabase.setPlayListLength(count);
-        }
-      });
+          public void actionPerformed(ActionEvent e) {
+            trackDatabase.setPlayListLength(count);
+          }
+        });
       //Added for UI niceness by Allen Tipper 14.9.03
 
       mi.addMenuDragMouseListener(new MenuDragMouseListener() {
-              public void menuDragMouseDragged(MenuDragMouseEvent e){}
-              public void menuDragMouseEntered(MenuDragMouseEvent e){
-                  downloadThread.setState("Set your play list to " + count + " number of tracks");
-              }
-              public void menuDragMouseExited(MenuDragMouseEvent e){
-                  downloadThread.doCheckAutoDownload();
-              }
-              public void menuDragMouseReleased(MenuDragMouseEvent e){
-                  downloadThread.doCheckAutoDownload();
-              }
-          });
+          public void menuDragMouseDragged(MenuDragMouseEvent e){}
+          public void menuDragMouseEntered(MenuDragMouseEvent e){
+            downloadThread.setState("Set your play list to " + count + " number of tracks");
+          }
+          public void menuDragMouseExited(MenuDragMouseEvent e){
+            downloadThread.doCheckAutoDownload();
+          }
+          public void menuDragMouseReleased(MenuDragMouseEvent e){
+            downloadThread.doCheckAutoDownload();
+          }
+        });
       //end add
       bg.add(mi);
       mi.setState(count == autoDownload);
@@ -447,28 +447,81 @@ public class Client extends JFrame {
     return m;
   }
     
+  public JMenu createUnratedsOnListMenu() {
+    int autoDownload = trackDatabase.getPlayListLength(); 
+    
+    JMenu m = new JMenu("Unrateds on list");
+    //Added by Allen Tipper for UI niceness 14.9.03
+    m.addMenuListener(new MenuListener() {
+        public void menuSelected(MenuEvent e){
+          downloadThread.setState("Set percentage of unrated tracks in "+
+                                  "playlist");
+        }
+        public void menuDeselected(MenuEvent e){
+          downloadThread.doCheckAutoDownload();
+        }
+        public void menuCanceled(MenuEvent e){
+          downloadThread.doCheckAutoDownload();
+        }
+      });
+    //end add
+    ButtonGroup bg = new ButtonGroup();
+    int[] counts = new int[] { 0, 13, 29, 47, 63, 79, 97 };
+    for (int i = 0; i < counts.length; i++) {
+      final int count = counts[i];
+      JCheckBoxMenuItem mi = new JCheckBoxMenuItem(count + "%");
+      mi.addActionListener(new ActionListener() {
+          public void actionPerformed(ActionEvent e) {
+            trackDatabase.setUnratedPlayListRatio(count);
+          }
+        });
+      //Added for UI niceness by Allen Tipper 14.9.03
+
+      mi.addMenuDragMouseListener(new MenuDragMouseListener() {
+          public void menuDragMouseDragged(MenuDragMouseEvent e){}
+          public void menuDragMouseEntered(MenuDragMouseEvent e){
+            downloadThread.setState("Set percentage of unrated songs in "+
+                                    "playlist to " + count + "%.");
+          }
+          public void menuDragMouseExited(MenuDragMouseEvent e){
+            downloadThread.doCheckAutoDownload();
+          }
+          public void menuDragMouseReleased(MenuDragMouseEvent e){
+            downloadThread.doCheckAutoDownload();
+          }
+        });
+      //end add
+      bg.add(mi);
+      mi.setState(count == autoDownload);
+      m.add(mi);
+    }
+    
+    return m;
+  }
+
+
   public JMenu createSettingsMenu() {
     JMenu m = new JMenu("Settings");
     menuItemAccount = new JMenuItem("Account");
     menuItemAccount.addActionListener(new ActionListener() {
-      public void actionPerformed(ActionEvent e) {
-        actionAccount();
-      }
-    });
+        public void actionPerformed(ActionEvent e) {
+          actionAccount();
+        }
+      });
     //Added for UI niceness by Allen Tipper 14.9.03
 
     menuItemAccount.addMenuDragMouseListener(new MenuDragMouseListener() {
 	    public void menuDragMouseDragged(MenuDragMouseEvent e){}
 	    public void menuDragMouseEntered(MenuDragMouseEvent e){
-		downloadThread.setState("Account settings");
+          downloadThread.setState("Account settings");
 	    }
 	    public void menuDragMouseExited(MenuDragMouseEvent e){
-		downloadThread.doCheckAutoDownload();
+          downloadThread.doCheckAutoDownload();
 	    }
 	    public void menuDragMouseReleased(MenuDragMouseEvent e){
-		downloadThread.doCheckAutoDownload();
+          downloadThread.doCheckAutoDownload();
 	    }
-	});
+      });
     //end add
     m.add(menuItemAccount);
     perhapsDisableAccount();
@@ -476,10 +529,10 @@ public class Client extends JFrame {
     if (playThread.isSpeechSupported()) {
       final JCheckBoxMenuItem roboJock = new JCheckBoxMenuItem("Enable RoboJock");
       roboJock.addActionListener(new ActionListener() {
-        public void actionPerformed(ActionEvent e) {
-          trackDatabase.setRoboJockEnabled(roboJock.getState());
-        }
-      });
+          public void actionPerformed(ActionEvent e) {
+            trackDatabase.setRoboJockEnabled(roboJock.getState());
+          }
+        });
       roboJock.setState(trackDatabase.isRoboJockEnabled());
       m.add(roboJock);
     }
@@ -501,22 +554,22 @@ public class Client extends JFrame {
     }
     //Added by Allen Tipper for UI niceness 14.9.03
     player.addMenuListener(new MenuListener() {
-      public void menuSelected(MenuEvent e){
-	downloadThread.setState("Set mp3 player");
-      }
-      public void menuDeselected(MenuEvent e){
-	downloadThread.doCheckAutoDownload();
-      }
-      public void menuCanceled(MenuEvent e){
-	downloadThread.doCheckAutoDownload();
-      }
-    });
+        public void menuSelected(MenuEvent e){
+          downloadThread.setState("Set mp3 player");
+        }
+        public void menuDeselected(MenuEvent e){
+          downloadThread.doCheckAutoDownload();
+        }
+        public void menuCanceled(MenuEvent e){
+          downloadThread.doCheckAutoDownload();
+        }
+      });
     //end add
     m.add(player);
 
     m.add(createDownloadMenu());
     m.add(createPlayListMenu());
-
+    m.add(createUnratedsOnListMenu());
     return m;
   }
 
