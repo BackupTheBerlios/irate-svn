@@ -1,0 +1,135 @@
+# This spec can build directly from a CVS pull by defining an IRATE_SRC
+# environment variable. It will still require an irate-src.tar.gz
+# tarball in the SOURCES directory, even though that file will not be
+# used.
+
+Name: irate-client-gtk
+Summary: The iRATE music database client
+Version: 0.3pre
+Release: 20031115
+Group: Applications/Multimedia
+Copyright: GPL
+Packager: Todd Pytel <tppytel@sophrosune.org>
+BuildRoot: /tmp/build-%{name}
+Source: irate-src.tar.gz
+Requires: mad, libswt-gtk2, libgcj3
+BuildRequires: gcc-java
+
+%description
+iRATE radio is a collaborative filtering mp3 player/downloader. The client logs into
+an iRATE server containing a large database of legally downloadable music. You rate 
+downloaded tracks and the server matches your ratings with those of other people to 
+provide you with music you'll like. 
+
+This package was built from a developer's version of iRATE. Thus, it may
+be unstable or have other undesirable behavior.
+
+%prep
+rm -rf $RPM_BUILD_ROOT
+mkdir $RPM_BUILD_ROOT
+
+if [ ! $IRATE_SRC ]; then
+%setup -n irate
+fi
+
+# The build macro will fail on a CVS build if we don't create this
+#
+mkdir -p $RPM_BUILD_DIR/irate
+
+%build
+if [ $IRATE_SRC ]; then
+cd $IRATE_SRC
+fi
+./configure
+PLATFORM=linux-libswt-gtk2 make
+
+%install
+if [ $IRATE_SRC ]; then
+cd $IRATE_SRC
+fi
+make PLATFORM=linux-libswt-gtk2 DESTDIR=$RPM_BUILD_ROOT install
+mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
+
+rmdir $RPM_BUILD_ROOT/usr/lib
+
+mkdir -p $RPM_BUILD_ROOT/usr/lib/menu
+cp rpm/mdk91/menu-mdk91 $RPM_BUILD_ROOT/usr/lib/menu/irate-client-gtk
+
+mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
+cp debian/irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1
+ln -s irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1/irate-client-gtk.1
+
+mkdir -p $RPM_BUILD_ROOT/usr/share/icons
+cp irate/swt/irate.png $RPM_BUILD_ROOT/usr/share/icons/irate-client-gtk.png
+
+# Building from a CVS pull breaks the traditional doc directive, so
+# we need to copy docs explicitly and use a docdir below
+#
+mkdir -p $RPM_BUILD_ROOT/usr/share/doc/%{name}-%{version}
+cp README COPYING $RPM_BUILD_ROOT/usr/share/doc/%{name}-%{version}
+
+%post
+%{update_menus}
+
+%postun
+%{clean_menus}
+
+%clean
+if [ $IRATE_SRC ]; then
+cd $IRATE_SRC
+make clean
+rm make.configure
+fi
+rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_DIR/irate
+
+%files
+%defattr(-,root,root)
+%docdir /usr/share/doc/%{name}-%{version}
+/usr/share/doc/%{name}-%{version}
+/usr/bin
+/usr/lib/menu
+/usr/share/man
+/usr/share/icons
+
+%changelog
+* Sat Nov 15 2003 Todd Pytel <tppytel@sophrosune.org> 0.3pre-20031115
+- Added Requires and build instructions for separate libswt-gtk2 RPM
+- Changed versioning to better match Anthony's debs
+
+* Sat Nov 08 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031108
+- Added icon
+
+* Sat Oct 11 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031011
+- Added checks for $IRATE_SRC to allow builds direct from a CVS directory
+- Explicitly copied the doc files and specified a docdir
+- Fixed typo in description
+
+* Mon Oct 06 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031006
+- Changed versioning to be consistent with Redhat specs
+
+* Mon Oct 06 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-2
+- Menu file is no longer a separate source since it is now in CVS
+
+* Sat Sep 20 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-1
+- Initial CVS commit
+
+* Sat Sep 20 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-b
+- Removed makefile patch due to new makefile, added PLATFORM export
+- added man page
+
+* Thu Sep 18 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-a
+- Initial snapshot spec required various name changes
+- moved menu file to separate source, rather than patch
+- removed icon
+
+* Sat Sep 13 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-1
+- Initial public RPM package
+
+* Sat Sep 13 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-b
+- Changed dependency to mad/madplay
+- Replaced desktop file with a menu system entry
+- Added post/postun menu macros
+
+* Wed Sep 10 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-a
+- Initial Mandrake RPM package

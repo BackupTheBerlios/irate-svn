@@ -1,0 +1,42 @@
+Building snapshot RPM's for the iRATE client
+
+Steps 1-3 need only be done once, and may not be necessary if you've built
+RPM's before.
+
+1) Install the rpm-build package.
+
+2) Assuming that you want to build as a normal user instead of root, create
+the file ~/.rpmmacros with the single line
+
+%_topdir                /home/tppytel/RPM
+
+Substituting your username for "tppytel", of course. The path can point to 
+any directory which is writeable by you. You cannot use the ~ shortcut for 
+your home directory, however.
+
+3) Create the necessary directories:
+
+mkdir -p /home/tppytel/RPM/{SPECS,SOURCES,RPMS,SRPMS,BUILD}
+
+substituting your choice of path appropriately.
+
+4) Copy the spec file from your distro's subdirectory to RPM/SPECS. You may
+want to rename it to something logical like irate.spec.
+
+5) Create a source tarball called irate-src.tar.gz from the CVS pull and put
+it in RPM/SOURCES. With my path choices, this looks like:
+
+cd ~/cvsirate
+tar czf ~/RPM/SOURCES/irate-src.tar.gz
+
+6) cd to the SPECS directory and do: 
+
+rpmbuild -bb irate.spec
+
+using whatever name you chose for the spec. Note that SuSE (should I ever get
+specs in for it) uses an older RPM version - use "rpm -bb" instead of
+"rpmbuild -bb".
+
+7) You will find the new RPM in either the i386 or i586 subdirectory of 
+RPM/RPMS - which one depends on the distro.
+
