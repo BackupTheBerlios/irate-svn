@@ -28,6 +28,8 @@
       <fileset dir="." includes="irate/download/*.class"/>
       <fileset dir="." includes="irate/plugin/*.class"/>
       <fileset dir="." includes="irate/plugin/*/*.class"/>
+      <fileset dir="." includes="irate/swt/plugin/*.class"/>
+      <fileset dir="." includes="irate/swt/plugin/*/*.class"/>
     </jar>
 
     <jar jarfile="irate-server.jar" manifest="META-INF/manifest.irate-server" compress="false">

@@ -15,6 +15,12 @@ import irate.common.Track;
 public interface PluginApplication
 {
   /**
+   * Get a factory that creates suitable UI objects, depending on the style of
+   * user interface used in the application.
+   */
+  public PluginUIFactory getUIFactory();
+
+  /**
    * Return true if music play is paused.
    */
   public boolean isPaused();

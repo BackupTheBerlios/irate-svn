@@ -2,8 +2,6 @@
 
 package irate.plugin;
 
-import irate.common.Track;
-
 /**
  * Base class for all plugins.
  *
@@ -12,11 +10,6 @@ import irate.common.Track;
 public abstract class Plugin
 {
   private PluginApplication app;
-
-  /**
-   * Plugin identifier, used to map to the right configurator.
-   */
-  public abstract String getIdentifier(); 
 
   /**
    * Get a short description of this plugin.

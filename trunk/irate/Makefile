@@ -56,8 +56,8 @@ irate-client: $(CLIENT_DEPS) $(CLIENT_LIBS)
 irate-server: $(SERVER_DEPS)
 	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o irate-server --main=irate.server.Server
 	
-irate-swt.o: irate/swt/*.java
-	$(GCJ) -c irate/swt/*.java -o irate-swt.o
+irate-swt.o: irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
+	$(GCJ) -c irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java -o irate-swt.o
 
 irate-client.o: $(CLIENT_FILES)
 	$(GCJ) -c $(CLIENT_FILES) -o irate-client.o
@@ -68,7 +68,7 @@ irate-download.o: irate/download/*.java
 irate-common.a:irate-common.o
 	ar rcs irate-common.a irate-common.o
 	 
-irate-common.o:irate/common/*.java
+irate-common.o:irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java
 	$(GCJ) -c irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java -o irate-common.o
 
 irate-server.o:irate/server/*.java
@@ -79,6 +79,8 @@ win32:
 	$(GCJ_WIN32) \
 	$(CLIENT_FILES) \
 	irate/swt/*.java \
+	irate/swt/plugin/*.java \
+	irate/swt/plugin/*/*.java \
 	irate/common/*.java \
 	irate/plugin/*.java \
 	irate/plugin/*/*.java \

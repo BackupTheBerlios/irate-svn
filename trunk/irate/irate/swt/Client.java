@@ -6,9 +6,11 @@ import irate.common.TrackDatabase;
 import irate.common.Track;
 import irate.common.UpdateListener;
 import irate.client.*;
+import irate.swt.plugin.SWTPluginUIFactory;
 import irate.download.DownloadThread;
 import irate.plugin.PluginApplication;
 import irate.plugin.PluginManager;
+import irate.plugin.PluginUIFactory;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
@@ -41,7 +43,13 @@ public class Client implements UpdateListener, PluginApplication {
   private Help help = new Help();
   
   private String strState = "";
-  
+
+  /**
+   * User-interface factory that creates SWT user-interface components for
+   * plug-ins.
+   */
+  private SWTPluginUIFactory uiFactory;
+
   public Client() {
 
     File home = new File(System.getProperties().getProperty("user.home"));
@@ -79,6 +87,7 @@ public class Client implements UpdateListener, PluginApplication {
     playListManager = new PlayListManager(trackDatabase);
     playThread = new PlayThread(playListManager, playerList);
 
+    uiFactory = new SWTPluginUIFactory(display, (PluginApplication)this);
     pluginManager = new PluginManager(this, dir);
 
     initGUI();
@@ -653,7 +662,7 @@ public class Client implements UpdateListener, PluginApplication {
     item2_1.setText("Plug-ins");
     item2_1.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        new PluginDialog(display, pluginManager);
+        new PluginDialog(display, pluginManager, (PluginApplication)Client.this);
       }
     });
 
@@ -767,7 +776,16 @@ public class Client implements UpdateListener, PluginApplication {
     }   
   }
   
-  
+  /**
+   * PluginApplication interface:
+   * Get a factory that creates suitable UI objects, depending on the style of
+   * user interface used in the application.
+   **/
+  public PluginUIFactory getUIFactory()
+  {
+    return uiFactory;
+  }
+
   public static void main(String[] args) throws Exception{
     new Client().run();
   }

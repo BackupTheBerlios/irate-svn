@@ -17,7 +17,7 @@ import java.io.*;
  */
 public class LircRemoteControlPlugin
   extends Plugin
-  implements Runnable, LircRemoteControlListener
+  implements LircRemoteControlListener
 {
   private String host;
   private int port;
@@ -113,7 +113,6 @@ public class LircRemoteControlPlugin
     });
 
       // Cheat just to get it going for now...
-    setHost("tui");
     ((Function)functions.get(0)).buttons.add(new Button("tune-down denon-tuner", Button.SINGLE));
     ((Function)functions.get(1)).buttons.add(new Button("tune-up denon-tuner", Button.SINGLE));
     ((Function)functions.get(2)).buttons.add(new Button("p.scan denon-tuner", Button.SINGLE));
@@ -126,14 +125,6 @@ public class LircRemoteControlPlugin
   public List getFunctions()
   {
     return functions;
-  }
-
-  /**
-   * Plugin identifier, used to map to the right configurator.
-   */
-  public String getIdentifier()
-  {
-    return "lircRemoteControl";
   }
 
   /**
@@ -162,12 +153,12 @@ public class LircRemoteControlPlugin
     listeners.remove(listener);
   }
 
-  private void notifyConnectStatusChanged(boolean connected)
+  private void notifyConnectStatusChanged()
   {
     Vector listeners = (Vector) this.listeners.clone();
     for (int i = 0; i < listeners.size(); i++) {
       LircRemoteControlListener listener = (LircRemoteControlListener) listeners.get(i);
-      listener.connectStatusChanged(this, connected);
+      listener.connectStatusChanged(this, connectStatus);
     }
   }
 
@@ -182,6 +173,12 @@ public class LircRemoteControlPlugin
 
 
 // ------ I/O ----------------------------------------------------------
+
+  private boolean terminating;
+  private Object timer = new Object();
+  private IOThread ioThread;
+  private Socket s;
+  private BufferedReader r;
 
   /**
    * Subclasses to override to do real work of attaching.
@@ -201,17 +198,29 @@ public class LircRemoteControlPlugin
     removeLircRemoteControlListener(this);
   }
 
+  /**
+   * True if we are attempting to connect.
+   */
   private boolean connected = false;
-
   private boolean isConnected() {return connected;}
+
+  /**
+   * True if we have actually established a connection.
+   */
+  private boolean connectStatus = false;
+
+  /**
+   * Return true if we have established a connection to the lirc daemon.
+   */
+  public boolean getConnectStatus() {return connectStatus;}
 
   private void connect()
   {
     if (!connected) {
-      terminating = false;
-      ioThread = new Thread(this);
-      ioThread.start();
       connected = true;
+      terminating = false;
+      ioThread = new IOThread();
+      ioThread.start();
     }
   }
 
@@ -220,34 +229,27 @@ public class LircRemoteControlPlugin
     if (connected) {
       try {
         if (ioThread != null) {
-          terminating = true;
+          ioThread.terminating = true;
           synchronized (timer) {
             timer.notifyAll();
           }
-          terminating = true;
+	  Socket s = ioThread.s;
           if (s != null)
             try {s.close();} catch (IOException e) {}
-	  System.out.println("Joining...");
-          ioThread.join();
-	  System.out.println("Joined...");
+	  // Work around GCJ bug:  Closing the socket, as we do above, does not
+	  // terminate the thread under GCJ.  So, we will just leave it dangling.
+	  // It breaks my heart to have to work around bugs like this.  :)
+	  //try {ioThread.join();} catch (InterruptedException e) {}
         }
-      }
-      catch (InterruptedException e) {
       }
       finally {
         ioThread = null;
-        r = null;
-        s = null;
         connected = false;
+	connectStatus = false;
+	notifyConnectStatusChanged();
       }
     }
   }
-
-  private boolean terminating;
-  private Object timer = new Object();
-  private Thread ioThread;
-  private Socket s;
-  private BufferedReader r;
 
   public String getHost()
   {
@@ -256,10 +258,12 @@ public class LircRemoteControlPlugin
 
   public synchronized void setHost(String host)
   {
-    this.host = host;
-    if (isConnected()) {
-      disconnect();
-      connect();
+    if (!this.host.equals(host)) {
+      this.host = host;
+      if (isConnected()) {
+	disconnect();
+	connect();
+      }
     }
   }
 
@@ -270,91 +274,109 @@ public class LircRemoteControlPlugin
 
   public synchronized void setPort(int port)
   {
-    this.port = port;
-    if (isConnected()) {
-      disconnect();
-      connect();
+    if (this.port != port) {
+      this.port = port;
+      if (isConnected()) {
+	disconnect();
+	connect();
+      }
     }
   }
 
-  public void run()
+  public class IOThread
+    extends Thread
   {
-    while (!terminating) {
-      long connectStart = System.currentTimeMillis();
-      try {
-	s = new Socket(host, port);
+    IOThread()
+    {
+    }
+
+    public Socket s;
+    public boolean terminating = false;
+
+    public void run()
+    {
+      while (!terminating) {
+	long connectStart = System.currentTimeMillis();
 	try {
-	    // Work around GCJ bug:  Closing the socket on another thread doesn't
-	    // unblock the socket read, so we make it wake up every 3 seconds
-	    // and check terminating flag. (Doesn't work.)
-	  //s.setSoTimeout(3000);
-	  r = new BufferedReader(new InputStreamReader(s.getInputStream()));
+	  s = new Socket(host, port);
+	    // This makes the thread wake up occasionally, which will allow any
+	    // dead threads to be cleaned up.  This can result from disconnect()
+	    // being called at a bad time.
+	  s.setSoTimeout(10000);
 	  try {
-	    notifyConnectStatusChanged(true);
-	    while (!terminating) {
-	      try {
-		String buttonText = r.readLine();
-		if (buttonText == null)
-		  break;
-		int space1 = buttonText.indexOf(' ');
-		if (space1 >= 0) {
-		  int space2 = buttonText.indexOf(' ', space1+1);
-		  String repeatCountStr = buttonText.substring(space1+1, space2);
-		  String idStr = buttonText.substring(space2+1);
-		  Button button = new Button(idStr, Integer.parseInt(repeatCountStr));
-		  notifyButtonPressed(button);
+	    BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
+	    try {
+	      connectStatus = true;
+	      notifyConnectStatusChanged();
+	      while (!terminating) {
+		try {
+		  String buttonText = r.readLine();
+		  if (terminating || buttonText == null)
+		    break;
+		  int space1 = buttonText.indexOf(' ');
+		  if (space1 >= 0) {
+		    int space2 = buttonText.indexOf(' ', space1+1);
+		    String repeatCountStr = buttonText.substring(space1+1, space2);
+		    String idStr = buttonText.substring(space2+1);
+		    Button button = new Button(idStr, Integer.parseInt(repeatCountStr));
+		    notifyButtonPressed(button);
+		  }
+		}
+		catch (InterruptedIOException e) {
 		}
               }
-	      catch (InterruptedIOException e) {
-	      }
+	    }
+	    finally {
+	      if (!terminating) {
+		connectStatus = false;
+		notifyConnectStatusChanged();
+              }
+	      try {r.close();} catch (IOException e) {}
 	    }
 	  }
 	  finally {
-	    notifyConnectStatusChanged(false);
-	    try {r.close();} catch (IOException e) {}
+	    try {s.close();} catch (IOException e) {}
+	    s = null;
 	  }
 	}
-	finally {
-	  try {s.close();} catch (IOException e) {}
+	catch (NumberFormatException e) {
+	    e.printStackTrace();
 	}
-      }
-      catch (NumberFormatException e) {
-          e.printStackTrace();
-      }
-      catch (IOException e) {
-      }
-      if (terminating)
-          break;
-        // If the failed connection took less than 20 seconds, then wait the remainder
-        // of the 20 seconds.  This protects against getting stuck in a tight loop. 
-      long duration = System.currentTimeMillis() - connectStart;
-      if (duration < 20000L && duration >= 0L) {
-          try {
-              synchronized (timer) {
-                  timer.wait(20000L - duration);
-              }
-          }
-          catch (InterruptedException e) {}
+	catch (IOException e) {
+	}
+	if (terminating)
+	    break;
+	  // If the failed connection took less than 20 seconds, then wait the remainder
+	  // of the 20 seconds.  This protects against getting stuck in a tight loop. 
+	long duration = System.currentTimeMillis() - connectStart;
+	if (duration < 20000L && duration >= 0L) {
+	  try {
+	    synchronized (timer) {
+	      timer.wait(20000L - duration);
+	    }
+	  }
+	  catch (InterruptedException e) {}
+	}
       }
     }
   }
 
   public static void main(String[] args)
   {
-      LircRemoteControlPlugin plugin = new LircRemoteControlPlugin();
-      plugin.setHost("tui");
-      plugin.addLircRemoteControlListener(new LircRemoteControlListener() {
-          public void connectStatusChanged(LircRemoteControlPlugin plugin, boolean connected)
-          {
-              System.out.println(connected?"** Connected":"** Disconnected");
-          }
+    LircRemoteControlPlugin plugin = new LircRemoteControlPlugin();
+    plugin.setHost("tui");
+    plugin.addLircRemoteControlListener(new LircRemoteControlListener() {
+      public void connectStatusChanged(LircRemoteControlPlugin plugin, boolean connected)
+      {
+	System.out.println(connected?"** Connected":"** Disconnected");
+      }
 
-          public void buttonPressed(LircRemoteControlPlugin plugin, LircRemoteControlPlugin.Button button)
-          {
-              System.out.println(button);
-          }
-      });
-      plugin.attach(null);
+      public void buttonPressed(LircRemoteControlPlugin plugin, LircRemoteControlPlugin.Button button)
+      {
+	System.out.println(button);
+      }
+    });
+    plugin.attach(null);
   }
 
 
@@ -362,33 +384,33 @@ public class LircRemoteControlPlugin
 
   public void connectStatusChanged(LircRemoteControlPlugin plugin, boolean connected)
   {
-      System.out.println("lirc remote control: "+(connected?"connected":"disconnected"));
+    System.out.println("lirc remote control: "+(connected?"connected":"disconnected"));
   }
 
   public void buttonPressed(LircRemoteControlPlugin plugin, LircRemoteControlPlugin.Button button)
   {
-      // System.out.println("lirc remote control: "+button);
-      Function function = null;
-      synchronized (this) {
-          outerLoop:
-          for (int i = 0; i < functions.size(); i++) {
-              Function thisFunction = (Function) functions.get(i);
-              for (int j = 0; j < thisFunction.buttons.size(); j++) {
-                  Button thisButton = (Button) thisFunction.buttons.get(j);
-                  if (thisButton.equals(button)) {
-                      function = thisFunction;
-                      break outerLoop;
-                  }
-              }
-          }
+    // System.out.println("lirc remote control: "+button);
+    Function function = null;
+    synchronized (this) {
+      outerLoop:
+      for (int i = 0; i < functions.size(); i++) {
+	Function thisFunction = (Function) functions.get(i);
+	for (int j = 0; j < thisFunction.buttons.size(); j++) {
+	  Button thisButton = (Button) thisFunction.buttons.get(j);
+	  if (thisButton.equals(button)) {
+	    function = thisFunction;
+	    break outerLoop;
+	  }
+	}
       }
-      if (function != null) {
-          System.out.println("lirc remote control: "+function.getName());
-          if (getApp() != null)
-              function.perform();
-      }
-      /*else
-          System.out.println("lirc remote control: unmapped button "+button);*/
+    }
+    if (function != null) {
+      System.out.println("lirc remote control: "+function.getName());
+      if (getApp() != null)
+	function.perform();
+    }
+    /*else
+      System.out.println("lirc remote control: unmapped button "+button);*/
   }
 }
 

@@ -17,7 +17,7 @@ public class PluginDialog
   private PluginManager pluginManager;
   private boolean done = false;
 
-  public PluginDialog(Display display, PluginManager pluginManager)
+  public PluginDialog(Display display, PluginManager pluginManager, final PluginApplication app)
   {
     this.pluginManager = pluginManager;
     final Shell shell = new Shell(display);
@@ -30,6 +30,12 @@ public class PluginDialog
     });
     GridLayout layout = new GridLayout(2, false);
     shell.setLayout(layout);
+
+    Label heading = new Label(shell, SWT.NONE);
+    heading.setText("Select the plugins you wish to enable");
+    GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+    gd.horizontalSpan = 2;
+    heading.setLayoutData(gd);
 
     java.util.List plugins = pluginManager.getPlugins();
     for (int i = 0; i < plugins.size(); i++) {
@@ -47,11 +53,16 @@ public class PluginDialog
       });
       Button configure = new Button(shell, SWT.NONE);
       configure.setText("Configure");
+      configure.addSelectionListener(new SelectionAdapter(){
+	public void widgetSelected(SelectionEvent e){
+	  app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
+	}
+      });
     }
 
     Button ok = new Button(shell, SWT.NONE);
     ok.setText("OK");
-    GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+    gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
     gd.horizontalSpan = 2;
     ok.setLayoutData(gd);
     ok.addSelectionListener(new SelectionAdapter(){
