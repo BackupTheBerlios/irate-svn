@@ -537,7 +537,7 @@ public class TrackDatabase {
   public void purge() {
     for (Iterator itr = tracks.iterator(); itr.hasNext(); ) {
       Track track = (Track) itr.next();
-      if (track.isHidden())
+      if (track.isPendingPurge())
         track.erase();
     }
   }

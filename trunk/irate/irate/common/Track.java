@@ -314,6 +314,27 @@ public class Track {
   public boolean isHidden() {
     return isBroken() || getRating() == 0;
   }
+  
+  /** Check if this file is pending a purge.
+   * @return True if the file needs to be deleted, false otherwise. 
+   */ 
+  public boolean isPendingPurge() {
+    // Files must be rated 0 to be pending purge. */
+    if (getRating() != 0)
+      return false;
+      
+    // If this is a file:// url then we don't want to delete the file.
+    URL url = getURL();
+    if (url.getProtocol().equals("file"))
+      return false;
+
+    // Now we return true if the file is non-null and exists.
+    File file = getFile();
+    if (file == null)
+      return false;
+      
+    return file.exists();
+  }
 
   public void setArtist(String artist) {
     elt.setAttribute("artist", artist);
@@ -452,15 +473,15 @@ public class Track {
   }
 
   public String getAlbum() {
-		try {
-				MP3File mp3 = new MP3File(this.getFile());
-				return mp3.getAlbum();
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				return "";
-			}		
-	}
+    try {
+      MP3File mp3 = new MP3File(this.getFile());
+      return mp3.getAlbum();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return "";
+    }
+  }
   
   public String getCopyrightInfo() {
     try {
@@ -473,14 +494,14 @@ public class Track {
     return null;
   }
 
- public String getPlayingTimeString() {
-  try {
-    MP3File mp3 = new MP3File(this.getFile());
-    return mp3.getPlayingTimeString();
+  public String getPlayingTimeString() {
+    try {
+      MP3File mp3 = new MP3File(this.getFile());
+      return mp3.getPlayingTimeString();
     }
     catch (Exception e) {
       e.printStackTrace();
       return "";
-    }		
+    }
   }
 }
