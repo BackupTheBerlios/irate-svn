@@ -232,7 +232,9 @@ public class DownloadThread extends Thread {
     System.out.println(url);
     final File finishedFile = getFileName(url);
     if (finishedFile.exists()) {
-      // We've already successfully downloaded the file, nothing to do
+      // We've already successfully downloaded the file. Set the file to the 
+      // correct name.
+      track.setFile(finishedFile);
       return;
     }
     final File downloadingFile = new File(finishedFile.toString() + ".part");
