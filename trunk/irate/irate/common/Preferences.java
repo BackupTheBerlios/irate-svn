@@ -49,11 +49,19 @@ public class Preferences {
     return getUserPreference("downloadDir");
   }
   
+  public static void setPlayer(String player) {
+    setUserPreference("Player", player);
+  }
+
+  public static String getPlayer() {
+    return getUserPreference("Player");
+  }
+
   public static boolean isRoboJockEnabled() {
     return isUserPreference("RoboJock");
   }
 
-  public static void setRoboJockEnabled(boolean enabled) throws IOException {
+  public static void setRoboJockEnabled(boolean enabled) {
     setUserPreference("RoboJock", enabled);
   }
 
@@ -96,8 +104,26 @@ public class Preferences {
    * @param prefName the preference name
    * @param enabled the boolean preference value.
    */
-  public static void setUserPreference(String prefName, boolean enabled) throws IOException {
-    savePreferenceToFile(prefName, Boolean.toString(enabled));
+  public static void setUserPreference(String prefName, boolean enabled) {
+    setUserPreference(prefName, Boolean.toString(enabled));
+  }
+
+
+  /**
+   * Sets a user preference. This convenience method catches any
+   * IOException during preference saving (the preference will only
+   * last for the duration of the session).  If you don't like this
+   * behaviour, use updateWithChild or savePreferenceToFile directly.
+   *
+   * @param prefName the preference name
+   * @param value the preference value.
+   */
+  public static void setUserPreference(String prefName, String value) {
+    try {
+      savePreferenceToFile(prefName, value);
+    } catch (IOException ioe) {
+      ioe.printStackTrace(); // Preference will only last for this session
+    }
   }
 
 

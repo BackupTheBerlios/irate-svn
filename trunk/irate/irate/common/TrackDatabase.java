@@ -394,14 +394,6 @@ public class TrackDatabase {
     return false;
   }
 
-  public void setPlayer(String path) {
-    setAttribute("Player", "path", path);
-  }
-
-  public String getPlayer() {
-    return getAttribute("Player", "path");
-  }
-
   public void setError(String code, String url) {
     setAttribute("Error", "code", code);
     setAttribute("Error", "url", url);

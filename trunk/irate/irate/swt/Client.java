@@ -891,11 +891,7 @@ public class Client extends AbstractClient {
       mRoboJock.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
           MenuItem self = (MenuItem) e.getSource();
-          try {
-            Preferences.setRoboJockEnabled(self.getSelection());
-          } catch (IOException ioe) {
-            ioe.printStackTrace(); // Couldn't save preferences. RoboJock is enabled for this session only.
-          }
+          Preferences.setRoboJockEnabled(self.getSelection());
         }
       });
     }
@@ -946,7 +942,7 @@ public class Client extends AbstractClient {
   
         MenuItem mPlayer = new MenuItem(menu2, SWT.CHECK, i);
         mPlayer.setText(player);
-        if (trackDatabase.getPlayer().equals(player))
+        if (Preferences.getPlayer().equals(player))
           mPlayer.setSelection(true);
         mPlayer.addSelectionListener(new SelectionAdapter() {
           public void widgetSelected(SelectionEvent e) {
@@ -954,8 +950,7 @@ public class Client extends AbstractClient {
             MenuItem self = (MenuItem) e.getSource();
             uncheckSiblingMenuItems(self);
             self.setSelection(true);
-  
-            trackDatabase.setPlayer(player);
+            Preferences.setPlayer(player);
             downloadThread.checkAutoDownload();
           }
         });
