@@ -138,9 +138,12 @@ public class ExternalControlPlugin
             response.setAttribute("source","selected");
             replyNeeded = true;
 
+          } else if (cmdType.equals("invert-pause")) {
+            app.setPaused(!app.isPaused());
+            
           } else if (cmdType.equals("pause")) {
             app.setPaused(true);
-
+            
           } else if (cmdType.equals("unpause")) {
             app.setPaused(false);
 
