@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/02/09 05:25:17 $
+ * Date Updated: $Date: 2004/03/09 20:40:05 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class SettingDialog
 {
@@ -28,8 +28,15 @@ public class SettingDialog
   private BaseDialog dialog;
   private PluginApplication app;
   private TabFolder tabs;
-  
   private String browser;
+
+  //these used to be final variables in a method,
+  //but needed to be rearranged due to a nasty bug in Mr GCJ
+  private BrowserButton[] browsers;
+  private Button browserSpecified;
+  private Text browserText;
+  private Button browseButton;
+
   
   public SettingDialog(Display display, PluginManager pluginManager, PluginApplication app) {
     this.pluginManager = pluginManager;
@@ -183,7 +190,7 @@ public class SettingDialog
       }
     }
 
-    final BrowserButton[] browsers = { 
+    browsers = new BrowserButton[]{ 
       new BrowserButton("Mozilla/Firebird (Linux/UNIX)", 
                         "mozilla -remote openURL(%u,new-window)", 
                         getResourceString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
@@ -197,13 +204,14 @@ public class SettingDialog
                         getResourceString("SettingDialog.Button.Browser.Tooltip.MacOSXDefault")),
     }; 
 
-    final Button browserSpecified = new Button(comp, SWT.RADIO);
-    final Text browserText = new Text(comp, SWT.NONE);
-    final Button browseButton = new Button(comp, SWT.NONE);
+    browserSpecified = new Button(comp, SWT.RADIO);
+    browserText = new Text(comp, SWT.NONE);
+    browseButton = new Button(comp, SWT.NONE);
 
     class DoBrowser implements SelectionListener {
       public void widgetSelected(SelectionEvent e) {
         for (int i=0; i<browsers.length; i++) {
+          System.out.println("Selection "+i+"=");
           if (browsers[i].getButton().getSelection()) {
             browserText.setText(browsers[i].getCommand());
           }
@@ -214,7 +222,7 @@ public class SettingDialog
         } else {
           browserText.setEnabled(false);
           browseButton.setEnabled(false);
-        }
+        }        
       }
     
       public void widgetDefaultSelected(SelectionEvent e) { }
