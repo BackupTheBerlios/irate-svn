@@ -29,6 +29,7 @@ public class BaseDialog {
     shell = new Shell(display);
     shell.setLayout(new GridLayout(1, false));
     shell.setText(title);
+    shell.setMenuBar(MacMenuFixer.grayMenuBar(shell));
     setImage(display);
     mainComposite = new Composite(shell, SWT.NONE);
     GridData data;

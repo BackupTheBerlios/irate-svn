@@ -559,6 +559,10 @@ public class Client extends AbstractClient {
     
     Menu menubar = new Menu(shell, SWT.BAR);
     shell.setMenuBar(menubar);
+    
+    // Declare this as our main menu bar to prettify things on Mac OS X
+    MacMenuFixer.setMenuBar(menubar);
+    
     final int accel=(isMac() ? SWT.COMMAND : SWT.CTRL);
 
     MenuItem item1 = new MenuItem(menubar, SWT.CASCADE);
