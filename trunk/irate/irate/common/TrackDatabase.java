@@ -389,17 +389,14 @@ public class TrackDatabase {
       float[] probs = new float[tracks.length]; 
 
         // Choose a minimum probability
-      float minRating = (MAX_RATING - 1) * random.nextFloat();
+      float minRating = MAX_RATING * Math.abs(random.nextFloat());
     
       float totalProb = 0;
       for (int i = 0; i < tracks.length; i++) {
         Track track = tracks[i];
-	if (toOmit != null)
-	  if (toOmit.containsKey(track))
-	    continue;
-        float rating = track.getRating();
+          float rating = track.getRating();
 
-        if (rating >= minRating)
+        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track))) 
           totalProb += getProbability(track);
 
         probs[i] = totalProb;
@@ -424,6 +421,32 @@ public class TrackDatabase {
     }
   }
 
+  /**
+   * Choose an unrated track from the track database, excluding tracks in
+   * 'toOmit'. Ignore toOmit if it is null.
+   */
+  public Track chooseUnratedTrack(Random random, Hashtable toOmit) {
+    Track[] tracks = getTracks();
+    List list = new Vector();
+    for (int i = 0; i < tracks.length; i++) {
+      Track track = tracks[i];
+      if (!track.isRated() && (toOmit == null || !toOmit.containsKey(track)))
+        list.add(track);
+    }
+    int rand = Math.round(Math.abs(random.nextFloat()) * list.size());
+    return (Track) list.get(rand);
+  }
+  
+  public int getNoOfUnrated() {
+    Track[] tracks = getTracks();
+    List list = new Vector();
+    int noOfUnrated = 0;
+    for (int i = 0; i < tracks.length; i++)
+      if (!tracks[i].isRated())
+        noOfUnrated++;  
+    return noOfUnrated;  
+  }
+  
   private int compare(Track track0, Track track1) {
     return track0.getName().compareToIgnoreCase(track1.getName());
   }

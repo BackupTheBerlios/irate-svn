@@ -11,7 +11,6 @@ import nanoxml.XMLElement;
 public class Track {
 
   private final int DEFAULT_RATING = 6;
-  private final int INITIAL_RATING = 10;
   
   private XMLElement elt;
   private File dir;
@@ -63,11 +62,13 @@ public class Track {
   }
 
   public float getRating() {
+    return getRating(DEFAULT_RATING);
+  }
+
+  public float getRating(float defaultRating) {
     if (isRated())
       return getRawRating();
-    if (getNoOfTimesPlayed() == 0)
-      return INITIAL_RATING;
-    return DEFAULT_RATING;
+    return defaultRating;
   }
 
   public void erase() {
@@ -263,8 +264,8 @@ public class Track {
 
   public float getProbability() {
     int noOfTimesPlayed = getNoOfTimesPlayed();
-    float rating = getRating();
-    float prob = rating * rating / (1 + noOfTimesPlayed);
+    float rating = getRating(1);
+    float prob = /* rating * */ rating / (1 + noOfTimesPlayed);
     if (prob < 0)
       return 0;
 

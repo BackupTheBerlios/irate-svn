@@ -33,32 +33,56 @@ public class PlayListManager {
   }
   
   public synchronized Track chooseTrack() {
+    int playListLength = trackDatabase.getPlayListLength();
 
+      // Remove the track we've just played if necessary.
+    if (playListIndex < playList.size()) {
+      Track track = (Track) playList.get(playListIndex);
+      if (!track.isOnPlayList()) {
+        playList.remove(playListIndex);
+        
+          // Subtract one from the index because it'll get incremented later.
+        playListIndex--;
+      }
+    }
+         
+      // Remove extra unwanted items.
+    while (playList.size() > playListLength) 
+      playList.remove(playList.size() - 1);  
+    
       // Maintain a 'toOmit' hash table, which is used to make the choosing
       // of tracks not choose ones we have already got on the list.
     Hashtable toOmit = new Hashtable();
+    int noOfUnrated = 0;
     for (int i = 0; i < playList.size(); i++) {
       Track track = (Track) playList.get(i);
       if (!track.isOnPlayList()) {
-        playList.remove(i);
-        if (i < playListIndex)
-          --playListIndex;
+        if (track.getRating() == 0) {
+          playList.remove(i);
+          if (i < playListIndex)
+            --playListIndex;
+        }
       }
-      else
+      else {
 	toOmit.put(track, track);
+        if (!track.isRated())
+          noOfUnrated++;
+      }
     }
-    
-      // Remove extra unwanted items.
-    while (playList.size() > trackDatabase.getPlayListLength()) 
-      playList.remove(playList.size() - 1);
     
       // Loop around one time for each track which needs to be added to the 
       // play list. Don't worry too much if we don't exactly that number of
       // tracks because it will likely get one next time around.
-    for (int i = trackDatabase.getPlayListLength() - playList.size(); i > 0; i--) {
+    for (int i = playListLength - playList.size(); i > 0; i--) {
       synchronized (trackDatabase) {
-        Track track = trackDatabase.chooseTrack(random, toOmit);
+        Track track;
+        if (noOfUnrated == 0 && playList.size() != 0)
+          track = trackDatabase.chooseUnratedTrack(random, toOmit);
+        else
+          track = trackDatabase.chooseTrack(random, toOmit);
         if (track != null) {
+          if (!track.isRated())
+            noOfUnrated++;
 	  toOmit.put(track, track);
 	  playList.add(track);
         }
