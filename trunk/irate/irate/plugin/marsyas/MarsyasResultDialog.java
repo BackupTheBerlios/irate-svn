@@ -41,12 +41,27 @@ public class MarsyasResultDialog extends BaseDialog{
     super(Display.findDisplay(Thread.currentThread()), Resources.getString("similar_music")+query.getName());
     this.result = result;
     this.plugin = plugin;
+    createUI();
+  }
+
+  
+  /**
+   * 
+   */
+  private void createUI() {
     Composite mainComposite = getMainComposite();
     createResultTable(mainComposite);
-    Shell shell = super.getShell();
+    Shell shell = getShell();
+    addButton(Resources.getString("close")).addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent arg0) {
+        getShell().close();
+        dispose();
+      }
+    });
     shell.pack();
-    shell.open();    
+    shell.open();        
   }
+
 
   /** Setup the result table 
    * @param mainComposite
@@ -60,22 +75,26 @@ public class MarsyasResultDialog extends BaseDialog{
     gridData.grabExcessVerticalSpace = true;
     resultTable.setLayoutData(gridData);
     
-    TableColumn col = new TableColumn(resultTable, SWT.LEFT);
-    col.setWidth(200);
-    col.setText(Resources.getString("track_name"));
-    col = new TableColumn(resultTable, SWT.LEFT);
-    col.setWidth(200);
-    col.setText(Resources.getString("track_distance"));
+    TableColumn colName = new TableColumn(resultTable, SWT.LEFT);
+    colName.setText(Resources.getString("track_name"));
+    
+    TableColumn  colD = new TableColumn(resultTable, SWT.LEFT);
+    colD.setText(Resources.getString("track_distance"));
+    
+    TableColumn  colS = new TableColumn(resultTable, SWT.LEFT);
+    colD.setText(Resources.getString("track_source"));
     
     resultTable.setHeaderVisible(true);
     
     for (Iterator iter = result.iterator(); iter.hasNext();) {
       MarsyasSimilaritySearch.ComparableTrack ct = (MarsyasSimilaritySearch.ComparableTrack) iter.next();
       TableItem ti = new TableItem(resultTable, SWT.NONE);
-      ti.setText(new String[]{ct.track.toString(), ct.distance.toString()});
+      ti.setText(new String[]{ct.track.toString(), ct.distance.toString(),""});
       ti.setData(ct.track);
     }
     
+    colD.pack();
+    colName.pack();
     resultTable.pack();
     resultTable.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent se) {

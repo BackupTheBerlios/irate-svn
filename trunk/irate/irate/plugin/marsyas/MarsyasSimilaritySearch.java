@@ -5,6 +5,13 @@
  */
 package irate.plugin.marsyas;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -25,7 +32,7 @@ import irate.common.Track;
  * This class provides track similarity matching capabilities
  * based on Abe's similarto.pl
  */
-public class MarsyasSimilaritySearch  {
+public class MarsyasSimilaritySearch extends Thread  {
   final int FEATURE_COUNT = 30;
   private float features[][];
   private Track tracks[];
@@ -35,6 +42,7 @@ public class MarsyasSimilaritySearch  {
   private float range[] = new float[FEATURE_COUNT];
   private Track selectedTrack;
   private MarsyasPlugin plugin;
+  private MarsyasResultDialog resultDialog = null;
   /**
    * @param plugin
    * @param tracks
@@ -75,16 +83,67 @@ public class MarsyasSimilaritySearch  {
     }
     
     Collections.sort(al);
-    dbg("features.length="+features.length+" ts.size="+al.size());
     
-    for (Iterator iter = al.iterator(); iter.hasNext();) {
-      ComparableTrack ct = ((ComparableTrack) iter.next());
-      dbg("Similar:"+ct.track+" by "+ct.distance);
-    }
-  
-    new MarsyasResultDialog(plugin, selectedTrack, al.subList(0,10));
+    resultDialog = new MarsyasResultDialog(plugin, selectedTrack, al.subList(0,10));
+    start();
   }
-
+  
+  /** most inefficient string escape ever */
+  private String escape(String str) {
+    int i = str.indexOf('"');
+    if(i==-1)
+      return str;
+    
+    return str.substring(0,i)+"\""+escape(str.substring(i+1));
+  }
+  
+  /** do the remote track comparison in a thread */
+  public void run() {
+    StringBuffer sb = new StringBuffer();
+    for (int i = 0; i < tracks.length; i++) {
+      sb.append('"');
+      sb.append(escape(tracks[i].getURL().toString()));
+      sb.append('"');
+      sb.append(',');
+      sb.append('"');
+      sb.append(escape(tracks[i].getCopyrightInfo()));
+      sb.append('"');
+      sb.append(',');
+      sb.append('"');
+      sb.append(escape(tracks[i].getArtist()));
+      sb.append('"');
+      sb.append(',');
+      sb.append('"');
+      sb.append(escape(tracks[i].getTitle()));
+      sb.append('"');
+      sb.append(',');
+      sb.append('"');
+      sb.append(escape(tracks[i].getProperty("marsyas")));
+      sb.append('"');
+      sb.append("\r\n");
+    }
+    URL url = null;
+    try {
+       url = new URL("http://glek.net/cgi-bin/similar.pl?query="+selectedTrack.getURL());
+       HttpURLConnection con = (HttpURLConnection)url.openConnection();
+       con.setDoOutput(true);
+       con.setUseCaches(false);
+       con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
+       con.setRequestProperty("Content-Length", ""+sb.length());
+       PrintStream ps = new PrintStream(con.getOutputStream ());
+       ps.print(sb.toString());
+       ps.flush();
+       BufferedReader br = new BufferedReader(new InputStreamReader(con.getInputStream()));
+       String line;
+       while((line=br.readLine()) != null)
+         dbg(line);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return;
+    }
+    //dbg(sb.toString());
+  }
+  
   private double distance(float a[], float b[]) {
     float res = 0;
     for (int i = 0; i < a.length; i++) {

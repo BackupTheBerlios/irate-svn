@@ -142,7 +142,10 @@ implements TrackLifeCycleListener
   {
     //System.err.println("Checking "+track);
     // If we don't know how loud it is, queue it to be processed.
-    if (track.getFile() != null && track.getProperty("marsyas") == null) {
+    if (track.getFile() != null && track.isRated() && track.getProperty("marsyas") == null) {
+      //extract doesn't like files over 3MB
+      if(track.getFile().length() > 3*1000*1000)
+        return;
       MarsyasExtractor.processTrack(track);
     }
   }
