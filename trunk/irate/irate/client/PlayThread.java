@@ -1,4 +1,4 @@
-// Copyright 2003 Anthony Jones
+// Copyright 2003 Anthony Jones, Taras 
 
 package irate.client;
 
@@ -13,24 +13,16 @@ public class PlayThread extends Thread {
   private Track currentTrack;
   private Track nextTrack;
   private Player player;
+  private PlayerList playerList;
   private PlayListManager playListManager;
   private Vector updateListeners = new Vector();
-  private Process playerProcess;
-  private String externalPlayer;
   private Speech speech = new Speech();
   private boolean speaking;
   private boolean toKeepPlaying;
   
-  public PlayThread(PlayListManager playListManager) {
+  public PlayThread(PlayListManager playListManager, PlayerList playerList) {
     this.playListManager = playListManager;
-    //player = new JavaLayerPlayer();
-    try{
-    player = (Player)Class.forName("JavaLayerPlayer").newInstance();
-    }catch(Exception e)
-    {
-      //e.printStackTrace();
-    }
-    externalPlayer = "";
+    this.playerList = playerList;
   }
 
   public boolean isSpeechSupported() {
@@ -44,33 +36,21 @@ public class PlayThread extends Thread {
   }
 
   private void playFile(File file) throws Exception {
-    if (externalPlayer.length() != 0) {
-      playerProcess = Runtime.getRuntime().exec(new String[] { externalPlayer, file.getPath() });
-      try {
-        playerProcess.waitFor();
-        if (playerProcess.exitValue() != 0) 
-          throw new Exception("extern player returned " + playerProcess.exitValue());
-      }
-      catch (InterruptedException e) {
-      }
+    player = playerList.getPlayer(playListManager.getPlayList().getPlayer());
+    try {
+      player.play(file);
     }
-    else {
-      try {
-	player.play(file);
-      }
-      catch (PlayerException e) {
-        e.printStackTrace();
-      }
-      finally {
-	  // Without this, RoboJock can't talk because it fights with the
-	  // Java player over the sound device.
-	player.close();
-      }
+    catch (PlayerException e) {
+      e.printStackTrace();
+    }
+    finally {
+        // Without this, RoboJock can't talk because it fights with the
+        // Java player over the sound device.
+      player.close();
     }
   }
 
-  public synchronized void play(Track track)
-  {
+  public synchronized void play(Track track) {
     nextTrack = track;
     reject();
   }
@@ -87,11 +67,7 @@ public class PlayThread extends Thread {
       }
  
       if (currentTrack != null) {
-          // Work out which player we're planning to use
-       externalPlayer = playListManager.getPlayList().getPlayer();
-        //System.out.println("got here externalPlayer="+externalPlayer);
-        //if(this!=null)return;
-       notifyUpdateListeners();
+        notifyUpdateListeners();
         File file = currentTrack.getFile();
         if (file.exists()) {
           if (speaking) {
@@ -139,14 +115,10 @@ public class PlayThread extends Thread {
     
       // Clear the toKeepPlaying flag to instruct the play thread to co-operatively stop.
     toKeepPlaying = false;
-    if (externalPlayer.length() != 0) {
-      if (playerProcess != null) 
-        playerProcess.destroy();
-    }
-    else {
-      if (player != null)
-        player.close();
-    }
+    if (player != null)
+      player.close();
+
+      // Stop RoboJock if it's talking.
     if (speech != null && speaking) 
       speech.abort();
   }
@@ -164,10 +136,6 @@ public class PlayThread extends Thread {
     if (player == null)
       return false;
     return player.isPaused();
-  }
-
-  public boolean isPauseSupported() {
-    return externalPlayer.length() == 0;
   }
 
   public void addUpdateListener(UpdateListener updateListener) {

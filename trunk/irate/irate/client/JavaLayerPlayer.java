@@ -11,6 +11,10 @@ public class JavaLayerPlayer implements Player {
 
   public JavaLayerPlayer() {
   }
+
+  public String getName() {
+    return "javalayer";
+  }
   
   public void setPaused(boolean paused) {
     synchronized (this) {

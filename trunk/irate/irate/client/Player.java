@@ -6,6 +6,8 @@ import java.io.File;
 
 public interface Player {
 
+  public String getName();
+
   public void setPaused(boolean paused);
 
   public boolean isPaused();
