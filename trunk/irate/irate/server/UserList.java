@@ -21,9 +21,8 @@ public class UserList {
         try {
           ServerDatabase user = new ServerDatabase(files[i]);
           users.add(user);
-          if ((i % 10) == 0)
+          if ((i % 100) == 0)
             System.out.print(".");
-//          System.out.println("  " + user.getUserName() + " " + user.getNoOfTracks());
         }
         catch (IOException e) {
           System.out.println();

@@ -34,7 +34,7 @@ public class MasterDatabase extends ServerDatabase {
 
     // The user rate is the number of songs the database must have for each
     // track the user is allowed.
-  private int userRate = 3;
+  private int userRate = 5;
   
   public MasterDatabase(File file, UserList userList) throws IOException {
     super(file);
@@ -53,8 +53,7 @@ public class MasterDatabase extends ServerDatabase {
   public ServerDatabase processRequest(ServerDatabase request) {
     ServerDatabase reply = new ServerDatabase();
 
-    System.out.println("User " + request.getUserName());
-//    System.out.println("User " + request.getUserName() + " Password " + request.getPassword());
+    System.out.println("User " + request.getUserName() + " " + request.getNoOfTracks());
     ServerDatabase user = userList.getUser(request.getUserName());
 
       // If the user doesn't exist or the password is incorrect the return a 
@@ -78,6 +77,11 @@ public class MasterDatabase extends ServerDatabase {
 
     if (user.getNoOfTracks() * userRate >= getNoOfTracks()) {
       reply.setError("gotnone", "getstuffed.html");
+      return reply;
+    }
+
+    if (!user.hasRatedEnoughTracks()) {
+      reply.setError("notenoughrating", "http://www.irateradio.org/irate/client/help/notenoughratings.html");
       return reply;
     }
 
@@ -170,13 +174,7 @@ public class MasterDatabase extends ServerDatabase {
   } 
   
   public ServerDatabase findOrphans() {
-    ServerDatabase orphans = null;
-    try {
-      orphans = new ServerDatabase(new File("orphans.xml"));
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
+    ServerDatabase orphans = new ServerDatabase();
     Track[] tracks = getTracks();
     ServerDatabase[] users = userList.getUsers();
     for (int i = 0; i < tracks.length; i++) {
@@ -200,16 +198,16 @@ public class MasterDatabase extends ServerDatabase {
   }
 
   public ServerDatabase getBest(ServerDatabase user) {
-    ServerDatabase best = new ServerDatabase();
     ServerDatabase[] users = userList.getUsers();
     TrackAverageRating tar = new TrackAverageRating();
     for (int i = 0; i < users.length; i++) {
       if (user != users[i]) {
         DatabaseCorrelator dc = new DatabaseCorrelator(user, users[i]);
         dc.process();
-        if (dc.getCorrelation() > 0) {
+        float correlation = dc.getCorrelation();
+        if (correlation > 0) {
 //          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation());
-          tar.add(dc.getSpares());
+          tar.add(dc.getSpares(), correlation);
         }
       }
     }

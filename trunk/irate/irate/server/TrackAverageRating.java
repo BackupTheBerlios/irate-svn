@@ -16,15 +16,15 @@ public class TrackAverageRating {
     averages = new ServerDatabase();
   }
 
-  public void add(ServerDatabase db) {
+  public void add(ServerDatabase db, float weight) {
     Track[] tracks = db.getTracks();
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
       Rating rating = (Rating) hash.get(track.getKey());
       if (rating == null)
-        hash.put(track.getKey(), new Rating(track));
+        hash.put(track.getKey(), new Rating(track, weight));
       else
-        rating.add(track);
+        rating.add(track, weight);
     }
   }
 
@@ -37,17 +37,17 @@ public class TrackAverageRating {
     private float sum;
     private float weight;
 
-    public Rating(Track track) {
+    public Rating(Track track, float weight) {
       this.track = averages.add(track);
-      sum = track.getRating();
-      weight = track.getWeight();
+      this.sum = track.getRating() * weight;
+      this.weight = weight;
     }
 
-    public void add(Track track) {
-      sum += track.getRating();
-      weight += track.getWeight();
-      track.setRating(sum / weight);
-    }
+    public void add(Track track, float weight) {
+      this.sum += track.getRating() * weight;
+      this.weight += weight;
+      this.track.setRating(sum / this.weight);
+    }    
   }
 }
 

@@ -30,7 +30,7 @@ public class ServerDatabase extends TrackDatabase {
         // rating is strictly above 5. That means that there has to be at least
         // one person who think's it's better than just alright.
       if (rating > 5)
-        return rating * rating;
+        return rating * rating * rating;
     }
     return 0;
   }

@@ -23,6 +23,8 @@ public class Server {
   private ServerSocket serverSocket;
 
   public Server() throws IOException {
+    serverSocket = new ServerSocket(2278);
+    
     userList = new UserList();
 
     File file = new File("masterdatabase.xml");
@@ -30,8 +32,6 @@ public class Server {
     masterDatabase = new MasterDatabase(file, userList);
 
     requestHandler = new RequestHandler(masterDatabase);
-
-    serverSocket = new ServerSocket(2278);
   }
 
   public void run() throws IOException {

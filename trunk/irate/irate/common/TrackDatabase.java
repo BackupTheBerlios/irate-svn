@@ -304,14 +304,14 @@ public class TrackDatabase {
         fw.write(toString());
         fw.close();
         fw = null;
-        System.out.println("Successfully Wrote: "+name );
+//        System.out.println("Successfully Wrote: "+name );
 	  // If we wrote the file successfully, then rename the temporary
 	  // file to the real name of the configuration file.  This makes
 	  // the writing of the new file effectively atomic.
 	if (!temporaryFile.renameTo(file)) {
-    System.out.println("failed at renaming " + temporaryFile + " to " + file +"\n attempting to delete"+file);
+          System.out.println("failed at renaming " + temporaryFile + " to " + file +"\n attempting to delete"+file);
 	  if(!file.delete())
-      throw new IOException("Failed to delete "+ file);
+            throw new IOException("Failed to delete "+ file);
 	  if (!temporaryFile.renameTo(file))
 	    throw new IOException("Failed to rename "+temporaryFile+" to "+file);
         }
@@ -408,7 +408,7 @@ public class TrackDatabase {
         Track track = tracks[i];
           float rating = track.getRating();
 
-        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track)) && track.getFile() != null) 
+        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track))) 
           totalProb += getProbability(track);
 
         probs[i] = totalProb;
@@ -422,9 +422,8 @@ public class TrackDatabase {
         while (true) {
           float rand = Math.abs(random.nextFloat()) * totalProb;
           for (int i = 0; i < tracks.length; i++) {
-	    if (toOmit != null)
-	      if (toOmit.containsKey(tracks[i]))
-		continue;
+	        if (toOmit != null && toOmit.containsKey(tracks[i]))
+              continue;
             if (rand <= probs[i])
               return tracks[i];
           }

@@ -58,7 +58,7 @@ public class RequestHandler {
   
   public void process(Socket socket) {
     InetAddress ia = socket.getInetAddress();
-    System.out.println("Accepted connection from " + ia.getHostAddress() + " " + ia.getHostName());
+    System.out.println(new Date() + " Accepted connection from " + ia.getHostAddress() + " " + ia.getHostName());
     InputStream is = null;
     OutputStream os = null;
     try {
