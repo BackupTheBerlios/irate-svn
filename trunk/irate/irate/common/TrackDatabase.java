@@ -73,7 +73,7 @@ public class TrackDatabase {
     synchronized (this) {
       Track copy;
       if ((copy = getTrack(track)) == null) {
-        copy = new Track(track);
+        copy = new Track((XMLElement) track.getElement(), downloadDir);
         docElt.addChild(copy.getElement());
         tracks.add(copy);
         hash.put(copy.getKey(), copy);
@@ -245,7 +245,10 @@ public class TrackDatabase {
   public void setFile(File file) {
     this.file = file;
   }
-
+  
+  public File getDownloadDirectory() {
+    return downloadDir;
+  }
 
   public void load(File file) throws IOException {
     this.file = file;

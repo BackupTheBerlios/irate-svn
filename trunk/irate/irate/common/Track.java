@@ -21,10 +21,6 @@ public class Track {
     this.dir = dir;
   }
   
-  public Track(Track track) {
-    this((XMLElement) track.getElement(), track.dir);
-  }
-  
   public String toString() {
     String ratingStr = getState();
     String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ")";

@@ -23,7 +23,7 @@ public class DownloadThread extends Thread {
   
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
-    downloadDir = new File("download");
+    downloadDir = trackDatabase.getDownloadDirectory();
     if (!downloadDir.exists()) 
       downloadDir.mkdir();
   }
