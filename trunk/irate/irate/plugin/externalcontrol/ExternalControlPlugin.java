@@ -177,6 +177,7 @@ public class ExternalControlPlugin
         if (replyNeeded) {
           OutputStreamWriter outSW = new OutputStreamWriter(out);
           response.write(outSW);
+          outSW.write('\n');
           outSW.flush(); // If we don't flush, it doesn't get sent.
           outSW = null; // Just to avoid them hanging around unwanted.
         }
