@@ -106,7 +106,7 @@ public class MarsyasPlugin
   {
   	//System.err.println("Checking "+track);
       // If we don't know how loud it is, queue it to be processed.
-    if (track.isRated() && track.getProperty("marsyas") == null) {
+    if (track.getFile() != null && track.isRated() && track.getProperty("marsyas") == null) {
       MarsyasExtractor.processTrack(track);
     }
   }
