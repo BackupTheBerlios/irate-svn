@@ -2,6 +2,8 @@
 
 package irate.plugin;
 
+import nanoxml.XMLElement;
+
 /**
  * Base class for all plugins.
  *
@@ -10,6 +12,11 @@ package irate.plugin;
 public abstract class Plugin
 {
   private PluginApplication app;
+
+  /**
+   * Get a short identifier for this Plugin.
+   */
+  public abstract String getIdentifier();
 
   /**
    * Get a short description of this plugin.
@@ -68,5 +75,16 @@ public abstract class Plugin
    * Application is available through getApp().
    */
   protected abstract void doDetach();
+
+  /**
+   * Parse the configuration stored in the specified element.
+   */
+  public abstract void parseConfig(XMLElement elt);
+
+  /**
+   * Format the configuration of this plugin by modifying the specified
+   * element.
+   */
+  public abstract void formatConfig(XMLElement elt);
 }
 

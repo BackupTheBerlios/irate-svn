@@ -6,6 +6,7 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.SWT;
+import java.io.IOException;
 import irate.common.*;
 import irate.plugin.*;
 
@@ -74,7 +75,14 @@ public class PluginDialog
     shell.open();
     while (!done) {
       if (!display.readAndDispatch()) display.sleep();
-    } 
+    }
+    try {
+      pluginManager.saveConfig();
+    }
+    catch (IOException e) {
+        // @todo Handle error better
+      e.printStackTrace();
+    }
     shell.close();
     shell.dispose();
   }

@@ -4,11 +4,14 @@ package irate.plugin.lircremote;
 
 import irate.plugin.*;
 import irate.common.Track;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Vector;
 import java.net.Socket;
 import java.net.SocketException;
 import java.io.*;
+import nanoxml.*;
 
 /**
  * Plugin for remote control based on lirc (Linux/Unix).
@@ -28,12 +31,46 @@ public class LircRemoteControlPlugin
     public Function()
     {
     }
+    
+    public abstract String getID();
 
     public abstract String getName();
 
     public abstract void perform();
 
     public List buttons = new Vector();
+
+    public void clearConfig()
+    {
+      buttons.clear();
+    }
+
+    public void parseXML(XMLElement elt)
+    {
+      buttons.clear();
+      Enumeration enum = elt.enumerateChildren();
+      while (enum.hasMoreElements()) {
+        XMLElement child = (XMLElement) enum.nextElement();
+        if (child.getName().equals("button"))
+          buttons.add(new Button(child));
+      }
+    }
+
+    public XMLElement formatXML()
+    {
+      XMLElement elt = new XMLElement(new Hashtable(), false, false);
+      elt.setName("function");
+      elt.setAttribute("id", getID());
+      for (int i = 0; i < buttons.size(); i++)
+        elt.addChild(((Button)buttons.get(i)).formatXML());
+      return elt;
+    }
+
+    /**
+     * Default repeat policy is: Single button presses only.
+     * Functions such as volume up/down will use Button.REPEAT;
+     */
+    public int getRepeatPolicy() {return Button.SINGLE;}
   }
 
   public static class Button
@@ -41,14 +78,39 @@ public class LircRemoteControlPlugin
     private String id;
     private int repeatCount;
     public static final int SINGLE = 0;
-    public static final int REPEATING = -1;
+    public static final int REPEAT = -1;
 
     public Button(String id, int repeatCount)
     {
       this.id = id;
       this.repeatCount = repeatCount;
     }
-    
+
+    public Button(XMLElement elt)
+    {
+      this.id = elt.getStringAttribute("id");
+      String rcStr = elt.getStringAttribute("repeat");
+      if (rcStr.equals("REPEAT"))
+        this.repeatCount = REPEAT;
+      else {
+        try {
+          this.repeatCount = Integer.parseInt(rcStr);
+        }
+        catch (NumberFormatException e) {
+          this.repeatCount = 0;
+        }
+      }
+    }
+
+    public XMLElement formatXML()
+    {
+      XMLElement elt = new XMLElement(new Hashtable(), false, false);
+      elt.setName("button");
+      elt.setAttribute("id", id);
+      elt.setAttribute("repeat", repeatCount == REPEAT ? "REPEAT" : Integer.toString(repeatCount));
+      return elt;
+    }
+
     /**
      * The string that identifies this button.
      */
@@ -69,7 +131,7 @@ public class LircRemoteControlPlugin
         Button other = (Button)other_;
         if (!id.equals(other.id))
           return false;
-        if (repeatCount == REPEATING || other.repeatCount == REPEATING)
+        if (repeatCount == REPEAT || other.repeatCount == REPEAT)
           return true;
         return repeatCount == other.repeatCount;
       }
@@ -84,30 +146,37 @@ public class LircRemoteControlPlugin
     port = 8765;
     functions = new Vector();
     functions.add(new Function() {
+      public String getID() {return "this-sux";}
       public String getName() {return "Rate as 'This sux'";}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 0); getApp().skip();}
     });
     functions.add(new Function() {
+      public String getID() {return "yawn";}
       public String getName() {return "Rate as 'Yawn'";}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 2);}
     });
     functions.add(new Function() {
+      public String getID() {return "not-bad";}
       public String getName() {return "Rate as 'Not bad'";}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 5);}
     });
     functions.add(new Function() {
+      public String getID() {return "cool";}
       public String getName() {return "Rate as 'Cool'";}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 7);}
     });
     functions.add(new Function() {
+      public String getID() {return "love-it";}
       public String getName() {return "Rate as 'Love it'";}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 10);}
     });
     functions.add(new Function() {
+      public String getID() {return "pause/resume";}
       public String getName() {return "Pause/Resume";}
       public void perform() {getApp().setPaused(!getApp().isPaused());}
     });
     functions.add(new Function() {
+      public String getID() {return "skip";}
       public String getName() {return "Skip";}
       public void perform() {getApp().skip();}
     });
@@ -125,6 +194,14 @@ public class LircRemoteControlPlugin
   public List getFunctions()
   {
     return functions;
+  }
+
+  /**
+   * Get a short identifier for this Plugin.
+   */
+  public String getIdentifier()
+  {
+    return "lirc-remote";
   }
 
   /**
@@ -361,6 +438,7 @@ public class LircRemoteControlPlugin
     }
   }
 
+  /*
   public static void main(String[] args)
   {
     LircRemoteControlPlugin plugin = new LircRemoteControlPlugin();
@@ -378,6 +456,7 @@ public class LircRemoteControlPlugin
     });
     plugin.attach(null);
   }
+  */
 
 
 // ------ Translate button presses to actions --------------------------
@@ -409,8 +488,60 @@ public class LircRemoteControlPlugin
       if (getApp() != null)
 	function.perform();
     }
-    /*else
-      System.out.println("lirc remote control: unmapped button "+button);*/
+    else {
+      if (button.getRepeatCount() == 0)
+        System.out.println("lirc remote control: unmapped button "+button);
+    }
+  }
+
+
+// ------ Saving/load of configuration details -------------------------
+
+  /**
+   * Parse the configuration stored in the specified element.
+   */
+  public void parseConfig(XMLElement elt)
+  {
+    for (int i = 0; i < functions.size(); i++) {
+      Function func = (Function) functions.get(i);
+      func.clearConfig();
+    }
+
+    Enumeration enum = elt.enumerateChildren();
+    while (enum.hasMoreElements()) {
+      XMLElement funcElt = (XMLElement) enum.nextElement();
+      if (funcElt.getName().equals("function")) {
+        String id = funcElt.getStringAttribute("id");
+        for (int i = 0; i < functions.size(); i++) {
+          Function func = (Function) functions.get(i);
+          if (func.getID().equals(id))
+            func.parseXML(funcElt);
+        }
+      }
+      else
+      if (funcElt.getName().equals("connect")) {
+        host = funcElt.getStringAttribute("host");
+        port = Integer.parseInt(funcElt.getStringAttribute("port"));
+      }
+    }
+  }
+
+  /**
+   * Format the configuration of this plugin by modifying the specified
+   * element.
+   */
+  public void formatConfig(XMLElement elt)
+  {
+    XMLElement connElt = new XMLElement(new Hashtable(), false, false);
+    elt.addChild(connElt);
+    connElt.setName("connect");
+    connElt.setAttribute("host", host);
+    connElt.setAttribute("port", Integer.toString(port));
+
+    for (int i = 0; i < functions.size(); i++) {
+      Function func = (Function) functions.get(i);
+      elt.addChild(func.formatXML());
+    }
   }
 }
 
