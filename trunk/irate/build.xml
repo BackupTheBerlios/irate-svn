@@ -27,6 +27,7 @@
       <fileset dir="." includes="irate/common/locale.properties"/>
       <fileset dir="." includes="irate/download/*.class"/>
       <fileset dir="." includes="irate/download/locale.properties"/>
+      <fileset dir="." includes="irate/resources/*.class"/>
       <fileset dir="." includes="javazoom/jlGui/*.class"/>
     </jar>
   </target>
