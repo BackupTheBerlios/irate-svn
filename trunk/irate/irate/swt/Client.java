@@ -244,7 +244,8 @@ public class Client implements UpdateListener, PluginApplication {
 
   /**
    * PluginApplication interface:
-   * Get the track that is currently selected.
+   * Get the track that is currently selected.  In some implementations
+   * this may be the same as the track that is playing.
    */
   public Track getSelectedTrack()
   {

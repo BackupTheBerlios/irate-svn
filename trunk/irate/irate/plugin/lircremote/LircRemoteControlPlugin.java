@@ -184,6 +184,7 @@ public class LircRemoteControlPlugin
       try {
         if (ioThread != null) {
           ioThread.terminating = true;
+            // Wake up the timer if it happens to be doing a timed wait.
           synchronized (timer) {
             timer.notifyAll();
           }
@@ -191,8 +192,10 @@ public class LircRemoteControlPlugin
           if (s != null)
             try {s.close();} catch (IOException e) {}
 	  // Work around GCJ bug:  Closing the socket, as we do above, does not
-	  // terminate the thread under GCJ.  So, we will just leave it dangling.
-	  // It breaks my heart to have to work around bugs like this.  :)
+	  // terminate the thread under GCJ, so Thread.join() deadlocks.
+          // Instead, we just leave it dangling. This works out not so bad,
+          // because I've written the code in such a way as to make it clean the
+          // dangling thread up the next time a remote control button is pressed. 
 	  //try {ioThread.join();} catch (InterruptedException e) {}
         }
       }
