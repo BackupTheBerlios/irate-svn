@@ -231,17 +231,17 @@ public class DownloadThread extends Thread {
     final URL url = getProxyURL(track.getURL());
     System.out.println(url);
     final File finishedFile = getFileName(url);
-    if (finishedFile.exists()) {
-      // We've already successfully downloaded the file. Set the file to the 
-      // correct name.
-      for (int i = 0; i < downloadListeners.size(); i++)
-        ((DownloadListener)downloadListeners.get(i)).downloadStarted(track);
-      track.setFile(finishedFile);
-      for (int i = 0; i < downloadListeners.size(); i++)
-        ((DownloadListener)downloadListeners.get(i)).downloadFinished(track, true);
-      return;
-    }
     final File downloadingFile = new File(finishedFile.toString() + ".part");
+    if (finishedFile.exists()) {
+      // We've already have the finished file then we rename it to .part in
+      // case it's a partially downloaded file from a previous version of
+      // the program.
+      if (!finishedFile.renameTo(downloadingFile)) {
+        System.out.println("Failed to rename " + finishedFile + " to " + downloadingFile);
+        finishedFile.delete();
+      }
+    }
+
     setState(getResourceString("DownloadThread.Connecting_to")
              + url.getHost());
     try {
