@@ -38,7 +38,7 @@ libswt.o: swt.jar
 ifeq ($(PLATFORM),win32)
 	echo libswt.o should come from the zip file ':)'	
 else
-	$(GCJ) -classpath swt-pi.jar -fjni -o libswt.o -c  swt.jar 
+	$(GCJ) -fjni -o libswt.o -c  swt.jar 
 endif
 
 libswt-pi.o: swt-pi.jar
