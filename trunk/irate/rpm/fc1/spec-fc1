@@ -1,7 +1,7 @@
 Name: irate-client-gtk
 Summary: The iRATE music database client
-Version: 0.3pre
-Release: 20040117
+Version: 0.3
+Release: rc2
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
@@ -16,8 +16,8 @@ an iRATE server containing a large database of legally downloadable music. You r
 downloaded tracks and the server matches your ratings with those of other people to 
 provide you with music you'll like. 
 
-This package is built from a developer's snapshot of iRATE. As such, it may
-exhibit instability, bugs, or other undesirable behavior. Caveat emptor.
+#This package is built from a developer's snapshot of iRATE. As such, it may
+#exhibit instability, bugs, or other undesirable behavior. Caveat emptor.
 
 %prep
 rm -rf $RPM_BUILD_ROOT
@@ -59,6 +59,9 @@ rm -rf $RPM_BUILD_DIR/irate
 /usr/share/pixmaps
 
 %changelog
+* Mon Jan 26 2004 Todd Pytel <tppytel@sophrosune.org> 0.3-rc2
+- updated to rc2
+
 * Sat Jan 17 2004 Todd Pytel <tppytel@sophrosune.org> 0.3pre-20040117
 - used make -e to set the platform
 
