@@ -1,9 +1,3 @@
-/*
- * Created on Jun 19, 2003
- *
- * To change the template for this generated file go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
- */
 package irate.swt;
 
 import org.eclipse.swt.widgets.*;
@@ -12,18 +6,29 @@ import org.eclipse.swt.events.*;
 //import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.SWT;
 import irate.common.*;
+
+
 /**
- * @author taras
- *
- * To change the template for this generated type comment go to
- * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
+ * 
+ * Date Created: Jun 19, 2003
+ * Date Updated: $Date: 2003/09/17 20:13:04 $
+ * @author Creator:	taras
+ * @author Updated:	$Author: ebdalqui $
+ * @version $Revision: 1.5 $
  */
 public class AccountDialog {
   boolean done = false;
   
+  /**
+   * Creates a new AccountDialog class.
+   * 
+   * @param display
+   * @param trackDatabase
+   */
   public AccountDialog(Display display, TrackDatabase trackDatabase)
   {
     final Shell shell = new Shell(display);
+    
     shell.addShellListener(new ShellAdapter()
     {
       public void shellClosed(ShellEvent e){
@@ -57,6 +62,12 @@ public class AccountDialog {
     
     Button btnSave = new Button(shell, SWT.NONE);
     btnSave.setText("Save");
+    
+    new Label(shell, SWT.NONE).setText
+    (
+      "Please choose a User name & password. If\n" + 
+      "the User does not exist it will be created."
+    );
     
     final TrackDatabase finTrackDatabase  = trackDatabase;
     btnSave.addSelectionListener(new SelectionAdapter(){

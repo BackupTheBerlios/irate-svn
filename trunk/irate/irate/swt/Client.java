@@ -21,6 +21,14 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
+/**
+ * 
+ * Date Created: Sep 13, 2003
+ * Date Updated: $Date: 2003/09/17 20:13:03 $
+ * @author Creator:	Eric Dalquist
+ * @author Updated:	$Author: ebdalqui $
+ * @version $Revision: 1.73 $
+ */
 public class Client implements UpdateListener, PluginApplication {
   
   private static final int VOLUME_RESOLUTION = 3;
@@ -50,11 +58,7 @@ public class Client implements UpdateListener, PluginApplication {
 
   private String strState = "";
 
-  /**
-   * User-interface factory that creates SWT user-interface components for
-   * plug-ins.
-   */
-  private SWTPluginUIFactory uiFactory;
+    private SWTPluginUIFactory uiFactory;
 
   public Client() {
       //Added by Allen Tipper 16.9.03, code by Anthony
@@ -99,7 +103,7 @@ public class Client implements UpdateListener, PluginApplication {
       //do as much handholding as possible
     if(trackDatabase.getNoOfTracks() == 0)
     {
-      new AccountDialog(display, trackDatabase);
+      this.showAccountDialog();
       Player players[] = playerList.getPlayers();
       trackDatabase.setAutoDownload(2);
       if(players.length > 0)
@@ -480,6 +484,12 @@ public class Client implements UpdateListener, PluginApplication {
     System.exit(0);
   }
 
+  void showAccountDialog() {  
+    this.shell.setVisible(false); 
+    new AccountDialog(display, trackDatabase);
+    this.shell.setVisible(true);
+  }
+
   void uncheckSiblingMenuItems(MenuItem self) {
     Menu parent = self.getParent();
 		MenuItem items[] = parent.getItems();
@@ -669,8 +679,16 @@ public class Client implements UpdateListener, PluginApplication {
     //end add
     item2.setMenu(mSettings);
 
-    //MenuItem item2_1 = new MenuItem(menu2,SWT.PUSH);
-    //item2_1.setText("Account");
+
+//Uncommented EBD - adding account edit functionality
+    MenuItem mAccount = new MenuItem(mSettings,SWT.PUSH);
+    mAccount.setText("Account");
+    mAccount.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        showAccountDialog();
+      }
+    });
+
 
     MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
     mDownload.setText("Auto download");

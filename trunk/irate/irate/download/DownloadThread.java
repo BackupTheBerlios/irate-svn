@@ -114,33 +114,33 @@ public class DownloadThread extends Thread {
   }
 
   URLConnection openConnection(URL u) throws IOException{
-  	final URL url = u;
+    final URL url = u;
 
-  	return null;
+    return null;
   }
 
   private abstract class TimeoutWorker implements Runnable {
-	protected Object input;
-  	private Object output;
-	private Thread timeoutThread;
-	private Exception exception;
+    protected Object input;
+    private Object output;
+    private Thread timeoutThread;
+    private Exception exception;
 
-	public TimeoutWorker(Object input) {
-	  this.input = input;
+    public TimeoutWorker(Object input) {
+      this.input = input;
 //    workerThread = new Thread(this);
-	}
+    }
 
-	protected void setOutput(Object output) {
-		this.output = output;
-	//	timeoutThread.interrupt();
-	}
+    protected void setOutput(Object output) {
+        this.output = output;
+    //  timeoutThread.interrupt();
+    }
 
-	protected void setException(Exception exception) {
-		this.exception = exception;
-	//	timeoutThread.interrupt();
-	}
+    protected void setException(Exception exception) {
+        this.exception = exception;
+    //  timeoutThread.interrupt();
+    }
 
-	public abstract void run();
+    public abstract void run();
 
     public Object runOrTimeout(long timeout) throws Exception {
       //running thread
@@ -211,6 +211,7 @@ public class DownloadThread extends Thread {
 
         final long offset = continueOffset;
         TimeoutWorker worker = new TimeoutWorker((Object) finalUrl) {
+
           public void run() {
             try {
               URLConnection conn = ((URL) input).openConnection();
@@ -240,7 +241,7 @@ public class DownloadThread extends Thread {
           return;
         }
         //get rid of the problem where tracks are downloaded but in reality they are 404 messages or some other html crud
-		String contentType = conn.getContentType();
+        String contentType = conn.getContentType();
         if (contentType.indexOf("text") != -1) {
           track.setBroken();
           track.setRating(0);
@@ -341,6 +342,8 @@ public class DownloadThread extends Thread {
       trackDatabase.save();
 
       String errorCode = reply.getErrorCode();
+//if errorCode == "password" we can give a better prompt.
+System.out.println("DownloadThread.java:326: " + errorCode);
       if (errorCode.length() != 0)
         handleError(errorCode, reply.getErrorURLString());
       else//if no error incrmement serial
@@ -398,7 +401,7 @@ public class DownloadThread extends Thread {
     else {
       int autoDownload = trackDatabase.getAutoDownload();
       int noOfUnrated = trackDatabase.getNoOfUnrated();
-      if (noOfUnrated >= autoDownload) 
+      if (noOfUnrated >= autoDownload)
         setState(noOfUnrated + " unrated track" + (noOfUnrated == 1 ? "" : "s"));
       else
         go();
