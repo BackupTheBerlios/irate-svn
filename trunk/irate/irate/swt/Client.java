@@ -23,15 +23,16 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import java.io.*;
 import java.net.*;
+import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/10/26 15:57:29 $
+ * Date Updated: $Date: 2003/10/27 22:22:49 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.90 $
+ * @version $Revision: 1.91 $
  */
 public class Client extends AbstractClient {
 
@@ -51,7 +52,7 @@ public class Client extends AbstractClient {
   private Help help = new Help();
   private ErrorDialog errorDialog;
 
-  private SettingDialog settingDialog;
+//  private SettingDialog settingDialog;
   private String strState = "";
   private TrackTable trackTable;
 	
@@ -373,6 +374,13 @@ public class Client extends AbstractClient {
   @param url web address!
   */
   public void showURL(String url) {
+    try {
+      showURLwithJNLP(new URL(url));
+    }
+    catch (Exception e) {
+      System.out.println("JNLP:"+e);
+    }
+    
     String cmd;
     Runtime r = Runtime.getRuntime();
     try {
@@ -383,7 +391,7 @@ public class Client extends AbstractClient {
     catch (Exception ex) {
       try {
         //win32 way
-        cmd = "rundll32 url.dll,FileProtocolHandler " + url;
+        cmd = "rundll32 url.dll,FileProtocolHandler '" + url+"'";
         System.out.println(cmd);
         r.exec(cmd);
       }
@@ -391,6 +399,23 @@ public class Client extends AbstractClient {
 
       }
     }
+  }
+  
+  /** use webstart to launch a browser */
+  private boolean  showURLwithJNLP ( URL  url ) throws Exception {    
+    Class  serviceManagerClass = Class.forName ( "javax.jnlp.ServiceManager" );
+
+    Method  lookupMethod = serviceManagerClass.getMethod ( "lookup", new Class [ ] { String.class } );
+
+    Object basicServiceObject = lookupMethod.invoke (
+    null, new Object [ ] { "javax.jnlp.BasicService" } );
+    Method  method = serviceManagerClass.getMethod (
+    "showDocument", new Class [ ] { URL.class } );
+    
+    Boolean  resultBoolean = ( Boolean ) method.invoke (
+    basicServiceObject, new Object [ ] { url } );
+    
+    return resultBoolean.booleanValue ( );
   }
   
   public void createMenu() {
@@ -587,7 +612,7 @@ public class Client extends AbstractClient {
     }
 
     MenuItem item2_1 = new MenuItem(mSettings, SWT.PUSH);
-    item2_1.setText("Plug-ins");
+    item2_1.setText("Advanced");
     item2_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         showSettingDialog(SettingDialog.PLUGIN_PAGE);
@@ -713,7 +738,24 @@ public class Client extends AbstractClient {
 		item.setToolTipText("Visit artist website");
 		item.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-					showURL(getSelectedTrack().getArtistWebsite());
+        Track track = getSelectedTrack();
+        String www = track.getArtistWebsite();
+
+        if(www == null) {
+          www = "\"" + track.getArtist()+ "\" ";
+          www += "\"" + track.getTitle()+ "\"";
+          try {
+            // We need to use the deprecated version of this method because the
+            // un-deprecated version isn't implemented in GCJ 3.0.4. We can change
+            // this when we drop support for Debian Woody (when Sarge becomes 
+            // stable).
+            www = "http://www.google.com/search?q="+URLEncoder.encode(www);
+          }
+          catch(Exception eee){
+            System.out.println(e.toString());
+          }
+        }
+        showURL(www);
       }
 		});
     		
@@ -771,15 +813,15 @@ public class Client extends AbstractClient {
   }
 
   /** Display a preference
-  @page duh
+  @page SettingDialog.*_PAGE value.wish java had enums
   */
 	public void showSettingDialog(int page) {
-    if(settingDialog == null) {
-      settingDialog = new SettingDialog(
-          display,
-          pluginManager,
-          (PluginApplication) Client.this);
-		}
+  //  if(settingDialog == null) {
+    SettingDialog settingDialog = new SettingDialog(
+        display,
+        pluginManager,
+        (PluginApplication) Client.this);
+		//}
     settingDialog.setPage(page);
     settingDialog.open(display);
 	}

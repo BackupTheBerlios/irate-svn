@@ -15,7 +15,7 @@ import irate.plugin.*;
 public class SettingDialog
 {
 	public static final int PLUGIN_PAGE = 0;
-	
+	public static final int BROWSER_PAGE = 1;	
   private PluginManager pluginManager;
   private boolean done = false;
 	private Shell shell;
@@ -50,7 +50,7 @@ public class SettingDialog
       e.printStackTrace();
     }
     //should do dispose in a finalyzer
-    //shell.dispose();
+    shell.dispose();
 
   }
 	/** Creates widgets */
@@ -62,12 +62,29 @@ public class SettingDialog
         done=true;
       }
     });
-		tabs = new TabFolder(shell, SWT.NONE);
+		GridLayout layout = new GridLayout(1, false);
+    shell.setLayout(layout);
+    
+    tabs = new TabFolder(shell, SWT.NONE);
 		//Pluginpage
     TabItem tabItem = new TabItem(tabs, SWT.NONE);
     tabItem.setText("Plugins");
 		tabItem.setControl(createPluginPage(tabs));
+    tabItem = new TabItem(tabs, SWT.NONE);
+    tabItem.setText("Browser");
+		tabItem.setControl(createBrowserPage(tabs));
 		tabs.pack();
+
+    Button ok = new Button(shell, SWT.NONE);
+    ok.setText("Save");
+    
+    //gd.horizontalSpan = 2;
+    ok.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
+    ok.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        shell.close();
+      }
+    });
 		
     shell.pack();    
   }
@@ -106,16 +123,14 @@ public class SettingDialog
 			});
 		}
 
-    Button ok = new Button(comp, SWT.NONE);
-    ok.setText("OK");
-    gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
-    gd.horizontalSpan = 2;
-    ok.setLayoutData(gd);
-    ok.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        shell.close();
-      }
-    });
 		return comp;
 	}
+
+  
+	private Composite createBrowserPage(Composite parent) {
+		Composite comp = new Composite(parent, SWT.NONE);
+    GridLayout layout = new GridLayout(2, false);
+    comp.setLayout(layout);
+    return comp;
+  }
 }

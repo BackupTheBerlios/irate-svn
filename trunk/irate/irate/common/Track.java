@@ -415,22 +415,7 @@ public class Track {
 
   /** Returns artist website */
   public String getArtistWebsite() {
-    String www = elt.getStringAttribute("www");
-    if(www == null) {
-      www = "\"" +getArtist()+ "\" ";
-      www += "\"" +getTitle()+ "\"";
-      try {
-        // We need to use the deprecated version of this method because the
-        // un-deprecated version isn't implemented in GCJ 3.0.4. We can change
-        // this when we drop support for Debian Woody (when Sarge becomes 
-        // stable).
-        www = "http://www.google.com/search?q="+URLEncoder.encode(www);
-      }
-      catch(Exception e){
-        System.out.println(e.toString());
-      }
-    }
-    return www;
+    return elt.getStringAttribute("www");
   }
 	
   public int hashCode() {
