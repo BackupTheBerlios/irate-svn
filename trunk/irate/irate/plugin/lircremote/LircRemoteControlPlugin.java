@@ -21,6 +21,8 @@ public class LircRemoteControlPlugin
   private String host;
   private int port;
   private Vector functions;
+  private final String rateAsBefore = Resources.getString("rate_as_before");
+  private final String rateAsAfter = Resources.getString("rate_as_after");
 
   public LircRemoteControlPlugin()
   {
@@ -29,42 +31,42 @@ public class LircRemoteControlPlugin
     functions = new Vector();
     functions.add(new Function() {
       public String getID() {return "this-sux";}
-      public String getName() {return "Rate as 'This sux'";}
+      public String getName() {return rateAsBefore+irate.swt.Resources.getString("button.this_sux")+rateAsAfter;}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 0); getApp().skip(false);}
     });
     functions.add(new Function() {
       public String getID() {return "yawn";}
-      public String getName() {return "Rate as 'Yawn'";}
+      public String getName() {return rateAsBefore+irate.swt.Resources.getString("button.yawn")+rateAsAfter;}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 2);}
     });
     functions.add(new Function() {
       public String getID() {return "not-bad";}
-      public String getName() {return "Rate as 'Not bad'";}
+      public String getName() {return rateAsBefore+irate.swt.Resources.getString("button.not_bad")+rateAsAfter;}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 5);}
     });
     functions.add(new Function() {
       public String getID() {return "cool";}
-      public String getName() {return "Rate as 'Cool'";}
+      public String getName() {return rateAsBefore+irate.swt.Resources.getString("button.cool")+rateAsAfter;}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 7);}
     });
     functions.add(new Function() {
       public String getID() {return "love-it";}
-      public String getName() {return "Rate as 'Love it'";}
+      public String getName() {return rateAsBefore+irate.swt.Resources.getString("button.love_it")+rateAsAfter;}
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 10);}
     });
     functions.add(new Function() {
       public String getID() {return "pause/resume";}
-      public String getName() {return "Pause/Resume";}
+      public String getName() {return irate.swt.Resources.getString("button.pause.tooltip")+"/"+irate.swt.Resources.getString("button.play.tooltip");}
       public void perform() {getApp().setPaused(!getApp().isPaused());}
     });
     functions.add(new Function() {
       public String getID() {return "skip";}
-      public String getName() {return "Forward";}
+      public String getName() {return irate.swt.Resources.getString("button.next.tooltip");}
       public void perform() {getApp().skip(false);}
     });
     functions.add(new Function() {
       public String getID() {return "back";}
-      public String getName() {return "Back";}
+      public String getName() {return irate.swt.Resources.getString("button.previous.tooltip");}
       public void perform() {getApp().skip(true);}
     });
   }
@@ -87,7 +89,7 @@ public class LircRemoteControlPlugin
    */
   public String getDescription()
   {
-    return "lirc remote control (Linux/Unix)";
+    return Resources.getString("description");
   }
 
   /**
@@ -95,7 +97,7 @@ public class LircRemoteControlPlugin
    */
   public String getLongDescription() 
   {
-    return "This plugin allows iRATE to be remotely controlled by an infra-red remote control. Linux and UNIX only.";
+    return Resources.getString("long_description");
   }
 
 // ------ Listeners ----------------------------------------------------

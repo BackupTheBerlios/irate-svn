@@ -21,5 +21,10 @@ public abstract class PluginUIFactory
    * @return null if a UI object can't be found for it.
    */
   public abstract Object lookup(Plugin plugin, String type);
+
+  /**
+   * Returns true if lookup would return an object for the same arguments.
+   */
+  public abstract boolean available(Plugin plugin, String type);
 }
 

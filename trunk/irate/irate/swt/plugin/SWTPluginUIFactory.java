@@ -54,5 +54,21 @@ public class SWTPluginUIFactory
     }
     return null;
   }
+
+  /**
+   * Returns true if lookup would return an object for the same arguments.
+   */
+  public boolean available(Plugin plugin, String type)
+  {
+    if (type.equals(CONFIGURATOR)) {
+      if (plugin instanceof irate.plugin.lircremote.LircRemoteControlPlugin)
+        return true;
+      if (plugin instanceof irate.plugin.externalcontrol.ExternalControlPlugin)
+        return true;
+      if (plugin instanceof irate.plugin.unratednotifier.UnratedNotifierPlugin)
+        return true;
+    }
+    return false;
+  }
 }
 

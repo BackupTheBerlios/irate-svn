@@ -10,6 +10,7 @@ import irate.plugin.*;
 import irate.plugin.lircremote.LircRemoteControlPlugin;
 import irate.plugin.lircremote.LircRemoteControlListener;
 import irate.plugin.lircremote.Function;
+import irate.plugin.lircremote.Resources;
 
 /**
  * SWT version of the configurator for the Lirc remote control.
@@ -42,7 +43,7 @@ public class LircRemoteControlConfigurator
       plugin.detach();
 
     final Shell shell = new Shell(display);
-    shell.setText("Lirc remote control configuration");
+    shell.setText(Resources.getString("configuration"));
     shell.addShellListener(new ShellAdapter()
     {
       public void shellClosed(ShellEvent e){
@@ -52,7 +53,7 @@ public class LircRemoteControlConfigurator
     GridLayout layout = new GridLayout(2, false);
     shell.setLayout(layout);
 
-    new Label(shell, SWT.NONE).setText("Host or device");
+    new Label(shell, SWT.NONE).setText(Resources.getString("host_or_device"));
     host = new Text(shell, SWT.SINGLE | SWT.BORDER);
     host.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));;
     host.setText(plugin.getHost());
@@ -63,13 +64,13 @@ public class LircRemoteControlConfigurator
     };
     host.addModifyListener(callSetup);
 
-    new Label(shell, SWT.NONE).setText("Port (if host specified)");
+    new Label(shell, SWT.NONE).setText(Resources.getString("port"));
     port = new Text(shell, SWT.SINGLE | SWT.BORDER);
     port.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));;
     port.setText(Integer.toString(plugin.getPort()));
     port.addModifyListener(callSetup);
 
-    new Label(shell, SWT.NONE).setText("Status");
+    new Label(shell, SWT.NONE).setText(Resources.getString("status"));
     status = new Label(shell, SWT.SINGLE | SWT.BORDER);
     setStatus();
 
@@ -77,7 +78,7 @@ public class LircRemoteControlConfigurator
       final Function func = (Function) plugin.getFunctions().get(i);
       new Label(shell, SWT.NONE).setText(func.getName());
       org.eclipse.swt.widgets.Button setUp = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
-      setUp.setText("Set up");
+      setUp.setText(Resources.getString("set_up"));
       setUp.addSelectionListener(new SelectionAdapter(){
 	public void widgetSelected(SelectionEvent e){
           new FunctionSetup(display, app, plugin, func);
@@ -86,7 +87,7 @@ public class LircRemoteControlConfigurator
     }
 
     org.eclipse.swt.widgets.Button ok = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
-    ok.setText("OK");
+    ok.setText(Resources.getString("button.OK"));
     GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
     gd.horizontalSpan = 2;
     ok.setLayoutData(gd);
@@ -124,7 +125,7 @@ public class LircRemoteControlConfigurator
   private void setStatus()
   {
     if (!done)
-      status.setText(plugin.getConnectStatus() ? "connected" : "disconnected");
+      status.setText(plugin.getConnectStatus() ? Resources.getString("status_connected") : Resources.getString("status_disconnected"));
   }
 
   public void connectStatusChanged(LircRemoteControlPlugin plugin, boolean connected)

@@ -10,6 +10,7 @@ import irate.plugin.*;
 import irate.plugin.lircremote.LircRemoteControlPlugin;
 import irate.plugin.lircremote.LircRemoteControlListener;
 import irate.plugin.lircremote.Function;
+import irate.plugin.lircremote.Resources;
 
 /**
  * Dialog box to set up the buttons that correspond to a function.
@@ -36,14 +37,14 @@ public class FunctionSetup
     shell.setLayout(layout);
 
     Label heading1 = new Label(shell, SWT.NONE);
-    heading1.setText("This is the list of buttons that will trigger the");
+    heading1.setText(Resources.getString("function_setup_1"));
     Label heading2 = new Label(shell, SWT.NONE);
-    heading2.setText(func.getName()+" function.");
+    heading2.setText(Resources.getString("function_setup_2a")+func.getName()+Resources.getString("function_setup_2b"));
     Label heading3 = new Label(shell, SWT.NONE);
-    heading3.setText("Press button on remote control to add it to the list.");
+    heading3.setText(Resources.getString("function_setup_3"));
 
     org.eclipse.swt.widgets.Button clear = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
-    clear.setText("Clear list");
+    clear.setText(Resources.getString("clear_list"));
 
     list = new List(shell, SWT.NONE);
     for (int i = 0; i < func.buttons.size(); i++) {
@@ -62,7 +63,7 @@ public class FunctionSetup
     });
 
     org.eclipse.swt.widgets.Button ok = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
-    ok.setText("OK");
+    ok.setText(Resources.getString("button.OK"));
     gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
     ok.setLayoutData(gd);
     ok.addSelectionListener(new SelectionAdapter(){

@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/05/31 04:38:45 $
+ * Date Updated: $Date: 2004/06/15 11:53:09 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.23 $
+ * @version $Revision: 1.24 $
  */
 public class SettingDialog
 {
@@ -139,13 +139,17 @@ public class SettingDialog
               plugin.detach();
           }
         });
-      Button configure = new Button(comp, SWT.NONE);
-      configure.setText(getResourceString("SettingDialog.Button.Configure")); 
-      configure.addSelectionListener(new SelectionAdapter(){
-        public void widgetSelected(SelectionEvent e){
-          app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
-        }
-        });
+      if (app.getUIFactory().available(plugin, PluginUIFactory.CONFIGURATOR)) {
+        Button configure = new Button(comp, SWT.NONE);
+        configure.setText(getResourceString("SettingDialog.Button.Configure")); 
+        configure.addSelectionListener(new SelectionAdapter(){
+          public void widgetSelected(SelectionEvent e){
+            app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
+          }
+          });
+      }
+      else
+        new Label(comp, SWT.NONE).setText("");
     }
     
     return comp;

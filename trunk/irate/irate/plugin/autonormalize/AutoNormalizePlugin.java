@@ -41,7 +41,7 @@ public class AutoNormalizePlugin
    */
   public String getIdentifier()
   {
-    return "auto-normalize";
+    return "auto-normalize";  // Used internally, don't internationalize
   }
 
   /**
@@ -49,7 +49,7 @@ public class AutoNormalizePlugin
    */
   public String getDescription()
   {
-    return "auto-normalize";
+    return Resources.getString("description");
   }
 
   /**
@@ -57,7 +57,7 @@ public class AutoNormalizePlugin
    */
   public String getLongDescription() 
   {
-    return "This plugin automatically normalizes the volumes of tracks, that is, it makes all tracks about the same volume level.";
+    return Resources.getString("long_description");
   }
 
   protected void doAttach()
@@ -240,7 +240,7 @@ public class AutoNormalizePlugin
         try {
             // Wait until we have determined how loud it is.
           synchronized (bgHowLoud.getMutex()) {
-            final String message = "Please wait... Need to determine track loudness";
+            final String message = Resources.getString("wait_determining");
             getApp().addStatusMessage(100, message);
             try {
               while ((loudness = track.getProperty("loudness")) == null)
