@@ -538,7 +538,7 @@ public class Client extends AbstractClient {
 
   public void createShell() {
     shell = new Shell(display);
-    shell.setText("iRATE Radio - Initializing");
+    shell.setText(Resources.getString("titlebar.startup"));
     
     // On Mac OS X we already have an icon set by the application bundle
     if (!isMac())
