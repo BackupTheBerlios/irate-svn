@@ -1,3 +1,5 @@
+// Copyright 2003 Anthony Jones
+
 package irate.swing;
 
 import irate.common.TrackDatabase;
@@ -84,14 +86,14 @@ public class Client extends JFrame {
         actionSetContinuousDownload(false);
         URL url;
         if (urlString.indexOf(':') < 0)
-          url = getClass().getResource("help/" + urlString);
+          url = getResource("help/" + urlString);
         else 
           try {
             url = new URL(urlString);
           }
           catch (MalformedURLException e) {
             e.printStackTrace();
-            url = getClass().getResource("help/malformedurl.html");
+            url = getResource("help/malformedurl.html");
           }
         errorDialog.showURL(url);
       }
@@ -125,6 +127,10 @@ public class Client extends JFrame {
     setJMenuBar(createMenuBar());
   }
 
+  public URL getResource(String s) {
+    return playThread.getClass().getResource(s);
+  }
+
   /** Disable the 'Account' settings if the number of tracks is non-zero.
    * The server gets confused if you already have tracks and you try to create 
    * access a different account name. */  
@@ -153,11 +159,11 @@ public class Client extends JFrame {
   }
 
   public void actionGettingStarted() {
-    errorDialog.showURL(getClass().getResource("help/gettingstarted.html"));
+    errorDialog.showURL(getResource("help/gettingstarted.html"));
   }
 
   public void actionAbout() {
-    errorDialog.showURL(getClass().getResource("help/about.html"));
+    errorDialog.showURL(getResource("help/about.html"));
   }
 
   public void actionSetContinuousDownload(boolean state) {

@@ -1,4 +1,4 @@
-// Copyright Taras
+// Copyright 2003 Anthony Jones, Taras
 
 package irate.swt;
 
@@ -36,6 +36,7 @@ public class Client implements UpdateListener {
   private DownloadThread downloadThread;
   private ToolItem pause;
   private Track previousTrack;
+  private ErrorDialog errorDialog;
   
   private String strState = "";
   // private PlayThread playThread;
@@ -69,12 +70,10 @@ public class Client implements UpdateListener {
     playThread = new PlayThread(playListManager, playerList);
  
     initGUI();
+    errorDialog = new ErrorDialog(display, shell);
     
-    if(playerList.getPlayers().length == 0){
-      MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR);
-      msg.setMessage("Couldn't locate a commandline mp3 player. Please install madplay, mpg321 or mpg123 into /usr/bin or /usr/local/bin.\n iRate will be unable to play mp3s.");
-      msg.open();
-    }
+    if (playerList.getPlayers().length == 0) 
+      errorDialog.showURL(getResource("help/missingplayer.html"));
 
     playThread.addUpdateListener(this);
     playThread.start();
@@ -98,15 +97,14 @@ public class Client implements UpdateListener {
           }
           catch (MalformedURLException e) {
             e.printStackTrace();
-            url = getClass().getResource("help/malformedurl.html");
+            url = getResource("help/malformedurl.html");
           }
-          MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR);
-          msg.setMessage("Error with url:"+url);
-          msg.open();
-        }
-      };
-      final Client client = this;
-      downloadThread.addUpdateListener(new UpdateListener() {
+        errorDialog.showURL(url);
+      }
+    };
+    
+    final Client client = this;
+    downloadThread.addUpdateListener(new UpdateListener() {
       boolean newState = false;
       public void actionPerformed() {
         String state = downloadThread.getState();
@@ -334,6 +332,7 @@ public class Client implements UpdateListener {
     shell.setBounds(rec);
  
     progressBar.setVisible(false);
+
     shell.open();
   }
 
@@ -413,6 +412,16 @@ public class Client implements UpdateListener {
     gridData.horizontalSpan = 2;
     tblSongs.setLayoutData(gridData);
     tblSongs.pack();
+  }
+
+  public URL getResource(String s) {
+    if (s.endsWith(".html"))
+      s = s.substring(0, s.length() - 5) + ".txt";
+    return playThread.getClass().getResource(s);
+  }
+
+  public void actionAbout() {
+    errorDialog.showURL(getResource("help/about.html"));
   }
   
   public void createMenu() {
@@ -512,6 +521,21 @@ public class Client implements UpdateListener {
         }
       });
     }
+
+    MenuItem item3 = new MenuItem(menubar,SWT.CASCADE);
+    item3.setText("Info");
+    
+    Menu menu3 = new Menu(item3);
+    item3.setMenu(menu3);
+    
+    MenuItem item3_1 = new MenuItem(menu3,SWT.PUSH);
+    item3_1.setText("Credits");
+    item3_1.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        actionAbout();
+      }
+    });    
+    
   }
 
   public void createToolBar() {
@@ -605,7 +629,8 @@ public class Client implements UpdateListener {
 
   public void run(){
     while (true) {
-      if (!display.readAndDispatch()) display.sleep();
+      if (!display.readAndDispatch()) 
+        display.sleep();
     }   
   }
   

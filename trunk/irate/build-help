@@ -1,0 +1,10 @@
+#!/bin/bash
+for FILE in irate/client/help/*.html 
+do
+  OUTFILE=`echo "${FILE}" | sed -e "s/\\.html/\\.txt/"`
+  if test "${OUTFILE}" != "${FILE}"
+  then
+    echo "${FILE} -> ${OUTFILE}"
+    html2text "${FILE}" > "${OUTFILE}"
+  fi
+done

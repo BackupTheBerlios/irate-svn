@@ -23,7 +23,7 @@
     <jar jarfile="irate-swt-client.jar" manifest="META-INF/manifest.irate-swt-client" compress="false">
       <fileset dir="." includes="irate/swt/*.class"/>
       <fileset dir="." includes="irate/client/*.class"/>
-      <fileset dir="." includes="irate/client/help/*.html"/>
+      <fileset dir="." includes="irate/client/help/*.txt"/>
       <fileset dir="." includes="irate/common/*.class"/>
       <fileset dir="." includes="irate/download/*.class"/>
     </jar>
