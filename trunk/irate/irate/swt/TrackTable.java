@@ -26,11 +26,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
@@ -78,18 +78,18 @@ public class TrackTable {
   
   /** Constructor to create a table contained in the given Shell where the
    * tracks are updated from the given TrackDatabase. 
-   * @param shell         The Shell to add the Table to.
+   * @param composite     The Composite to add the Table to.
    * @param trackDatabase The database containing the list of tracks. Track
    *                      listings are automatically updated from this
    *                      database.
    * @param skinManager   The skin manager used to display graphics for the
    *                      table headings. 
    */ 
-  public TrackTable(Shell shell, TrackDatabase trackDatabase, SkinManager skinManager) {
-    display = shell.getDisplay();
+  public TrackTable(Composite composite, TrackDatabase trackDatabase, SkinManager skinManager) {
+    display = composite.getDisplay();
     this.trackDatabase = trackDatabase;
     basicSkinable = new BasicSkinable(this.display);
-    table = new Table(shell, SWT.NONE);
+    table = new Table(composite, SWT.NONE);
     table.setEnabled(false);
 
     TableColumn col = new TableColumn(table, SWT.LEFT);
