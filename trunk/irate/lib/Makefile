@@ -8,8 +8,8 @@ all: libswt.o libnanoxml-lite.o
 #libswt.a:libswt.o 
 #	ar -rcs libswt.a libswt.o
 ifeq ($(PLATFORM),linux-motif)
-swt.jar: swt-2.1-motif-linux.zip
-	unzip swt-2.1-motif-linux.zip
+swt.jar: swt-2.1-linux-motif.zip
+	unzip swt-2.1-linux-motif.zip
 else
 
 ifeq ($(PLATFORM),win32)
@@ -19,9 +19,10 @@ swt.jar: swt-2.1-win32.zip
 else
 
 ifeq ($(PLATFORM),linux-gtk2)
-swt.jar: swt-2.1.1-linux-gtk.zip
-	unzip swt-2.1.1-linux-gtk.zip
-
+#swt.jar: swt-2.1.1-linux-gtk.zip
+#	unzip swt-2.1.1-linux-gtk.zip
+swt.jar: swt-3.0M6-linux-gtk.zip
+	unzip swt-3.0M6-linux-gtk.zip
 else
 
 ifeq ($(PLATFORM),linux-libswt-gtk2)
@@ -38,14 +39,17 @@ endif
 
 endif
 
-swt-2.1-motif-linux.zip:
-	wget http://download2.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-motif-linux.zip
+swt-2.1-linux-motif.zip:
+	wget http://download.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-linux-motif.zip
 	
 swt-2.1-win32.zip:
 	wget http://download2.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-win32.zip
 
 swt-2.1.1-linux-gtk.zip:
 	wget http://download2.eclipse.org/downloads/drops/R-2.1.1-200306271545/swt-2.1.1-linux-gtk.zip
+
+swt-3.0M6-linux-gtk.zip:
+	wget http://download.eclipse.org/downloads/drops/S-3.0M6-200312182000/swt-3.0M6-linux-gtk.zip
 
 libswt.o: swt.jar
 ifeq ($(PLATFORM),win32)
