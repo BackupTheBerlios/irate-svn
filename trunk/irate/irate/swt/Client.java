@@ -542,6 +542,12 @@ public class Client implements UpdateListener {
     ToolBar toolbar = new ToolBar(shell,SWT.FLAT);
     ToolItem item;
     item = new ToolItem(toolbar,SWT.PUSH);
+    GridData gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = true;
+    gridData.horizontalSpan = 2;
+    toolbar.setLayoutData(gridData);
+
     item.setText("This sux");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
@@ -601,11 +607,6 @@ public class Client implements UpdateListener {
         downloadThread.checkAutoDownload();
       }
     });
-    GridData gridData = new GridData();
-    gridData.horizontalAlignment = GridData.FILL;
-    gridData.grabExcessHorizontalSpace = true;
-    gridData.horizontalSpan = 2;
-    toolbar.setLayoutData(gridData);
   }
 
   public void createState() {

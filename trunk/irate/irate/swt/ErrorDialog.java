@@ -53,7 +53,7 @@ public class ErrorDialog {
     try {
       StringBuffer sb = new StringBuffer();
       InputStream is = url.openStream();
-      byte buf[] = new byte[512];
+      byte[] buf = new byte[512];
       int nbytes;
       while ((nbytes = is.read(buf, 0, buf.length)) != -1) 
         sb.append(new String(buf, 0, nbytes));
