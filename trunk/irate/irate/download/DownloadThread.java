@@ -28,7 +28,6 @@ public class DownloadThread extends Thread {
       downloadDir.mkdir();
   }
 
-
   public void run() {
     while (true) {
       doCheckAutoDownload();
@@ -183,20 +182,43 @@ public class DownloadThread extends Thread {
             break;
           urlString = urlString.substring(0, index) + " " + urlString.substring(index + 3);
         }
+        
+        long continueOffset = 0;
         File file = new File(downloadDir, urlString);
+        if(file.exists()){
+          //System.out.println("Resuming " +file + " from " + file.length()+ " bytes");
+          continueOffset = file.length();
+        }
 
         setState("Connecting " + track.getName());
 
-        //0 second timeout for the impatient
-        long timeout = 60000;
-        TimeoutWorker worker = new TimeoutWorker((Object) url) {
+        //120 second timeout for the impatient
+        long timeout = 120000;
+        URL finalUrl = null; //JDR
+        String HTTPProxy = trackDatabase.getHTTPProxy(); //JDR
+        if ((HTTPProxy!=null) && (!HTTPProxy.trim().equals("")) ) //JDR
+        {//JDR HTTP proxy *is* defined in xml file.
+        	//System.out.println("\nUsing HTTPProxy:"+HTTPProxy+"\n"); //JDR
+        	finalUrl = new URL ("http",HTTPProxy,trackDatabase.getHTTPProxyPort(),url.toString());//JDR
+        	//JDR The URL constructor created this way will cause the URL to go through the proxy.
+        	//JDR port -1 = protocol port default (example http uses port 80 unless otherwise specified).
+        } else //JDR
+        {//JDR HTTP proxy is *not* defined in xml file.
+        	//System.out.println("\nNo HTTP proxy in use.\n"); //JDR
+        	finalUrl = url; //JDR
+        } //JDR
+
+        final long offset = continueOffset;
+        TimeoutWorker worker = new TimeoutWorker((Object) finalUrl) {
           public void run() {
             try {
               URLConnection conn = ((URL) input).openConnection();
+              if (offset != 0);
+                conn.setRequestProperty("Range", "bytes=" + offset + "-");
               conn.connect();
               Vector v = new Vector();
               v.add(conn);
-              v.add(new Integer(conn.getContentLength()));
+              v.add(new Integer(conn.getContentLength()+((int)offset)));
               setOutput(v);
             }
             catch (IOException e) {
@@ -228,9 +250,10 @@ public class DownloadThread extends Thread {
         int contentLength = intContentLength.intValue();
         setState("Downloading " + track.getName());
         final InputStream is = conn.getInputStream();
-        OutputStream os = new FileOutputStream(file);
+        //open the file for append
+        OutputStream os = new FileOutputStream(file.toString(), true);
         final byte buf[] = new byte[128000];
-        int totalBytes = 0;
+        int totalBytes = (int)continueOffset;
         worker = new TimeoutWorker((Object) is){
           public void run() {
             int n;
@@ -293,8 +316,8 @@ public class DownloadThread extends Thread {
       InputStream is = socket.getInputStream();
       setState("Sending server request");
       OutputStream os = socket.getOutputStream();
-      System.out.println("Request:");
-      System.out.println(trackDatabase.toString());
+      //System.out.println("Request:");
+      //System.out.println(trackDatabase.toString());
       byte[] buf = trackDatabase.toString().getBytes();
       os.write(("Content-Length: " + Integer.toString(buf.length) + "\r\n\r\n").getBytes());
       os.write(buf);
@@ -306,6 +329,7 @@ public class DownloadThread extends Thread {
       System.out.println("reply: ");
       System.out.println(reply.toString());
       trackDatabase.add(reply);
+      trackDatabase.incrementSerial();
       trackDatabase.save();
 
       String errorCode = reply.getErrorCode();
@@ -335,7 +359,10 @@ public class DownloadThread extends Thread {
   public int getPercentComplete() {
     return percentComplete;
   }
-    //made public by Allen Tipper for UI tweak 14.9.03
+  
+  //Made public for UI Tweak by Allen Tipper 14.9.03
+  //Can we have more reasons here?
+  //and next time please dont back out other people's hard work
   public void setState(String state) {
     this.state = state;
     notifyUpdateListeners();
@@ -351,7 +378,8 @@ public class DownloadThread extends Thread {
       updateListener.actionPerformed();
     }
   }
-    //Made public for UI Tweak by Allen Tipper 14.9.03 
+
+  //Made public for UI Tweak by Allen Tipper 14.9.03
   public void doCheckAutoDownload() {
     if (!trackDatabase.hasRatedEnoughTracks()) {
       setState("Not enough rated tracks");
