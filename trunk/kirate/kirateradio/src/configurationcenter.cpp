@@ -70,7 +70,7 @@ ConfigurationCenter::ConfigurationCenter(SongList* l,TrackDatabase * mtd,View* p
 	this->playSize = new KIntNumInput(this->td->getPlaylistSize(),tmp);
 	
 	//Playlist selection
-	box1 = this->addVBoxPage(i18n("Playlist"),QString::null,KGlobal::iconLoader()->loadIcon("folder_sound",KIcon::Panel,KIcon::SizeMedium));
+	/*box1 = this->addVBoxPage(i18n("Playlist"),QString::null,KGlobal::iconLoader()->loadIcon("folder_sound",KIcon::Panel,KIcon::SizeMedium));
 	tmp = new QHBox(box1);
 	new QLabel(i18n("Unrated weight"),tmp);
 	this->unratedWeight = new KIntNumInput(this->sl->getSelector()->getUnratedWeight(),tmp);
@@ -96,6 +96,7 @@ ConfigurationCenter::ConfigurationCenter(SongList* l,TrackDatabase * mtd,View* p
 	this->useExp->setChecked(this->sl->getSelector()->getUseExp());
 	this->useSqrtPlay = new QCheckBox(i18n("Use square root of played (played less important)"),box1);
 	this->useSqrtPlay->setChecked(this->sl->getSelector()->getUseSqrtPlayed());
+	*/
 	box1 = this->addVBoxPage(i18n("Display"),QString::null,KGlobal::iconLoader()->loadIcon("tv",KIcon::Panel,KIcon::SizeMedium));
 	new QLabel(i18n("Playlist font"),box1);
 	this->pl_f= new KFontRequester(box1,"playlistFont",false);
@@ -168,7 +169,7 @@ void ConfigurationCenter::slotApply(){
 	this->sl->setMinUnrated(this->minUnrated->value());
 	this->sl->setAllowConnect(this->allowConnection->isChecked());
 	//Playlist option
-	BasicSelection* select=this->sl->getSelector();
+	/*BasicSelection* select=this->sl->getSelector();
 	select->setCarePlayed(this->usePlayed->isChecked());
 	select->setUseExp(this->useExp->isChecked());
 	select->setUnratedWeight(this->unratedWeight->value());
@@ -185,6 +186,7 @@ void ConfigurationCenter::slotApply(){
 	config->writeEntry("select_use_exp",this->useExp->isChecked());
 	config->writeEntry("select_unrated_weight",this->unratedWeight->value());
 	config->writeEntry("select_use_sqrt_play",this->useSqrtPlay->isChecked());
+	*/
 	config->writeEntry("display_font",this->pl_f->font());
 	config->writeEntry("osd_mode",this->osdSetting->currentItem());
 	this->sl->setFont(this->pl_f->font());

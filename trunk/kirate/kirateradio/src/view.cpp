@@ -93,7 +93,7 @@ View::View(IratePlugin *): KMainWindow(0,0) {
 	this->mAbout = new KAction(i18n("About iRate Radio"), KGlobal::iconLoader()->loadIcon("irate",KIcon::User,0,KIcon::ActiveState,0,false),0,this,SLOT(showAboutApplication()),actionCollection(),"about_irate");
 	this->mAbout->plug(this->toolBar("irate"));
 	this->mExport = new KAction(i18n("Export as m3u..."),KGlobal::iconLoader()->loadIcon("fileexport",KIcon::Small,0,KIcon::ActiveState,0,false),0,this,SLOT(showExport()),actionCollection(),"export");
-	this->mViewDeleted= new KAction(i18n("View deleted tracks..."),KGlobal::iconLoader()->loadIcon("fileimport",KIcon::Small,0,KIcon::ActiveState,0,false),0,this,SLOT(showDeleted()),this->actionCollection(),"view_deleted");
+	//this->mViewDeleted= new KAction(i18n("View deleted tracks..."),KGlobal::iconLoader()->loadIcon("fileimport",KIcon::Small,0,KIcon::ActiveState,0,false),0,this,SLOT(showDeleted()),this->actionCollection(),"view_deleted");
 	this->mViewCurrent= new KAction(i18n("View current"),KGlobal::iconLoader()->loadIcon("goto",KIcon::Small,0,KIcon::ActiveState,0,false),0,this,SLOT(viewCurrent()),actionCollection(),"view_current");
 	//kdDebug()<<"ACtion collection"<<this->actionCollection()->count()<<endl;
 	//NoatunStdAction::play(this,"noa_play");
@@ -112,10 +112,10 @@ View::View(IratePlugin *): KMainWindow(0,0) {
 	//this->noa_eq->plug(this->toolBar("noatun"));
 	
 	this->mExport->plug(this->toolBar("irate"));
-	this->mViewDeleted->plug(this->toolBar("irate"));
+	//this->mViewDeleted->plug(this->toolBar("irate"));
 	this->mViewCurrent->plug(this->toolBar("irate"));
 	this->mFile= new KPopupMenu(this);
-	this->mViewDeleted->plug(mFile);
+//	this->mViewDeleted->plug(mFile);
 	this->mExport->plug(mFile);
 	this->menuBar()->insertItem(i18n("&File"),this->mFile);
 	this->mSetting= new KPopupMenu(this);
@@ -170,7 +170,7 @@ View::~View() {
 	delete list;
 	delete m_osd;
 	delete this->mViewCurrent;
-	delete this->mViewDeleted;
+	//delete this->mViewDeleted;
 }
 //Mainly load all config stuff
 void View::init() {
@@ -183,11 +183,18 @@ void View::init() {
 	DownloadCenter::instance()->setAllowConnect(config->readBoolEntry("allow_connect",true));
 	this->list->setMinUnrated(config->readNumEntry("min_unrated",5));
 	BasicSelection* select= this->list->getSelector();
+	/*
 	select->setCarePlayed(config->readBoolEntry("select_care_played",true));
 	select->setMinRating(config->readNumEntry("select_min_rating",0));
 	select->setUnratedWeight(config->readNumEntry("select_unrated_weight",15));
 	select->setUseExp(config->readBoolEntry("select_use_exp",false));
 	select->setUseSqrtPlayed(config->readBoolEntry("select_use_sqrt_play",false));
+	*/
+	select->setCarePlayed(true);
+	select->setMinRating(0);
+	select->setUnratedWeight(15);
+	select->setUseExp(false);
+	select->setUseSqrtPlayed(false);
 	this->list->setShowPassivePopup(config->readBoolEntry("show_passive",true));
 	this->list->setAllowConnect(config->readBoolEntry("allow_connect",true));
 	QFont ft=config->readFontEntry("display_font");
@@ -198,7 +205,7 @@ void View::init() {
 	Template::instance()->init(list->getTD()->getIRateDir()+"templates/",KGlobal::instance()->dirs()->findResourceDir("data","noatun/pics/irate.png")+"noatun/pics/");
 	Template::instance()->loadOSDTemplate(config->readEntry("osd_templ_file","default.osd"));
 	Template::instance()->loadInfoTemplate(config->readEntry("info_templ_file","default.tmpl"));
-	kdDebug()<<Template::instance()->getCurrentOSDTemplate()<<" info : "<<Template::instance()->getCurrentInfoTemplate()<<endl;
+	//kdDebug()<<Template::instance()->getCurrentOSDTemplate()<<" info : "<<Template::instance()->getCurrentInfoTemplate()<<endl;
 	this->ktb->setFont(ft);
 	this->osdMode=config->readNumEntry("osd_mode",1);
 	ft=config->readFontEntry("osd_font");
@@ -349,7 +356,7 @@ void View::rate(int id) {
 
 	}
 }
-void View::downloadMessage(const QString& message){
+void View::downloadMessage(const QString& /*message*/){
 	//this->statusBar()->changeItem(message.left(60),0);
 }
 void View::totalDownloadSpeed(const QString& speed){

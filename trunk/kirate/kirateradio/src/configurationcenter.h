@@ -47,9 +47,11 @@ class ConfigurationCenter : public KDialogBase {
 		TrackDatabase *td;
 		SongList* sl;
 		View * view;
-		KIntNumInput *maxSimDown,*mTimeout,*minUnrated,*autoDown,*playSize,*maxRetry,*unratedWeight,*osdDuration;
-		QCheckBox *allowConnection,*showPassive,*usePlayed,*useExp,*useSqrtPlay;
-		QComboBox* minRating,*osdSetting,*osdTemplate,*infoTemplate;
+		KIntNumInput *maxSimDown,*mTimeout,*minUnrated,*autoDown,*playSize,*maxRetry,*osdDuration;
+		//KIntNumInput *unratedWeight removed as all playlist options
+		QCheckBox *allowConnection,*showPassive;//,*usePlayed,*useExp,*useSqrtPlay;
+		//QComboBox* minRating,
+		QComboBox*osdSetting,*osdTemplate,*infoTemplate;
 		KPushButton * osdTest;
 		KFontRequester* pl_f;
 		

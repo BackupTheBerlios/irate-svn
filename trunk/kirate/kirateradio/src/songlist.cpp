@@ -75,19 +75,20 @@ SongList::SongList(View *parent): KListView(parent)/*,DownloadListener() */{
 	this->popDown->setTitle(i18n("File"));
 	this->mPopup->insertItem(this->popDown,8,8);
 	this->mPopup->insertItem(kil->loadIconSet("reload",KIcon::Small,0,false),i18n("Download Again"),9,9);
-	this->mPopup->insertItem(kil->loadIconSet("remove",KIcon::Small,0,false),i18n("Set broken"),10,10);
-	this->mPopup->insertItem(kil->loadIconSet("fileexport",KIcon::Small,0,false),i18n("Save playlist..."),11,11);
-	this->mPopup->insertItem(kil->loadIconSet("editdelete",KIcon::Small,0,false),i18n("Delete files..."),12,12);
+	//this->mPopup->insertItem(kil->loadIconSet("remove",KIcon::Small,0,false),i18n("Set broken"),10,10);
+	this->mPopup->insertItem(kil->loadIconSet("fileexport",KIcon::Small,0,false),i18n("Save playlist..."),10,10);
+	//Function removed to conform original iRATE
+	//this->mPopup->insertItem(kil->loadIconSet("editdelete",KIcon::Small,0,false),i18n("Delete files..."),12,12);
 	connect(this->mPopup,SIGNAL(activated(int)),this,SLOT(processPopup(int)));
 	this->header()->installEventFilter(this);
-	
+
 	//setAcceptDrops(true);
 	setSorting(-1);
 	//setDropVisualizer(true);
 	//setDragEnabled(true);
 	//setItemsMovable(true);
 	setSelectionMode(QListView::Extended);
-	
+
 	//connect(this, SIGNAL(dropped(QDropEvent*, QListViewItem*)), SLOT(dropEvent(QDropEvent*, QListViewItem*)));
 	//connect(this, SIGNAL(moved()), SLOT(move()));
 	//connect(this, SIGNAL(aboutToMove()), parent, SLOT(setNoSorting()));
@@ -130,7 +131,7 @@ SongList::~SongList() {
 	delete selector;
 	//KMessageBox::information(0,"TrackDb deleted","Start",QString::null,KMessageBox::AllowLink);
 }
-//The methods where too much things are//TODO clean it
+//The methods where too much things are TODO clean it
 void SongList::init(const QString &startDir) {
 	QString irateDir=startDir;
 	this->noUnrated=0;
@@ -204,7 +205,7 @@ void SongList::init(const QString &startDir) {
 	}
 	DownloadCenter::instance()->setDownloadListener(this);
 	if(initplaylist) {
-		
+
 		td->setNotify(true);
 		QPtrList<TrackInfo> l=td->getPlayable();
 		TrackInfo* track;
@@ -219,40 +220,43 @@ void SongList::init(const QString &startDir) {
 			//printf("%s\n",track->property("artist").latin1());
 		}
 		it=static_cast<SafeListViewItem*>(this->firstChild());
-		while(it){
+		while(it) {
 			it->setProbs(it->getProbs(),this->totalRating);
 			it->setHeaders();
 			it=static_cast<SafeListViewItem*>(it->nextSibling());
 		}
-		
+
 		this->selector->setTotal(this->totalRating);
-		KConfig* config=KGlobal::config();
-		config->setGroup("irate_songlist");
-		this->setColumnWidthMode(IR_ARTIST_COL,Manual);
-		this->setColumnWidth(IR_ARTIST_COL,config->readNumEntry("songlist_col_artist",columnWidth(IR_ARTIST_COL)));
-		this->setColumnWidthMode(IR_TITLE_COL,Manual);
-		this->setColumnWidth(IR_TITLE_COL,config->readNumEntry("songlist_col_title",this->columnWidth(IR_TITLE_COL)));
-		this->setColumnWidthMode(IR_RATING_COL,Manual);
-		this->setColumnWidth(IR_RATING_COL,config->readNumEntry("songlist_col_rating",this->columnWidth(IR_RATING_COL)));
-		this->setColumnWidthMode(IR_PLAYED_COL,Manual);
-		this->setColumnWidth(IR_PLAYED_COL,config->readNumEntry("songlist_col_played",this->columnWidth(IR_PLAYED_COL)));
-		this->setColumnWidthMode(IR_TIME_COL,Manual);
-		this->setColumnWidth(IR_TIME_COL,config->readNumEntry("songlist_col_time",this->columnWidth(IR_TIME_COL)));
-		this->setColumnWidthMode(IR_LAST_COL,Manual);
-		this->setColumnWidth(IR_LAST_COL,config->readNumEntry("songlist_col_last",this->columnWidth(IR_LAST_COL)));
-		this->setColumnWidthMode(IR_COPYRIGHT_COL,Manual);
-		this->setColumnWidth(IR_COPYRIGHT_COL,config->readNumEntry("songlist_col_copyright",this->columnWidth(IR_COPYRIGHT_COL)));
-		this->setColumnWidthMode(IR_PROBS_COL,Manual);
-		this->setColumnWidth(IR_PROBS_COL,config->readNumEntry("songlist_col_probability",this->columnWidth(IR_PROBS_COL)));
-		this->setColumnWidthMode(IR_DOWNLOAD_COL,Manual);
-		this->setColumnWidth(IR_DOWNLOAD_COL,config->readNumEntry("songlist_col_download",this->columnWidth(IR_DOWNLOAD_COL)));
-		
+		this->initColumnWidth();
+
 	}
 	this->timerid=this->startTimer(60000);
 	this->songtimerid=-1;
 
 }
-
+void SongList::initColumnWidth() {
+	KConfig* config=KGlobal::config();
+	config->setGroup("irate_songlist");
+	this->setColumnWidthMode(IR_ARTIST_COL,Manual);
+	this->setColumnWidth(IR_ARTIST_COL,config->readNumEntry("songlist_col_artist",columnWidth(IR_ARTIST_COL)));
+	this->setColumnWidthMode(IR_TITLE_COL,Manual);
+	this->setColumnWidth(IR_TITLE_COL,config->readNumEntry("songlist_col_title",this->columnWidth(IR_TITLE_COL)));
+	this->setColumnWidthMode(IR_RATING_COL,Manual);
+	this->setColumnWidth(IR_RATING_COL,config->readNumEntry("songlist_col_rating",this->columnWidth(IR_RATING_COL)));
+	this->setColumnWidthMode(IR_PLAYED_COL,Manual);
+	this->setColumnWidth(IR_PLAYED_COL,config->readNumEntry("songlist_col_played",this->columnWidth(IR_PLAYED_COL)));
+	this->setColumnWidthMode(IR_TIME_COL,Manual);
+	this->setColumnWidth(IR_TIME_COL,config->readNumEntry("songlist_col_time",this->columnWidth(IR_TIME_COL)));
+	this->setColumnWidthMode(IR_LAST_COL,Manual);
+	this->setColumnWidth(IR_LAST_COL,config->readNumEntry("songlist_col_last",this->columnWidth(IR_LAST_COL)));
+	this->setColumnWidthMode(IR_COPYRIGHT_COL,Manual);
+	this->setColumnWidth(IR_COPYRIGHT_COL,config->readNumEntry("songlist_col_copyright",this->columnWidth(IR_COPYRIGHT_COL)));
+	//For probability default is hidden
+	this->setColumnWidthMode(IR_PROBS_COL,Manual);
+	this->setColumnWidth(IR_PROBS_COL,config->readNumEntry("songlist_col_probability",0));
+	this->setColumnWidthMode(IR_DOWNLOAD_COL,Manual);
+	this->setColumnWidth(IR_DOWNLOAD_COL,config->readNumEntry("songlist_col_download",this->columnWidth(IR_DOWNLOAD_COL)));
+}
 void SongList::unload() {
 	DownloadCenter::instance()->clean(true);
 	this->td->saveFile();
@@ -307,7 +311,7 @@ void SongList::addTrack(TrackInfo* newTrack) {
 	int w=this->selector->setSongWeight(it);
 	this->totalRating+=w;
 	this->selector->setTotal(this->totalRating);
-	
+
 	if(it->property("rating","").isEmpty())
 		this->noUnrated++;
 	//printf("%s\n",track->property("artist").latin1());
@@ -350,6 +354,8 @@ void SongList::customEvent(QCustomEvent * event) {
 			emit downloadMessage(i18n("Downloading : [%1] %2 Error : %3 ").arg(de->getItem()->property("artist")).arg(de->getItem()->property("title")).arg(de->getMessage()));
 			de->getItem()->setProperty("state","broken",false);
 			de->getItem()->setProperty("file","",false);
+			//Ugly hack imported from iRATE
+			de->getItem()->setProperty("rating","0");
 			de->getItem()->remove();
 			de->getItem()->removeRef();
 		}
@@ -366,13 +372,13 @@ void SongList::showMenu(QListViewItem *i,const QPoint &p,int) {
 		this->ensureItemVisible(i);
 		int count=0;
 		QListViewItem *it=this->firstChild();
-		while(it&&count<2){
-			if(it->isSelected()){
+		while(it&&count<2) {
+			if(it->isSelected()) {
 				count++;
 			}
 			it=it->nextSibling();
 		}
-		if(count<2){
+		if(count<2) {
 			if(!i->isEnabled()) {
 				this->tmpItem=static_cast<SafeListViewItem*>(i);
 				this->clearSelection();
@@ -384,10 +390,10 @@ void SongList::showMenu(QListViewItem *i,const QPoint &p,int) {
 				this->mPopup->setItemEnabled(7,false);
 				this->mPopup->setItemEnabled(9,false);
 				this->mPopup->setItemEnabled(10,false);
-				this->mPopup->setItemEnabled(11,false);
-				this->mPopup->setItemEnabled(12,false);
+				//this->mPopup->setItemEnabled(11,false);
+				//	this->mPopup->setItemEnabled(12,false);
 			} else {
-			
+
 				this->tmpItem=static_cast<SafeListViewItem*>(i);
 				this->clearSelection();
 				this->mPopup->setItemEnabled(1,true);
@@ -397,14 +403,14 @@ void SongList::showMenu(QListViewItem *i,const QPoint &p,int) {
 				this->mPopup->setItemEnabled(6,true);
 				this->mPopup->setItemEnabled(7,true);
 				this->mPopup->setItemEnabled(9,true);
-				this->mPopup->setItemEnabled(10,true);
-				this->mPopup->setItemEnabled(11,false);
-				this->mPopup->setItemEnabled(12,true);
+				this->mPopup->setItemEnabled(10,false);
+				//this->mPopup->setItemEnabled(11,false);
+				//	this->mPopup->setItemEnabled(12,true);
 				this->setSelected(i,TRUE);
 			}
 			SafeListViewItem *j=static_cast<SafeListViewItem*>(i);
 			this->popInfo->setTitle(j->property("artist")+" - "+j->property("title"));
-		}else{
+		} else {
 			//this->clearSelection();
 			this->tmpItem=0;
 			this->mPopup->setItemEnabled(1,false);
@@ -414,17 +420,17 @@ void SongList::showMenu(QListViewItem *i,const QPoint &p,int) {
 			this->mPopup->setItemEnabled(6,false);
 			this->mPopup->setItemEnabled(7,false);
 			this->mPopup->setItemEnabled(9,false);
-			this->mPopup->setItemEnabled(10,false);
-			this->mPopup->setItemEnabled(11,true);
-			this->mPopup->setItemEnabled(12,true);
+			this->mPopup->setItemEnabled(10,true);
+			//this->mPopup->setItemEnabled(11,true);
+			//this->mPopup->setItemEnabled(12,true);
 			this->popInfo->setTitle(i18n("Grouped action"));
 		}
-		
+
 		this->mPopup->popup(p);
 	} /*else {
-		this->popInfo->setTitle("Header");
-		this->mPopup->popup(p);
-	}*/
+			this->popInfo->setTitle("Header");
+			this->mPopup->popup(p);
+		}*/
 }
 void SongList::serverError(QString code,QString url) {
 	QString lfile=locate("html","en/kirateradio/"+url);
@@ -439,7 +445,7 @@ void SongList::serverError(QString code,QString url) {
 }
 
 void SongList::processPopup(int id) {
-	if(id<=0)return;
+	if(id<=0||id>10)return;
 	//SafeListViewItem * i= this->tmpItem;
 	if(id==1) {//Info
 		if(this->tmpItem==0)return;
@@ -449,40 +455,42 @@ void SongList::processPopup(int id) {
 		if(this->tmpItem==0)return;
 		this->tmpItem->reDownload(this->td->getIRateDir());
 		return;
-	} else if(id==10) {//Set broken
+	} /*else if(id==10) {//Set broken
 		if(this->tmpItem==0)return;
 		this->tmpItem->setBroken();
 		return;
-	}else if(id==11||id==12){//For both action we need to get a list of selected items
+
+	} */else if(id==10/*||id==12*/) {//For both action we need to get a list of selected items Actually id==12 removed
 		QPtrList<SafeListViewItem> sel_list;
 		SafeListViewItem* it=static_cast<SafeListViewItem*>(this->firstChild());
-		while(it){
-			if(it->isSelected()){
+		while(it) {
+			if(it->isSelected()) {
 				sel_list.append(it);
 			}
 			it=static_cast<SafeListViewItem*>(it->nextSibling());
 		}
-		if(id==11){//Playlist
+		if(id==10) {//Playlist
 			QString filename=KFileDialog::getSaveFileName(QString::null,"*.m3u|"+i18n("Playlist (*.m3u)"),this->getMainView());
 			if(filename.isNull())return;
 			QFile f(filename);
 			f.open(IO_WriteOnly);
 			QTextStream s(&f);
-			if(KMessageBox::questionYesNo(this->getMainView(),i18n("Do you want to save the playlist using URL(good to share) or absolute filename ?"),i18n("Save as m3u..."), i18n("URL"),i18n("Absolute filename"))==KMessageBox::Yes){//Url
-				for(it=sel_list.first();it;it=sel_list.next()){
+			if(KMessageBox::questionYesNo(this->getMainView(),i18n("Do you want to save the playlist using URL(good to share) or absolute filename ?"),i18n("Save as m3u..."), i18n("URL"),i18n("Absolute filename"))==KMessageBox::Yes) {//Url
+				for(it=sel_list.first();it;it=sel_list.next()) {
 					s<<it->getRealUrl()<<"\n";
 				}
-			}
-			else{
-				for(it=sel_list.first();it;it=sel_list.next()){
+			} else {
+				for(it=sel_list.first();it;it=sel_list.next()) {
 					s<<it->property("file")<<"\n";
 				}
 			}
 			f.flush();
 			f.close();
 			return;
-			
-		}else if(id==12){//Delete
+
+		}
+		//Function removed to conform iRATE
+		/*else if(id==12){//Delete
 			QStringList itemList;
 			for(it=sel_list.first();it;it=sel_list.next()){
 				itemList.append("["+it->property("artist")+"] - "+it->property("title"));
@@ -496,7 +504,7 @@ void SongList::processPopup(int id) {
 				}
 			}
 			return;
-		}
+		}*/
 	}
 	if(id<3||id>7||this->tmpItem==0)return;
 	//Rating actions
@@ -558,7 +566,7 @@ void SongList::processPopup(int id) {
 	}
 }
 void SongList::timerEvent(QTimerEvent* e) {
-	if(e->timerId()==this->timerid){
+	if(e->timerId()==this->timerid) {
 		this->noUnrated=0;
 		SafeListViewItem *i=static_cast<SafeListViewItem*>(this->firstChild());
 		while(i) {
@@ -568,13 +576,13 @@ void SongList::timerEvent(QTimerEvent* e) {
 			//if(i->text(5)=="Download finished")i->setText(6,"");
 			i=static_cast<SafeListViewItem*>(i->nextSibling());
 		}
-		
+
 		//this->td->saveFile();
 		if(this->allowConnect&&this->noUnrated<this->minUnrated) {
 			kdDebug()<<"Connecting from timer "<<this->noUnrated<<" sur "<<this->minUnrated<<endl;
 			td->connectToServer();
 		}
-	}else if(e->timerId()==this->songtimerid){
+	} else if(e->timerId()==this->songtimerid) {
 		this->songtimerid=-1;
 		if(!this->previousSong.isEmpty()) {
 			SafeListViewItem * last = static_cast<SafeListViewItem*>(this->previousSong.top().data());
@@ -609,7 +617,7 @@ void SongList::updateRating() {
 }
 PlaylistItem SongList::next() {
 	if(!this->childCount())return 0;
-	
+
 	//this->updateRating();
 	int rand=this->selector->getRandom();
 	int curTot=0;
@@ -651,14 +659,14 @@ void SongList::setCurrentSong(SafeListViewItem* i) {
 		if(!i->isProperty("rating")&&this->showPassive) {
 			KPassivePopup::message("[Unrated]",Template::instance()->osdTemplate(i)/*i18n("%1 - %2").arg(i->property("artist","")).arg(i->property("title",""))*/,this->getMainView());
 		}
-		if(this->songtimerid!=-1){
+		if(this->songtimerid!=-1) {
 			this->killTimer(this->songtimerid);
 			this->songtimerid=-1;
-			kdDebug()<<"song Not finished"<<endl; 
+			kdDebug()<<"song Not finished"<<endl;
 		}
 		int length=i->length();
 		//Should always pass
-		if(length>10000){
+		if(length>10000) {
 			//here we would like to ensure we don't miss the song
 			this->songtimerid=this->startTimer(length-10000);
 		}

@@ -82,7 +82,7 @@ class SafeListViewItem: public KListViewItem, public PlaylistItemData{
 		virtual void setHeaders();
 		
 		virtual bool operator==(const PlaylistItemData &d)const;
-		virtual void setBroken();
+//		virtual void setBroken();
 
 		virtual QString getRealUrl()const{
 			return this->track->property("url",QString::null);

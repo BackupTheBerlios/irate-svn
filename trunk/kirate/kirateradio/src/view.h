@@ -104,10 +104,10 @@ class View : public KMainWindow {
 
 	private:
 		SongList *list;
-		KAction *mAbout,*mConf,*mExport,*noa_playp,*noa_for,*noa_back,*noa_stop,*mViewDeleted,*mViewCurrent;
+		KAction *mAbout,*mConf,*mExport,*noa_playp,*noa_for,*noa_back,*noa_stop/*,*mViewDeleted*/,*mViewCurrent;
+		//Doesn't work 
 		//KAction * rSux,*rYawn,*rNotBad,*rCool,*rLove;
 		KPopupMenu *mFile,*mSetting;
-//		CyclicText * ct;
 		InfoDialog * ktb;
 		OSDWidget * m_osd;
 		/*0 => never show

@@ -101,6 +101,7 @@ class SongList : public KListView/*, public DownloadListener*/{
 		void keyPressEvent(QKeyEvent *e);
 		void timerEvent(QTimerEvent* t);
 		bool eventFilter( QObject *o, QEvent *e );
+		void initColumnWidth();
 		//Members 
 		KPopupMenu *mPopup;
 		KPopupTitle * popInfo,*popRate,*popDown;

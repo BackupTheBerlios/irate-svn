@@ -55,7 +55,8 @@ SafeListViewItem::SafeListViewItem(QListView *parent, TrackInfo* mtrack, const Q
 	this->track->setProperty("probs","0%");
 	//This has been checked before <We can safely ignore this check now
 	//track->property("state",QString::null).isEmpty()&&(track->property("deleted")=="false"||!track->isProperty("deleted"))&&
-	if(track->property("file",QString::null).isEmpty()||!QFile::exists(track->property("file"))) {
+	//if file field is empty we assume it hasn't been downloaded, to conform to orgininal iRATE
+	if(track->property("file",QString::null).isEmpty()/*||!QFile::exists(track->property("file"))*/) {
 		KURL url(this->track->getURL());
 		QString localfilename=irateDir+"download/"+url.fileName(true);
 		//printf("LocalFilename is %s\n",localfilename.latin1());
@@ -67,8 +68,19 @@ SafeListViewItem::SafeListViewItem(QListView *parent, TrackInfo* mtrack, const Q
 		DownloadCenter::instance()->enqueue(this, url, localfilename);
 	} else if(track->isProperty("file")) {
 		
+		//This isn't the best way to do it. But when we have unrecognised unicode chars it doesn't find 
+		//the file so we must recheck it
+		//Seems like to much have to found another way
+		/*if(!QFile::exists(track->property("file"))){
+			KURL url(this->track->getURL());
+			QString localfilename=irateDir+"download/"+url.fileName(true);
+			if(QFile::exists(localfilename)){
+				track->setProperty("file",localfilename);
+			}
+		}*/
 		KURL tmpURL(track->property("file"));
 		this->mUrl=tmpURL.url();
+		
 		//setOn(true);
 		this->setEnabled(true);
 		//this->setProperty("enabled","true");
@@ -221,20 +233,22 @@ void SafeListViewItem::reDownload(const QString& irateDir) {
 	PlaylistItemData::removed();
 	DownloadCenter::instance()->enqueue(this, url, localfilename);
 }
-void SafeListViewItem::setBroken() {
+/*void SafeListViewItem::setBroken() {
 	this->track->setProperty("state","broken");
 	this->track->setProperty("file","");
 	this->remove();
 	this->removeRef();
-}
+}*/
 void SafeListViewItem::downloadSpeed(const QString &speed) {
 	if(removed)return;
 	this->setProperty("downspeed",speed,false);
 	this->setText(IR_DOWNLOAD_COL,i18n("%1 at %2").arg(this->property("percdone","0%")).arg(speed));
 	//this->modified();
 }
-void SafeListViewItem::downloadInfoMessage(const QString &) {
-	//this->setText(6,msg);
+void SafeListViewItem::downloadInfoMessage(const QString &msg) {
+	//Before this was disturbing display but now (since column width are Manualy set) it should disturb 
+	//anymore
+	this->setText(IR_DOWNLOAD_COL,msg);
 	//this->modified();
 }
 void SafeListViewItem::downloaded(const QString& percent) {
@@ -267,43 +281,7 @@ void SafeListViewItem::downloadFinished(const QString& msg) {
 
 	//setText(2, "Unrated");
 }
-/*QString SafeListViewItem::getInfo()const {
-	QString message("<html><body bgcolor=\"#000000\"><table border=\"0\" cellspacing=\"1\" cellpadding=\"0\" bgcolor=\"#000000\"><tr><td valign=\"top\"><table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"8\" bgcolor=\"#758CFF\"><tr><td valign=\"top\"><h2>");
-	message.append(i18n("Song information"));
-	message.append("</h2></td></tr></table><table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"8\" bgcolor=\"#FFFFFF\">");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("Artist")+"</b></td><td valign=\"top\">"+this->track->property("artist",i18n("Unknow"))+"</td></tr>");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("Title")+"</b></td><td valign=\"top\">"+this->track->property("title",i18n("Unknow"))+"</td></tr>");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("Genre")+"</b></td><td valign=\"top\">"+this->track->property("genre",i18n("Unknow"))+"</td></tr>");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("Date")+"</b></td><td valign=\"top\">"+this->track->property("date",i18n("Unknow"))+"</td></tr>");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("Comment")+"</b></td><td valign=\"top\">"+this->track->property("comment","")+"</td></tr>");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("Copyright")+"</b></td><td valign=\"top\">"+this->track->property("copyright",i18n("Unknow"))+"</td></tr>");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("File url")+"</b></td><td valign=\"top\">"+this->track->property("url",i18n("Unknow"))+"</td></tr>");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("Rating")+"</b></td><td valign=\"top\">"+this->track->property("rating",i18n("Unrated"))+"</td></tr>");
-	message.append("<tr><td valign=\"top\"><b>"+i18n("Played")+"</b></td><td valign=\"top\">"+this->track->property("played","0")+"</td></tr>");
-	message.append("</table></td></tr></table><br /><br />");
-	message.append("<table border=\"0\" cellspacing=\"1\" cellpadding=\"0\" bgcolor=\"#000000\"><tr><td valign=\"top\"><table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"8\" bgcolor=\"#758CFF\"><tr><td valign=\"top\"><h2>");
-	message.append(i18n("File information"));
-	message.append("</h2></td></tr></table><table width=\"100%\" border=\"0\" cellspacing=\"1\" cellpadding=\"8\" bgcolor=\"#FFFFFF\">");
-	if(this->track->property("file","").isEmpty()&&!this->track->property("tmpfile","").isEmpty()) {
-		message.append("<tr><td valign=\"top\"><b>"+i18n("File")+"</b></td><td valign=\"top\">"+this->track->property("file",i18n("Not downloaded"))+"</td></tr>");
-		message.append("<tr><td valign=\"top\"><b>"+i18n("Download speed")+"</b></td><td valign=\"top\">"+this->track->property("downspeed",i18n("Unknow"))+"</td></tr>");
-		message.append("<tr><td valign=\"top\"><b>"+i18n("Percent completed")+"</b></td><td valign=\"top\">"+this->track->property("percdone",i18n("Unknow"))+"</td></tr>");
-	} else {
-		message.append("<tr><td valign=\"top\"><b>"+i18n("File")+"</b></td><td valign=\"top\">"+this->track->property("file",i18n("Not downloaded"))+"</td></tr>");
-		message.append("<tr><td valign=\"top\"><b>"+i18n("Bitrate")+"</b></td><td valign=\"top\">"+this->track->property("bitrate",i18n("Unknow"))+"</td></tr>");
-		message.append("<tr><td valign=\"top\"><b>"+i18n("Sample rate in kHz")+"</b></td><td valign=\"top\">"+this->track->property("samplerate",i18n("Unknow"))+"</td></tr>");
-		message.append("<tr><td valign=\"top\"><b>"+i18n("Channels")+"</b></td><td valign=\"top\">"+this->track->property("channels",i18n("Unknow"))+"</td></tr>");
-		message.append("<tr><td valign=\"top\"><b>"+i18n("Length")+"</b></td><td valign=\"top\">"+this->lengthString()+"</td></tr>");
-	}
-	message.append("</table></td></tr></table><br /><br /></body></html>");
-	// 		QStringList a=track->properties();
-	// 		QStringList::iterator it;
-	// 		for(it=a.begin();it!=a.end();++it){
-	// 			message.append("<tr><td><b>"+(*it)+"</b></td><td>"+track->property((*it),"")+"</td></tr>");
-	// 		}
-	// 		message.append("</table>");
-	return message;
-}*/
+
 void SafeListViewItem::modified(const int& col) {
 	if(!track) return;
 	if(col==IR_ARTIST_COL||col==-1) {

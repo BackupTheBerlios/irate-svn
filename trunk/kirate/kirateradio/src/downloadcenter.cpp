@@ -112,10 +112,16 @@ DownloadCenter::~DownloadCenter() {
 
 void DownloadCenter::enqueue(SafeListViewItem * i, const KURL& url, const QString& localfile) {
 	if(QFile::exists(localfile)) {
+		//if file field is empty we assume it hasn't been downloaded, to conform to orgininal iRATE
+		//Actually we remove it first and redownload again. Don't know how to match different partial 
+		//downloads
+		QFile::remove(localfile);
+		/*
 		if(this->mListener!=0) {
 			QApplication::postEvent(this->mListener,new DownloadEvent(DownloadEvent::Finished,i18n("Finished"),i));
 		}
 		return;
+		*/
 	}
 	if(this->allowConnect && this->blockedServer.findIndex(url.host())==-1&&( this->concurrentDownload==0||this->currentJobs.count()<this->concurrentDownload)) {
 		this->startJob(i,url,localfile);
