@@ -45,6 +45,7 @@ public class Track implements TrackDetails {
     setArtist(track.getArtist());
     setRating(track.getRawRating());
     setWeight(track.getWeight());
+    setDeleted(track.getDeleted());
 //    System.out.println(elt);
 //    setWebURL(track.getWebURL());
     // copy other attributes
@@ -325,9 +326,13 @@ public class Track implements TrackDetails {
    */
   public boolean isMissing() {
     File file = getFile();
-    return file != null && !file.exists();
+    return file != null && !file.exists() && !isDeleted();
   }
 
+  public boolean isDeleted() {
+      return isRated() && this.getDeleted().equals("true");
+  }
+  
   /**
    * True if the file has not been downloaded.
    */
@@ -341,7 +346,7 @@ public class Track implements TrackDetails {
    * the user.
    */
   public boolean isHidden() {
-    return isBroken() || getRating() == 0;
+    return isBroken() || getRating() == 0 || isDeleted();
   }
   
   /** Check if this file is pending a purge.
@@ -379,6 +384,17 @@ public class Track implements TrackDetails {
   public synchronized void setTitle(String title) {
     elt.setAttribute("title", title);
   }
+  
+  public synchronized void setDeleted(String trueOrFalse) {
+      elt.setAttribute("deleted", trueOrFalse);
+  }
+  
+  public synchronized String getDeleted() {
+      String deleted = elt.getStringAttribute("deleted");
+      if (deleted == null)
+        return "false";
+      return deleted;
+    }
 
   public synchronized String getTitle() {
     String title = elt.getStringAttribute("title");
