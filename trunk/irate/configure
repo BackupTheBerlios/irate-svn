@@ -54,12 +54,15 @@ foreach my $program (sort(keys(%lookup))){
 		}
 }
 
+my $out = "make.configure";
+open OUT, ">$out" or die ("Couldn't open $out for writing");
+
 if(defined($lookup{"libswt-gtk2.so"}{"dir"})){
-		my $out = "make.configure";
-		print "\nSetting up for a system-wide libswt in $out\n";
-		open OUT, ">$out" or die ("Couldn't open $out for writing");
+		print "\nSet up for a system-wide libswt\n";
 		print OUT "SWT_INCLUDE=".$lookup{"libswt-gtk2.so"}{"dir"}."/libswt-gtk2.jar\n";
 		print OUT "SWT_LIB=-lswt-gtk2\n";
 }
+
+print OUT "NO_RESOURCE=1\n" and print "Disabled use of gcj --resource due to gcj 3.0.4\n" if $lookup{"gcj"}{"version"} eq "3.0.4" ;
 #my $gcj = 
 #my $make = locate_program("make");

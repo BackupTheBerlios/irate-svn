@@ -27,6 +27,12 @@ JAVA_DOWNLOAD=irate/download/*.java
 HELPFILES=irate/client/help/*.html
 JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CLIENT:.java=.class) $(JAVA_DOWNLOAD:.java=.class)
 
+#requist icon compilation if not gcj 3.0.4
+#set in make.configure
+ifndef NO_RESOURCE
+CLIENT_LIBS += irate-icon.o
+endif
+
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
 IRATE_SERVER=irate-server.exe
@@ -126,6 +132,9 @@ irate-common.o:	$(JAVA_COMMONSRC)
 
 irate-server.o:irate/server/*.java
 	$(GCJ) -c irate/server/*.java -o irate-server.o
+
+irate-icon.o: irate.png
+	$(GCJ) -c --resource $^ $^ -o $@
 
 deb:
 	dpkg-buildpackage -b -rfakeroot
