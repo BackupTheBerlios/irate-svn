@@ -319,7 +319,7 @@ public class Client extends AbstractClient {
     createMenu();
     
     topPanel = new Composite(shell, SWT.FLAT);
-    skinManager.addControl(topPanel, "panel.play");
+    skinManager.addControl(topPanel, "topPanelBackground");
     
     
     GridData gridData = new GridData();
@@ -709,7 +709,7 @@ public class Client extends AbstractClient {
   public void createToolBar() {
     trackGroup = new Composite(topPanel, SWT.BORDER);
     trackGroup.setEnabled(false);
-    //skinManager.add(trackGroup, "topPanel-background!");
+    
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;

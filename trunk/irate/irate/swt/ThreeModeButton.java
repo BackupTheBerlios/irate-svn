@@ -214,10 +214,10 @@ public class ThreeModeButton extends Canvas implements Skinable {
       String key;
       if (isActive) {
         if (isPressed) {
-          key = "pressed";
+          key = "activePressed";
         }
         else {
-          key = "";
+          key = "active";
         }
       }
       else {
@@ -226,6 +226,9 @@ public class ThreeModeButton extends Canvas implements Skinable {
           // If the mouse is pressed, display the pressed Hot Image
           if (isPressed) {
             key = "hotPressed";
+            if(!imageDataHash.containsKey(key)) {
+                key = "pressed";
+            }
           }
           // Otherwise, display the normal hot image
           else {
