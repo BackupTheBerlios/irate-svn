@@ -19,13 +19,6 @@ public class PlayerList {
     	e.printStackTrace();
     }
     
-//    try {
-//      players.add(Class.forName("irate.client.LibMadPlayer").newInstance());
-//    }
-//    catch (Exception e) {
-//      e.printStackTrace();
-//    }
-    
     try {
       players.add(Class.forName("irate.client.MadplayPlayer").newInstance());
       //players.add(new MadplayPlayer());
@@ -33,14 +26,14 @@ public class PlayerList {
     catch (Exception e) {
       e.printStackTrace();
     }
-
-//    try {
-//      players.add(new ExternalPlayer("mpg123", new String[] { "mpg123", "/usr/bin/mpg123", "/usr/local/bin/mpg123" }));
-//    }
-//    catch (FileNotFoundException e) {
-//      e.printStackTrace();
-//    }
     
+    try {
+      players.add(Class.forName("irate.client.StreamPlayer").newInstance());
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+
     this.players = (Player[]) players.toArray(new Player[players.size()]);
   }
 
