@@ -355,8 +355,17 @@ public class TrackDatabase {
       return 0;
     return track.getProbability();
   }
-      
-  public Track chooseTrack(Random random) {
+
+  public Track chooseTrack(Random random)
+  {
+    return chooseTrack(random, null);
+  }
+
+  /**
+   * Choose a track from the track database, excluding tracks in 'toOmit'.
+   * Ignore toOmit if it is null.
+   */
+  public Track chooseTrack(Random random, Hashtable toOmit) {
     Track[] tracks = getTracks();
     while (true) {
       float[] probs = new float[tracks.length]; 
@@ -367,6 +376,9 @@ public class TrackDatabase {
       float totalProb = 0;
       for (int i = 0; i < tracks.length; i++) {
         Track track = tracks[i];
+	if (toOmit != null)
+	  if (toOmit.containsKey(track))
+	    continue;
         float rating = track.getRating();
 
         if (rating >= minRating)
@@ -382,9 +394,13 @@ public class TrackDatabase {
       else {
         while (true) {
           float rand = Math.abs(random.nextFloat()) * totalProb;
-          for (int i = 0; i < tracks.length; i++) 
+          for (int i = 0; i < tracks.length; i++) {
+	    if (toOmit != null)
+	      if (toOmit.containsKey(tracks[i]))
+		continue;
             if (rand <= probs[i])
               return tracks[i];
+          }
         }
       }
     }

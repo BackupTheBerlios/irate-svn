@@ -287,4 +287,9 @@ public class Track {
   public boolean equals(Track track) {
     return getURL().equals(track.getURL());
   }
+
+  public int hashCode()
+  {
+    return getURL().hashCode();
+  }
 }

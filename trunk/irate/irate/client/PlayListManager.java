@@ -31,7 +31,10 @@ public class PlayListManager {
   }
   
   public synchronized Track chooseTrack() {
-    
+
+      // Maintain a 'toOmit' hash table, which is used to make the choosing
+      // of tracks not choose ones we have already got on the list.
+    Hashtable toOmit = new Hashtable();
     for (int i = 0; i < playList.size(); i++) {
       Track track = (Track) playList.get(i);
       if (!track.isOnPlayList()) {
@@ -39,6 +42,8 @@ public class PlayListManager {
         if (i < playListIndex)
           --playListIndex;
       }
+      else
+	toOmit.put(track, track);
     }
     
       // Remove extra unwanted items.
@@ -50,15 +55,10 @@ public class PlayListManager {
       // tracks because it will likely get one next time around.
     for (int i = trackDatabase.getPlayListLength() - playList.size(); i > 0; i--) {
       synchronized (trackDatabase) {
-        Track track = trackDatabase.chooseTrack(random);
+        Track track = trackDatabase.chooseTrack(random, toOmit);
         if (track != null) {
-            // Only add it if it's not already in the list
-          add: {
-            for (int j = 0; j < playList.size(); j++)
-              if (playList.get(j) == track)
-                break add; 
-            playList.add(track);
-          }
+	  toOmit.put(track, track);
+	  playList.add(track);
         }
       }
     }
