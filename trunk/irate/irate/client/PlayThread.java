@@ -42,7 +42,7 @@ public class PlayThread extends Thread {
       player.play(file);
     }
     catch (PlayerException e) {
-      e.printStackTrace();
+//      e.printStackTrace();
     }
     finally {
         // Without this, RoboJock can't talk because it fights with the
