@@ -22,7 +22,7 @@ public class PlayThread extends Thread {
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
-    player = new JavaLayerPlayer();
+//    player = new JavaLayerPlayer();
   }
 
   public boolean isSpeechSupported() {
@@ -58,7 +58,6 @@ public class PlayThread extends Thread {
 	  // Java player over the sound device.
 	player.close();
       }
-      player = null;
     }
   }
 
@@ -152,6 +151,8 @@ public class PlayThread extends Thread {
   }
 
   public boolean isPaused() {
+    if (player == null)
+      return false;
     return player.isPaused();
   }
 
