@@ -126,6 +126,16 @@ public class PlayPanel extends JPanel implements MouseListener {
     });
     panel.add(veryGoodButton);
 
+/* nic 25/10/2003 adding a rewind button so I can rate songs that I've just missed */
+	JButton rewindButton = new JButton("<<"); 
+	rewindButton.addActionListener(new ActionListener() {
+	  public void actionPerformed(ActionEvent e) {
+		playThread.goBack();
+	  }
+	});
+	panel.add(rewindButton);
+
+
     pauseButton = new JButton(""); 
     pauseButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
