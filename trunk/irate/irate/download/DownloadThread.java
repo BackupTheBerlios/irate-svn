@@ -10,6 +10,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
+import HTTPClient.*;
+
 public class DownloadThread extends Thread {
   
   private Vector updateListeners = new Vector();
@@ -198,44 +200,30 @@ private abstract class TimeoutWorker implements Runnable{
         setState("Connecting " + track.getName());
         
         //30 second timeout for the impatient
-        long timeout = 180000;
-        TimeoutWorker worker = new TimeoutWorker((Object) url) {
-        	public void run() {
-        		try {
-        			URLConnection conn = ((URL)input).openConnection();
-        			conn.connect();
-        			Vector v = new Vector();
-        			v.add(conn);
-        			v.add(new Integer(conn.getContentLength()));
-					setOutput(v);
-        		} catch(IOException e) {
-        			setException(e);
-        		}
-        	}
-        };
-        URLConnection conn;
-        Integer intContentLength; 
+        int timeout = 60000;
+        HTTPConnection.setDefaultTimeout(timeout);
+       
+        HTTPConnection con = new HTTPConnection(url);
+        int contentLength = 0;
+        InputStream is = null;
         try{
-          Vector v =  (Vector) worker.runOrTimeout(timeout);
-          conn = (URLConnection) v.elementAt(0);
-          intContentLength = (Integer) v.elementAt(1);
-        }catch(Exception e) {
-        	setState("Could not connect: "+ e);
-          e.printStackTrace();
-        	return;
+          HTTPResponse   rsp = con.Get(url.getFile());
+          contentLength = rsp.getHeaderAsInt("Content-Length");
+          if(rsp.getStatusCode() >= 300){
+            System.err.println("HTTP Error:"+rsp.getReasonLine());
+            System.err.println(rsp.getText());
+            return;
+          }
+          setState("Downloading " + track.getName());
+          is = rsp.getInputStream();
+        }catch(HTTPClient.ModuleException me){
+          me.printStackTrace();
+          return;
+        }catch(HTTPClient.ParseException pe){
+          pe.printStackTrace();
+          return;
         }
-        //get rid of the problem where tracks are downloaded but in reality they are 404 messages or some other html crud
-		String contentType = conn.getContentType();
-		if(contentType.indexOf("text") != -1) {
-			track.setBroken();
-			track.setRating(0);
-			return;
-		}
 		
-        worker = null;
-        int contentLength = intContentLength.intValue();
-        setState("Downloading " + track.getName());
-        final InputStream is = conn.getInputStream();
         OutputStream os = new FileOutputStream(file);
         final byte buf[] = new byte[256000];
         int totalBytes = 0;
