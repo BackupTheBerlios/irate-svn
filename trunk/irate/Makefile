@@ -14,9 +14,9 @@ CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
 CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o 
 
 #cute hack to see if we can bundle the docs too
-ifneq ($(shell html2text -help 2> /dev/null),)
-CLIENT_DEPS += resource_irate_client_*.o
-endif
+#ifneq ($(shell html2text -help 2> /dev/null),)
+#CLIENT_DEPS += resource_irate_client_*.o
+#endif
 
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
