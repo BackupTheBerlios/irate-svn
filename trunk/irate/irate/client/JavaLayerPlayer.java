@@ -12,11 +12,18 @@ public class JavaLayerPlayer implements Player {
   }
   
   public void setPaused(boolean paused) {
-    audio.setPaused(paused);
+    synchronized (this) {
+      if (audio != null)
+        audio.setPaused(paused);
+    }
   }
 
   public boolean isPaused() {
-    return audio.isPaused();
+    synchronized (this) {
+      if (audio == null)
+        return false;
+      return audio.isPaused();
+    }
   }
 
   public void play(File file) throws PlayerException {
@@ -33,7 +40,10 @@ public class JavaLayerPlayer implements Player {
   }
 
   public void close() {
-    player.close();
+    synchronized (this) {
+      player.close();
+      audio = null;
+    }
   }
 
 }

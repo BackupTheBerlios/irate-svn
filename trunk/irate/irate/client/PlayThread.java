@@ -152,14 +152,10 @@ public class PlayThread extends Thread {
   }
 
   public boolean isPaused() {
-    if (player == null)
-      return false;
     return player.isPaused();
   }
 
   public boolean isPauseSupported() {
-    if (externalPlayer == null)
-      return false;
     return externalPlayer.length() == 0;
   }
 

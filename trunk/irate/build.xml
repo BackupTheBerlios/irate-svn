@@ -31,7 +31,7 @@
   </target>
 
   <target name="tar" depends="jar">
-    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/lib/nanoxml-lite-2.2.3.jar"/>
+    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,lib/irate/jl020.jar,irate/lib/nanoxml-lite-2.2.3.jar"/>
   </target>
 
   <target name="gzip" depends="tar">
