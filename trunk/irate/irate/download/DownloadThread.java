@@ -156,7 +156,8 @@ public class DownloadThread extends Thread {
 			else
 				return output;
 		}
-    th.stop();
+    //th.stop();
+    th.destroy();
 		throw new IOException("Timeout exceeded");
 	}
   }
@@ -208,6 +209,14 @@ public class DownloadThread extends Thread {
           e.printStackTrace();
         	return;
         }
+        //get rid of the problem where tracks are downloaded but in reality they are 404 messages or some other html crud
+		String contentType = conn.getContentType();
+		if(contentType.indexOf("text") != -1) {
+			track.setBroken();
+			track.setRating(0);
+			return;
+		}
+		
         worker = null;
         int contentLength = intContentLength.intValue();
         setState("Downloading " + track.getName());
