@@ -152,9 +152,11 @@ public class SkinManager {
             Rectangle clientArea = control.getBounds();
             Image img = getImage(control.getDisplay(), name);
             ImageData data = img.getImageData();
+            img.dispose();
             data = data.scaledTo(clientArea.width, clientArea.height);
             img = new Image(control.getDisplay(), data);
             e.gc.drawImage(img, 0, 0);
+            img.dispose();
             }
             catch (IOException f) {}
           }
