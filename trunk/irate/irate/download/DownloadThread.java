@@ -219,7 +219,7 @@ public class DownloadThread extends Thread {
       URLConnection conn;
       int contentLength;
       long continueOffset;
-      final InputStream inputStream = null;
+      InputStream inputStream;
       try {
         // These values are returned by the Timeout Worker.
         final URLConnection[] urlConnectionArray = new URLConnection[1];
@@ -287,11 +287,12 @@ public class DownloadThread extends Thread {
           
           try {
             final Integer[] nbytesArray = new Integer[1];
+            final InputStream finalInputStream = inputStream;
             while (true) {
               try {
                 new TimeoutWorker() {
                   public void run() throws Exception {
-                    nbytesArray[0] = new Integer(inputStream.read(buf));
+                    nbytesArray[0] = new Integer(finalInputStream.read(buf));
                   }
                 }.runOrTimeout(timeout);
               }
