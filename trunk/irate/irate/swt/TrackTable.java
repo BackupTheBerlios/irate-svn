@@ -46,6 +46,9 @@ public class TrackTable {
   /** A hash table which finds the Track associated with a given TableItem. */
   private Hashtable hashByTableItem;
   
+  /** A hash keeping track of the image handles by table item. */
+  private Hashtable imageHandleHash = new Hashtable();
+  
   /** The current comparitor used to sort the table. */
   private TrackComparator comparator;
   
@@ -245,8 +248,12 @@ public class TrackTable {
     System.out.println("TrackTable: Resizing"); //$NON-NLS-1$
     // Update the list of tracks
     int size = listOfTracks.size();
-    while (table.getItemCount() > size)
-      table.remove(table.getItemCount() - 1);
+    while (table.getItemCount() > size) {
+      int index = table.getItemCount() - 1;
+      TableItem tableItem = table.getItem(index);
+      imageHandleHash.remove(tableItem);
+      table.remove(index);
+    }
     while (table.getItemCount() < size)
       new TableItem(table, SWT.NONE);
       
@@ -269,32 +276,19 @@ public class TrackTable {
       select(selected);
   }
   
-  /** Loads the Track into the TableItem. */
-  private void updateTableItem(TableItem tableItem, Track track) {
-    Color background = tableItem.getBackground();
-//    Can't get it to work out the current background color. COLOR_LIST_SELECTION
-//    is correct only when the TrackTable has focus (at least on GTK).
-//
-//    TableItem[] selection = table.getSelection();
-//    if (selection != null)
-//      for (int i = 0; i < selection.length; i++) 
-//        if (tableItem == selection[i])
-//          background = display.getSystemColor(SWT.COLOR_LIST_SELECTION);
-    
-    String state = track.getState();
-    //System.out.println("WOOT: " + state);
+  private ImageHandle getStateImage(Color background, String state) {
+    ImageHandle imageHandle;
     ImageData stateImageData = basicSkinable.getImageData(state);
     if (stateImageData != null) {
       ImageData mergedImageData = imageMerger.merge(background, stateImageData);
-//      mergedImageData.transparentPixel = mergedImageData.palette.getPixel(background.getRGB());
-      ImageHandle stateImage = (ImageHandle) imageCache.get(mergedImageData);
-      if (stateImage == null)
-        imageCache.put(mergedImageData, stateImage = new ImageHandle(new Image(display, mergedImageData)));
-      tableItem.setImage(2, stateImage.getImage());
+  //    mergedImageData.transparentPixel = mergedImageData.palette.getPixel(background.getRGB());
+      imageHandle = (ImageHandle) imageCache.get(mergedImageData);
+      if (imageHandle == null)
+        imageCache.put(mergedImageData, imageHandle = new ImageHandle(new Image(display, mergedImageData)));
     }
     else {
       /* We need to generate an image for the text */
-      ImageHandle imageHandle = (ImageHandle) imageCache.get(state);
+      imageHandle = (ImageHandle) imageCache.get(state);
       if (imageHandle == null) {
         GC gc = new GC(table);      
         Point size = gc.stringExtent(state);
@@ -305,8 +299,40 @@ public class TrackTable {
         gc.dispose();
         imageCache.put(state, imageHandle = new ImageHandle(image));
       }
-      tableItem.setImage(2, imageHandle.getImage());
     }
+    return imageHandle;
+  }
+  
+  private ImageHandle getIconImage(Color background, String icon) {
+    ImageHandle imageHandle = null;
+    if (icon == null || icon.length() == 0)
+      return null;
+    ImageData scaledImageData = (ImageData) imageCache.get(icon);
+    try {
+      if (scaledImageData == null) {
+        System.out.println("Loading image: " + icon);
+        Image image = new Image(display, BaseResources.getResourceAsStream(icon));
+        ImageData imageData = image.getImageData();
+        image.dispose();
+        int scaledHeight = 20;
+        imageCache.put(icon, scaledImageData = imageData.scaledTo(
+            imageData.width * scaledHeight / imageData.height, scaledHeight));
+      }
+
+      ImageData mergedImageData = imageMerger.merge(background, scaledImageData);
+      imageHandle = (ImageHandle) imageCache.get(mergedImageData);
+      if (imageHandle == null)      
+        imageCache.put(mergedImageData, imageHandle = new ImageHandle(new Image(display, scaledImageData)));
+      return imageHandle;
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
+  /** Loads the Track into the TableItem. */
+  private void updateTableItem(TableItem tableItem, Track track) {
     
     tableItem.setText(new String[] {
       track.getArtist(),
@@ -316,38 +342,25 @@ public class TrackTable {
       track.getLastPlayed().toString(),
       ""
     });
-       
-    /*
-     * Get the license image.
-     */
-    String icon = licenseIndex.get(track).getIcon();
-    ImageHandle imageHandle = null;
-    if (icon != null && icon.length() != 0) {
-      ImageData scaledImageData = (ImageData) imageCache.get(icon);
-      try {
-        if (scaledImageData == null) {
-          System.out.println("Loading image: " + icon);
-          Image image = new Image(display, BaseResources.getResourceAsStream(icon));
-          ImageData imageData = image.getImageData();
-          image.dispose();
-          int scaledHeight = 20;
-          imageCache.put(icon, scaledImageData = imageData.scaledTo(
-              imageData.width * scaledHeight / imageData.height, scaledHeight));
-        }
+    
+    Color background = tableItem.getBackground();
+//  Can't get it to work out the current background color. COLOR_LIST_SELECTION
+//  is correct only when the TrackTable has focus (at least on GTK).
+//
+//  TableItem[] selection = table.getSelection();
+//  if (selection != null)
+//    for (int i = 0; i < selection.length; i++) 
+//      if (tableItem == selection[i])
+//        background = display.getSystemColor(SWT.COLOR_LIST_SELECTION);
   
-        ImageData mergedImageData = imageMerger.merge(background, scaledImageData);
-        imageHandle = (ImageHandle) imageCache.get(mergedImageData);
-        if (imageHandle == null)      
-          imageCache.put(mergedImageData, imageHandle = new ImageHandle(new Image(display, scaledImageData)));
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    if (imageHandle != null)
-      tableItem.setImage(5, imageHandle.getImage());
-    else
-      tableItem.setImage(5, null);
+    ImageHandle stateImageHandle = getStateImage(background, track.getState()); 
+    tableItem.setImage(2, stateImageHandle.getImage());    
+       
+    ImageHandle licenseImageHandle = getIconImage(background, licenseIndex.get(track).getIcon());    
+    tableItem.setImage(5, licenseImageHandle == null ? null : licenseImageHandle.getImage());
+    
+    /* Put the image handles into the hash table so the images don't get forgotten. */
+    imageHandleHash.put(tableItem, new ImageHandle[] { stateImageHandle, licenseImageHandle });
   }
   
   /** Remove the specified track from the table. */
