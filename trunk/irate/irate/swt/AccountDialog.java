@@ -21,10 +21,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/02/02 06:26:26 $
+ * Date Updated: $Date: 2004/02/02 18:31:43 $
  * @author Creator:	taras
- * @author Updated:	$Author: ajones $
- * @version $Revision: 1.23 $
+ * @author Updated:	$Author: spaetz $
+ * @version $Revision: 1.24 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -79,7 +79,7 @@ public class AccountDialog {
 
     Group group = new Group(steps, SWT.NONE);
     controls[0] = group;
-    group.setText("Introduction");
+    group.setText(getResourceString( "AccountDialog.Intro.Group"));
     group.setLayout(new GridLayout(2, false));
     Label lblIcon = new Label(group, SWT.NONE);
     try {
@@ -96,7 +96,7 @@ public class AccountDialog {
     
     group = new Group(steps, SWT.NONE);
     controls[1] = group;
-    group.setText("Account Settings");
+    group.setText(getResourceString( "AccountDialog.Settings.Group"));
     label = new Label(group, SWT.NONE);
     GridData data = new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL);
     data.horizontalSpan = 4;
@@ -107,7 +107,7 @@ public class AccountDialog {
     
     group = new Group(steps, SWT.NONE);
     controls[2] = group;
-    group.setText("Server Communication");
+    group.setText(getResourceString( "AccountDialog.Communication.Group"));
     createStatus(group);  
     
     Composite buttonComposite = new Composite(shell, SWT.NONE);
