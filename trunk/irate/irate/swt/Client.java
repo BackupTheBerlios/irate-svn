@@ -302,7 +302,6 @@ public class Client extends AbstractClient {
       shell.setText(track.toString() + " - " + 
         Resources.getString("titlebar.program_name"));
     trackLabel.setText(Resources.getString("title.now_playing") + " " + track.getArtist() + " / " + track.getTitle());
-    System.out.println("RATING FUNCTIONS: " +track+" isRated="+track.isRated());  /* ### */
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       ThreeModeButton item = rf.getItem();

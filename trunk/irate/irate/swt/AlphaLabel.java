@@ -121,7 +121,7 @@ public class AlphaLabel extends Canvas implements Skinable {
       /* Draw the text onto it. */
       gc.drawText(text, 0, 0, true);
       gc.dispose();
-      System.out.println("Text: " + text);
+      // System.out.println("Text: " + text);
     }
     else {
       ImageData mergedImageData;
