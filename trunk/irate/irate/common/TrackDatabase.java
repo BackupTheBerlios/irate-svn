@@ -525,13 +525,15 @@ public class TrackDatabase {
     }
   }
   
-  public void incrementSerial(){
+  public int getSerial() {
     String serial = docElt.getStringAttribute("serial");
-    if(serial==null) {
-      docElt.setAttribute("serial","1");
-      return;
-    }
-    int num = Integer.parseInt(serial);
+    if(serial==null)
+      return 0;
+    return Integer.parseInt(serial);
+  }
+
+  public void incrementSerial(){
+    int num = getSerial();
     num++;
     docElt.setAttribute("serial",""+num);
   }
