@@ -53,29 +53,16 @@ for ($i=0;$i<count($ratings);$i++) {
 
 
 
- //this is not really scientific :/
 
 
-$maxdiff=2;
 $numusers=50;
 
-$users=$this->getUsersLike($maxdiff,$numusers);
+$users=$this->getUsersLike($numusers);
 
-if (count($users)<5) {
- $maxdiff++;
- $users=$this->getUsersLike($maxdiff,$numusers);
-
- if (count($users)<10) {
-  $users=$this->getUsersLike($maxdiff,$numusers);
- }
-}
 
 $tracks=$this->getTracksLike($users,7,$num);
 
 
-if (count($tracks)<$num) {
- $tracks=$this->getTracksLike($users,7,$num);
-}
 if (count($tracks)<$num) {
  $tracks=$this->getTracksLike($users,6,$num);
 }
@@ -83,7 +70,7 @@ if (count($tracks)<$num) {
 if (count($tracks)<$num) {
  $numusers+=50;
  $maxdiff++;
- $users=$this->getUsersLike($maxdiff,$numusers);
+ $users=$this->getUsersLike($numusers);
  $tracks=$this->getTracksLike($users,5,$num);
 }
 
@@ -107,8 +94,14 @@ function getTracksLike($users,$minrating,$num) {
  }
 
 
+//todo pondérer avgrating par le weight !
+
 $tracks=$this->irs->db->getAll("
-SELECT ratings.trackid, avg(ratings.rating) as avgrating, sum(ratings.weight) as c1
+SELECT 
+ ratings.trackid,
+ avg(ratings.rating) as avgrating,
+ avg(ratings.rating) * ( sum(ratings.weight) * sum(ratings.weight) ) / ( (sum(ratings.weight)+1) * (sum(ratings.weight)+1) ) as result
+ 
 FROM irate_ratings as ratings LEFT JOIN irate_ratings as ratings2                                
 ON ratings.trackid=ratings2.trackid   
 AND ratings2.userid=!
@@ -116,7 +109,7 @@ WHERE (ratings.userid=".implode(" OR ratings.userid=",$users).")
 AND (ratings2.id IS NULL OR ratings2.weight<".$this->min_old_weight.")
 GROUP BY ratings.trackid
 HAVING avgrating>!
-ORDER BY c1 DESC , avgrating DESC 
+ORDER BY result DESC
 LIMIT 0,!
 ",array($this->irs->user["id"],$minrating,$num));
 
@@ -132,20 +125,59 @@ return $tracks1;
 
 
 
-//todo : fix diff !!
 
-function getUsersLike($maxdiff,$num) {
+function getUsersLike($num) {
 
-$users=$this->irs->db->getAll("
-SELECT ratings2.userid,sum(ratings.weight) as c1,sum(abs(ratings2.rating-ratings.rating))/count(*) as diff
+
+//avg_similarity est la moyenne pondérée par la somme des weight, de la différence entre mêmes notations.
+//sum_weight est la somme des poids des pistes notées par les 2 utilisateurs.
+// result est (10-y)*(x/(x+1))² , formule du classement sylvinus1.
+
+
+/*
+
+wrong one
+
+
+SELECT
+ ratings2.userid,
+ 
+ sum(ratings.weight) as sum_weight,
+ 
+ sum( abs(ratings2.rating-ratings.rating) * (ratings2.weight+ratings.weight) )/sum(ratings2.weight+ratings.weight) as avg_similarity,
+
+ (10-avg_similarity)*(sum_weight/(sum_weight+1))*(sum_weight/(sum_weight+1)) as result
+
 FROM irate_ratings as ratings LEFT JOIN irate_ratings as ratings2
 ON ratings.trackid=ratings2.trackid 
+
 WHERE ratings.userid=! AND ratings2.userid<>!
 GROUP BY ratings2.userid 
-HAVING diff<!
-ORDER BY c1 DESC , diff ASC
+HAVING avg_similarity<!
+ORDER BY result DESC
 LIMIT 0,!
-",array($this->irs->user["id"],$this->irs->user["id"],$maxdiff,$num)); 
+
+*/
+
+
+
+
+$users=$this->irs->db->getAll("
+
+SELECT
+ ratings2.userid,
+ 
+ (10- sum( abs(ratings2.rating-ratings.rating) * (ratings2.weight+ratings.weight) )/sum(ratings2.weight+ratings.weight))*(sum(ratings.weight)/(sum(ratings.weight)+1))*(sum(ratings.weight)/(sum(ratings.weight)+1)) as result
+
+FROM irate_ratings as ratings LEFT JOIN irate_ratings as ratings2
+ON ratings.trackid=ratings2.trackid 
+
+WHERE ratings.userid=! AND ratings2.userid<>!
+GROUP BY ratings2.userid 
+ORDER BY result DESC
+LIMIT 0,!
+
+",array($this->irs->user["id"],$this->irs->user["id"],$num)); 
 
 $users1=array();
 for ($i=0;$i<count($users);$i++) {
