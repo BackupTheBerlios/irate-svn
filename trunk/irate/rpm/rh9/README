@@ -1,0 +1,8 @@
+Besides the general instructions found in the parent directory, note
+that using iRATE on Red Hat is made a bit tricky by the lack of MP3
+libraries in the official distro. In order to use iRATE, you will
+need several other packages - see
+
+www.sophrosune.org/irate/rh9
+
+for details.

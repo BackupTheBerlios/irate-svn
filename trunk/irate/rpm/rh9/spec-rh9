@@ -1,0 +1,70 @@
+Name: irate-client-gtk
+Summary: The iRATE music database client
+Version: snapshot1
+Release: 20030923
+Group: Applications/Multimedia
+Copyright: GPL
+Packager: Todd Pytel <tppytel@sophrosune.org>
+BuildRoot: /tmp/build-%{name}
+Source0: irate-src.tar.gz
+Source1: desktop-rh9
+Requires: madplay
+
+%description
+iRATE radio is a collaborative filtering mp3 player/downloader. The client logs into
+an iRATE server containing a large database of legally downloadable music. You rate 
+downloaded tracks and the server matches your ratings with those of other people to 
+provide you with music you'll like. 
+
+%prep
+rm -rf $RPM_BUILD_ROOT
+mkdir $RPM_BUILD_ROOT
+
+%setup -n irate
+
+%build
+make PLATFORM=linux-gtk2 irate-client
+
+%install
+make PLATFORM=linux-gtk2 DESTDIR=$RPM_BUILD_ROOT install
+mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
+
+mkdir -p $RPM_BUILD_ROOT/usr/share/applications/
+cp $RPM_SOURCE_DIR/desktop-rh9 $RPM_BUILD_ROOT/usr/share/applications/irate-client-gtk.desktop
+mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
+cp debian/irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1
+ln -s irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1/irate-client-gtk.1
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_DIR/irate
+
+%files
+%defattr(-,root,root)
+%doc README COPYING
+/usr/bin
+/usr/lib
+/usr/share/applications
+/usr/share/man
+
+%changelog
+* Tue Sep 23 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20030923
+- Initial CVS commit
+- Renamed desktop file for consistency
+
+* Tue Sep 23 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-a
+- First snapshot spec
+- Removed icon
+- Moved desktop file from patch to source
+- Added man page
+
+* Sat Sep 6 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-1
+- Initial public RPM release
+
+* Sat Sep 6 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-b
+- Added icon
+- Renamed binary to irate-client-gtk
+- Added madplay dependency
+
+* Sun Aug 31 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-a
+- Initial RPM package
