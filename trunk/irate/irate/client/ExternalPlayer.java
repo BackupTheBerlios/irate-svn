@@ -99,6 +99,10 @@ public class ExternalPlayer extends AbstractPlayer {
   public String[] formatVolumeArgument() {
     return new String[0];
   }
+  
+  public String[] formatOtherArguments() {
+    return new String[0];
+  }
 
   /**
    * Get the number of milliseconds of play time so far for the song
@@ -131,6 +135,7 @@ public class ExternalPlayer extends AbstractPlayer {
           new String[] { path },
           formatResumeArgument(),
           formatVolumeArgument(),
+          formatOtherArguments(),
           new String[] { file.getPath() } 
         });
 //        for (int i = 0 ; i < args.length; i++) 
