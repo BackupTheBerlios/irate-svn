@@ -469,7 +469,7 @@ public class Track implements TrackDetails {
     File file = getFile();
     if (isNotDownloaded()) {
       if(percentComplete != -1)
-        return "%" + percentComplete;
+        return "%" + (percentComplete / 5) * 5;
       return Resources.getString("track.rating.notdownloaded");
     }
     String isDeleted = elt.getStringAttribute("deleted");
