@@ -19,6 +19,7 @@
     <jar jarfile="irate-client-swing.jar" manifest="META-INF/manifest.irate-client" compress="true">
       <fileset dir="." includes="irate/swing/*.class"/>
       <fileset dir="." includes="irate/swing/locale.properties"/>
+      <fileset dir="." includes="irate/swing/*.png"/>
       <fileset dir="." includes="irate/client/*.class"/>
       <fileset dir="." includes="irate/client/locale.properties"/>
       <fileset dir="." includes="irate/client/help/*.html"/>

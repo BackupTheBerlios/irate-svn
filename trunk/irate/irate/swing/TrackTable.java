@@ -78,6 +78,7 @@ public class TrackTable implements TableModel {
     Track track = tracks[rowIndex];
     
     switch (columnIndex) {
+      case -1: return track;
       case 0: return track.getArtist();
       case 1: return track.getTitle();
       case 2: return track.getState();

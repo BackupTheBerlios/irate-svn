@@ -16,10 +16,10 @@ public class PlayPanel extends JPanel implements MouseListener {
   private JLabel currentSongLabel = new JLabel("<nothing playing>");
 //  privatAe JList list = new JList();
 //  private Track[] tracks;
-  private TrackTable trackTable;
+ // private TrackTable trackTable;
   private JTable table;
   private JButton pauseButton;
-  private TableSorter sorter;
+  private TableSorter sortedTrackTable;
   private Client client;
 
   public PlayPanel(PlayListManager playListManager, PlayThread playThread, 
@@ -40,12 +40,13 @@ public class PlayPanel extends JPanel implements MouseListener {
     currentSongLabel.setFont(new Font("Serif", Font.PLAIN, 16));
     add(currentSongLabel, BorderLayout.NORTH);
 
-    trackTable = new TrackTable(playListManager);
+    //trackTable = new TrackTable(playListManager);
     
-    sorter = new TableSorter(trackTable); //ADDED THIS
+    sortedTrackTable = new TableSorter(new TrackTable(playListManager)); //ADDED THIS
     //table = new JTable(trackTable);           //OLD
-    table = new JTable(sorter);             //NEW
-    sorter.addMouseListenerToHeaderInTable(table); //ADDED THIS
+    table = new JTable(sortedTrackTable);             //NEW
+    table.getTableHeader().setDefaultRenderer(new SortedHeaderRenderer());
+    sortedTrackTable.addMouseListenerToHeaderInTable(table); //ADDED THIS
 
 
 /*
@@ -67,8 +68,9 @@ public class PlayPanel extends JPanel implements MouseListener {
     if (e.getClickCount() == 2) {
       int index = table.getSelectedRow();
       if (index >= 0) {
-        Integer temp = (Integer) sorter.getValueAt(index, 0);
-        this.playThread.play(trackTable.getTrack(temp.intValue()));
+       // Integer temp = (Integer) sortedTrackTable.getValueAt(index, 0);
+        //this.playThread.play(sortedTrackTable.getTrack(temp.intValue()));
+    this.playThread.play((Track) sortedTrackTable.getValueAt(index,-1));
       }
 
     }
@@ -171,7 +173,8 @@ public class PlayPanel extends JPanel implements MouseListener {
         playThread.reject();
     }
     else
-      trackTable.getTrack(index).setRating(rating);
+     // trackTable.getTrack(index).setRating(rating);
+     ((Track) sortedTrackTable.getValueAt(index,-1)).setRating(rating);
 
     //save the precious ratings :)
     try{
@@ -192,12 +195,13 @@ public class PlayPanel extends JPanel implements MouseListener {
                       currentTrack.toString() + " - iRATE Radio");
     }
 
-    trackTable.notifyListeners();
+    //trackTable.notifyListeners();
+    ((TrackTable) sortedTrackTable.getModel()).notifyListeners();
     pauseButton.setText(playThread.isPaused() ? "|>" : "||");
     
     if (null != currentTrack) {
-      for (int i = 0; i < sorter.getRowCount(); i++) {
-        if (currentTrack.getTitle().equals(sorter.getValueAt(i, 2))) {
+      for (int i = 0; i < sortedTrackTable.getRowCount(); i++) {
+        if (currentTrack.getTitle().equals(sortedTrackTable.getValueAt(i, 2))) {
           table.clearSelection();
           table.setRowSelectionInterval(i, i);
           break;

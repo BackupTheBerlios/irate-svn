@@ -107,7 +107,7 @@ public class TableSorter extends TableMap {
         } else if (type == String.class) {
             String s1 = (String)data.getValueAt(row1, column);
             String s2    = (String)data.getValueAt(row2, column);
-            int result = s1.compareTo(s2);
+            int result = s1.compareToIgnoreCase(s2);
 
             if (result < 0) {
                 return -1;
@@ -330,7 +330,7 @@ public class TableSorter extends TableMap {
         int viewColumn = columnModel.getColumnIndexAtX(e.getX()); 
         int column = table.convertColumnIndexToModel(viewColumn); 
 
-        if (e.getClickCount() == 2 && column != -1) 
+        if (column != -1) 
             {
             if(column == sortedColumn)
                 {this.ascending = !this.ascending;}
