@@ -16,6 +16,7 @@ public class ExternalPlayer implements Player {
   private int action;
   private boolean paused;
   private Process process;
+  private long playTime;
   
   public ExternalPlayer(String name, String path) throws FileNotFoundException {
     this(name, new String[] { path });
@@ -54,16 +55,42 @@ public class ExternalPlayer implements Player {
     return paused;
   }
 
+  public String[] formatResumeArgument()
+  {
+    return null;
+  }
+
+  /**
+   * Get the number of milliseconds of play time so far for the song
+   * currently being played.
+   */
+  protected long getPlayTime()
+  {
+    return playTime;
+  }
+
   public void play(File file) throws PlayerException {
+    playTime = 0;
     do {
       try {
         action = ACTION_PLAY;
-        process = Runtime.getRuntime().exec(new String[] { path, file.getPath() });
+	String[] resumeArg = formatResumeArgument();
+	String[] args;
+	if (resumeArg == null)
+	  args = new String[2];
+	else {
+	  args = new String[resumeArg.length+2];
+	  System.arraycopy(resumeArg, 0, args, 1, resumeArg.length);
+        }
+	args[0] = path;
+	args[args.length-1] = file.getPath();
+        process = Runtime.getRuntime().exec(args);
       }
       catch (IOException e) {
         e.printStackTrace();
         throw new PlayerException(e.toString());
       }
+      long start = System.currentTimeMillis();
       try {
         process.waitFor();
         if (!paused && process.exitValue() != 0) 
@@ -71,6 +98,10 @@ public class ExternalPlayer implements Player {
       }
       catch (InterruptedException e) {
         e.printStackTrace();
+      }
+      if (paused) {
+	long timePlayed = System.currentTimeMillis() - start;
+	playTime += timePlayed;
       }
       while (paused) { 
         try {

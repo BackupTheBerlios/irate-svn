@@ -9,6 +9,7 @@ CLIENT_FILES = \
 	irate/client/Player.java \
 	irate/client/PlayerList.java \
 	irate/client/ExternalPlayer.java \
+	irate/client/MadplayPlayer.java \
 	irate/client/Speech.java
 #	irate/client/AudioDevice.java 
 #	irate/client/JavaSoundAudioDevice.java 

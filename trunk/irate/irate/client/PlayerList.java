@@ -21,7 +21,7 @@ public class PlayerList {
     }
     
     try {
-      players.add(new ExternalPlayer("madplay", new String[] { "madplay", "/usr/bin/madplay", "/usr/local/bin/madplay", "madplay.exe" }));
+      players.add(new MadplayPlayer());
     }
     catch (FileNotFoundException e) {
       e.printStackTrace();
