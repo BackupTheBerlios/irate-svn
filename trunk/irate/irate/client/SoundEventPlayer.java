@@ -1,13 +1,14 @@
 package irate.client;
 
+import irate.common.Preferences;
 import java.io.*;
 
 /**
  * Date Created: Feb 6, 2004
- * Date Updated: $Date: 2004/05/31 04:38:42 $
+ * Date Updated: $Date: 2004/09/29 02:09:21 $
  * @author Creator: Mathieu Mallet
- * @author Updated: $Author: eythian $
- * @version $Revision: 1.2 $ */
+ * @author Updated: $Author: lenbok $
+ * @version $Revision: 1.3 $ */
 
 public class SoundEventPlayer {
   private Player player;
@@ -20,7 +21,7 @@ public class SoundEventPlayer {
   }
   
   public void PlaySoundEvent(File file) throws PlayerException {
-    player = playerList.getPlayer(playListManager.getTrackDatabase().getPlayer());
+    player = playerList.getPlayer(Preferences.getPlayer());
 
     player.play(file);
 
