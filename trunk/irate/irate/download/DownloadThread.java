@@ -1,3 +1,5 @@
+// Copyright 2003 Anthony Jones
+
 package irate.download;
 
 import irate.common.Track;

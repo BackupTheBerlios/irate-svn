@@ -1,3 +1,5 @@
+// Copyright 2003 Anthony Jones
+
 package irate.client;
 
 import java.io.*;

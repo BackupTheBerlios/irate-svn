@@ -1,3 +1,5 @@
+// Copyright Taras
+
 package irate.swt;
 
 import irate.common.TrackDatabase;

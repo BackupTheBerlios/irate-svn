@@ -1,3 +1,5 @@
+// Copyright 2003 Anthony Jones, Stephen Blackheath, Taras
+
 package irate.common;
 
 import java.io.*;
