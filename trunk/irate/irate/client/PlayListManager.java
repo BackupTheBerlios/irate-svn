@@ -135,8 +135,15 @@ public class PlayListManager {
         if (++playListIndex >= size)
           playListIndex = 0;
         selectedTrack = (Track) playList.get(playListIndex);
-        if (!selectedTrack.isHidden() && selectedTrack != lastPlayedTrack)
-          break;
+        
+        // This first statement says that if the user has 0% unrated on playlist
+        // that we won't play an unrated song.  The playlist may have been generated
+        // before they changed this setting, so we're just filtering.
+        if(!(trackDatabase.getUnratedPlayListRatio() == 0 && !selectedTrack.isRated())) {
+            // Also ensure the song isn't hidden -- if they Suxed a song, we don't want to play it.
+            if (!selectedTrack.isHidden() && selectedTrack != lastPlayedTrack)
+                break;
+        }
       } while (playListIndex != currentIndex);
     }
 
