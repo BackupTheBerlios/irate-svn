@@ -3,8 +3,10 @@
  */
 package irate.swt;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 
@@ -73,7 +75,7 @@ public class ImageMerger {
           int g = (frgb.green * a + brgb.green * (255 - a)) / 255;
           int b = (frgb.blue * a + brgb.blue * (255 - a)) / 255;
           RGB drgb = new RGB(r, g, b);
-          destPixels[j] = destData.palette.getPixel(drgb);
+          destPixels[j] = getNearestPixel(destData.palette, drgb);
         }
         destData.setPixels(merge.x, merge.y + i, destPixels.length, destPixels, 0);
     }    
@@ -99,12 +101,34 @@ public class ImageMerger {
         int g = (frgb.green * a + brgb.green * (255 - a)) / 255;
         int b = (frgb.blue * a + brgb.blue * (255 - a)) / 255;
         RGB drgb = new RGB(r, g, b);
-        destPixels[j] = destData.palette.getPixel(drgb);
+        destPixels[j] = getNearestPixel(destData.palette, drgb);
       }
       destData.setPixels(0, i, destPixels.length, destPixels, 0);
     }
     return destData;
-  }  
+  }
+  
+  private int getNearestPixel(PaletteData palette, RGB ideal) {
+    int pixel = palette.getPixel(ideal);
+    if (pixel != SWT.ERROR_INVALID_ARGUMENT)
+      return pixel;
+    System.out.println("Pixel match failure");
+    RGB[] rgbs = palette.getRGBs();
+    pixel = 0;
+    int best = 1 << 31;
+    for (int i = 0; i < rgbs.length; i++) {
+      RGB rgb = rgbs[i];
+      int dist = (rgb.red - ideal.red) ^ 2 
+          + (rgb.green - ideal.green) ^ 2
+          + (rgb.blue - ideal.blue) ^ 2;
+      if (dist < best) {
+        pixel = i;
+        best = dist;
+      }
+    }
+    
+    return pixel;
+  }
 
   private class Merge {
     ImageData backgroundData;
@@ -121,6 +145,10 @@ public class ImageMerger {
           && foregroundData == merge.foregroundData 
           && backgroundData == merge.backgroundData; 
     }
+
+    public int hashCode() {
+      return x + (y  << 16) + backgroundData.hashCode() + foregroundData.hashCode();
+    }
   }
   
   private class ColourMerge {
@@ -134,6 +162,9 @@ public class ImageMerger {
       ColourMerge merge = (ColourMerge) obj;
       return foregroundData == merge.foregroundData 
           && backgroundColour.equals(merge.backgroundColour); 
+    }
+    public int hashCode() {
+      return backgroundColour.hashCode() + foregroundData.hashCode();
     }
   }
 }

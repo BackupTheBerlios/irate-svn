@@ -233,7 +233,7 @@ public class Client extends AbstractClient {
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       ThreeModeButton item = rf.getItem();
-      item.setSelection(track.getRating() == rf.getValue());
+      item.setSelection(i != 0 && track.isRated() && rf.getValue() <= track.getRating());
     }
     volumeScale.setSelection(
       (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
