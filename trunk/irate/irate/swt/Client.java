@@ -33,8 +33,9 @@ public class Client implements UpdateListener {
   private PlayListManager playListManager;
   private PlayThread playThread;
   private DownloadThread downloadThread;
-
-  private String strState = "                                                                     ";
+  private ToolItem pause;
+  
+  private String strState = "";
   // private PlayThread playThread;
   
   
@@ -68,7 +69,7 @@ public class Client implements UpdateListener {
 		trackDatabase.setAutoDownload(2);
 	}
     playListManager = new PlayListManager(trackDatabase);
-    playThread = new PlayThread(playListManager);
+    playThread = new PlayThread(playListManager, new PlayerList());
  
 	initGUI();
     
@@ -180,6 +181,11 @@ public class Client implements UpdateListener {
     synchronizePlaylist(playListManager, tblSongs);
     update();
   } 
+  
+  public void setPaused(boolean paused) {
+	playThread.setPaused(paused);
+	pause.setText(paused ? ">" : "||");
+  }
   
   void SortTableByStringColumn(int column_index, Table table)
   {
@@ -464,10 +470,14 @@ public class Client implements UpdateListener {
 
     new ToolItem(toolbar,SWT.SEPARATOR);    
     
-    item = new ToolItem(toolbar,SWT.PUSH);
-    item.setText("||");
-    item.setEnabled(false);
-    
+	pause = new ToolItem(toolbar,SWT.PUSH);
+	pause.setText("||");
+	pause.addSelectionListener(new SelectionAdapter(){
+		public void widgetSelected(SelectionEvent e){
+			setPaused(!playThread.isPaused());
+		}
+	});
+ 
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText(">>");
     item.addSelectionListener(new SelectionAdapter(){

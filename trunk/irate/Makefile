@@ -15,8 +15,12 @@ CLIENT_FILES = \
 SERVER_DEPS = irate-server.o irate-common.a
 SERVER_LIBS = lib/libnanoxml-lite.a
 
-all: irate-client irate-server
 
+all: lib irate-client irate-server
+
+lib:
+	$(MAKE) -C lib/
+	
 irate-client: $(CLIENT_DEPS) 
 	gcj  $(CLIENT_DEPS) $(CLIENT_LIBS) -o irate-client --main=irate.swt.Client
 
