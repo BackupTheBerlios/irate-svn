@@ -9,7 +9,7 @@ import java.util.*;
 
 import nanoxml.XMLElement;
 
-public class Track {
+public class Track implements TrackDetails {
 
   private static final TimeZone UTC = new SimpleTimeZone(/*SimpleTimeZone.UTC_TIME*/ 2, "UTC");
   private final int DEFAULT_RATING = 6;
@@ -469,12 +469,34 @@ public class Track {
     return getURL().equals(track.getURL());
   }
 
-  /** Returns artist website */
-  public String getArtistWebsite() {
-  	String www = elt.getStringAttribute("www");
-    return www;
+  /** Returns the web site associated with this track */
+  public URL getWebSite() {
+    try {
+    	String www = elt.getStringAttribute("www");
+      if (www == null)
+        return null;
+      return new URL(www);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 	
+  /** Returns license */
+  public URL getLicense() {
+    try {
+      String www = elt.getStringAttribute("license");
+      if (www == null)
+        return null;
+      return new URL(www);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+  
   public int hashCode() {
     return getKey().hashCode();
   }

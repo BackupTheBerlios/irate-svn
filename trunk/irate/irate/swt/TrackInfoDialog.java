@@ -7,6 +7,7 @@ import irate.common.Track;
 import irate.resources.BaseResources;
 
 import java.io.IOException;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import org.eclipse.swt.SWT;
@@ -183,8 +184,8 @@ public class TrackInfoDialog {
     wwwLink =
       createButton(buttonGrid,
                    getResourceString("TrackInfoDialog.Button.WWW"));
-    if (currentTrack.getArtistWebsite() == null
-        || currentTrack.getArtistWebsite().equals(""))  
+    if (currentTrack.getWebSite() == null
+        || currentTrack.getWebSite().equals(""))  
       wwwLink.setEnabled(false);
     return buttonGrid;
   }
@@ -272,7 +273,7 @@ public class TrackInfoDialog {
   // Add listener for the www button
   wwwLink.addSelectionListener(new SelectionAdapter() {
     public void widgetSelected(SelectionEvent e) {
-      parentClient.showURL(currentTrack.getArtistWebsite());
+      parentClient.showURL(currentTrack.getWebSite());
     }
   }); 
 		
@@ -285,11 +286,11 @@ public class TrackInfoDialog {
       www += "\"" + currentTrack.getTitle() + "\"";  //$NON-NLS-2$
       try {
         www = "http://www.google.com/search?q=" + URLEncoder.encode(www); 
+        parentClient.showURL(new URL(www));
       }
       catch (Exception z) {
         z.printStackTrace();
       }
-      parentClient.showURL(www);
     }
   }); 
  
@@ -298,7 +299,7 @@ public class TrackInfoDialog {
     {
       licenseButton.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
-          parentClient.showURL(license.getURL().toString());
+          parentClient.showURL(license.getURL());
         }
       });
     } 

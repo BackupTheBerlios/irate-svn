@@ -1,9 +1,7 @@
 package irate.swt;
 
-import java.util.*;
-
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 

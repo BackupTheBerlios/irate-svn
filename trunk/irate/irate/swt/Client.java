@@ -401,9 +401,9 @@ public class Client extends AbstractClient {
   /** launches a web browser 
   @param url web address!
   */
-  public void showURL(String url) {
+  public void showURL(URL url) {
     try {
-      showURLwithJNLP(new URL(url));
+      showURLwithJNLP(url);
     }
     catch (Exception e) {
       System.out.println("JNLP:" + e);
