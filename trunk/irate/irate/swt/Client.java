@@ -326,7 +326,7 @@ public class Client extends AbstractClient {
    */
   public void setPaused(boolean paused) {
     super.setPaused(paused);
-    final Boolean pausedFinal = Boolean.valueOf(paused);
+    final Boolean pausedFinal = new Boolean(paused);
 
     // We have to delegate to the SWT event thread, because we might be
     // called from a thread other than it, such as the remote control thread.
