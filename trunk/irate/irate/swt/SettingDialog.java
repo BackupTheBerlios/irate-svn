@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/03/16 23:30:52 $
+ * Date Updated: $Date: 2004/03/16 23:35:03 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 public class SettingDialog
 {
@@ -180,7 +180,6 @@ public class SettingDialog
     class DoBrowser implements SelectionListener {
       public void widgetSelected(SelectionEvent e) {
         for (int i=0; i<browsers.length; i++) {
-          System.out.println("Selection "+i+"=");
           if (browsers[i].getButton().getSelection()) {
             browserText.setText(browsers[i].getCommand());
           }
