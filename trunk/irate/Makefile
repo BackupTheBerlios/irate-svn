@@ -31,9 +31,9 @@ JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CL
 #set in make.configure
 ifndef NO_RESOURCE
 IMAGES_GIF = $(shell find irate/resources/ -name '*.gif')
-IMAGES_PNG = $(shell find irate/resources/ -name '*.png')
+#IMAGES_PNG = $(shell find irate/resources/ -name '*.png')
 CLIENT_DEPS += $(IMAGES_GIF:.gif=.gifres.o)
-CLIENT_DEPS += $(IMAGES_PNG:.png=.pngres.o)
+#CLIENT_DEPS += $(IMAGES_PNG:.png=.pngres.o)
 LOCALES = \
   $(wildcard irate/common/locale*.properties) \
   $(wildcard irate/download/locale*.properties) \
@@ -178,8 +178,8 @@ irate-server.o:irate/server/*.java
 %.gifres.o: %.gif
 	$(GCJ) -c --resource $^ $^ -o $@
 
-%.pngres.o: %.png
-	$(GCJ) -c --resource $^ $^ -o $@
+#%.pngres.o: %.png
+#	$(GCJ) -c --resource $^ $^ -o $@
 
 %.properties.o: %.properties	
 	$(GCJ) -c --resource $^ $^ -o $@
