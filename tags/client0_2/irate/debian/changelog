@@ -1,0 +1,52 @@
+irate (0.2-8) unstable; urgency=low
+
+  * Made it so that the account dialog opens if you haven't downloaded any
+  * tracks.
+  * 
+
+ -- Anthony Jones <ajones@clear.net.nz>  Thu, 28 Aug 2003 21:30:10 +0800
+
+irate (0.2-7) unstable; urgency=low
+
+  * Nothing much different.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Thu, 28 Aug 2003 08:34:24 +0800
+
+irate (0.2-6) unstable; urgency=low
+
+  * Fixed broken packaging.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Wed, 27 Aug 2003 08:18:45 +0800
+
+irate (0.2-5) unstable; urgency=low
+
+  * Fixed syncronisation problem with 'this sux'.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Sun, 24 Aug 2003 23:31:18 +0800
+
+irate (0.2-4) unstable; urgency=low
+
+  * Updated play algorithm.
+  * Fixed Debian menus.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Wed, 20 Aug 2003 15:38:47 +0800
+
+irate (0.2-3) unstable; urgency=low
+
+  * Fixed a problem with the infra red remote configuration.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Wed, 13 Aug 2003 10:57:23 +0800
+
+irate (0.2-2) unstable; urgency=low
+
+  * Added missing dependencies.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Tue, 12 Aug 2003 10:29:30 +0800
+
+irate (0.2-1) unstable; urgency=low
+
+  * Initial Debian Release.
+  * This is my first Debian package.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Sun, 20 Jul 2003 19:14:00 +0800
+

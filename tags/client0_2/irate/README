@@ -1,0 +1,63 @@
+INTRODUCTION
+
+This directory contains iRATE radio client and server code. iRATE radio client
+and server are free software. See the file COPYING for copying permission.
+
+General information and the latest updates or iRATE can be found on the
+website.
+
+http://irate.sourceforge.net/
+
+
+IRATE VERSIONS
+
+There are two versions of the iRATE client. Each uses a different GUI library.
+One uses the Eclipse SWT library and the other uses Sun's Swing library.
+
+The Swing version works on all platforms but can't be compiled natively. It
+depends on Sun's Swing library which does not meet the DFSG (Debian Free
+Software Guidelines) requirements of being free.
+
+The SWT version works on Windows, Linux using Motif widgets and Linux using
+GTK2 widgets. The SWT library itself is free software but both Windows and
+Motif are non-free. Therefore the the GTK2 version of iRATE is recommended
+if it is supported on your platform.
+
+
+BUILDING WITH JAVA SDK
+
+To compile iRATE to run under the java VM you will need the Java SDK v1.4 or 
+equivalent and Apache Ant 1.5.2.
+
+http://java.sun.com/j2se/downloads.html
+http://ant.apache.org/
+
+Unzip the appropriate SWT version inside the lib directory platform. Then
+run ant. There is no separate build to compile only the Swing version at
+the moment.
+
+$ ant
+
+To run the SWT version you need to do this:
+
+$ export LD_LIBRARY_PATH=lib
+$ java -jar irate-client.jar
+
+To run the Swing version you will need to do this:
+
+$ java -jar irate-swing-client.jar
+
+
+BUILDING WITH GCJ
+
+To build the SWT binary version you will need GCJ > 3.0.4 installed. All you
+need to do is run make like this:
+
+$ make
+
+There's a handy scrip to run it:
+
+$ ./irate-client.sh
+
+Building iRATE using GCJ on Windows is not recommended. If you wish to develop
+iRATE on the Windows platform then use the Java SDK (above).
