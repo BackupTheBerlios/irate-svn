@@ -6,24 +6,14 @@
 package irate.plugin.marsyas;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
-import java.util.SortedMap;
-import java.util.SortedSet;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.Vector;
-
-import org.eclipse.swt.widgets.Display;
 
 import irate.common.Track;
 

@@ -19,7 +19,6 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 
 import irate.common.Track;
-import irate.plugin.PluginApplication;
 import irate.swt.BaseDialog;
 
 /**

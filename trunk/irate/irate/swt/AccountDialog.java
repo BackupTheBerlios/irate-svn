@@ -13,7 +13,6 @@ import java.util.Random;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.*;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -23,10 +22,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/08/29 21:50:06 $
+ * Date Updated: $Date: 2004/09/05 03:50:57 $
  * @author Creator:	taras
- * @author Updated:	$Author: parlabane $
- * @version $Revision: 1.30 $
+ * @author Updated:	$Author: ajones $
+ * @version $Revision: 1.31 $
  */
 public class AccountDialog {
   private boolean done = false;
