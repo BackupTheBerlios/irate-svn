@@ -1,5 +1,6 @@
 package irate.swt;
 
+import irate.common.Track;
 import irate.common.Preferences;
 import irate.common.TrackDatabase;
 import irate.download.DownloadThread;
@@ -21,10 +22,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/02/02 18:31:43 $
+ * Date Updated: $Date: 2004/02/17 21:11:07 $
  * @author Creator:	taras
- * @author Updated:	$Author: spaetz $
- * @version $Revision: 1.24 $
+ * @author Updated:	$Author: emh_mark3 $
+ * @version $Revision: 1.25 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -296,6 +297,7 @@ public class AccountDialog {
             }
           });//inner class
         }//method
+        public void newTrackStarted(Track track) { }
       };//ul
       downloadThread.addUpdateListener(ul);
 

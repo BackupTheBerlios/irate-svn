@@ -2,6 +2,7 @@
 
 package irate.swing;
 
+import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
 import irate.download.DownloadThread;
@@ -146,11 +147,13 @@ public class Client extends JFrame {
            playPanel.update();
          }
        }
+       public void newTrackStarted(Track track) { }
      });
        playThread.addUpdateListener(new UpdateListener() {
        public void actionPerformed() {
          downloadThread.checkAutoDownload();
        }
+       public void newTrackStarted(Track track) { }
      });
      getContentPane().add(downloadPanel, BorderLayout.SOUTH);
 

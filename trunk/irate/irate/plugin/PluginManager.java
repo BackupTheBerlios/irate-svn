@@ -12,6 +12,7 @@ import nanoxml.*;
 import irate.common.Preferences;
 import irate.plugin.lircremote.LircRemoteControlPlugin;
 import irate.plugin.externalcontrol.ExternalControlPlugin;
+import irate.plugin.unratednotifier.UnratedNotifierPlugin;
 
 /**
  * Manager to manage the list of plugins.
@@ -52,6 +53,7 @@ public class PluginManager
     plugins = new Vector();
     plugins.add(new LircRemoteControlPlugin());
     plugins.add(new ExternalControlPlugin());
+    plugins.add(new UnratedNotifierPlugin());
     try {
       loadConfig();
     }
@@ -125,5 +127,6 @@ public class PluginManager
     }
 
   }
+  
 }
 

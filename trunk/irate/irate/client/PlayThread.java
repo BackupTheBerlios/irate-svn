@@ -74,6 +74,7 @@ public class PlayThread extends Thread {
       if (currentTrack != null) {
         currentTrack.updateTimeStamp();
         notifyUpdateListeners();
+        notifyNewTrackStarted(currentTrack);
         File file = currentTrack.getFile();
         if (file != null && file.exists()) {
           if (speaking) {
@@ -207,4 +208,12 @@ public class PlayThread extends Thread {
       updateListener.actionPerformed();
     }
   }
+ 
+  private void notifyNewTrackStarted(Track track) {
+    for (int i = 0; i < updateListeners.size(); i++) {
+      UpdateListener updateListener = (UpdateListener) updateListeners.elementAt(i);
+      updateListener.newTrackStarted(track);
+    }    
+  }
+ 
 }

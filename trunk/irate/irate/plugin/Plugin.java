@@ -2,6 +2,7 @@
 
 package irate.plugin;
 
+import irate.common.*;
 import nanoxml.XMLElement;
 
 /**
@@ -92,5 +93,14 @@ public abstract class Plugin
    * element.
    */
   public abstract void formatConfig(XMLElement elt);
+  
+  
+  /**
+   * Feedback functions from client to plugin
+   */
+  public void eventPositionUpdated(int position, int length) { }
+  public void eventNewTrack(Track track) { }
+  public void eventRatingApplied(Track ratedTrack, int rating) { }
+  
 }
 

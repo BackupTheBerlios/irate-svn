@@ -49,6 +49,8 @@ public class SWTPluginUIFactory
         return new irate.swt.plugin.lircremote.LircRemoteControlConfigurator(display, app, plugin);
       if (plugin instanceof irate.plugin.externalcontrol.ExternalControlPlugin)
         return new irate.swt.plugin.externalcontrol.ExternalControlConfigurator(display, app, plugin);
+      if (plugin instanceof irate.plugin.unratednotifier.UnratedNotifierPlugin)
+        return new irate.swt.plugin.unratednotifier.UnratedNotifierConfigurator(display, app, plugin);
     }
     return null;
   }

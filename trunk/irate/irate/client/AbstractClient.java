@@ -5,11 +5,13 @@ package irate.client;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
 import irate.download.DownloadThread;
+import irate.plugin.Plugin;
 import irate.plugin.PluginApplication;
 import irate.plugin.PluginManager;
 import irate.common.Preferences;
@@ -27,6 +29,7 @@ public abstract class AbstractClient
   protected DownloadThread downloadThread;
   protected PluginManager pluginManager;
   protected Preferences userPreferences;
+  protected SoundEventPlayer soundEventPlayer;
 
   private Track lastRatedTrack;
   private int lastTrackPreviousRank;
@@ -82,6 +85,7 @@ public abstract class AbstractClient
 
     playListManager = new PlayListManager(trackDatabase);
     playThread = new PlayThread(playListManager, playerList);
+    soundEventPlayer  = new SoundEventPlayer(playListManager);
 
     pluginManager = new PluginManager(this, dir);
 
@@ -108,6 +112,7 @@ public abstract class AbstractClient
         if (downloadThread.getPercentComplete() == 100)
           updateTrackTable();
       }
+      public void newTrackStarted(Track track) { }
     });
 
     System.out.println("Number of tracks "+trackDatabase.getNoOfTracks() );
@@ -155,6 +160,13 @@ public abstract class AbstractClient
     }
     catch (Exception e) {
       e.printStackTrace();
+    }
+    
+    // Send update to all plugins
+    List plugins = pluginManager.getPlugins();
+    for (int i = 0; i < plugins.size(); i++) {
+      Plugin plugin = (Plugin) plugins.get(i);
+      plugin.eventRatingApplied(track, rating);
     }
 
     updateTrack(track);
@@ -256,5 +268,37 @@ public abstract class AbstractClient
 
   /** Update the display of only one track. */
   public abstract void updateTrack(Track track);
+  
+  /**
+   * PluginApplication interface:
+   * Plays a sound event on the client.
+   */
+  public void playSoundEvent(File file, String description) {
+    System.out.println("Trying to play sound event (" + description + ")"); 
+
+    if (soundEventPlayer == null)
+      System.out.println("No SoundEventPlayer found!");
+    else {
+      try {
+        soundEventPlayer.PlaySoundEvent(file);
+      }
+      catch (PlayerException e) {
+        System.out.println("Exception playing sound event: " + file.getPath());
+        e.printStackTrace();
+      }
+    }
+  }
+  
+  /**
+   * Called by PlayThread when a new track is played.
+   */
+  public void newTrackStarted(Track track) {
+    // Send event to all plugins
+    List plugins = pluginManager.getPlugins();
+    for (int i = 0; i < plugins.size(); i++) {
+      Plugin plugin = (Plugin) plugins.get(i);
+      plugin.eventNewTrack(track);
+    }  
+  }
 
 }

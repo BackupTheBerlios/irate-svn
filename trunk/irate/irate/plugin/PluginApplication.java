@@ -2,6 +2,8 @@
 
 package irate.plugin;
 
+import java.io.File;
+
 import irate.common.Track;
 
 /**
@@ -50,5 +52,11 @@ public interface PluginApplication
    * Set rating for the specified track.
    */
   public void setRating(Track track, int rating);
+  
+  /**
+   * Plays a sound event on the client.
+   */
+  public void playSoundEvent(File file, String description);
+  
 }
 

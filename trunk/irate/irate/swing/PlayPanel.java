@@ -33,6 +33,7 @@ public class PlayPanel extends JPanel implements MouseListener {
       public void actionPerformed() {
         update();
       }
+      public void newTrackStarted(Track track) { }
     });
     
     currentSongLabel.setBackground(Color.black);

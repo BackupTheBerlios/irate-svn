@@ -7,11 +7,13 @@ import irate.client.Help;
 import irate.client.Player;
 import irate.common.Preferences;
 import irate.common.Track;
+import irate.plugin.Plugin;
 import irate.plugin.PluginApplication;
 import irate.plugin.PluginUIFactory;
 import irate.swt.plugin.SWTPluginUIFactory;
 
 import java.io.*;
+import java.util.List;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -959,6 +961,13 @@ public class Client extends AbstractClient {
     }
     else {
       checkedTime = length;
+    }
+    
+    // Send update to all plugins
+    List plugins = pluginManager.getPlugins();
+    for (int i = 0; i < plugins.size(); i++) {
+      Plugin plugin = (Plugin) plugins.get(i);
+      plugin.eventPositionUpdated(position, length);
     }
     
 //    final int finalTime = checkedTime;

@@ -4,4 +4,5 @@ package irate.common;
 
 public interface UpdateListener {
   public void actionPerformed();
+  public void newTrackStarted(Track track);
 }

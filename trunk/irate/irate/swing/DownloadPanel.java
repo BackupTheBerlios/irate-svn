@@ -1,5 +1,6 @@
 package irate.swing;
 
+import irate.common.Track;
 import irate.common.UpdateListener;
 import irate.download.DownloadThread;
 
@@ -23,6 +24,7 @@ public class DownloadPanel extends JPanel {
       public void actionPerformed() {
         update();
       }
+      public void newTrackStarted(Track track) { }
     });
   }
 
