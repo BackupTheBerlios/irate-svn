@@ -13,4 +13,14 @@ equivalent and Apache Ant 1.5.2.
 http://java.sun.com/j2se/downloads.html
 http://ant.apache.org/
 
-Just run ant and it will automatically build it for you.
+If you want to run the SWT version you need to run go:
+
+$ ./build-help
+
+To compile both bytecode versions just type go:
+
+$ ant
+
+To build with gcj go:
+
+$ make

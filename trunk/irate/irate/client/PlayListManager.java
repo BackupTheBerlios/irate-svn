@@ -10,24 +10,99 @@ import java.util.*;
 public class PlayListManager {
 
   private Random random = new Random();
-  
   private int playListMaximumSize;
   
   private TrackDatabase trackDatabase;
-  private TrackDatabase playList;
+  private List playList;
+  private int playListIndex;
   
   public PlayListManager(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
-    this.playList = trackDatabase;
+    this.playList = createPlayList();
+    playListIndex = 0;
   }
   
-  public TrackDatabase getPlayList() {
+  public TrackDatabase getTrackDatabase() {
+    return trackDatabase;
+  }
+  
+  public synchronized Track[] getPlayList() {
+    return (Track[]) playList.toArray(new Track[playList.size()]);
+  }
+  
+  public synchronized Track chooseTrack() {
+    
+    for (int i = 0; i < playList.size(); i++) {
+      Track track = (Track) playList.get(i);
+      if (!isOnPlayList(track)) {
+        playList.remove(i);
+        if (i < playListIndex)
+          --playListIndex;
+      }
+    }
+    
+      // Loop around one time for each track which needs to be added to the 
+      // play list. Don't worry too much if we don't exactly that number of
+      // tracks because it will likely get one next time around.
+    for (int i = trackDatabase.getPlayListLength() - playList.size(); i > 0; i--) {
+      synchronized (trackDatabase) {
+        Track track = trackDatabase.chooseTrack(random);
+        if (track != null)
+          playList.add(track);
+      }
+    }
+    
+    int size = playList.size();
+    if (playList.size() == 0)
+      return null;
+    
+    if (++playListIndex >= size) {
+      playListIndex = 0;
+//      randomise(playList);
+    }
+
+    System.out.println("---Play list---");
+    for (int i = 0; i < playList.size(); i++) {
+      Track track = (Track) playList.get(i);
+      if (i == playListIndex)
+        System.out.print("* ");
+      System.out.println(track.toString());
+    }
+    
+    return (Track) playList.get(playListIndex);
+  }
+
+  private boolean isOnPlayList(Track track) {
+    float rating = track.getRating();
+    return rating != 0 && (track.getNoOfTimesPlayed() % Math.round(rating)) != 0;
+  }
+  
+  private void randomise(List playList) {
+    for (int i = 0; i < playList.size(); i++) {
+      int swap = (Math.abs(random.nextInt()) % playList.size());
+      if (swap != i) {
+        Object o = playList.get(i);
+        playList.set(i, playList.get(swap));
+        playList.set(swap, o);
+      }
+    }
+  }
+
+  private List createPlayList() {
+    List playList = new Vector();
+    Track[] tracks = trackDatabase.getTracks();
+    for (int i = 0; i < tracks.length; i++) {
+      Track track = tracks[i];
+      if (isOnPlayList(track))
+        playList.add(track);
+    }
+    randomise(playList);
+    
+      // Remove extra unwanted items.
+    while (playList.size() > trackDatabase.getPlayListLength()) 
+      playList.remove(playList.size() - 1);
+    
     return playList;
   }
 
-  public Track chooseTrack() {
-    synchronized (playList) {
-      return playList.chooseTrack(random);
-    }
-  }
 }

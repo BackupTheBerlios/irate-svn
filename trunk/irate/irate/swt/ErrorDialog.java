@@ -4,7 +4,6 @@ package irate.swt;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;

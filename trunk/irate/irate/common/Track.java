@@ -10,7 +10,7 @@ import nanoxml.XMLElement;
 
 public class Track {
 
-  private final int DEFAULT_RATING = 7;
+  private final int DEFAULT_RATING = 6;
   private final int INITIAL_RATING = 10;
   
   private XMLElement elt;
@@ -237,12 +237,15 @@ public class Track {
     if (prob < 0)
       return 0;
 
+/*
       // Make it 1/10th of the chance of being played if the number of times 
       // played is a multiple of the rating. This means that a track will get
       // played in chunks proportional to the number of times it has been 
       // played.
     if (noOfTimesPlayed != 0 && (noOfTimesPlayed % rating) == 0)
       prob /= 10;
+*/
+      
     return prob;
   }
 

@@ -36,7 +36,7 @@ public class PlayThread extends Thread {
   }
 
   private void playFile(File file) throws Exception {
-    player = playerList.getPlayer(playListManager.getPlayList().getPlayer());
+    player = playerList.getPlayer(playListManager.getTrackDatabase().getPlayer());
     try {
       player.play(file);
     }
@@ -58,39 +58,44 @@ public class PlayThread extends Thread {
   private void playTrack() {
     try {
       synchronized (this) {
-	speaking = playListManager.getPlayList().isRoboJockEnabled();
-	  // If a next track has been chosen by the user, use that, otherwise
-	  // pick one intelligently.
-	currentTrack = nextTrack != null ? nextTrack : playListManager.chooseTrack();
-	toKeepPlaying = true;
-	nextTrack = null;
+        speaking = playListManager.getTrackDatabase().isRoboJockEnabled();
+        // If a next track has been chosen by the user, use that, otherwise
+        // pick one intelligently.
+        currentTrack =
+          nextTrack != null ? nextTrack : playListManager.chooseTrack();
+        toKeepPlaying = true;
+        nextTrack = null;
       }
- 
+
       if (currentTrack != null) {
         notifyUpdateListeners();
         File file = currentTrack.getFile();
         if (file.exists()) {
           if (speaking) {
             try {
-              speech.say((currentTrack.isRated() ? "" : "Unrated. ") + currentTrack.getTitle() + " by " + currentTrack.getArtist());
+              speech.say(
+                (currentTrack.isRated() ? "" : "Unrated. ")
+                  + currentTrack.getTitle()
+                  + " by "
+                  + currentTrack.getArtist());
             }
             catch (Exception e) {
               e.printStackTrace();
             }
-	    finally {
-	      speaking = false;
-	    }
+            finally {
+              speaking = false;
+            }
           }
-	  if (toKeepPlaying) {
-	    playFile(file);
+          if (toKeepPlaying) {
+            playFile(file);
             if (toKeepPlaying) {
               currentTrack.incNoOfTimesPlayed();
-              playListManager.getPlayList().incNoOfPlays();
+              playListManager.getTrackDatabase().incNoOfPlays();
             }
           }
         }
-	else
-	  speaking = false;
+        else
+          speaking = false;
       }
     }
     catch (Exception e) {

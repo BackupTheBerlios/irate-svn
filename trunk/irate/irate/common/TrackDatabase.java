@@ -206,6 +206,15 @@ public class TrackDatabase {
     }
     return 0; 
   }
+  
+  public int getPlayListLength() {
+    try {
+      return Integer.parseInt(getAttribute("PlayList", "length"));
+    }
+    catch (NumberFormatException e) {
+    }
+    return 20;
+  }
 
   public void setAutoDownloadCount(int count) {
     setAttribute(autoDownloadElementName, "count", Integer.toString(count));

@@ -17,10 +17,8 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
-
-
-
 public class Client implements UpdateListener {
+  
   static Label lblTitle;
   static Label lblState;
   static Table tblSongs;
@@ -39,9 +37,6 @@ public class Client implements UpdateListener {
   private ErrorDialog errorDialog;
   
   private String strState = "";
-  // private PlayThread playThread;
-  private final static boolean debug = true;
-  
   
   public Client() {
 
@@ -77,8 +72,7 @@ public class Client implements UpdateListener {
 
     playThread.addUpdateListener(this);
     playThread.start();
-    
-    
+        
     
     downloadThread = new DownloadThread(trackDatabase) {
       public void process() {
@@ -103,7 +97,6 @@ public class Client implements UpdateListener {
       }
     };
     
-    final Client client = this;
     downloadThread.addUpdateListener(new UpdateListener() {
       boolean newState = false;
       public void actionPerformed() {
@@ -173,7 +166,7 @@ public class Client implements UpdateListener {
     });
   }
 
-  Track getTrackByTableItem(TableItem i)
+  private Track getTrackByTableItem(TableItem i)
   {
     Enumeration e = hashSongs.keys();
     while(e.hasMoreElements()){
@@ -185,7 +178,7 @@ public class Client implements UpdateListener {
     return null;
   }
   
-  void track2TableItem(Track track, TableItem tableItem) {
+  private void track2TableItem(Track track, TableItem tableItem) {
     String[] data = {
       track.getArtist(),
       track.getTitle(),
@@ -222,7 +215,7 @@ public class Client implements UpdateListener {
     pause.setText(paused ? ">" : "||");
   }
   
-  void SortTableByStringColumn(int column_index, Table table)
+  void sortTable(Table table, Comparator c)
   {
     //problem with code below is that it loses track/tableitem relationship
     TableItem[] items = table.getItems();
@@ -245,18 +238,6 @@ public class Client implements UpdateListener {
     }
     hashSongs.clear();
     
-    final Integer the_column_index = new Integer(column_index);
-    
-    Comparator c = new Comparator(){
-      public int compare(Object o1, Object o2){
-        Object obj1[] = (Object[])o1;
-        Object obj2[] = (Object[])o2;
-        
-        String[] s1 = (String[])obj1[1];
-        String[] s2 = (String[])obj2[1];
-        return s1[the_column_index.intValue()].compareTo(s2[the_column_index.intValue()]);
-      }
-    };
     Collections.sort(v, c);
     
     for(int i=0;i< v.size();i++)
@@ -271,14 +252,13 @@ public class Client implements UpdateListener {
     }
     table.setVisible(true);
     
-    
     update();
   }
   
   /* todo update # of times played */
   void synchronizePlaylist(PlayListManager playListManager, Table tblSongs){
     int itemCount = tblSongs.getItemCount();
-    TrackDatabase td = playListManager.getPlayList();
+    TrackDatabase td = playListManager.getTrackDatabase();
     Track tracks[] = td.getTracks();
     for(int i=0;i<tracks.length;i++){
       Track track = tracks[i];
@@ -352,6 +332,15 @@ public class Client implements UpdateListener {
     // Set the layout into the composite.
     shell.setLayout(layout);
   }
+  
+  private void addColumnListener(TableColumn col, final Comparator c) {
+    //final Integer colNo = new Integer(columnNumber);
+    col.addListener(SWT.Selection, new Listener() {
+      public void handleEvent(Event e) {
+        sortTable(tblSongs, c);
+      }
+    });
+  }
     
   public void createTitle() {
     lblTitle = new Label(shell, SWT.NONE);
@@ -368,27 +357,23 @@ public class Client implements UpdateListener {
     TableColumn col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(200);
     col.setText("Artist");
-    col.addListener(SWT.Selection, new Listener() {
-      public void handleEvent(Event e) {
-        SortTableByStringColumn(0, tblSongs);
-      }
-    });
+    addColumnListener(col, new MagicComparator(0));
     
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(200);
     col.setText("Track");
-    col.addListener(SWT.Selection, new Listener() {
-      public void handleEvent(Event e) {
-        SortTableByStringColumn(1, tblSongs);
-      }
-    });
+    addColumnListener(col, new MagicComparator(1));
 
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Rating");
+    addColumnListener(col, new MagicComparator(2));
+
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(50);
     col.setText("Plays");
+    addColumnListener(col, new MagicComparator(3));
+    
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Last");
