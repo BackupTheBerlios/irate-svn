@@ -8,6 +8,7 @@ import java.util.*;
 
 public class RequestHandler {
   
+  private final int socketTimeoutMs = 5000;
   private MasterDatabase masterDatabase;
   
   public RequestHandler(MasterDatabase masterDatabase) {
@@ -61,6 +62,8 @@ public class RequestHandler {
     InputStream is = null;
     OutputStream os = null;
     try {
+      socket.setSoTimeout(socketTimeoutMs);
+      
       is = socket.getInputStream();
       os = socket.getOutputStream();
 
@@ -85,7 +88,7 @@ public class RequestHandler {
       os.write(reply.toString().getBytes());
     }
     catch (Exception e) {
-      e.printStackTrace();
+      e.printStackTrace(System.out);
     }
     finally {
       if (is != null) try { is.close(); } catch (IOException e) { e.printStackTrace(); }

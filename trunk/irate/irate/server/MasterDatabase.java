@@ -10,10 +10,13 @@ import java.util.*;
 public class MasterDatabase extends ServerDatabase {
 
     /** Add an orphan track one time in n. */
-  private final int orphanChance = 10;
+  private final int orphanChance = 2;
 
     /** Add a random track one time in n. */
-  private final int randomChance = 20;
+  private final int randomChance = 4;
+
+    /** Issue five tracks to correlate. */
+  private final int correlateNoOfTracks = 4;
 
     /** The number of peer tracks to start with. */
   private final int initialPeerTracks = 7;
@@ -22,11 +25,12 @@ public class MasterDatabase extends ServerDatabase {
   private final int peerThreshhold = 14;
 
     /** The number of times it will pick a user in order to get a random track. */
-  private final int peerRetries = 10;
+  private final int peerRetries = 30;
   
   private UserList userList;
   private Random random = new Random();
   private ServerDatabase orphans;
+  private Track[] compulsoryTracks;
 
     // The user rate is the number of songs the database must have for each
     // track the user is allowed.
@@ -35,6 +39,14 @@ public class MasterDatabase extends ServerDatabase {
   public MasterDatabase(File file, UserList userList) throws IOException {
     super(file);
     this.userList = userList;
+    
+      // Find the compulsory tracks
+    ServerDatabase compulsory = getCompulsory();
+    compulsoryTracks = compulsory.getTracks();
+
+      // Find the orphans
+    System.out.println("Finding orphans");
+    orphans = findOrphans();
   }
   
   public ServerDatabase processRequest(ServerDatabase request) {
@@ -68,26 +80,34 @@ public class MasterDatabase extends ServerDatabase {
       return reply;
     }
 
-    if ((random.nextInt() % orphanChance) == 0) {
-        // If there are any orphans then we add one here
-      if (orphans == null)
-        orphans = findOrphans();
-      Track track = orphans.randomTrack(random);
-      if (track != null) {
-        System.out.println("Orphan: " + track.getName());
-    
+    for (int i = 0; i < compulsoryTracks.length; i++) {
+      Track track = compulsoryTracks[i];
+      if (user.getTrack(track) == null) {
+        System.out.println("Compulsory: " + track.getName());
         reply.add(track);
-        orphans.remove(track);
       }
     }
 
-      // See if we can correlate a track
+
     if (user.getNoOfTracks() >= initialPeerTracks) {
+      if ((random.nextInt() % orphanChance) == 0) {
+          // If there are any orphans then we add one here
+        Track track = orphans.randomTrack(random);
+        if (track != null) {
+          System.out.println("Orphan: " + track.getName());
+    
+          reply.add(track);
+        }
+      }
+
+        // See if we can correlate a track
       ServerDatabase corel = getBest(user);
-      Track track = corel.chooseTrack(random);
-      if (track != null) {
-        System.out.println("Correlation: " + track.getName() + " " + track.getRating());
-        reply.add(track);
+      for (int i = reply.getNoOfTracks(); i < correlateNoOfTracks; i++) {
+        Track track = corel.chooseTrack(random);
+        if (track != null) {
+          System.out.println("Correlation: " + track.getName() + " " + track.getRating());
+          reply.add(track);
+        }
       }
     }
 
@@ -131,6 +151,8 @@ public class MasterDatabase extends ServerDatabase {
     catch (IOException e) {
       e.printStackTrace();
     }
+    
+    orphans.remove(reply);
     
     return reply;
   } 
@@ -185,5 +207,19 @@ public class MasterDatabase extends ServerDatabase {
       track.unSetFile();
       track.unSetWeight();
     }
+  }
+
+  public ServerDatabase getCompulsory() {
+    System.out.println("Finding compulsory tracks");
+    ServerDatabase comp = new ServerDatabase();
+    Track[] tracks = getTracks();
+    for (int i = 0; i < tracks.length; i++) {
+      Track track = tracks[i];
+      if (track.getWeight() == 10) {
+        System.out.println(track.getName());
+        comp.add(track);
+      }
+    }
+    return comp;
   }
 }

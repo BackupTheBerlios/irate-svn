@@ -73,7 +73,7 @@ public class TrackDatabase {
     synchronized (this) {
       Track copy;
       if ((copy = getTrack(track)) == null) {
-        copy = new Track((XMLElement) track.getElement(), downloadDir);
+        copy = new FastTrack((XMLElement) track.getElement(), downloadDir);
         docElt.addChild(copy.getElement());
         tracks.add(copy);
         hash.put(copy.getKey(), copy);
@@ -267,7 +267,7 @@ public class TrackDatabase {
         XMLElement elt = (XMLElement)enum.nextElement();
         if(!elt.getName().equals(trackElementName)) continue;
         //System.out.println(elt.toString());
-        Track track = new Track(elt, downloadDir);
+        Track track = new FastTrack(elt, downloadDir);
         tracks.add(track);
         //System.out.println("key="+track.getKey());
         hash.put(track.getKey(), track);
@@ -315,6 +315,12 @@ public class TrackDatabase {
     Track[] tracks = trackDatabase.getTracks();
     for (int i = 0; i < tracks.length; i++) 
       add(tracks[i]);
+  }
+
+  public void remove(TrackDatabase trackDatabase) {
+    Track[] tracks = trackDatabase.getTracks();
+    for (int i = 0; i < tracks.length; i++) 
+      remove(tracks[i]);
   }
 
   public void setPlayer(String path) {

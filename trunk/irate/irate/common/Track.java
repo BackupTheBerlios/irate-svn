@@ -44,9 +44,9 @@ public class Track {
   }
 
   /**
-   * Return the rating with -1 meaning that it hasn't been rated.
+   * Return the rating with Float.NaN meaning that it hasn't been rated.
    */
-  private float getRawRating() {
+  protected float getRawRating() {
     try {
       String s = elt.getStringAttribute("rating");
       if (s == null)

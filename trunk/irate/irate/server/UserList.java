@@ -15,17 +15,22 @@ public class UserList {
     if (!userDir.exists())
       userDir.mkdir();
     File[] files = userDir.listFiles();
-    System.out.println("Loading users");
+    System.out.print("Loading users");
     for (int i = 0; i < files.length; i++)
       if (files[i].getName().toLowerCase().endsWith(".xml")) 
         try {
           ServerDatabase user = new ServerDatabase(files[i]);
           users.add(user);
-          System.out.println("  " + user.getUserName() + " " + user.getNoOfTracks());
+          if ((i % 10) == 0)
+            System.out.print(".");
+//          System.out.println("  " + user.getUserName() + " " + user.getNoOfTracks());
         }
         catch (IOException e) {
+          System.out.println();
           e.printStackTrace();
         }
+    System.out.println();
+    System.out.println(users.size() + " users");
   }
 
   public ServerDatabase getUser(String name) {

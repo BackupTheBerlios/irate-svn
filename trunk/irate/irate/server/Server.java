@@ -26,6 +26,7 @@ public class Server {
     userList = new UserList();
 
     File file = new File("masterdatabase.xml");
+    System.out.println("Loading database");
     masterDatabase = new MasterDatabase(file, userList);
 
     requestHandler = new RequestHandler(masterDatabase);
