@@ -166,14 +166,18 @@ public class TrackTable {
         listOfTracks.add(track);
     }
     comparator.setDirection(!comparator.direction);
-    load();
+    sort();
   }
   
   /** Sorts the table and loads it into the Table (displays it). */
-  private void load() {
-    // Sort first
+  private void sort() {
+    System.out.println("TrackTable: Sorting"); //$NON-NLS-1$
     Collections.sort(listOfTracks, comparator);
-    
+    load();
+  }
+  
+  /** Loads the table assuming that it is already sorted. */  
+  private void load() {
     System.out.println("TrackTable: Resizing"); //$NON-NLS-1$
     // Update the list of tracks
     int size = listOfTracks.size();
@@ -203,43 +207,68 @@ public class TrackTable {
   
   /** Loads the Track into the TableItem. */
   private void updateTableItem(TableItem tableItem, Track track) {
-     
-    // Quick fix.  This shouldn't have to update the entire table 
-    // to remove a single track. 
-    if(track.getRating() == 0) {
-      updateTable();
-    }
-    else {
-      tableItem.setText(new String[] {
-																	 track.getArtist(),
-																	 track.getTitle(),
-																	 track.getState(),
-																	 String.valueOf(track.getNoOfTimesPlayed()),
-																	 track.getLastPlayed().toString()
+    tableItem.setText(new String[] {
+      track.getArtist(),
+      track.getTitle(),
+      track.getState(),
+      String.valueOf(track.getNoOfTimesPlayed()),
+      track.getLastPlayed().toString()
     });
-    }
   }
+  
+  /** Remove the specified track from the table. */
+  private void removeTrack(Track track) {
+    updateTable();
+  }
+  
+  /** Insert the specified track into the table. */
+  private void insertTrack(Track track) {
+    updateTable();
+  }
+  
+  /** Move a track further down the list. */
+  private void moveTrackDown(Track track) {
+    sort();
+  }
+  
+  /** Move the track further up the list. */
+  private void moveTrackUp(Track track) {
+    sort();
+  }  
   
   /** Updates a single track. */
   public void updateTrack(Track track) {
     TableItem tableItem = (TableItem) hashByTrack.get(track);
     if (tableItem != null) {
-      updateTableItem(tableItem, track);
+      if (track.isHidden()) {
+        // The track has become hidden so we remove it from the table.
+        removeTrack(track);
+      }
+      else {
+        updateTableItem(tableItem, track);
       
         // If the tracks are now out of order then we have to sort the list.
         int index = table.indexOf(tableItem);
         if (index != 0) {
           Track prevTrack = (Track) hashByTableItem.get(table.getItem(index - 1));
           if (comparator.compare(prevTrack, track) > 0) {
-            load();
+            moveTrackDown(track);
             return;          
           }
         }
         if (index + 1 < table.getItemCount()) {
           Track nextTrack = (Track) hashByTableItem.get(table.getItem(index + 1));
-          if (comparator.compare(track, nextTrack) > 0)
-            load();
+          if (comparator.compare(track, nextTrack) > 0) {
+            moveTrackUp(track);
+          }
         }
+      }
+    }
+    else {
+      if (!track.isHidden()) {
+        // The track has become unhidden so we add it to the table.
+        insertTrack(track);
+      }
     }
   }
 

@@ -26,14 +26,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/08 03:18:19 $
+ * Date Updated: $Date: 2003/12/10 03:47:48 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.125 $
+ * @version $Revision: 1.126 $
  */
 public class Client extends AbstractClient {
 
@@ -46,7 +46,7 @@ public class Client extends AbstractClient {
   private Shell shell;
   private ProgressBar progressBar;
   private Scale volumeScale;
-  private TrackProgressBar songProgressBar;
+//  private TrackProgressBar songProgressBar;
 
   private ToolItem pause;
   private SkinManager.SkinItem pauseSkin;
@@ -745,7 +745,7 @@ public class Client extends AbstractClient {
     gridData.grabExcessHorizontalSpace = false;
     volumeScale.setLayoutData(gridData);
     
-    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
+//    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
   }
   
   public void createTableMenu() {
@@ -891,12 +891,12 @@ public class Client extends AbstractClient {
     
     final int finalTime = checkedTime;
     
-    display.asyncExec(new Runnable() {
-      public void run() {
-        songProgressBar.setCurrentTime(currentTime);
-        songProgressBar.setTotalTime(finalTime);
-      }
-    });
+//    display.asyncExec(new Runnable() {
+//      public void run() {
+//        songProgressBar.setCurrentTime(currentTime);
+//        songProgressBar.setTotalTime(finalTime);
+//      }
+//    });
   }
 
   public void bitRateUpdated(int bitRate) {}

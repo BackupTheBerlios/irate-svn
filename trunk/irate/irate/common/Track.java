@@ -18,8 +18,6 @@ public class Track {
   private File dir;
   private TrackDatabase trackDatabase;
   private int downloadAttempts = 0;
-  private URL cachedURL; // Caching the URL speeds up startup times heaps.
-  private boolean cachedURLValid = false;
 
   public Track(XMLElement elt, File dir) {
     this.elt = elt;
@@ -363,29 +361,19 @@ public class Track {
 
   public void setURL(URL url) {
     elt.setAttribute("url", url.toString());
-    cachedURL = url;
-    cachedURLValid = true;
   }
   
   public URL getURL() {
-    if (cachedURLValid) {
-      return cachedURL;
-    } else {
-      try {
-        String url = elt.getStringAttribute("url");
-        if (url == null)
-          url = "";
-        cachedURLValid = true;
-        cachedURL = new URL(url);
-        return cachedURL;
-      }
-      catch (Exception e) {
-        e.printStackTrace();
-      }
-      cachedURLValid = true;
-      cachedURL = null;
-      return null;
+    try {
+      String urlString = elt.getStringAttribute("url");
+      if (urlString == null)
+        urlString = "";
+      return new URL(urlString);
     }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 
   public String getKey() {
@@ -482,7 +470,7 @@ public class Track {
   }
 	
   public int hashCode() {
-    return getURL().hashCode();
+    return getKey().hashCode();
   }
 
   /**
