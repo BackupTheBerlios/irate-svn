@@ -26,7 +26,7 @@ public class ErrorDialog {
       createShell();
       createText(url);
       createCloseButton();
-      //shell.pack();
+      shell.pack();
       Point size = shell.getSize();
       Point ploc = parent.getLocation();
       Point psize = parent.getSize();
@@ -70,6 +70,7 @@ public class ErrorDialog {
     Text text = new Text(shell,SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL);
     text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     text.setText(s);
+    text.pack();
   }
 
   private void createCloseButton() {

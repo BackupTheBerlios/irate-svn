@@ -18,8 +18,9 @@ Source: "swt-win32-2133.dll"; DestDir: "{app}"
 
 Source: "README"; DestDir: "{app}"
 Source: "COPYING"; DestDir: "{app}"
-
-Source: "irate\client\help\about.txt"; DestDir: "{app}\irate\client\help\about.txt"; Flags: isreadme
+;Flags: isreadme
+Source: "irate\client\help\missingplayer.txt"; DestDir: "{app}\irate\client\help\missingplayer.txt";
+Source: "irate\client\help\about.txt"; DestDir: "{app}\irate\client\help\about.txt";
 Source: "irate\client\help\connectionfailed.txt"; DestDir: "{app}\irate\client\help\connectionfailed.txt"
 Source: "irate\client\help\connectionrefused.txt"; DestDir: "{app}\irate\client\help\connectionrefused.txt"
 Source: "irate\client\help\connectiontimeout.txt"; DestDir: "{app}\irate\client\help\connectiontimeout.txt"
