@@ -36,6 +36,7 @@ public class Client extends JFrame {
   private JMenuItem menuItemDownload;
   private JMenuItem menuItemAccount;
   private ErrorDialog errorDialog;
+  private ButtonGroup playerButtonGroup;
  
   public Client() throws Exception {
     setTitle("iRATE radio");
@@ -171,6 +172,35 @@ public class Client extends JFrame {
     return m;
   }
 
+  public JMenuItem createPlayer(String[] paths, String name) {
+    String playerPath;
+    if (paths == null) {
+      playerPath = "";
+    }
+    else {
+      playerPath = null;
+      for (int i = 0; i < paths.length; i++)
+        if (new File(paths[i]).exists()) {
+          playerPath = paths[i];
+          break;
+        }
+    }
+
+    final String path = playerPath;
+    JCheckBoxMenuItem mi = new JCheckBoxMenuItem(name); 
+    mi.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        trackDatabase.setPlayer(path);
+      }
+    });
+    mi.setEnabled(playerPath != null);
+    playerButtonGroup.add(mi);
+    if (path != null && path.equals(trackDatabase.getPlayer()))
+      mi.setState(true);  
+    
+    return mi; 
+  }
+    
   public JMenu createSettingsMenu() {
     JMenu m = new JMenu("Settings");
     menuItemAccount = new JMenuItem("Account");
@@ -192,6 +222,13 @@ public class Client extends JFrame {
     roboJock.setEnabled(playThread.isSpeechSupported());
     m.add(roboJock);
     
+    playerButtonGroup = new ButtonGroup();
+    JMenu player = new JMenu("Player");
+    player.add(createPlayer(null, "javalayer"));
+    player.add(createPlayer(new String[] { "/usr/bin/mpg123" }, "mpg123"));
+    player.add(createPlayer(new String[] { "/usr/bin/madplay", "madplay.exe" }, "madplay"));
+    m.add(player);
+
     return m;
   }
 

@@ -254,6 +254,14 @@ public class TrackDatabase {
     for (int i = 0; i < tracks.length; i++) 
       add(tracks[i]);
   }
+
+  public void setPlayer(String path) {
+    setAttribute("Player", "path", path);
+  }
+
+  public String getPlayer() {
+    return getAttribute("Player", "path");
+  }
   
   public void setError(String code, String url) {
     setAttribute("Error", "code", code);

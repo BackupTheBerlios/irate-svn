@@ -5,6 +5,7 @@ import java.io.*;
 import java.util.*;
 import javax.sound.sampled.*;
 import irate.common.*;
+import javazoom.jl.player.Player;
 
 public class PlayThread extends Thread {
  
@@ -15,15 +16,11 @@ public class PlayThread extends Thread {
   private Vector actionListeners = new Vector();
   private Process playerProcess;
   private String externalPlayer;
-  private String[] possiblePlayers = new String[] { "/usr/bin/mpg123", "madplay.exe" };
   private Speech speech = new Speech();
   private boolean playing;
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
-    for (int i = 0; i < possiblePlayers.length; i++)
-      if (new File(possiblePlayers[i]).exists())
-        externalPlayer = possiblePlayers[i];
   }
 
   public boolean isSpeechSupported() {
@@ -37,7 +34,8 @@ public class PlayThread extends Thread {
   }
 
   private void playFile(File file) throws Exception {
-    if (externalPlayer != null) {
+    externalPlayer = playListManager.getPlayList().getPlayer();
+    if (externalPlayer.length() != 0) {
       playerProcess = Runtime.getRuntime().exec(new String[] { externalPlayer, file.getPath() });
       try {
         playerProcess.waitFor();
@@ -84,7 +82,8 @@ public class PlayThread extends Thread {
           }
 	  if (playing) {
 	    playFile(file);
-	    currentTrack.incNoOfTimesPlayed();
+            if (playing) 
+              currentTrack.incNoOfTimesPlayed();
           }
         }
       }
@@ -109,14 +108,14 @@ public class PlayThread extends Thread {
       // Clear the playing flag to instruct the play thread to co-operatively stop.
     playing = false;
     if (externalPlayer.length() != 0) {
-      if (playerProcess != null)
+      if (playerProcess != null) 
         playerProcess.destroy();
     }
     else {
       if (player != null)
-        player.stop();
+        player.close();
     }
-    if (speech != null)
+    if (speech != null) 
       speech.abort();
   }
 
