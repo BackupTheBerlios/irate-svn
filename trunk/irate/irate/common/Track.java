@@ -16,8 +16,11 @@ public class Track {
 
   public String toString() {
     String ratingStr = isRated() ? Integer.toString((int) getRating()) : "UNRATED";
-    String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ") ";
-    return getName() + rating;
+    String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ")";
+    String s = getName() + rating;
+    if (getFile() == null)
+      return "[" + s + "]";
+    return s;
   }
 
   public String getName() {
@@ -137,7 +140,8 @@ public class Track {
   }
 
   public float getProbability() {
-    float prob = getRating() / (1 + getNoOfTimesPlayed());
+    float rating = getRating();
+    float prob = rating * rating / (1 + getNoOfTimesPlayed());
     if (prob < 0)
       return 0;
     return prob;

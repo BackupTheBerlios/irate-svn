@@ -257,15 +257,13 @@ public class TrackDatabase {
     if (totalProb == 0)
       return null;
 
-    float rand = Math.abs(random.nextFloat()) * totalProb;
-//    System.out.println("r=" + Float.toString(rand));
-
-    int i;
-    for (i = 0; i < tracks.length - 1; i++) 
-      if (rand < probs[i])
-        break;
-
-    return tracks[i];
+    
+    while (true) {
+      float rand = Math.abs(random.nextFloat()) * totalProb;
+      for (int i = 0; i < tracks.length; i++) 
+        if (rand <= probs[i])
+          return tracks[i];
+    }
   }
   
 }

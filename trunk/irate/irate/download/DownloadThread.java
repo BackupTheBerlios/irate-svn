@@ -79,11 +79,11 @@ public class DownloadThread extends Thread {
         }
         File file = new File(downloadDir, urlString);
 
-        setState("Connecting " + track.toString());
+        setState("Connecting " + track.getName());
         URLConnection conn = url.openConnection();
         conn.connect();
         int contentLength = conn.getContentLength();
-        setState("Downloading " + track.toString());
+        setState("Downloading " + track.getName());
         is = conn.getInputStream();
         os = new FileOutputStream(file);
         byte buf[] = new byte[128000];

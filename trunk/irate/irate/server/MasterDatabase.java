@@ -8,10 +8,10 @@ import java.util.*;
 public class MasterDatabase extends ServerDatabase {
 
     // Add an orphan track one time in n.
-  private final int orphanChance = 10;
+  private final int orphanChance = 5;
 
     // Add a random track one time in n.
-  private final int randomChance = 25;
+  private final int randomChance = 10;
   
   private UserList userList;
   private Random random = new Random();
@@ -79,7 +79,7 @@ public class MasterDatabase extends ServerDatabase {
     if (track == null || (random.nextInt() % randomChance) == 0) {
         // Just pick any random track that we don't already have
       ServerDatabase spares = getSpares(user);
-      track = spares.chooseTrack(random);
+      track = spares.randomTrack(random);
       if (track != null) {
         System.out.println("Random: " + track.getName());
         user.add(track);
