@@ -89,10 +89,12 @@ deb:
 	dpkg-buildpackage -b -rfakeroot
 
 setup.exe: $(IRATE_CLIENT)
+	./build-help
 	iscc irate-client.iss
 	mv Output/setup.exe .
 
-tarball: $(IRATE_CLIENT)
+tarball: $(IRATE_CLIENT) build-help
+	./build-help
 	bin/mktarball.sh
 
 clean:
