@@ -17,7 +17,8 @@ public class PlayThread extends Thread {
   private Process playerProcess;
   private String externalPlayer;
   private Speech speech = new Speech();
-  private boolean playing;
+  private boolean speaking;
+  private boolean toKeepPlaying;
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
@@ -47,7 +48,14 @@ public class PlayThread extends Thread {
     else {
       player = new Player(new BufferedInputStream(
           new FileInputStream(file), 2048));
-      player.play();
+      try {
+	player.play();
+      }
+      finally {
+	  // Without this, RoboJock can't talk because it fights with the
+	  // Java player over the sound device.
+	player.close();
+      }
       player = null;
     }
   }
@@ -61,10 +69,11 @@ public class PlayThread extends Thread {
   private void playTrack() {
     try {
       synchronized (this) {
+	speaking = playListManager.getPlayList().isRoboJockEnabled();
 	  // If a next track has been chosen by the user, use that, otherwise
 	  // pick one intelligently.
 	currentTrack = nextTrack != null ? nextTrack : playListManager.chooseTrack();
-	playing = true;
+	toKeepPlaying = true;
 	nextTrack = null;
       }
 
@@ -74,20 +83,25 @@ public class PlayThread extends Thread {
         notifyActionListeners();
         File file = currentTrack.getFile();
         if (file.exists()) {
-          if (playListManager.getPlayList().isRoboJockEnabled()) {
+          if (speaking) {
             try {
               speech.say((currentTrack.isRated() ? "" : "Unrated. ") + currentTrack.getTitle() + " by " + currentTrack.getArtist());
             }
             catch (Exception e) {
               e.printStackTrace();
             }
+	    finally {
+	      speaking = false;
+	    }
           }
-	  if (playing) {
+	  if (toKeepPlaying) {
 	    playFile(file);
-            if (playing) 
+            if (toKeepPlaying) 
               currentTrack.incNoOfTimesPlayed();
           }
         }
+	else
+	  speaking = false;
       }
     }
     catch (Exception e) {
@@ -107,8 +121,8 @@ public class PlayThread extends Thread {
   }
 
   public synchronized void reject() {
-      // Clear the playing flag to instruct the play thread to co-operatively stop.
-    playing = false;
+      // Clear the toKeepPlaying flag to instruct the play thread to co-operatively stop.
+    toKeepPlaying = false;
     if (externalPlayer.length() != 0) {
       if (playerProcess != null) 
         playerProcess.destroy();
@@ -117,7 +131,7 @@ public class PlayThread extends Thread {
       if (player != null)
         player.close();
     }
-    if (speech != null) 
+    if (speech != null && speaking) 
       speech.abort();
   }
 
