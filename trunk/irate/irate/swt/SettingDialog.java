@@ -12,10 +12,10 @@ import irate.common.Preferences;
 import irate.plugin.*;
 
 /**
- * Date Updated: $Date: 2003/11/27 08:12:26 $
+ * Date Updated: $Date: 2003/11/27 09:03:35 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class SettingDialog
 {
@@ -179,10 +179,12 @@ public class SettingDialog
     }
 
     final BrowserButton[] browsers = { 
-      new BrowserButton("Mozilla/Firebird (Linux/UNIX)","mozilla"),
+      new BrowserButton("Mozilla/Firebird (Linux/UNIX)",
+                        "mozilla -remote openURL(%u,new-window)"),
       new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec"),
       new BrowserButton("Windows Default",
                         "rundll32 url.dll,FileProtocolHandler")};
+
     final Button browserSpecified = new Button(comp, SWT.RADIO);
     final Text browserText = new Text(comp, SWT.NONE);
     final Button browseButton = new Button(comp, SWT.NONE);

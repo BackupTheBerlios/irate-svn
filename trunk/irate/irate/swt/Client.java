@@ -26,14 +26,14 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/27 08:00:55 $
+ * Date Updated: $Date: 2003/11/27 09:03:34 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.115 $
+ * @version $Revision: 1.116 $
  */
 public class Client extends AbstractClient {
 
@@ -365,7 +365,16 @@ public class Client extends AbstractClient {
           }
           cmd = "rundll32 url.dll,FileProtocolHandler";
         }
-        cmd += " " + url;
+        // If '%u' is in the cmd, then we replace it with the
+        // URL. Otherwise we just append the URL.
+        int insertPt = cmd.indexOf("%u");
+        if (insertPt != -1) {
+          String leftBit = cmd.substring(0,insertPt);
+          String rightBit = cmd.substring(insertPt+2);
+          cmd = leftBit + url + rightBit;
+        } else {
+          cmd += " " + url;
+        }
         System.out.println(cmd);
         r.exec(cmd);
       }
