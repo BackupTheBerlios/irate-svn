@@ -31,7 +31,13 @@ public class Resources {
         new ImageData(irate.resources.BaseResources.getResourceAsStream("icon.png"));
     return iconImageData;
   }
-  
+
+  public static Image getIconImage(Display display, Color backgroundColour, int width, int height) throws IOException {
+    ImageData imageData = getIconImageData().scaledTo(width, height);
+    ImageData mergedImageData = imageMerger.merge(backgroundColour, imageData);
+    return new Image(display, mergedImageData);
+  }
+
   public static Image getIconImage(Display display, Color backgroundColour) throws IOException {
   	ImageData imageData = getIconImageData();
   	ImageData mergedImageData = imageMerger.merge(backgroundColour, imageData);

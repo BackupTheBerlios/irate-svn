@@ -31,7 +31,7 @@ public class AboutDialog {
   private BaseDialog dialog;
 
   private Shell parent;
-
+  
   private Image icon;
 
   public AboutDialog(Display display, Shell parent) {
@@ -41,7 +41,6 @@ public class AboutDialog {
 
   public void show(Reader reader) {
     if (dialog == null) {
-      createIcon();
       createDialog();
       Composite mainComposite = dialog.getMainComposite();
       createHeaderGrid(mainComposite);
@@ -58,16 +57,6 @@ public class AboutDialog {
     }
   }
 
-  private void createIcon() {
-    try {
-      ImageData imageData = Resources.getIconImageData(); 
-      icon = new Image(display, imageData.scaledTo(32, 32));
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-  }
-  
   private void createDialog() {
     String title =
       getResourceString("AboutDialog.Title") + " "
@@ -87,8 +76,13 @@ public class AboutDialog {
     layout.numColumns = 2;
     header.setLayout(layout);
     Label labelImage = new Label(header, SWT.HORIZONTAL);
-    if (icon != null)
+    try {
+      icon = Resources.getIconImage(display, dialog.getShell().getBackground(), 48, 48);
       labelImage.setImage(icon);
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
     Label labelText = new Label(header, SWT.HORIZONTAL);
     String text = getResourceString("titlebar.program_name");
     String version = Version.getVersionString();
