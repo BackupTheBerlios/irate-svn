@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/03/09 20:40:05 $
+ * Date Updated: $Date: 2004/03/16 23:30:52 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 public class SettingDialog
 {
@@ -36,7 +36,7 @@ public class SettingDialog
   private Button browserSpecified;
   private Text browserText;
   private Button browseButton;
-
+  private Composite comp;
   
   public SettingDialog(Display display, PluginManager pluginManager, PluginApplication app) {
     this.pluginManager = pluginManager;
@@ -153,42 +153,11 @@ public class SettingDialog
 
   
   private Composite createBrowserPage(Composite parent) {
-    final Composite comp = new Composite(parent, SWT.NONE);
+    //    final Composite comp = new Composite(parent, SWT.NONE);
+    comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(1, false);
     comp.setLayout(layout);
     new Label(comp, SWT.NONE).setText(getResourceString("SettingDialog.Label.Browser")); 
-
-    class BrowserButton {
-      String description; // Button label
-      String command;     // Command it generates
-      String tooltip;     // Tooltip for this option
-      Button button;
-    
-      public BrowserButton(String d, String c, String t) {
-        description = d;
-        command = c;
-        tooltip = t;
-        button = new Button(comp, SWT.RADIO);
-        button.setText(description);
-        button.setToolTipText(t);
-      }
-
-      public void addSelectionListener(SelectionListener s) {
-        button.addSelectionListener(s);
-      }
-
-      public Button getButton() {
-        return button;
-      }
-    
-      public String getCommand() {
-        return command;
-      }
-    
-      public boolean isCommand(String s) {
-        return command.equals(s);
-      }
-    }
 
     browsers = new BrowserButton[]{ 
       new BrowserButton("Mozilla/Firebird (Linux/UNIX)", 
@@ -287,6 +256,38 @@ public class SettingDialog
     return Resources.getString(key); 
   }
  
+  class BrowserButton {
+    String description; // Button label
+    String command;     // Command it generates
+    String tooltip;     // Tooltip for this option
+    Button button;
+    
+    public BrowserButton(String d, String c, String t) {
+      description = d;
+      command = c;
+      tooltip = t;
+      button = new Button(comp, SWT.RADIO);
+      button.setText(description);
+      button.setToolTipText(t);
+    }
+
+    public void addSelectionListener(SelectionListener s) {
+      button.addSelectionListener(s);
+    }
+
+    public Button getButton() {
+      return button;
+    }
+    
+    public String getCommand() {
+      return command;
+    }
+    
+    public boolean isCommand(String s) {
+      return command.equals(s);
+    }
+  }
+
 }
 
 // Local Variables:
