@@ -25,13 +25,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/13 03:19:53 $
+ * Date Updated: $Date: 2003/11/17 05:12:50 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.100 $
+ * @version $Revision: 1.101 $
  */
 public class Client extends AbstractClient {
 
@@ -44,6 +44,7 @@ public class Client extends AbstractClient {
   private Shell shell;
   private ProgressBar progressBar;
   private Scale volumeScale;
+  private SongProgressBar songProgressBar;
 
   private ToolItem pause;
   private ToolItem previous;
@@ -312,7 +313,7 @@ public class Client extends AbstractClient {
     });
     //probly should use filllayout..but i dont wanna figure it out
     //gridlayout is overkill for this
-    GridLayout layout = new GridLayout(2, false);
+    GridLayout layout = new GridLayout(3, false);
     layout.horizontalSpacing = 0;
     // Set the layout into the composite.
     shell.setLayout(layout);
@@ -670,27 +671,11 @@ public class Client extends AbstractClient {
           return;
         
         TrackInfoDialog trackInfoDialog = new TrackInfoDialog(display, shell);
-        trackInfoDialog.displayTrackInfo(track, clientToPass);
-        
-//        String www = track.getArtistWebsite();
-//
-//        if (www == null) {
-//          www = "\"" + track.getArtist() + "\" ";
-//          www += "\"" + track.getTitle() + "\"";
-//          try {
-//            // We need to use the deprecated version of this method because the
-//            // un-deprecated version isn't implemented in GCJ 3.0.4. We can change
-//            // this when we drop support for Debian Woody (when Sarge becomes 
-//            // stable).
-//            www = "http://www.google.com/search?q=" + URLEncoder.encode(www);
-//          }
-//          catch (Exception eee) {
-//            System.out.println(e.toString());
-//          }
-//        }
-//        showURL(www);
+        trackInfoDialog.displayTrackInfo(track, clientToPass);   
       }
     });
+
+    songProgressBar = new SongProgressBar(shell, SWT.NONE);
 
     volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
     volumeScale.setIncrement(1);
@@ -706,7 +691,6 @@ public class Client extends AbstractClient {
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = false;
-    gridData.horizontalSpan = 1;
     volumeScale.setLayoutData(gridData);
   }
   
@@ -850,5 +834,21 @@ public class Client extends AbstractClient {
     public String getToolTip() { return toolTip; }
     
   }
+  /**
+   * This method is called whenever the track time changes, and it
+   * updates the progress bar.
+   */
+  public void positionUpdated(int position, int length) {
+    final int currentTime = position;
+    final int finalTime = length;
+    display.asyncExec(new Runnable() {
+      public void run() {
+        songProgressBar.setCurrentTime(currentTime);
+        songProgressBar.setTotalTime(finalTime);
+      }
+    });
+  }
+
+  public void bitRateUpdated(int bitRate) {}
 
 }

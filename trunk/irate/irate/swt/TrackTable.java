@@ -125,7 +125,7 @@ public class TrackTable {
     gridData.grabExcessHorizontalSpace = true;
     gridData.verticalAlignment = GridData.FILL;
     gridData.grabExcessVerticalSpace = true;
-    gridData.horizontalSpan = 2;
+    gridData.horizontalSpan = 3;
     table.setLayoutData(gridData);
     table.pack();
     

@@ -16,7 +16,7 @@ import irate.plugin.PluginManager;
 /**
  * @author Anthony Jones
  */
-public abstract class AbstractClient implements UpdateListener, PluginApplication {
+public abstract class AbstractClient implements UpdateListener, PlayerListener, PluginApplication {
   
   protected TrackDatabase trackDatabase;
   protected PlayListManager playListManager;
@@ -51,6 +51,15 @@ public abstract class AbstractClient implements UpdateListener, PluginApplicatio
     }
 
     playerList = new PlayerList();
+    
+    // Add the client as a player listener on each player.
+    // If this doesn't make sense in the future, we'll have to look
+    // at doing this another way.
+    for(int i=0; i<playerList.getPlayers().length; ++i)
+    {
+      playerList.getPlayers()[i].addPlayerListener(this);
+    }
+    
     playListManager = new PlayListManager(trackDatabase);
     playThread = new PlayThread(playListManager, playerList);
 
