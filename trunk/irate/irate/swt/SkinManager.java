@@ -177,7 +177,10 @@ public class SkinManager {
     }
 
     public void pre() {
-      skinable.setText(Resources.getString(name));
+      String text = Resources.getString(name);
+      skinable.setText(text);
+      String pressed = Resources.getString(name+".pressedText");
+      skinable.setPressedText(pressed.startsWith("!") ? text : pressed);
       skinable.setToolTipText(Resources.getString(name + ".tooltip"));
       gotImage = false;
     }
