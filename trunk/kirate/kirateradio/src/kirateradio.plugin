@@ -1,0 +1,9 @@
+Filename=noatun_kirateradioplugin.la
+Author=Matthias Studer
+Site=http://sourceforge.net/projects/irate/
+Email=matthias.studer@ezwww.ch
+Type=playlist
+License=GPL
+Name=KiRateRadio
+Comment=Construct Playlist based on iRate Radio protocol
+Comment[fr]=Construit une liste de lecture en se basant sur le protocol Radio iRate

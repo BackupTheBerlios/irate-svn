@@ -1,0 +1,1 @@
+<body bgcolor="#4989FF"><nobr><font size="+1" face="Arial" color="#FFFFFF"><b>&nbsp;<img src="%IR_ICON">&nbsp;iRate Radio</b></font></nobr><br><nobr>&nbsp;&nbsp;<font face="Comic Sans MS">%SONG_RATE_STRING / [<b>%SONG_ARTIST</b>] - %SONG_TITLE</font></nobr></body> 
