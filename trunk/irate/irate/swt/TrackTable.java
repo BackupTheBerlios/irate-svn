@@ -247,9 +247,7 @@ public class TrackTable extends BasicSkinable {
        tableItem.setImage(2, stateImage);
     }
     else {
-        if(tableItem.getImage(2) != null) {
-            tableItem.setImage(2, null);
-        }
+      tableItem.setImage(2, null);
     }
     
     tableItem.setText(new String[] {
