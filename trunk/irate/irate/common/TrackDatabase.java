@@ -249,7 +249,8 @@ public class TrackDatabase {
           break;
       }
     }
-    return playListLength;  
+    return MAX_PLAY_LIST_LENGTH;
+    //return playListLength;  
   }
 
 /**
