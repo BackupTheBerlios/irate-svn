@@ -34,6 +34,8 @@ public abstract class AbstractClient
   protected Preferences userPreferences;
   protected SoundEventPlayer soundEventPlayer;
 
+  private PlayThread.Volume playerVolume;
+  private PlayThread.Volume trackVolume;
   private Track lastRatedTrack;
   private int lastTrackPreviousRank;
 
@@ -100,6 +102,8 @@ public abstract class AbstractClient
 
     playListManager = new PlayListManager(trackDatabase);
     playThread = new PlayThread(playListManager, playerList);
+    playerVolume = playThread.new Volume();
+    trackVolume = playThread.new Volume();
     soundEventPlayer  = new SoundEventPlayer(playListManager);
 
     if (playerList.getPlayers().length == 0)
@@ -229,12 +233,18 @@ public abstract class AbstractClient
   public boolean canUndoLastRating() {
     return (lastRatedTrack != null);
   }
+  
+  public void setPlayerVolume(int volume) {
+    playerVolume.setVolume(volume);
+  }
 
-  public void setVolume(final int volume) {
+  public void setTrackVolume(int volume) {
 
-    final Integer volumeInt = new Integer(volume);
-
-    playThread.setVolume(volumeInt.intValue());
+    Track track = playThread.getCurrentTrack();
+    if (track != null)
+      track.setVolume(volume);
+    
+    trackVolume.setVolume(volume);
 
     //save the updated volume
     try {

@@ -17,7 +17,6 @@ import irate.swt.plugin.SWTPluginUIFactory;
 import java.io.*;
 import java.util.List;
 import java.util.StringTokenizer;
-import java.util.Date;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -41,7 +40,7 @@ import org.eclipse.swt.widgets.*;
  */
 public class Client extends AbstractClient {
 
-  private static final int VOLUME_RESOLUTION = 3;
+  private static final int VOLUME_RESOLUTION = 1;
   private static final int VOLUME_SPAN = 30;
   private static final int VOLUME_OFFSET = VOLUME_SPAN / 2;
 
@@ -53,7 +52,7 @@ public class Client extends AbstractClient {
   private Shell shell;
   private AlphaLabel trackLabel;
   private ProgressBar progressBar;
-//  private Scale volumeScale;
+  private Scale volumeScale;
 //  private TrackProgressBar songProgressBar;
 
 //  private SkinManager.SkinItem pauseSkin;
@@ -410,7 +409,7 @@ public class Client extends AbstractClient {
     gridData.horizontalSpan = 3;
     
     topPanel.setLayoutData(gridData);
-    GridLayout gridLayout = new GridLayout(5, false);
+    GridLayout gridLayout = new GridLayout(6, false);
     gridLayout.marginHeight = 7;
     
     topPanel.setLayout(gridLayout);
@@ -1042,23 +1041,6 @@ public class Client extends AbstractClient {
     info.setToolTipText(Resources.getString("button.info.tooltip"));
     skinManager.add(info, "button.info");
 
-//    volumeScale = new Scale(trackGroup, SWT.HORIZONTAL | SWT.FLAT);
-//    volumeScale.setIncrement(1);
-//    volumeScale.setPageIncrement(1);
-//    volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
-//    volumeScale.setToolTipText(Resources.getString("slider.volume.tooltip"));
-//    volumeScale.addSelectionListener(new SelectionAdapter() {
-//      public void widgetSelected(SelectionEvent e) {
-//        setVolume(
-//          volumeScale.getSelection() * VOLUME_RESOLUTION - VOLUME_OFFSET);
-//      }
-//    });
-//    gridData = new GridData();
-//    gridData.horizontalAlignment = GridData.END;
-//    gridData.grabExcessHorizontalSpace = false;
-//    volumeScale.setLayoutData(gridData);
-    
-    
     /************ PREVIOUS BUTTON (<<) ****************/
     previous = new ThreeModeButton(topPanel, SWT.NONE);
     previous.setEnabled(false);
@@ -1111,7 +1093,21 @@ public class Client extends AbstractClient {
     next.setToolTipText(Resources.getString("button.next.tooltip"));
     skinManager.add(next, "button.next");
     
-    
+    volumeScale = new Scale(topPanel, SWT.VERTICAL | SWT.FLAT);
+    volumeScale.setIncrement(1);
+    volumeScale.setPageIncrement(1);
+    volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
+    volumeScale.setSelection(VOLUME_OFFSET / VOLUME_RESOLUTION);
+    volumeScale.setToolTipText(Resources.getString("slider.volume.tooltip"));
+    volumeScale.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        setPlayerVolume(
+          VOLUME_OFFSET - volumeScale.getSelection() * VOLUME_RESOLUTION);
+      }
+    });
+//    gridData = new GridData();
+//    gridData.horizontalSpan = 3;
+//    volumeScale.setLayoutData(gridData);
     
     //songProgressBar = new TrackProgressBar(shell, SWT.NONE);
   }

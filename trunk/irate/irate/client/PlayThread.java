@@ -22,7 +22,10 @@ public class PlayThread extends Thread {
   private Vector history = new Vector();
   private boolean reverse = false;
   private boolean stopThread = false;
+  private Vector volumes = new Vector();
+  private int netVolume;
   private VolumeMeister volumeMeister = new VolumeMeister();
+  private Volume volumeMeisterVolume = new Volume(); 
 
   public PlayThread(PlayListManager playListManager, PlayerList playerList) {
     this.playListManager = playListManager;
@@ -39,10 +42,10 @@ public class PlayThread extends Thread {
     }
   }
 
-  private void playFile(File file, int volume) throws Exception {
+  private void playFile(File file) throws Exception {
     player = playerList.getPlayer(playListManager.getTrackDatabase().getPlayer());
     try {
-      player.setVolume(volume);
+      player.setVolume(netVolume);
       player.play(file);
     }
     catch (PlayerException e) {
@@ -94,7 +97,8 @@ public class PlayThread extends Thread {
             }
           }
           if (toKeepPlaying) {
-            playFile(file, volumeMeister.determineVolume(currentTrack));
+            volumeMeisterVolume.setVolume(volumeMeister.determineVolume(currentTrack));
+            playFile(file);
             if(!reverse){
               history.add(currentTrack);
               //System.out.println("Added to history:"+currentTrack+" reverse="+reverse);
@@ -192,12 +196,6 @@ public class PlayThread extends Thread {
     return player.isPaused();
   }
   
-  public synchronized void setVolume(int volume) {
-  if ( currentTrack == null ) return;
-    currentTrack.setVolume(volume);
-    player.setVolume(volume);
-  }
-
   public void addUpdateListener(UpdateListener updateListener) {
     updateListeners.add(updateListener);
   }
@@ -219,5 +217,33 @@ public class PlayThread extends Thread {
   public VolumeMeister getVolumeMeister()
   {
     return volumeMeister;
+  }
+  
+  /** Automatically add up volume settings from different parts of the program
+   * to give the net volume for the track.
+   */
+  public class Volume {
+    
+    private int volume = 0;
+    
+    {
+      volumes.add(this);
+    }
+    
+    /** Set the volume level. */
+    public void setVolume(int volume) {
+      synchronized (PlayThread.this) {
+        this.volume = volume;
+        
+        int totalVolume = 0;
+        for (Iterator itr = volumes.iterator(); itr.hasNext(); ) {
+          Volume volumeControl = (Volume) itr.next();
+          totalVolume += volumeControl.volume;
+        }
+        PlayThread.this.netVolume = totalVolume;
+        if (player != null)
+          player.setVolume(totalVolume);
+      }
+    }
   }
 }
