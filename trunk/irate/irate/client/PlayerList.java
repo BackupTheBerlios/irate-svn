@@ -1,6 +1,8 @@
 // Copyright 2003 Anthony Jones
+package irate.client;
 
 import java.util.Vector;
+import java.io.FileNotFoundException;
 
 public class PlayerList {
 
@@ -9,9 +11,9 @@ public class PlayerList {
   public PlayerList() {
     Vector players = new Vector();
     try {
-      players.add(Class.forName("JavaLayerPlayer").newInstance());
+      players.add(Class.forName("irate.client.JavaLayerPlayer").newInstance());
     } 
-    catch (ClassNotFoundException e) {
+    catch (Exception e) {
     }
     
     try {
@@ -22,14 +24,26 @@ public class PlayerList {
     }
     
     try {
-      players.add(new ExternalPlayer("madplay", new String[] { "madplay", "/usr/bin/madplay", "/usr/local/bin/madplay", "madplay.exe" });
+      players.add(new ExternalPlayer("madplay", new String[] { "madplay", "/usr/bin/madplay", "/usr/local/bin/madplay", "madplay.exe" }));
     }
     catch (FileNotFoundException e) {
       e.printStackTrace();
     }
+
+    this.players = (Player[]) players.toArray(new Player[players.size()]);
   }
 
   public Player[] getPlayers() {
     return players;
+  }
+
+  public Player getPlayer(String name) {
+    if (players.length == 0)
+      return null;
+    for (int i = 0; i < players.length; i++) {
+      if (name.equals(players[i].getName()))
+        return players[i];
+    }
+    return players[0];
   }
 }

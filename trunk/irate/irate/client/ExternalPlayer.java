@@ -4,12 +4,15 @@ package irate.client;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 
-public ExternalPlayer extends Player {
+public class ExternalPlayer implements Player {
 
   private String name;
   private String path;
   private boolean paused;
+  private boolean closed;
+  private Process process;
   
   public ExternalPlayer(String name, String path) throws FileNotFoundException {
     this(name, new String[] { path });
@@ -29,7 +32,7 @@ public ExternalPlayer extends Player {
         msg.append(" ");
       msg.append(paths[i]);
     }
-    throw new FileNotFoundException(msg);
+    throw new FileNotFoundException(msg.toString());
   }
 
   public String getName() {
@@ -38,7 +41,8 @@ public ExternalPlayer extends Player {
 
   public void setPaused(boolean paused) {
     this.paused = paused;
-    process.destroy();
+    if (paused)
+      process.destroy();
   }
 
   public boolean isPaused() {
@@ -46,35 +50,39 @@ public ExternalPlayer extends Player {
   }
 
   public void play(File file) throws PlayerException {
+    closed = false;
     while (true) {
-      process = Runtime.getRuntime().exec(new String[] { path, file.getPath() });
+      try {
+        process = Runtime.getRuntime().exec(new String[] { path, file.getPath() });
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+        throw new PlayerException(e.toString());
+      }
       try {
         process.waitFor();
-        if (process.exitValue() != 0) 
-          throw new Exception("extern player returned " + process.exitValue());
+        if (!paused && process.exitValue() != 0) 
+          throw new PlayerException("extern player returned " + process.exitValue());
       }
       catch (InterruptedException e) {
-        do { 
-          if (process == null)
-            return; 
-
-          try {
-            Thread.sleep(100);
-          }
-          catch (InterruptedException e) {
-            e.printStackTrace();
-          }
-        } while (isPaused());
+        e.printStackTrace();
       }
-      process = null;
-      break;
+      while (paused) { 
+        try {
+          Thread.sleep(100);
+        }
+        catch (InterruptedException ie) {
+          ie.printStackTrace();
+        }
+      }
+      if (closed) 
+        throw new PlayerException("extern player closed");
     }
   }
 
   public void close() {
     if (process != null) {
-      Process process = this.process;
-      this.process = null;
+      closed = true;
       process.destroy();
     }
   }

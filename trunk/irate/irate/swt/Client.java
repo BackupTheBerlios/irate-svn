@@ -53,7 +53,7 @@ public class Client implements UpdateListener {
 	//	e.printStackTrace();
     }
     playListManager = new PlayListManager(trackDatabase);
-    playThread = new PlayThread(playListManager);
+    playThread = new PlayThread(playListManager, new PlayerList());
  
 	initGUI();
     

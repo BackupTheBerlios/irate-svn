@@ -141,7 +141,6 @@ public class PlayPanel extends JPanel {
     Track currentTrack = playThread.getCurrentTrack();
     currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
     trackTable.notifyListeners();
-    pauseButton.setEnabled(playThread.isPauseSupported());
     pauseButton.setText(playThread.isPaused() ? ">" : "||");
   }
 }

@@ -5,6 +5,8 @@ import irate.common.UpdateListener;
 import irate.download.DownloadThread;
 import irate.client.PlayListManager;
 import irate.client.PlayThread;
+import irate.client.PlayerList;
+import irate.client.Player;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -37,6 +39,7 @@ public class Client extends JFrame {
 
   private PlayListManager playListManager;
   private TrackDatabase trackDatabase;
+  private PlayerList playerList;
   private PlayThread playThread;
   private PlayPanel playPanel;
   private DownloadThread downloadThread;
@@ -62,7 +65,8 @@ public class Client extends JFrame {
     }
     playListManager = new PlayListManager(trackDatabase);
     
-    playThread = new PlayThread(playListManager);
+    playerList = new PlayerList();
+    playThread = new PlayThread(playListManager, playerList);
     playPanel = new PlayPanel(playListManager, playThread);
     playThread.start();
     getContentPane().add(playPanel, BorderLayout.CENTER);
@@ -201,30 +205,16 @@ public class Client extends JFrame {
     return m;
   }
 
-  public JMenuItem createPlayer(String[] paths, String name) {
-    String playerPath;
-    if (paths == null) {
-      playerPath = "";
-    }
-    else {
-      playerPath = null;
-      for (int i = 0; i < paths.length; i++)
-        if (new File(paths[i]).exists()) {
-          playerPath = paths[i];
-          break;
-        }
-    }
-
-    final String path = playerPath;
+  public JMenuItem createPlayer(Player player) {
+    final String name = player.getName();
     JCheckBoxMenuItem mi = new JCheckBoxMenuItem(name); 
     mi.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        trackDatabase.setPlayer(path);
+        trackDatabase.setPlayer(name);
       }
     });
-    mi.setEnabled(playerPath != null);
     playerButtonGroup.add(mi);
-    if (path != null && path.equals(trackDatabase.getPlayer()))
+    if (name.equals(trackDatabase.getPlayer()))
       mi.setState(true);  
     
     return mi; 
@@ -274,18 +264,21 @@ public class Client extends JFrame {
     roboJock.setEnabled(playThread.isSpeechSupported());
     m.add(roboJock);
     
+    /* 
+     * Create player selection menu.
+     */
     playerButtonGroup = new ButtonGroup();
     JMenu player = new JMenu("Player");
-    player.add(createPlayer(null, "javalayer"));
-    player.add(createPlayer(new String[] { 
-        "/usr/bin/mpg123", 
-        "/usr/local/bin/mpg123" 
-        }, "mpg123"));
-    player.add(createPlayer(new String[] { 
-        "/usr/bin/madplay", 
-        "/usr/local/bin/madplay", 
-        "madplay.exe" 
-        }, "madplay"));
+    Player[] players = playerList.getPlayers();
+    if (players.length == 0) {
+      JMenuItem none = new JMenuItem("(none)");
+      none.setEnabled(false);
+      player.add(none);
+    }
+    else {
+      for (int i = 0; i < players.length; i++)
+        player.add(createPlayer(players[i]));
+    }
     m.add(player);
 
     m.add(createDownloadMenu());
