@@ -599,5 +599,12 @@ public class TrackTable {
     sort();
   }
 
+  /**
+   * @return context menu for this table
+   */
+  public Menu getMenu() {
+    return table.getMenu();
+  }
+
 }
 

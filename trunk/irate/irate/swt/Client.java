@@ -1194,6 +1194,8 @@ public class Client extends AbstractClient {
     }
   }
   
+  
+  
   public void createTrayItem() {
     final Menu trayMenu = new Menu(shell, SWT.POP_UP);
     
@@ -1452,5 +1454,20 @@ public class Client extends AbstractClient {
       client.skinManager.applySkin(skin);
       
     client.run();
-  }    
+  }
+
+	/* Used by plugins to associate custom actions with tracks
+	 * @param name name of the new menu entry..name is already internationalized
+	 * @param listener handler for the event
+	 * @see irate.plugin.PluginApplication#addTrackAction(java.lang.String, org.eclipse.swt.events.SelectionListener)
+	 */
+	public void addTrackAction(final String name, final SelectionListener listener) {
+	  display.syncExec(new Runnable() {
+        public void run() {
+ 		 MenuItem item = new MenuItem(trackTable.getMenu(), SWT.NONE);
+ 		 item.setText(name);
+		 item.addSelectionListener(listener);
+        }
+      });
+	}    
 }

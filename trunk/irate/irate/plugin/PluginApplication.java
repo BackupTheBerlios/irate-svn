@@ -2,6 +2,8 @@ package irate.plugin;
 
 import java.io.File;
 
+import org.eclipse.swt.events.SelectionListener;
+
 import irate.common.Track;
 import irate.client.TrackLifeCycleListener;
 import irate.download.DownloadListener;
@@ -113,5 +115,11 @@ public interface PluginApplication
    * be the same instance.
    */
   public void removeStatusMessage(String text);
+
+/** Adds customized track handlers to the UI
+ * @param string internationalized name of the action
+ * @param listener handler for it
+ */
+public void addTrackAction(String name, SelectionListener listener);
 }
 
