@@ -27,7 +27,7 @@ public class TransparencyManager {
       return imageData.scaledTo(bounds.width, bounds.height);
     
     // If there's no parent composite then we don't have a parent image.
-    Composite parent = control.getParent();
+    Composite parent = control.getParent();    
     if (parent == null)
       return null;
 
@@ -36,15 +36,16 @@ public class TransparencyManager {
     if (parentImageData == null)
       return null;
 
-
-//    System.out.println("Image size = " + bounds.x + "x" + bounds.y);
-     imageData = new ImageData(bounds.width, bounds.height, parentImageData.depth, parentImageData.palette);
-     int[] data = new int[bounds.width];
-     for (int i = 0; i < bounds.height; i++) {    
-       parentImageData.getPixels(bounds.x, bounds.y + i, data.length, data, 0);
-       imageData.setPixels(0, i, data.length, data, 0);
-     }
-     return imageData;
+    // System.err.println("Image size = " + bounds.x + "x" + bounds.y);
+    imageData = new ImageData(bounds.width, bounds.height, parentImageData.depth, parentImageData.palette);
+    int[] data = new int[bounds.width];
+    for (int i = 0; i < bounds.height; i++) {
+      if (bounds.y + i < parentImageData.height) {
+        parentImageData.getPixels(bounds.x, bounds.y + i, data.length, data, 0);
+        imageData.setPixels(0, i, data.length, data, 0);
+      }
+    }
+    return imageData;
   }
   
 }

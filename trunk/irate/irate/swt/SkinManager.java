@@ -21,8 +21,6 @@ import org.eclipse.swt.widgets.*;
  */
 public class SkinManager {
 
-  private Vector items = new Vector();
-
   private Hashtable itemHash = new Hashtable();
 
   private TransparencyManager transparencyManager = new TransparencyManager();
@@ -32,14 +30,14 @@ public class SkinManager {
   public SkinManager() {
   }
 
-  public SkinItem add(SkinItem skinItem) {
-    items.add(skinItem);
-    itemHash.put(skinItem.getName(), skinItem);
-    return skinItem;
-  }
-
   public SkinItem add(Skinable button, String name) {
-    return add(new SkinItem(button, name));
+    SkinItem skinItem = (SkinItem) itemHash.get(name);
+    if (skinItem == null) {
+      skinItem = new SkinItem(name);
+      itemHash.put(name, skinItem);
+    }
+    skinItem.add(button);
+    return skinItem;
   }
 
   public SkinItem addControl(final Control control, String name) {
@@ -110,7 +108,7 @@ public class SkinManager {
   }
 
   public void applySkin(InputStream is) {
-    for (Iterator itr = items.iterator(); itr.hasNext();) {
+    for (Iterator itr = itemHash.values().iterator(); itr.hasNext();) {
       SkinItem skinItem = (SkinItem) itr.next();
       skinItem.pre();
     }
@@ -151,7 +149,7 @@ public class SkinManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    for (Iterator itr = items.iterator(); itr.hasNext();) {
+    for (Iterator itr = itemHash.values().iterator(); itr.hasNext();) {
       SkinItem skinItem = (SkinItem) itr.next();
       skinItem.post();
     }
@@ -159,41 +157,56 @@ public class SkinManager {
 
   public class SkinItem {
 
-    private Skinable skinable;
+    private Vector skinables = new Vector();
 
     private String name;
 
     private boolean gotImage;
 
-    public SkinItem(Skinable button, String name) {
-      button.setTransparencyManager(transparencyManager);
-      this.skinable = button;
+    public SkinItem(String name) {
       this.name = name;
-      pre();
-      post();
+    }
+    
+    public void add(Skinable skinable) {
+      skinable.setTransparencyManager(transparencyManager);
+      skinables.add(skinable);
     }
 
     public String getName() {
       return name;
     }
 
-    public void pre() {
+    void pre() {
       String text = Resources.getString(name);
-      skinable.setText(text);
       String pressed = Resources.getString(name+".pressed");
-      skinable.setPressedText(pressed.startsWith("!") ? text : pressed);
-      skinable.setToolTipText(Resources.getString(name + ".tooltip"));
+      if (pressed.startsWith("!"))
+        pressed = text;
+      String toolTip = Resources.getString(name + ".tooltip");
+      if (toolTip.startsWith("!"))
+        toolTip = "";
+      for (Iterator itr = skinables.iterator(); itr.hasNext(); ) {
+        Skinable skinable = (Skinable) itr.next();
+        skinable.setText(text);
+        skinable.setPressedText(pressed);
+        skinable.setToolTipText(toolTip);
+      }
       gotImage = false;
     }
 
     public void setImage(String key, ImageData imageData) {
-      skinable.setImage(key, imageData);
+      for (Iterator itr = skinables.iterator(); itr.hasNext(); ) {
+        Skinable skinable = (Skinable) itr.next();
+        skinable.setImage(key, imageData);
+      }
       gotImage = true;
     }
 
     public void post() {
       if (!gotImage) System.err.println("No image: " + name);
-      skinable.redraw();
+      for (Iterator itr = skinables.iterator(); itr.hasNext(); ) {
+        Skinable skinable = (Skinable) itr.next();
+        skinable.redraw();
+      }
     }
   }
 }

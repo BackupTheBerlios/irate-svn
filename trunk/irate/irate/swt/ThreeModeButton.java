@@ -2,13 +2,13 @@ package irate.swt;
 
 import java.util.Hashtable;
 
-import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
-import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 
-public class ThreeModeButton extends Canvas implements Skinable {
+public class ThreeModeButton extends CLabel implements Skinable {
 
   private TransparencyManager transparencyManager;
 
@@ -33,10 +33,8 @@ public class ThreeModeButton extends Canvas implements Skinable {
   private int width;
   private int height;
 
-  ThreeModeButton(Composite parent, int width, int height, int style) {
+  ThreeModeButton(Composite parent, int style) {
     super(parent, style);
-    this.width = width;
-    this.height = height;
 
     addDisposeListener(new DisposeListener() {
 
@@ -48,7 +46,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
     addPaintListener(new PaintListener() {
 
       public void paintControl(PaintEvent e) {
-        ThreeModeButton.this.paintControl(e);
+        ThreeModeButton.this.paintControl(e.gc);
       }
     });
 
@@ -78,19 +76,15 @@ public class ThreeModeButton extends Canvas implements Skinable {
       }
 
       public void mouseUp(MouseEvent arg0) {
-        ThreeModeButton.this.pressButton(arg0);
+        ThreeModeButton.this.setSelection(false);
       }
     });
 
   }
 
-  // Call when the button is pressed -- i.e when a user has pressed down and
-  // released the mouse button.
-  // - switch the 'active' flag to false (long longer held down)
-  // - switch the 'pressed' flag to whatever it wasn't
-  public void pressButton(MouseEvent arg0) {
+  public void setSelection(boolean state) {
     isActive = false;
-    isPressed = !isPressed;
+    isPressed = state;
     redraw();
   }
 
@@ -132,12 +126,13 @@ public class ThreeModeButton extends Canvas implements Skinable {
   }
 
   // Paint the button depending on its current state.
-  void paintControl(PaintEvent e) {
-    gc = e.gc;
+  private void paintControl(GC gc) {
+    this.gc = gc;
 
     // Text Mode!
 
     if (imageDataHash.get("") == null) {
+/*      
       int textHeight = gc.getFontMetrics().getHeight();
 
       // If we have some kind of background, we need to deal with printing the
@@ -205,6 +200,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
           gc.drawText(normalText, x, y, true);
         }
       }
+*/      
     }
     else {
       // Graphic mode!
@@ -320,6 +316,19 @@ public class ThreeModeButton extends Canvas implements Skinable {
   public void setImage(String key, ImageData imageData) {
     imageDataHash.put(key, imageData);
     computeSize(0, 0, false);
+  }
+  
+  public void addSelectionListener(final SelectionListener selectionListener) {
+    addMouseListener(new MouseAdapter() {
+      public void mouseUp(MouseEvent mouseEvent) {
+        Event event = new Event();
+        event.data = mouseEvent.data;
+        event.display = mouseEvent.display;
+        event.time = mouseEvent.time;
+        event.widget = mouseEvent.widget;
+        selectionListener.widgetSelected(new SelectionEvent(event));
+      }
+    });
   }
 
 }

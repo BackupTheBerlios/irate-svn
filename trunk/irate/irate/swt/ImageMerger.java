@@ -32,6 +32,7 @@ public class ImageMerger {
     ImageData backgroundData = transparencyManager.getBackground(control);
     if (backgroundData == null)
       return foregroundData;
+    
     ImageData destData = new ImageData(backgroundData.width, backgroundData.height,
           foregroundData.depth, foregroundData.palette,
           backgroundData.scanlinePad, backgroundData.data);

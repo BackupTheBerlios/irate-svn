@@ -41,7 +41,8 @@ public class Client extends AbstractClient {
   private static final int VOLUME_SPAN = 30;
   private static final int VOLUME_OFFSET = VOLUME_SPAN / 2;
 
-  private Composite topPanel, bottomPanel;
+  private Composite topPanel;
+  private Composite bottomPanel;
   private Label lblState;
   private Display display;;
   private Shell shell;
@@ -229,7 +230,7 @@ public class Client extends AbstractClient {
     trackLabel.setText(Resources.getString("title.now_playing") + " " + track.getArtist() + " / " + track.getTitle());
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
-      ToolItem item = rf.getItem();
+      ThreeModeButton item = rf.getItem();
       item.setSelection(track.getRating() == rf.getValue());
     }
     volumeScale.setSelection(
@@ -297,7 +298,7 @@ public class Client extends AbstractClient {
     // If the play/pause button is pressed, meaning it is paused, then
     // 'press' the button.  
     if(pause.isPressed()) {
-      pause.pressButton(null);
+      pause.setSelection(false);
     }
   }
 
@@ -319,8 +320,7 @@ public class Client extends AbstractClient {
     createMenu();
     
     topPanel = new Composite(shell, SWT.FLAT);
-    skinManager.addControl(topPanel, "topPanelBackground");
-    
+    skinManager.addControl(topPanel, "panel.play");
     
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
@@ -330,7 +330,7 @@ public class Client extends AbstractClient {
     gridData.horizontalSpan = 3;
     
     topPanel.setLayoutData(gridData);
-    GridLayout gridLayout = new GridLayout(4, false);
+    GridLayout gridLayout = new GridLayout(5, false);
     gridLayout.marginHeight = 7;
     
     topPanel.setLayout(gridLayout);
@@ -707,9 +707,9 @@ public class Client extends AbstractClient {
   }
 
   public void createToolBar() {
-    trackGroup = new Composite(topPanel, SWT.BORDER);
+    trackGroup = new Composite(topPanel, SWT.FLAT );
+    skinManager.addControl(trackGroup, "panel.track");
     trackGroup.setEnabled(false);
-    
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
@@ -719,29 +719,39 @@ public class Client extends AbstractClient {
     trackGroup.setLayout(new GridLayout(2, false));
     
     trackLabel = new Label(trackGroup, SWT.CENTER);
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.FILL;
-    gridData.grabExcessHorizontalSpace = true;
+    gridData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
     gridData.horizontalSpan = 2;
     trackLabel.setLayoutData(gridData);
     
-    ToolBar trackToolbar = new ToolBar(trackGroup, SWT.FLAT);
+    Composite trackToolbar = new Composite(trackGroup, SWT.FLAT);
+    skinManager.addControl(trackToolbar, "panel.trackToolbar");
+    trackToolbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));    
+    trackToolbar.setLayout(new GridLayout(6, true));
+    final ThreeModeButton[] ratingButtons = new ThreeModeButton[ratingFunctions.length];
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
-      ToolItem item = new ToolItem(trackToolbar, SWT.RADIO);
+      ThreeModeButton button = ratingButtons[i] = new ThreeModeButton(trackToolbar, SWT.FLAT);
+      button.setLayoutData(new GridData(GridData.FILL_BOTH));
       final int value = rf.getValue();
-      item.addSelectionListener(new SelectionAdapter() {
+      button.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
+          for (int i = 0; i < ratingButtons.length; i++) {
+            ThreeModeButton button = ratingButtons[i];
+            button.setSelection(button == e.widget);
+          }
           setRating(getSelectedTrack(), value);
         }
       });
-      rf.setItem(item);
-      skinManager.addItem(item, rf.getName());
+      rf.setItem(button);
+      skinManager.add(button, rf.getName());
     }
   
-    new ToolItem(trackToolbar, SWT.SEPARATOR);
+//    new ToolItem(trackToolbar, SWT.SEPARATOR);
 
-    ToolItem info = new ToolItem(trackToolbar, SWT.PUSH);
+    ThreeModeButton info = new ThreeModeButton(topPanel, SWT.NONE);
+    gridData = new GridData();
+    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+    info.setLayoutData(gridData);
     final Client clientToPass = this;
     info.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -753,7 +763,7 @@ public class Client extends AbstractClient {
         trackInfoDialog.displayTrackInfo(track, clientToPass);   
       }
     });
-    skinManager.addItem(info, "button.info");
+    skinManager.add(info, "button.info");
 
     volumeScale = new Scale(trackGroup, SWT.HORIZONTAL | SWT.FLAT);
     volumeScale.setIncrement(1);
@@ -768,12 +778,12 @@ public class Client extends AbstractClient {
     });
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.END;
-    gridData.grabExcessHorizontalSpace = true;
+    gridData.grabExcessHorizontalSpace = false;
     volumeScale.setLayoutData(gridData);
     
     
     /************ PREVIOUS BUTTON (<<) ****************/
-    previous = new ThreeModeButton(topPanel, 32, 32, SWT.NONE);
+    previous = new ThreeModeButton(topPanel, SWT.NONE);
     previous.setEnabled(false);
 
     gridData = new GridData();
@@ -793,7 +803,7 @@ public class Client extends AbstractClient {
     skinManager.add(previous, "button.previous");
     
     /************ PLAY / PAUSE BUTTON  ****************/
-    pause = new ThreeModeButton(topPanel, 43, 43, SWT.NONE);
+    pause = new ThreeModeButton(topPanel, SWT.NONE);
     
     gridData = new GridData();
     gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
@@ -810,7 +820,7 @@ public class Client extends AbstractClient {
     skinManager.add(pause, "button.play");
     
     /************ NEXT BUTTON  ****************/
-    ThreeModeButton next = new ThreeModeButton(topPanel, 32, 32, SWT.NONE);
+    ThreeModeButton next = new ThreeModeButton(topPanel, SWT.NONE);
     
     gridData = new GridData();
     gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
@@ -1003,7 +1013,7 @@ public class Client extends AbstractClient {
     
     private int value;
     private String name;
-    private ToolItem item;
+    private ThreeModeButton item;
     
     public RatingFunction(int value, String name) {
       this.value = value;
@@ -1013,9 +1023,8 @@ public class Client extends AbstractClient {
     public int getValue() { return value; }
     public String getName() { return name; }
     
-    public void setItem(ToolItem item) { this.item = item; }
-    public ToolItem getItem() { return item; }
-    
+    public void setItem(ThreeModeButton item) { this.item = item; }
+    public ThreeModeButton getItem() { return item; }    
   }
   /**
    * This method is called whenever the track time changes, and it
@@ -1056,23 +1065,23 @@ public class Client extends AbstractClient {
 
   public static void main(String[] args) throws Exception {
     Client client = new Client();
-    InputStream skin;
-    
-    try {
-        skin = BaseResources.getResourceAsStream("skin.zip");
-    }
-    catch (IOException e) {
-        skin = null;
-    }
+    InputStream skin = null;
     
     if (args.length == 2)
       if (args[0].equals("--skin"))
         skin = new FileInputStream(new File(args[1]));
-        
+
+    if (skin == null)
+      try {
+          skin = BaseResources.getResourceAsStream("skin.zip");
+      }
+      catch (IOException e) {
+          e.printStackTrace();
+      }    
+
     if (skin != null)
       client.skinManager.applySkin(skin);
       
     client.run();
-  }
-    
+  }    
 }
