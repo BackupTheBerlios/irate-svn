@@ -101,12 +101,13 @@ public class LircRemoteControlConfigurator
       if (!display.readAndDispatch()) display.sleep();
     } 
     setup();
-    shell.close();
-    shell.dispose();
 
     if (wasAttached)
       plugin.attach(app);
     plugin.removeLircRemoteControlListener(this);
+
+    shell.close();
+    shell.dispose();
   }
 
 
