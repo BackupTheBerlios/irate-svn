@@ -160,8 +160,10 @@
     <!-- Disk image of the Mac app -->
     <!-- Requires Mac OS X 10.3 to build -->
   <target name="dmg" depends="mac">
+    <delete dir="mac/dist"/>
     <mkdir dir="mac/dist"/>
     <exec executable="ditto">
+      <!-- Make sure we copy all the exec bits etc -->
       <arg line="iRATE.app mac/dist/iRATE.app"/>
     </exec>
     <exec executable="hdiutil">
