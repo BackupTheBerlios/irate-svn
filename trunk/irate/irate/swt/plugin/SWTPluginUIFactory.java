@@ -34,19 +34,21 @@ public class SWTPluginUIFactory
    */
   public Object lookup(Plugin plugin, String type)
   {
-      // Note: These names are chosen so we can later switch to an implementation
-      // that automatically converts
-      //   irate.plugin.lircremote.LircRemoteControlPlugin
-      // to
-      //   irate.swt.plugin.lircremote.LircRemoteControlConfigurator
-      // (by adding 'swt' before 'plugin' and type in place of 'Plugin')
-      //
-      // If we stick to this convention, then we can later support plugins that
-      // are downloaded automatically.
-      //
+    // Note: These names are chosen so we can later switch to an implementation
+    // that automatically converts
+    //   irate.plugin.lircremote.LircRemoteControlPlugin
+    // to
+    //   irate.swt.plugin.lircremote.LircRemoteControlConfigurator
+    // (by adding 'swt' before 'plugin' and type in place of 'Plugin')
+    //
+    // If we stick to this convention, then we can later support plugins that
+    // are downloaded automatically.
+    //
     if (type.equals(CONFIGURATOR)) {
       if (plugin instanceof irate.plugin.lircremote.LircRemoteControlPlugin)
-	return new irate.swt.plugin.lircremote.LircRemoteControlConfigurator(display, app, plugin);
+        return new irate.swt.plugin.lircremote.LircRemoteControlConfigurator(display, app, plugin);
+      if (plugin instanceof irate.plugin.externalcontrol.ExternalControlPlugin)
+        return new irate.swt.plugin.externalcontrol.ExternalControlConfigurator(display, app, plugin);
     }
     return null;
   }

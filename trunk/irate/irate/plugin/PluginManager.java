@@ -10,6 +10,7 @@ import java.util.Vector;
 import nanoxml.*;
 
 import irate.plugin.lircremote.LircRemoteControlPlugin;
+import irate.plugin.externalcontrol.ExternalControlPlugin;
 
 /**
  * Manager to manage the list of plugins.
@@ -49,6 +50,7 @@ public class PluginManager
   {
     plugins = new Vector();
     plugins.add(new LircRemoteControlPlugin());
+    plugins.add(new ExternalControlPlugin());
     try {
       loadConfig();
     }
