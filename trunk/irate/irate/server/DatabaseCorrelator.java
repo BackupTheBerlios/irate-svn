@@ -65,7 +65,7 @@ public class DatabaseCorrelator {
     float offset1 = total1 / intersectLength;
     for (int i = 0; i < intersectLength; i++) 
       sum += (intersect0[i] - offset0) * (intersect1[i] - offset1);
-    correlation = sum / (total0 * total1);
+    correlation = sum * intersectLength * intersectLength / (total0 * total1);
     
       // Set the correlation value for each track.
     for (int i = 0; i < spares.size(); i++) {

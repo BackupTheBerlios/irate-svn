@@ -68,7 +68,7 @@ public class MasterDatabase extends ServerDatabase {
 
       // See if we can correlate a track
     ServerDatabase corel = getBest(user);
-    Track track = corel.randomTrack(random);
+    Track track = corel.chooseTrack(random);
     if (track != null) {
       System.out.println("Correlation: " + track.getName() + " " + track.getRating());
       user.add(track);

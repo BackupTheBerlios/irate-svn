@@ -51,8 +51,18 @@ public class DownloadThread extends Thread {
     for (int i = 0; i < tracks.length; i++) {
       currentTrack = tracks[i];
       File file = currentTrack.getFile();
-      if (file == null || !file.exists()) 
+      if (file == null) 
         download(currentTrack);
+      else if (!file.exists()) {
+        currentTrack.unSetFile();
+        try {
+          trackDatabase.save();
+          download(currentTrack);
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
+      }
     }
   }
 

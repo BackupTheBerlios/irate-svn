@@ -26,15 +26,7 @@ public class TrackDatabase {
   private Element docElt;
   
   public TrackDatabase() {
-    try {
-      createDOM();
-      doc = db.newDocument();
-      docElt = doc.createElement(docElementName);
-      doc.appendChild(docElt);
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
+    create();
   }
 
   public TrackDatabase(File file) throws IOException {
@@ -46,6 +38,7 @@ public class TrackDatabase {
       e.printStackTrace();
       if (!(e instanceof IOException))
         throw new IOException(e.toString());
+      create();
     }
   }
 
@@ -58,6 +51,21 @@ public class TrackDatabase {
       e.printStackTrace();
       if (!(e instanceof IOException))
         throw new IOException(e.toString());
+      create();
+    }
+  }
+
+  private void create() {
+    try {
+      tracks = new Vector();
+      hash = new Hashtable();
+      createDOM();
+      doc = db.newDocument();
+      docElt = doc.createElement(docElementName);
+      doc.appendChild(docElt);
+    }
+    catch (Exception e) {
+      e.printStackTrace();
     }
   }
 
@@ -251,7 +259,7 @@ public class TrackDatabase {
     for (int i = 0; i < tracks.length; i++) {
       totalProb += getProbability(tracks[i]);
       probs[i] = totalProb;
-//      System.out.println(Float.toString(totalProb) + tracks[i]);
+//      System.out.println(Float.toString(totalProb) + " " + getProbability(tracks[i]) + " " + tracks[i]);
     }
 
     if (totalProb == 0)
@@ -260,6 +268,7 @@ public class TrackDatabase {
     
     while (true) {
       float rand = Math.abs(random.nextFloat()) * totalProb;
+//      System.out.println("r=" + Float.toString(rand));
       for (int i = 0; i < tracks.length; i++) 
         if (rand <= probs[i])
           return tracks[i];
