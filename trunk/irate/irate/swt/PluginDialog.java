@@ -67,7 +67,7 @@ public class PluginDialog
     ok.setLayoutData(gd);
     ok.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        done = true;
+        shell.close();
       }
     });
     shell.pack();    
@@ -82,7 +82,6 @@ public class PluginDialog
         // @todo Handle error better
       e.printStackTrace();
     }
-    shell.close();
     shell.dispose();
   }
 }
