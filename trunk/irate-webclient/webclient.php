@@ -47,7 +47,13 @@ password : <input type='password' name='pass' value='test'><br />
   // if there's a rating to do
  if (!empty($_REQUEST["rate_id"])) {
  
-  $msg = new XML_RPC_Message("irate.rate",array(XML_RPC_PLN::php2xmlrpc(array(array(
+  $action="irate.rate";
+  
+  if ($_REQUEST["rate_rating"]=="-1") { //if -1 given, unrate the track
+   $action="irate.unrate";  
+  }
+  
+  $msg = new XML_RPC_Message($action,array(XML_RPC_PLN::php2xmlrpc(array(array(
    "id"=>$_REQUEST["rate_id"],
    "rating"=>$_REQUEST["rate_rating"]
   )))));
@@ -93,7 +99,7 @@ password : <input type='password' name='pass' value='test'><br />
 
 <?
 
-$select="<select name='rate_rating'><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option><option value='6'>6</option><option value='7'>7</option><option value='8'>8</option><option value='9'>9</option><option value='10'>10</option></select>";
+$select="<select name='rate_rating'><option value='0'>0</option><option value='1'>1</option><option value='2'>2</option><option value='3'>3</option><option value='4'>4</option><option value='5'>5</option><option value='6'>6</option><option value='7'>7</option><option value='8'>8</option><option value='9'>9</option><option value='10'>10</option><option value='-1'>unrate</option></select>";
 
 
 for ($i=0;$i<count($rated_tracks);$i++) {
@@ -127,7 +133,7 @@ echo "
 <input type='hidden' name='list' value='";
 
 for ($i=0;$i<count($rated_tracks);$i++) {
-echo $rated_tracks[$i]["Distributions"][0]["Sources"][0]["link"]."\n";
+echo $tracks_metadata[$i]["Distributions"][0]["Sources"][0]["link"]."\n";
 }
 echo $new_track[0]["Distributions"][0]["Sources"][0]["link"]."\n";
 
