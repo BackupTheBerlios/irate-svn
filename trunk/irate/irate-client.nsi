@@ -28,9 +28,11 @@ Section "iRATE radio"
   SetOutPath $INSTDIR
   ; Put file there
   File "irate-client.jar"
-  File "jl020.jar"  
-  File "xercesImpl.jar"  
-  File "xmlParserAPIs.jar"
+  File "jl020.jar"
+  CreateDirectory "$INSTDIR\lib"
+  File "lib/nanoxml-lite-2.2.3.jar"
+;  File "xercesImpl.jar"  
+;  File "xmlParserAPIs.jar"
 ;  File "madplay.exe"
   
   CreateDirectory "$SMPROGRAMS\iRATE radio"
@@ -39,7 +41,7 @@ Section "iRATE radio"
   WriteUninstaller "uninstall.exe"
 SectionEnd ; end the section
 
-UninstallText "This will uninstall Survey View."
+UninstallText "This will uninstall iRATE radio."
 
 Section "Uninstall"
   DeleteRegKey HKLM SOFTWARE\linetrek_ipaqdate
@@ -51,6 +53,8 @@ Section "Uninstall"
   Delete "$INSTDIR\xmlParserAPIs.jar"
 ;  Delete "$INSTDIR\madplay.exe"
   Delete "$INSTDIR\uninstall.exe"
+  Delete "lib/nanoxml-lite-2.2.3.jar"
+  RMDir "$INSTDIR\lib"
   RMDir "$INSTDIR\download"
   RMDir "$INSTDIR"
 SectionEnd ;

@@ -30,7 +30,7 @@
   </target>
 
   <target name="tar" depends="jar">
-    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/MAD/libs/linux-i386/madplay.so,irate/MAD/libs/sunos-sparc/madplay.so"/>
+    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/lib/nanoxml-lite-2.2.3.jar"/>
   </target>
 
   <target name="gzip" depends="tar">

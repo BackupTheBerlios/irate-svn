@@ -121,7 +121,7 @@ public class Track {
 
   public boolean isBroken() {
     String s = elt.getStringAttribute("broken");
-    return s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true");
+    return s != null && (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true"));
   }
 
   public boolean isHidden() {

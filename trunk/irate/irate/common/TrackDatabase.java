@@ -121,7 +121,10 @@ public class TrackDatabase {
     XMLElement elt = getElement(name);
     if (elt == null)
       return "";
-    return elt.getStringAttribute(attName);
+    String att = elt.getStringAttribute(attName);
+    if (att == null)
+      return "";
+    return att;
   }
 
   protected void setAttribute(String name, String attName, String attValue) {
