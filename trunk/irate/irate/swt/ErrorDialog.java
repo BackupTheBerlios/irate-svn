@@ -14,7 +14,9 @@ import org.eclipse.swt.widgets.*;
 public class ErrorDialog {
   
   private Display display;
-  private Shell shell;
+
+  private BaseDialog dialog;
+
   private Shell parent;
 
   public ErrorDialog(Display display, Shell parent) {
@@ -24,21 +26,20 @@ public class ErrorDialog {
 
   /** Display an error message */
   public void show(Reader r) {
-    if (shell == null) {
-      createShell();
+    if (dialog == null) {
+      createDialog();
       createText(r);
       createCloseButton();
-      shell.setSize(500, 300);
-//      shell.pack();
-      Point size = shell.getSize();
+      Point size = dialog.getSize();
       if(parent != null) {
         Point ploc = parent.getLocation();
         Point psize = parent.getSize();
       }
-      //shell.setLocation(ploc.x + (psize.x - size.x) / 2, ploc.y + (psize.y - size.y) / 2);
+      //dialog.setLocation(ploc.x + (psize.x - size.x) / 2, ploc.y + (psize.y - size.y) / 2);
 
         // Open the window and process the events.
-      shell.open();
+      dialog.pack();
+      dialog.open();
     }
   }
   
@@ -47,11 +48,11 @@ public class ErrorDialog {
     this.parent = parent;
   }
   
-  private void createShell() {
-    shell = new Shell(display);
+  private void createDialog() {
+    dialog = new BaseDialog(display, "");
     GridLayout layout = new GridLayout(1, false);
-    shell.setLayout(layout);
-    shell.addShellListener(new ShellAdapter() {
+    dialog.mainComposite.setLayout(layout);
+    dialog.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e){
         actionClose();
       }
@@ -76,17 +77,19 @@ public class ErrorDialog {
   }
 
   private void createText(String s) {
-//    Label text = new Label(shell,SWT.MULTI | SWT.WRAP | SWT.BORDER);
-    Text text = new Text(shell,SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL);
-    text.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+    Text text = new Text(dialog.mainComposite,
+                         SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL);
+    GridData data =
+        new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
+    final int numberLinesShown = 10;
+    data.heightHint = numberLinesShown * text.getLineHeight();;
+    text.setLayoutData(data);
     text.setText(s);
-    text.pack();
   }
 
   private void createCloseButton() {
-    Button close = new Button(shell, SWT.NONE);
-    close.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    close.setText(getResourceString("ErrorDialog.Button.Close")); 
+    Button close =
+        dialog.addButton(getResourceString("ErrorDialog.Button.Close")); 
     close.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         actionClose();
@@ -95,8 +98,8 @@ public class ErrorDialog {
   }
 
   private void actionClose() {
-    shell.dispose();
-    shell = null;
+    dialog.dispose();
+    dialog = null;
   }
   
   /**

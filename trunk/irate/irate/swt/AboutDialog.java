@@ -14,7 +14,7 @@ public class AboutDialog {
 
   private Display display;
 
-  private Shell shell;
+  private BaseDialog dialog;
 
   private Shell parent;
 
@@ -26,19 +26,19 @@ public class AboutDialog {
   }
 
   public void show(Reader reader) {
-    if (shell == null) {
+    if (dialog == null) {
       createIcon();
-      createShell();
-      createHeaderGrid(shell);
-      Text text = createText(shell, reader);
+      createDialog();
+      createHeaderGrid(dialog.mainComposite);
+      Text text = createText(dialog.mainComposite, reader);
       GridData data = new GridData(GridData.FILL_HORIZONTAL
                                    | GridData.FILL_VERTICAL);
       final int numberLinesShown = 10;
       data.heightHint = numberLinesShown * text.getLineHeight();;
       text.setLayoutData(data);
-      createCloseButton(shell);      
-      shell.pack();
-      shell.open();
+      createCloseButton();
+      dialog.pack();
+      dialog.open();
     }
   }
 
@@ -47,29 +47,25 @@ public class AboutDialog {
     try {
       InputStream stream = BaseResources.getResourceAsStream("icon.gif");
       ImageData imageData = new ImageData(stream); 
-      int whitePixel = imageData.palette.getPixel(new RGB(255, 255, 255));
-      imageData.transparentPixel = whitePixel;
       icon = new Image(display, imageData.scaledTo(32, 32));
     }
     catch (IOException e) {
     }
   }
   
-  private void createShell() {
-    shell = new Shell(display);
-    GridLayout layout = new GridLayout(1, false);
-    shell.setLayout(layout);
-    shell.setText(getResourceString("AboutDialog.Title") + " "
-                  + getResourceString("titlebar.program_name"));
-    if (icon != null)
-      shell.setImage(icon);
-    shell.addShellListener(new ShellAdapter() {
-      public void shellClosed(ShellEvent e){
-        actionClose();
-      }
-    });
+  private void createDialog() {
+    String title =
+      getResourceString("AboutDialog.Title") + " "
+      + getResourceString("titlebar.program_name");
+    dialog = new BaseDialog(display, title);
+    dialog.mainComposite.setLayout(new GridLayout(1, false));
+    dialog.addShellListener(new ShellAdapter() {
+        public void shellClosed(ShellEvent e){
+          actionClose();
+        }
+      });
   }
-
+  
   private Composite createHeaderGrid(Composite parent) {
     Composite header = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout();
@@ -107,13 +103,9 @@ public class AboutDialog {
     return text;
   }
 
-  private void createCloseButton(Composite parent) {
-    Button button = new Button(parent, SWT.NONE);
-    GridData data = new GridData();
-    data.horizontalAlignment = GridData.END;
-    data.grabExcessHorizontalSpace = true;
-    button.setLayoutData(data);
-    button.setText(getResourceString("ErrorDialog.Button.Close")); 
+  private void createCloseButton() {
+    Button button =
+      dialog.addButton(getResourceString("ErrorDialog.Button.Close"));
     button.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         actionClose();
@@ -130,8 +122,8 @@ public class AboutDialog {
   }
 
   private void actionClose() {
-    shell.dispose();
-    shell = null;
+    dialog.dispose();
+    dialog = null;
   }
 
   private String getResourceString(String key) {

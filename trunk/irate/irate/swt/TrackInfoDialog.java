@@ -19,7 +19,9 @@ import org.eclipse.swt.widgets.*;
 public class TrackInfoDialog {
   
   private Display display;
-  private Shell shell;
+
+  private BaseDialog dialog;
+
   private Shell parent;
   private Client parentClient;
   private Track currentTrack;
@@ -41,26 +43,6 @@ public class TrackInfoDialog {
   public TrackInfoDialog(Display display, Shell parent) {
     this.display = display;
     this.parent = parent;
-  }
-
-  private Shell createShell() {
-    Shell shell = new Shell(display);
-    GridLayout layout = new GridLayout();
-    layout.numColumns = 1;
-    shell.setLayout(layout);    
-    shell.setText(getResourceString("TrackInfoDialog.Title") + ": "
-                  + currentTrack.getTitle());
-    try {
-      ImageData icon =
-        new ImageData(BaseResources.getResourceAsStream("icon.gif")); 
-      int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
-      icon.transparentPixel = whitePixel;
-      shell.setImage(new Image(display, icon));
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-    return shell;
   }
 
   private Label createLabel(Composite grid, String tag, String data,
@@ -87,8 +69,8 @@ public class TrackInfoDialog {
     return button;
   }
 
-  private Composite createMainGrid(Shell shell) {
-    Composite mainGrid = new Composite(shell, SWT.NONE);
+  private Composite createMainGrid(Composite parent) {
+    Composite mainGrid = new Composite(parent, SWT.NONE);
     GridData data = new GridData();
     data.verticalAlignment = GridData.FILL;
     data.grabExcessVerticalSpace = true;
@@ -130,7 +112,7 @@ public class TrackInfoDialog {
       licenseButton = new Button(infoGrid, SWT.FLAT);      
       try {
         Image licenseImage =
-          new Image(shell.getDisplay(),
+          new Image(dialog.getDisplay(),
                     BaseResources.getResourceAsStream(license.getIcon()));
         licenseButton.setImage(licenseImage);
       }
@@ -167,19 +149,18 @@ public class TrackInfoDialog {
     if (currentTrack.getArtistWebsite() == null
         || currentTrack.getArtistWebsite().equals(""))  
       wwwLink.setEnabled(false);
-    closeButton =
-      createButton(buttonGrid,
-                   getResourceString("TrackInfoDialog.Button.Close"));
     return buttonGrid;
   }
 
-  /**
-   * This method builds and shows a TrackInfoDialog.
-   */
+  /** This method builds and shows a TrackInfoDialog. */
   private void buildDialog() {
-    shell = createShell();
-
-    trackTitle = new Label(shell, SWT.CENTER);
+    String title =
+      getResourceString("TrackInfoDialog.Title") + ": "
+      + currentTrack.getTitle();
+    dialog = new BaseDialog(display, title);
+    dialog.mainComposite.setLayout(new GridLayout(1, false));
+    
+    trackTitle = new Label(dialog.mainComposite, SWT.CENTER);
     trackTitle.setFont(resizeFontTo(trackTitle.getFont(), 16));
     trackTitle.setText(currentTrack.getTitle());
     GridData data = new GridData();
@@ -187,13 +168,14 @@ public class TrackInfoDialog {
     data.grabExcessHorizontalSpace = true;
     trackTitle.setLayoutData(data);
     
-    Label horiDivider = new Label(shell, SWT.SEPARATOR|SWT.HORIZONTAL);
+    Label horiDivider = new Label(dialog.mainComposite,
+                                  SWT.SEPARATOR|SWT.HORIZONTAL);
     data = new GridData();
     data.horizontalAlignment = GridData.FILL;
     data.grabExcessHorizontalSpace = true;
     horiDivider.setLayoutData(data);
 
-    Composite mainGrid = createMainGrid(shell);
+    Composite mainGrid = createMainGrid(dialog.mainComposite);
 
     Composite infoGrid = createInfoGrid(mainGrid);
     data = new GridData();
@@ -212,24 +194,26 @@ public class TrackInfoDialog {
     data.verticalAlignment = GridData.BEGINNING;
     buttonGrid.setLayoutData(data);
 
-    shell.pack();
+    closeButton =
+      dialog.addButton(getResourceString("TrackInfoDialog.Button.Close"));
+
+    dialog.pack();
 
     addListeners();
-    shell.open();    
+    dialog.open();    
   }
 
   /**
    * Add the various listeners to the buttons on the dialogue.
    */
   private void addListeners() {
-	
-  // Add a listener on the shell so it will close properly
-  shell.addShellListener(new ShellAdapter() {
-  	public void shellClosed(ShellEvent e){
-  		actionClose();
-  	}
-  });
-
+    // Add a listener on the shell so it will close properly
+    dialog.addShellListener(new ShellAdapter() {
+        public void shellClosed(ShellEvent e){
+          actionClose();
+        }
+      });
+    
   // Add listener for the close button
   closeButton.addSelectionListener(new SelectionAdapter() {
     public void widgetSelected(SelectionEvent e) {
@@ -276,8 +260,8 @@ public class TrackInfoDialog {
    * Dispose of the shell when a user closes the dialogue box.
    */
   private void actionClose() {
-    shell.dispose();
-    shell = null;
+    dialog.dispose();
+    dialog = null;
   }
 
   /**
@@ -312,3 +296,10 @@ public class TrackInfoDialog {
   }
   
 }
+
+// Local Variables:
+// c-file-style:"gnu"
+// c-basic-offset:2
+// indent-tabs-mode:nil
+// tab-width:4
+// End:
