@@ -257,7 +257,9 @@ public class TrackDatabase {
   public void load(File file) throws IOException {
     this.file = file;
     this.downloadDir = new File(file.getParent(), "download");
-    load(new FileInputStream(file));
+    InputStream is = new FileInputStream(file);
+    load(is);
+    is.close();
   }
       
   public void load(InputStream is) throws IOException {    
