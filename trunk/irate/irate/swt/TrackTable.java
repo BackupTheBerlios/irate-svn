@@ -424,6 +424,7 @@ public class TrackTable
           int barY = height / 4;
           int barHeight = height / 2;
           gc.drawRectangle(0, barY, width - 1, barHeight - 1);
+          gc.setBackground(gc.getForeground());
           gc.fillRectangle(0, barY, width * percent / 100 - 1, barHeight - 1);
         }
         else {
