@@ -4,6 +4,7 @@ package irate.swt;
 
 import irate.common.LicensingScheme;
 import irate.common.Track;
+import irate.resources.BaseResources;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -42,259 +43,178 @@ public class TrackInfoDialog {
     this.parent = parent;
   }
 
-  /**
-   * This method builds and shows a TrackInfoDialog.
-   */
-  private void buildDialog() {
-    
-    // Create the shell and setup the layout
-    shell = new Shell(display);
-    GridLayout layout = new GridLayout(2, false);
-    shell.setLayout(layout);
-    
+  private Shell createShell() {
+    Shell shell = new Shell(display);
+    GridLayout layout = new GridLayout();
+    layout.numColumns = 1;
+    shell.setLayout(layout);    
     try {
       ImageData icon =
-        new ImageData(irate.resources.BaseResources.getResourceAsStream("icon.gif")); 
-        int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
-        icon.transparentPixel = whitePixel;
-        shell.setImage(new Image(display, icon));
+        new ImageData(BaseResources.getResourceAsStream("icon.gif")); 
+      int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
+      icon.transparentPixel = whitePixel;
+      shell.setImage(new Image(display, icon));
     }
     catch (Exception e) {
       e.printStackTrace();
     }
-    
-    
-    shell.setSize(480, 350);
-    
-    // Print the title of the current track across the top of the window
-    trackTitle = new Label(shell,SWT.HORIZONTAL|SWT.CENTER);
-    trackTitle.setFont(resizeFontTo(trackTitle.getFont(), 16));
-    trackTitle.setText(currentTrack.getTitle());
-    
-    GridData data = new GridData(GridData.FILL_HORIZONTAL);
-    data.horizontalSpan = 2;
-    trackTitle.setLayoutData(data);
-    
-    trackTitle.pack();
-    
-    // Create a horizontal divider, beneath the title.
-    Label horiDivider = new Label(shell, SWT.SEPARATOR|SWT.HORIZONTAL);
-    data = new GridData();
-    data.horizontalSpan = 2;
-    data.widthHint = 465;
-    horiDivider.setLayoutData(data);
-    horiDivider.pack();
-    
-    // Create the grid for the left hand side of the dialog
-    // This grid is 2 columns wide -- one column will have a label and
-    // the second the related information
-    Composite leftGrid = new Composite(shell, SWT.NONE);
-    
+    return shell;
+  }
+
+  private Label createLabel(Composite grid, String tag, String data,
+                            int dataFontSize) {
+    Label labelTag = new Label(grid, SWT.HORIZONTAL);
+    labelTag.setText(tag);
     GridData gridData = new GridData();
-    gridData.verticalAlignment = SWT.TOP;
-    leftGrid.setLayoutData(gridData);
-    
-    GridLayout leftGridLayout = new GridLayout(2, false);
-    leftGridLayout.horizontalSpacing = 10;
-    leftGridLayout.verticalSpacing = 5;
-    leftGrid.setLayout(leftGridLayout);
-     
-    // Left Grid, Column 1, Row 1: Create an 'Artist:' label
-    Label artistLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    artistLabel.setText(getResourceString("TrackInfoDialog.Label.Artist")); 
-    
+    labelTag.setLayoutData(gridData);
+    labelTag.setFont(resizeFontTo(labelTag.getFont(), 12));
+    Label labelData = new Label(grid, SWT.HORIZONTAL);
     gridData = new GridData();
-    gridData.widthHint = 80;
-    artistLabel.setLayoutData(gridData);
-    
-    artistLabel.setFont(resizeFontTo(artistLabel.getFont(),12));
-    artistLabel.pack();
-    
-    // Left Grid, Column 2, Row 1: Label with the artist's name
-    artist = new Label(leftGrid,SWT.HORIZONTAL);
-    
-    gridData = new GridData();
-    gridData.widthHint = 300;
-    
-    artist.setLayoutData(gridData);
-    artist.setFont(resizeFontTo(artist.getFont(),12));
-    artist.setText(currentTrack.getArtist());
-    artist.pack();
-    
-  
-    // Left Grid, Column 1, Row 2: 'Album:' label
-    Label albumLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    albumLabel.setText(getResourceString("TrackInfoDialog.Label.Album")); 
-    albumLabel.setFont(resizeFontTo(albumLabel.getFont(),12));
-    
-    gridData = new GridData();
-    gridData.widthHint = 80;
-    
-    albumLabel.setLayoutData(gridData);
-    albumLabel.pack();
-    
-    // Left Grid, Column 2, Row 2: Album Label
-    album = new Label(leftGrid,SWT.HORIZONTAL);
-    gridData = new GridData();
-    gridData.widthHint = 300;
-    album.setLayoutData(gridData);
-    
-    album.setFont(resizeFontTo(album.getFont(),12));
-    album.setText(currentTrack.getAlbum());
-    album.pack();
-    
-    // Left Grid, Column 1, Row 3: 'Length:' label
-    Label playTimeLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    playTimeLabel.setText(getResourceString("TrackInfoDialog.Label.Length")); 
-    playTimeLabel.setFont(resizeFontTo(playTimeLabel.getFont(),12));
-    
-    gridData = new GridData();
-    gridData.widthHint = 80;
-   
-    playTimeLabel.setLayoutData(gridData);
-    playTimeLabel.pack();
-    
-    //	Left Grid, Column 2, Row 3: Playing time label
-    playTime = new Label(leftGrid,SWT.HORIZONTAL);
-   
-    gridData = new GridData();
-    gridData.widthHint = 300;
-    playTime.setLayoutData(gridData);
-   
-    playTime.setFont(resizeFontTo(album.getFont(),12));
-    playTime.setText(currentTrack.getPlayingTimeString());
-    playTime.pack();
-    
-    //	Left Grid, Column 1, Row 4: 'Copyright:' label
-    Label copyrightLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    copyrightLabel.setText(getResourceString("TrackInfoDialog.Label.Copyright")); 
-    copyrightLabel.setFont(resizeFontTo(copyrightLabel.getFont(),12));
-    
-    gridData = new GridData();
-    gridData.widthHint = 80;
-    gridData.heightHint = 60;
-    copyrightLabel.setLayoutData(gridData);
-    
-    copyrightLabel.pack();
-    
-    // Left Grid, Column 1, Row 4: Copyright information
-    copyright = new Label(leftGrid,SWT.HORIZONTAL|SWT.WRAP);
-    
-    gridData = new GridData();
-    gridData.widthHint = 300;
-    gridData.heightHint = 60;
-    gridData.verticalAlignment = SWT.BOTTOM;
-    copyright.setLayoutData(gridData);
-    
-    copyright.setFont(resizeFontTo(album.getFont(),10));
-    copyright.setText(license.getFullText());
-    copyright.pack();
-    
-    // If this track has an icon associated with the license, then display it.
-    if(license.getIcon() != null && !license.getIcon().equals("")) {	 
-    	
-    	licenseButton = new Button(leftGrid,SWT.FLAT);
-      
+    labelData.setLayoutData(gridData);
+    labelData.setFont(resizeFontTo(labelData.getFont(), dataFontSize));
+    labelData.setText(data);
+    return labelData;
+  }
+
+  private Button createButton(Composite grid, String text) {
+    Button button = new Button(grid, 0);
+    button.setText(text);
+    GridData data = new GridData();
+    data.horizontalAlignment = GridData.FILL;
+    button.setLayoutData(data);
+    return button;
+  }
+
+  private Composite createMainGrid(Shell shell) {
+    Composite mainGrid = new Composite(shell, SWT.NONE|SWT.PUSH);
+    GridData data = new GridData();
+    data.verticalAlignment = GridData.FILL;
+    data.grabExcessVerticalSpace = true;
+    data.horizontalAlignment = GridData.FILL;
+    data.grabExcessHorizontalSpace = true;
+    mainGrid.setLayoutData(data);
+    GridLayout mainLayout = new GridLayout();
+    mainLayout.numColumns = 3;
+    mainGrid.setLayout(mainLayout);
+    return mainGrid;
+  }
+
+  private Composite createInfoGrid(Composite parent) {
+    Composite infoGrid = new Composite(parent, SWT.NONE|SWT.PUSH);
+    GridLayout infoLayout = new GridLayout();
+    infoLayout.numColumns = 2;
+    infoGrid.setLayout(infoLayout);
+    GridData data = new GridData();
+    data.verticalAlignment = GridData.BEGINNING;
+    data.grabExcessHorizontalSpace = true;
+    infoGrid.setLayoutData(data);
+    artist =
+      createLabel(infoGrid,
+                  getResourceString("TrackInfoDialog.Label.Artist"),
+                  currentTrack.getArtist(), 12);
+    album =
+      createLabel(infoGrid,
+                  getResourceString("TrackInfoDialog.Label.Album"),
+                  currentTrack.getAlbum(), 12);
+    playTime =
+      createLabel(infoGrid,
+                  getResourceString("TrackInfoDialog.Label.Length"),
+                  currentTrack.getPlayingTimeString(), 12);
+    copyright =
+      createLabel(infoGrid,
+                  getResourceString("TrackInfoDialog.Label.Copyright"),
+                  license.getFullText(), 10);
+    if(license.getIcon() != null && ! license.getIcon().equals("")) {    	
+      licenseButton = new Button(infoGrid, SWT.FLAT);      
       try {
-        Image licenseImage = new Image(shell.getDisplay(), irate.resources.BaseResources.getResourceAsStream(license.getIcon()));
+        Image licenseImage =
+          new Image(shell.getDisplay(),
+                    BaseResources.getResourceAsStream(license.getIcon()));
         licenseButton.setImage(licenseImage);
       }
       catch (IOException e) {
         e.printStackTrace();
         licenseButton.setText(license.getName());
       }
-    	gridData = new GridData();
+      GridData gridData = new GridData();
       gridData.horizontalSpan = 2;
-      gridData.horizontalAlignment = SWT.RIGHT;
-      gridData.horizontalIndent = 85;
+      gridData.horizontalAlignment = GridData.END;
       licenseButton.setLayoutData(gridData);
-      
-    	licenseButton.pack();
-    
     }
-    
-    // Left Grid, Column 1, Row 5: 'Comment:' label
-    Label commentLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    commentLabel.setText(getResourceString("TrackInfoDialog.Label.Comment")); 
-    commentLabel.setFont(resizeFontTo(commentLabel.getFont(),12));
-    
-    gridData = new GridData();
-    gridData.widthHint = 80;
-    gridData.heightHint = 60; 
-    gridData.horizontalSpan = 1;
-    commentLabel.setLayoutData(gridData);
-    
-    commentLabel.pack();
+    comment =
+      createLabel(infoGrid,
+                  getResourceString("TrackInfoDialog.Label.Comment"),
+                  currentTrack.getComment(), 10);
+    return infoGrid;
+  }
 
-    // Left Grid, Column 2, Row 5: Track Comment
-    comment = new Label(leftGrid,SWT.WRAP);
-    gridData = new GridData();
-    gridData.widthHint = 300;
-    gridData.heightHint = 60;
-    comment.setLayoutData(gridData);
-    
-    comment.setFont(resizeFontTo(album.getFont(),10));
-    comment.setText(currentTrack.getComment());
-    
-    comment.pack();
-    
-    // Build the grid for the right side of the dialog.
-    // This grid will have a vertical divider down the first column, and
-    // a column of buttons in the other.
-    Composite rightGrid = new Composite(shell, SWT.NONE);
-    
-    gridData = new GridData();
-    gridData.verticalAlignment = SWT.TOP;
-    rightGrid.setLayoutData(gridData);
-    
-    GridLayout rightGridLayout = new GridLayout(2, false);
-    rightGrid.setLayout(rightGridLayout);
-    
-    // Right Grid, Column 1, Row 1-8: Vertical divider
-    Label divider = new Label(rightGrid, SWT.SEPARATOR | SWT.VERTICAL);
-    gridData = new GridData();
-    gridData.verticalSpan = 8;
-    gridData.heightHint = 250;
-    divider.setLayoutData(gridData);
-    divider.pack();
-      
-    // Right Grid, Column 2, Row 2: Search button
-    searchButton = new Button(rightGrid,0);
-    searchButton.setText(getResourceString("TrackInfoDialog.Button.Search")); 
-    searchButton.pack();
-    
-    // Right Grid, Column 2, Row 2: WWW Button
-    wwwLink = new Button(rightGrid,0);
-    wwwLink.setText(getResourceString("TrackInfoDialog.Button.WWW")); 
-      
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.END;
-    gridData.widthHint = searchButton.getSize().x;
-    gridData.heightHint = searchButton.getSize().y;
-    wwwLink.setLayoutData(gridData);
-    
-    // If the website isn't available, grey out this area.  
-    if(currentTrack.getArtistWebsite() == null || currentTrack.getArtistWebsite().equals(""))  
-    {
+  private Composite createButtonGrid(Composite parent) {
+    Composite buttonGrid = new Composite(parent, SWT.NONE|SWT.PUSH);
+    GridData data = new GridData();
+    data.verticalAlignment = GridData.BEGINNING;
+    buttonGrid.setLayoutData(data);
+    GridLayout buttonLayout = new GridLayout();
+    buttonLayout.numColumns = 1;
+    buttonGrid.setLayout(buttonLayout);
+    searchButton =
+      createButton(buttonGrid,
+                   getResourceString("TrackInfoDialog.Button.Search"));
+    wwwLink =
+      createButton(buttonGrid,
+                   getResourceString("TrackInfoDialog.Button.WWW"));
+    if (currentTrack.getArtistWebsite() == null
+        || currentTrack.getArtistWebsite().equals(""))  
       wwwLink.setEnabled(false);
-    }
-    wwwLink.pack();
-    
-    // Right Grid, Column 2, Row 3: Close Button
-    closeButton = new Button(rightGrid,0);
-    closeButton.setText(getResourceString("TrackInfoDialog.Button.Close")); 
-      
-    gridData = new GridData();
-    gridData.widthHint = searchButton.getSize().x;
-    gridData.heightHint = searchButton.getSize().y;
-    closeButton.setLayoutData(gridData);
-      
-    closeButton.pack();
+    closeButton =
+      createButton(buttonGrid,
+                   getResourceString("TrackInfoDialog.Button.Close"));
+    return buttonGrid;
+  }
 
-    // Add the listeners and open the shell
-    addListeners();
-    shell.open();
+  /**
+   * This method builds and shows a TrackInfoDialog.
+   */
+  private void buildDialog() {
+    shell = createShell();
+
+    trackTitle = new Label(shell, SWT.CENTER|SWT.PUSH);
+    trackTitle.setFont(resizeFontTo(trackTitle.getFont(), 16));
+    trackTitle.setText(currentTrack.getTitle());
+    GridData data = new GridData();
+    data.horizontalAlignment = GridData.FILL;
+    data.grabExcessHorizontalSpace = true;
+    trackTitle.setLayoutData(data);
     
+    Label horiDivider =
+        new Label(shell, SWT.SEPARATOR|SWT.HORIZONTAL|SWT.PUSH);
+    data = new GridData();
+    data.horizontalAlignment = GridData.FILL;
+    data.grabExcessHorizontalSpace = true;
+    horiDivider.setLayoutData(data);
+
+    Composite mainGrid = createMainGrid(shell);
+
+    Composite infoGrid = createInfoGrid(mainGrid);
+    data = new GridData();
+    data.verticalAlignment = GridData.BEGINNING;
+    data.grabExcessHorizontalSpace = true;
+    infoGrid.setLayoutData(data);
+
+    Label vertDivider = new Label(mainGrid, SWT.SEPARATOR|SWT.PUSH);
+    data = new GridData();
+    data.verticalAlignment = GridData.FILL;
+    data.grabExcessVerticalSpace = true;
+    vertDivider.setLayoutData(data);
+
+    Composite buttonGrid = createButtonGrid(mainGrid);
+    data = new GridData();
+    data.verticalAlignment = GridData.BEGINNING;
+    buttonGrid.setLayoutData(data);
+
+    shell.pack();
+
+    addListeners();
+    shell.open();    
   }
 
   /**
