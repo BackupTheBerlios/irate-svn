@@ -139,8 +139,11 @@ public class DownloadThread extends Thread {
             //silly gcj craps out if we call start fromt the TrackDownloader constructor
             td.start();
             downloadThreads.put(host, td);
-          }
-          
+          } 
+        }
+        if ((o instanceof TrackDownloader) && 
+            !((TrackDownloader)o).isAlive()) {
+          downloadThreads.remove(host);          
         }
       }//while
       //dont bother the system much
@@ -300,15 +303,13 @@ public class DownloadThread extends Thread {
       if (e instanceof FileNotFoundException) {
         setState("Broken download: " + track.getName()); //$NON-NLS-1$
         track.setBroken();
-      } else
-        if (e instanceof IOException) {
-          setState(getResourceString("DownloadThread.Download_failure")
-                   + track.getName());
-          track.increaseDownloadAttempts();
-        }
-        else {
-          System.out.println("Exception not handled");
-        }
+      } else if (e instanceof IOException) {
+        setState(getResourceString("DownloadThread.Download_failure")
+                 + track.getName());
+        track.increaseDownloadAttempts();
+      } else {
+        System.out.println("Exception not handled");
+      } 
     }
     finally {
       percentComplete = 0;
@@ -468,7 +469,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
         dt.download(track);
       } catch(IOException ioe) {
         ioe.printStackTrace();
-      }
+      } 
     }
   };
 }
