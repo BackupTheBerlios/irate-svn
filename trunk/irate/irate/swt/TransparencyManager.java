@@ -1,7 +1,6 @@
 package irate.swt;
 
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -37,14 +36,15 @@ public class TransparencyManager {
     if (parentImageData == null)
       return null;
 
-    System.out.println("Image size = " + bounds.x + "x" + bounds.y);
-    imageData = new ImageData(bounds.width, bounds.height, parentImageData.depth, parentImageData.palette);
-    int[] data = new int[bounds.width];
-    for (int i = 0; i < bounds.height; i++) {
-      parentImageData.getPixels(bounds.x, bounds.y + i, data.length, data, 0);
-      imageData.setPixels(0, i, data.length, data, 0);
-    }
-    return imageData;
+
+//    System.out.println("Image size = " + bounds.x + "x" + bounds.y);
+     imageData = new ImageData(bounds.width, bounds.height, parentImageData.depth, parentImageData.palette);
+     int[] data = new int[bounds.width];
+     for (int i = 0; i < bounds.height; i++) {    
+       parentImageData.getPixels(bounds.x, bounds.y + i, data.length, data, 0);
+       imageData.setPixels(0, i, data.length, data, 0);
+     }
+     return imageData;
   }
   
 }
