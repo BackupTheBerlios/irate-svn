@@ -1,2 +1,2 @@
-?package(irate):needs=X11|text|vc|wm section=Apps/Sound\
-  title="iRATE radio" command="/usr/bin/irate-client"
+?package(irate-client):needs=X11 section=Apps/Sound\
+  title="iRATE client" command="/usr/bin/irate-client"

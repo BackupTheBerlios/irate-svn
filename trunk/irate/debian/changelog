@@ -1,6 +1,7 @@
 irate (0.2-4) unstable; urgency=low
 
   * Updated play algorithm.
+  * Fixed Debian menus
 
  -- Anthony Jones <ajones@clear.net.nz>  Wed, 20 Aug 2003 15:38:47 +0800
 
