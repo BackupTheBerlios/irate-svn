@@ -7,15 +7,19 @@ import irate.client.*;
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
+import org.eclipse.swt.events.*;
+
 import java.io.*;
+import java.util.*;
 
-
-public class Client {
+public class Client implements UpdateListener{
   static Label lblTitle;
   static Table tblSongs;
   static Display display;
   static Shell shell;
   
+
+  private Hashtable hashSongs = new Hashtable();
   private TrackDatabase trackDatabase;
   private PlayListManager playListManager;
   private PlayThread playThread;
@@ -23,7 +27,7 @@ public class Client {
   
   
   public Client() throws Exception {
-    initGUI();
+   
     File file = new File("trackdatabase.xml");
     try {
       trackDatabase = new TrackDatabase(file);
@@ -33,8 +37,11 @@ public class Client {
       e.printStackTrace();
     }
     playListManager = new PlayListManager(trackDatabase);
-    fillPlaylist(playListManager, tblSongs);
     playThread = new PlayThread(playListManager);
+ 
+    initGUI();
+    
+    playThread.addUpdateListener(this);
     playThread.start();
     // playThread = new PlayThread(playListManager);
     //playPanel = new PlayPanel(playListManager, playThread);
@@ -42,12 +49,116 @@ public class Client {
     
   }
   
-  void fillPlaylist(PlayListManager playListManager, Table tblSongs){
+  public void update(){    
+    Track track = playThread.getCurrentTrack();
+    lblTitle.setText(""+track);
+    TableItem item = (TableItem)hashSongs.get(track);
+    tblSongs.select(tblSongs.indexOf(item));
+    tblSongs.showItem(item);
+  }
+  
+  public void actionPerformed(){
+  // now update the UI. We don't depend on the result,
+  // so use async.  
+  display.asyncExec(new Runnable() {
+    public void run() {
+      update();
+    }
+  });
+  }
+
+  Track getTrackByTableItem(TableItem i)
+  {
+    Enumeration e = hashSongs.keys();
+    while(e.hasMoreElements()){
+      Track track = (Track)e.nextElement();
+      TableItem  t = (TableItem)hashSongs.get(track);
+      if(t == i)
+        return track;
+    }
+    return null;
+  }
+  
+  public void setRating(int rating) {
+  //    int index = list.getSelectedIndex();
+    int index = tblSongs.getSelectionIndex();
+    Track track; 
+    if (index < 0)
+      track = playThread.getCurrentTrack();
+    else
+      track = getTrackByTableItem(tblSongs.getItems()[index]);
+    track.setRating(rating);
+    
+    TableItem ti = (TableItem) hashSongs.get(track);
+    ti.dispose();
+    //reinsert the track with new info
+    //should probly update the info inplace with setText :)
+    hashSongs.remove(track);
+    synchronizePlaylist(playListManager, tblSongs);
+    update();
+  } 
+  
+  void SortTableByStringColumn(int column_index, Table table)
+  {
+    //problem with code below is that it loses track/tableitem relationship
+    TableItem[] items = table.getItems();
+    Vector v = new Vector();
+    int column_count = table.getColumnCount();
+    table.setVisible(false);
+    
+    Enumeration e = hashSongs.keys();
+    while(e.hasMoreElements()){
+      Object obj[] = new Object[2];
+      obj[0] = e.nextElement();
+      TableItem item = (TableItem)hashSongs.get(obj[0]);
+      String values[] = new String[column_count];
+      for(int j=0;j<column_count;j++)
+        values[j]=item.getText(j);
+      item.dispose();
+ 
+      obj[1] = values;
+      v.add(obj);
+    }
+    hashSongs.clear();
+    
+    final int the_column_index =  column_index;
+    
+    Comparator c = new Comparator(){
+      public int compare(Object o1, Object o2){
+        Object obj1[] = (Object[])o1;
+        Object obj2[] = (Object[])o2;
+        
+        String[] s1 = (String[])obj1[1];
+        String[] s2 = (String[])obj2[1];
+        return s1[the_column_index].compareTo(s2[the_column_index]);
+      }
+    };
+    Collections.sort(v, c);
+    
+    for(int i=0;i< v.size();i++)
+    {
+      //System.out.println(items[i].getText(column_index));
+     // items[i].dispose();
+      TableItem new_item = new TableItem(table, SWT.NONE, i);
+      Object obj[] = (Object[])v.elementAt(i);
+      new_item.setText((String[])obj[1]);
+      hashSongs.put(obj[0], new_item);
+      
+    }
+    table.setVisible(true);
+    
+    
+    update();
+  }
+  
+  void synchronizePlaylist(PlayListManager playListManager, Table tblSongs){
     int itemCount = tblSongs.getItemCount();
     TrackDatabase td = playListManager.getPlayList();
     td.sort();
     Track tracks[] = td.getTracks();
     for(int i=0;i<tracks.length;i++){
+      if(hashSongs.containsKey(tracks[i]))
+        continue;
       TableItem item = new TableItem(tblSongs,SWT.NULL);
       String[] data = {tracks[i].getArtist(),
       tracks[i].getTitle(),
@@ -55,15 +166,34 @@ public class Client {
       String.valueOf(tracks[i].getNoOfTimesPlayed()),
       tracks[i].getLastPlayed() };
       item.setText(data);
+      hashSongs.put(tracks[i], item);
     }
   
   
+  }
+  void quit()
+  {
+    shell.setVisible(false);
+    try {
+      trackDatabase.save();
+    }
+    catch (IOException ee) {
+      ee.printStackTrace();
+    }
+    playThread.reject();
+    System.exit(0);
   }
   
   void initGUI(){
     display = new Display();
     shell = new Shell(display);
     shell.setText("iRate");
+    shell.addShellListener(new ShellAdapter()
+    {
+      public void shellClosed(ShellEvent e){
+        quit();
+      }
+    });
     // Create the layout.
     GridLayout layout = new GridLayout(3, true);
     layout.numColumns = 1;
@@ -119,13 +249,26 @@ public class Client {
     gridData.horizontalSpan = 7;
     tblSongs.setLayoutData(gridData);
     
+    
     TableColumn col;
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Artist");
+    col.addListener(SWT.Selection, new Listener() {
+      public void handleEvent(Event e) {
+        SortTableByStringColumn(0, tblSongs);
+      }
+    });
+    
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Track");
+    col.addListener(SWT.Selection, new Listener() {
+      public void handleEvent(Event e) {
+        SortTableByStringColumn(1, tblSongs);
+      }
+    });
+
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Rating");
@@ -137,6 +280,7 @@ public class Client {
     col.setText("Last");
     //col.setWidth(50);
     tblSongs.setHeaderVisible(true);
+    synchronizePlaylist(playListManager, tblSongs);
     
     
   /*  new Button(shell, SWT.PUSH).setText("This sux");
@@ -148,13 +292,76 @@ public class Client {
     new Button(shell, SWT.PUSH).setText(">>");
    */ 
     ToolBar toolbar = new ToolBar(shell,SWT.FLAT);
-    new ToolItem(toolbar,SWT.PUSH).setText("This sux");
-    new ToolItem(toolbar,SWT.PUSH).setText("Yawn");
-    new ToolItem(toolbar,SWT.PUSH).setText("Not bad");
-    new ToolItem(toolbar,SWT.PUSH).setText("Cool");
-    new ToolItem(toolbar,SWT.PUSH).setText("Love it");
+    ToolItem item;
+    item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText("This sux");
+    item.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        //MessageBox mesBox = new MessageBox(shell);
+        //mesBox.setMessage("ボタンがクリックされました");
+        //mesBox.open();
+        setRating(0);
+      }
+    });
+    
+    item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText("Yawn");
+    item.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        //MessageBox mesBox = new MessageBox(shell);
+        //mesBox.setMessage("ボタンがクリックされました");
+        //mesBox.open();
+        setRating(2);
+      }
+    });
+
+    item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText("Not bad");
+    item.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        //MessageBox mesBox = new MessageBox(shell);
+        //mesBox.setMessage("ボタンがクリックされました");
+        //mesBox.open();
+        setRating(5);
+      }
+    });
+
+    item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText("Cool");
+    item.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        //MessageBox mesBox = new MessageBox(shell);
+        //mesBox.setMessage("ボタンがクリックされました");
+        //mesBox.open();
+        setRating(7);
+      }
+    });
+
+    item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText("Love it");
+    item.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        //MessageBox mesBox = new MessageBox(shell);
+        //mesBox.setMessage("ボタンがクリックされました");
+        //mesBox.open();
+        setRating(10);
+      }
+    });
+
     new ToolItem(toolbar,SWT.PUSH).setText("||");
-    new ToolItem(toolbar,SWT.PUSH).setText(">>");
+    item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText(">>");
+    item.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        //MessageBox mesBox = new MessageBox(shell);
+        //mesBox.setMessage("ボタンがクリックされました");
+        //mesBox.open();
+        playThread.reject();
+      }
+    });
+
+
+
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;

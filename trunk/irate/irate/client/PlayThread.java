@@ -29,7 +29,7 @@ public class PlayThread extends Thread {
     player = (Player)Class.forName("JavaLayerPlayer").newInstance();
     }catch(Exception e)
     {
-      e.printStackTrace();
+      //e.printStackTrace();
     }
     externalPlayer = "";
   }
@@ -86,11 +86,13 @@ public class PlayThread extends Thread {
 	toKeepPlaying = true;
 	nextTrack = null;
       }
-
+ 
       if (currentTrack != null) {
           // Work out which player we're planning to use
-        externalPlayer = playListManager.getPlayList().getPlayer();
-        notifyUpdateListeners();
+       externalPlayer = playListManager.getPlayList().getPlayer();
+        //System.out.println("got here externalPlayer="+externalPlayer);
+        //if(this!=null)return;
+       notifyUpdateListeners();
         File file = currentTrack.getFile();
         if (file.exists()) {
           if (speaking) {
