@@ -268,7 +268,7 @@ public class TrackDatabase {
     }
     catch (NumberFormatException e) {
     }
-    return 5;
+    return 19;
   }
 
 /**

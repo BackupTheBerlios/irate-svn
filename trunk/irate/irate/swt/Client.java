@@ -25,13 +25,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/17 05:30:30 $
+ * Date Updated: $Date: 2003/11/19 14:30:58 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.102 $
+ * @version $Revision: 1.103 $
  */
 public class Client extends AbstractClient {
 
@@ -480,7 +480,7 @@ public class Client extends AbstractClient {
     Menu menuPlayList = new Menu(mPlayList);
     mPlayList.setMenu(menuPlayList);
 
-    counts = new int[] { 5, 7, 13, 19, 31 };
+    counts = new int[] { 13, 19, 31, 49 };
     int playListLength = trackDatabase.getPlayListLength();
     for (int i = 0; i < counts.length; i++) {
       MenuItem mTimes = new MenuItem(menuPlayList, SWT.CHECK, i);
