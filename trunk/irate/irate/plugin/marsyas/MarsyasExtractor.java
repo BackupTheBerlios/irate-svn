@@ -120,7 +120,10 @@ public class MarsyasExtractor extends Thread{
    */
   public static synchronized void processTrack(Track track) {
     me.queue.add(track);
-    if(!me.isAlive())
-      me.start();
+	try {
+    	if(!me.isAlive())
+    	  me.start();
+	} catch (IllegalThreadStateException stupidJavaThreading) {
+	}
   }
 }
