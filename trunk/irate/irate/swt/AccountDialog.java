@@ -3,29 +3,27 @@ package irate.swt;
 import irate.common.Preferences;
 import irate.common.TrackDatabase;
 import irate.download.DownloadThread;
-import irate.resources.BaseResources;
 import irate.common.UpdateListener;
 
 import java.io.File;
-import java.io.InputStream;
 import java.io.IOException;
 import java.util.Random;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.widgets.*;
-import org.eclipse.swt.graphics.*;
 
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/01/16 22:15:41 $
+ * Date Updated: $Date: 2004/01/21 15:15:23 $
  * @author Creator:	taras
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.20 $
+ * @version $Revision: 1.21 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -34,7 +32,7 @@ public class AccountDialog {
   private Shell shell;
   private TrackDatabase trackDatabase;
   private DownloadThread downloadThread;
-  private Random random = new Random();
+  private final Random random = new Random();
   private Text txtUser;
   private Text txtPassword;
   private Text txtServer;
@@ -42,9 +40,13 @@ public class AccountDialog {
   private Text txtDirectory;
   private Button buttonDirectorySelect;
   private Display display;
-  private TabFolder tabs;
   private Label lblStatus;
   private Button btnAccept;
+  private Composite steps;
+  private final StackLayout stackLayout = new StackLayout();
+  private int controlIndex = 0;
+  private final Control[] controls = new Control[3];
+  
   /**
    * Creates a new AccountDialog class.
    * 
@@ -66,36 +68,34 @@ public class AccountDialog {
     });
   
     shell.setLayout(new GridLayout(1, false));
-    tabs = new TabFolder(shell, SWT.NONE);
-    TabItem tabItem = new TabItem(tabs, SWT.NONE);
-    tabItem.setText("Introduction");
-    Composite composite = new Composite(tabs, SWT.NONE);
-    tabItem.setControl(composite);
-    composite.setLayout(new GridLayout(2, false));
-    Label lblIcon = new Label(composite, SWT.NONE);
+    steps = new Composite(shell, SWT.NONE);
+    steps.setLayout(stackLayout);
+
+    Group group = new Group(steps, SWT.NONE);
+    controls[0] = group;
+    group.setText("Introduction");
+    group.setLayout(new GridLayout(2, false));
+    Label lblIcon = new Label(group, SWT.NONE);
     lblIcon.setImage(Resources.getIconImage(display));
-    Text txt = new Text(composite, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
+    Label label = new Label(group, SWT.WRAP);
 //    txt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL));
-    txt.setText(getResourceString("AccountDialog.Intro"));
+    label.setText(getResourceString("AccountDialog.Intro"));
     
-    tabItem = new TabItem(tabs, SWT.NONE);
-    tabItem.setText("Account Settings");
-    composite = new Composite(tabs, SWT.NONE);
-    txt = new Text(composite, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
+    group = new Group(steps, SWT.NONE);
+    controls[1] = group;
+    group.setText("Account Settings");
+    label = new Label(group, SWT.WRAP);
     GridData data = new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL);
     data.horizontalSpan = 4;
-    txt.setLayoutData(data);
-    txt.setText(getResourceString("AccountDialog.Settings"));
+    label.setLayoutData(data);
+    label.setText(getResourceString("AccountDialog.Settings"));
 
-    createMain(composite);
-    tabItem.setControl(composite);
+    createMain(group);
     
-    tabItem = new TabItem(tabs, SWT.NONE);
-    tabItem.setText("Server Communication");
-    composite = new Composite(tabs, SWT.NONE);
-    tabItem.setControl(composite);
-    createStatus(composite);
-  
+    group = new Group(steps, SWT.NONE);
+    controls[2] = group;
+    group.setText("Server Communication");
+    createStatus(group);  
     
     Composite buttonComposite = new Composite(shell, SWT.NONE);
     buttonComposite.setLayout(new RowLayout(SWT.HORIZONTAL));
@@ -110,7 +110,7 @@ public class AccountDialog {
     });
     createAcceptButton(buttonComposite);
     
-    tabs.pack();
+    stackLayout.topControl = controls[0];    
     shell.pack();
     Point size = shell.getSize();
     if (size.x < 320)
@@ -217,10 +217,9 @@ public class AccountDialog {
   
     btnAccept.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
-        int index = tabs.getSelectionIndex();
-        index++;
-        tabs.setSelection(index);
-        if(index==2)
+        stackLayout.topControl = controls[++controlIndex]; 
+        steps.layout();
+        if (controlIndex == 2)
           createAccount();
       }
     });
@@ -291,7 +290,8 @@ public class AccountDialog {
         display.asyncExec(new Runnable() {
           public void run() {
             btnAccept.setEnabled(true);
-            tabs.setSelection(1);
+            stackLayout.topControl = controls[controlIndex = 1];
+            steps.layout();
           }
         });
       }

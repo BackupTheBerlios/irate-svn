@@ -69,14 +69,13 @@ public class ErrorDialog {
   }
 
   private void createText(String s) {
-    Text text = new Text(dialog.getMainComposite(),
-                         SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL);
+    Label label = new Label(dialog.getMainComposite(), SWT.WRAP);
     GridData data =
         new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
-    final int numberLinesShown = 10;
-    data.heightHint = numberLinesShown * text.getLineHeight();;
-    text.setLayoutData(data);
-    text.setText(s);
+//    final int numberLinesShown = 10;
+//    data.heightHint = numberLinesShown * text.getLineHeight();;
+    label.setLayoutData(data);
+    label.setText(s);
   }
 
   private void createCloseButton() {

@@ -32,12 +32,12 @@ public class AboutDialog {
       createDialog();
       Composite mainComposite = dialog.getMainComposite();
       createHeaderGrid(mainComposite);
-      Text text = createText(mainComposite, reader);
+      Label label = createText(mainComposite, reader);
       GridData data = new GridData(GridData.FILL_HORIZONTAL
                                    | GridData.FILL_VERTICAL);
-      final int numberLinesShown = 10;
-      data.heightHint = numberLinesShown * text.getLineHeight();;
-      text.setLayoutData(data);
+//      final int numberLinesShown = 10;
+//      data.heightHint = numberLinesShown * text.getLineHeight();;
+//      text.setLayoutData(data);
       createCloseButton();
       dialog.getShell().pack();
       dialog.centerOn(parent);
@@ -88,7 +88,7 @@ public class AboutDialog {
 
   }
 
-  private Text createText(Composite parent, Reader reader) {
+  private Label createText(Composite parent, Reader reader) {
     try {
       StringBuffer sb = new StringBuffer();      
       char[] buf = new char[512];
@@ -103,11 +103,10 @@ public class AboutDialog {
     }
   }
 
-  private Text createText(Composite parent, String s) {
-    Text text = new Text(parent, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP
-                         | SWT.V_SCROLL);
-    text.setText(s);
-    return text;
+  private Label createText(Composite parent, String s) {
+    Label label = new Label(parent, SWT.WRAP);
+    label.setText(s);
+    return label;
   }
 
   private void createCloseButton() {
