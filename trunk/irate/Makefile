@@ -3,6 +3,7 @@ LIB=$(DESTDIR)/usr/lib
 DOC=$(DESTDIR)/usr/doc/irate
 GCJ=gcj -g -pipe -march=i586 -mcpu=i586 -O2
 IRATE_CLIENT=irate-client
+IRATE_SERVER=irate-server
 PLATFORM=linux-motif
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
@@ -13,6 +14,11 @@ CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o
 
 ifeq ($(PLATFORM),linux-gtk2)
 CLIENT_LIBS += lib/libswt-pi.o
+endif
+
+ifeq ($(PLATFORM),win32)
+IRATE_CLIENT=irate-client.exe
+IRATE_SERVER=irate-server.exe
 endif
 
 CLIENT_FILES = \
@@ -32,11 +38,11 @@ CLIENT_FILES = \
 SERVER_DEPS = irate-server.o irate-common.o
 SERVER_LIBS = lib/libnanoxml-lite.o
 
-all: lib $(IRATE_CLIENT) irate-server
+all: lib $(IRATE_CLIENT) $(IRATE_SERVER)
 
-install: irate-client
+install: $(IRATE_CLIENT)
 	install -d $(BIN) $(LIB) $(DOC)
-	install irate-client $(BIN)
+	install $(IRATE_CLIENT) $(BIN)
 	install lib/libswt-gnome-motif-3009.so $(LIB)
 	install lib/libswt-kde-motif-3009.so $(LIB)
 	install lib/libswt-motif-3009.so $(LIB)
@@ -57,14 +63,12 @@ lib/libnanoxml-lite.o:
 lib/libnanoxml-lite.o:
 	$(MAKE) -C lib/ libnanoxml-lite.o
 	
-irate-client: $(CLIENT_DEPS) $(CLIENT_LIBS)
-	$(GCJ)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o irate-client --main=irate.swt.Client
+$(IRATE_CLIENT): $(CLIENT_DEPS) $(CLIENT_LIBS)
+	$(GCJ)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
 
-irate-client.exe: lib/libnanoxml-lite.o $(CLIENT_DEPS) lib/libswt-win32.a
-	$(GCJ) lib/libnanoxml-lite.o $(CLIENT_DEPS) lib/libswt-win32.a  --main=irate.swt.Client -o irate-client.exe
 
-irate-server: $(SERVER_DEPS) $(SERVER_LIBS)
-	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o irate-server --main=irate.server.Server
+$(IRATE_SERVER): $(SERVER_DEPS) $(SERVER_LIBS)
+	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o $(IRATE_SERVER) --main=irate.server.Server
 	
 irate-swt.o: irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
 	$(GCJ) -c irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java -o irate-swt.o
@@ -81,25 +85,9 @@ irate-common.o:irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java
 irate-server.o:irate/server/*.java
 	$(GCJ) -c irate/server/*.java -o irate-server.o
 
-#using $(GCJ) from http://thisiscool.com/gcc33_mingw.htm
-win32:
-	$(GCJ_WIN32) \
-	$(CLIENT_FILES) \
-	irate/swt/*.java \
-	irate/swt/plugin/*.java \
-	irate/swt/plugin/*/*.java \
-	irate/common/*.java \
-	irate/plugin/*.java \
-	irate/plugin/*/*.java \
-	irate/download/*.java \
-	thisiscool-gcc/swt/win32/lib/libswt.a \
-	lib/nanoxml-lite-2.2.3.jar \
-	--main=irate.swt.Client \
-	-g -O2 -mwindows -o irate-client.exe
-
 deb:
 	dpkg-buildpackage -b -rfakeroot
 
 clean:
-	rm -f $(DEPS) irate-client irate-server *.a *.o
+	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o
 	$(MAKE) -C lib clean
