@@ -4,6 +4,12 @@ irate (0.3-99post1) unstable; urgency=low
 
  -- Anthony Jones <ajones@clear.net.nz>  Wed, 11 Feb 2004 22:02:58 +0800
 
+irate (0.3-2) unstable; urgency=low
+
+  * Removed libswt-support files from main package.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Sun,  8 Feb 2004 10:24:44 +0800
+
 irate (0.3-1) unstable; urgency=low
 
   * Created new stable release.
