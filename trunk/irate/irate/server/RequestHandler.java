@@ -69,6 +69,8 @@ public class RequestHandler {
 
       String headers[] = getHeaders(is);
       byte[] buf = new byte[getContentLength(headers)];
+      if(getHeader(headers, "Content-Encoding:").equals("gzip"))
+        is = new java.util.zip.GZIPInputStream(is);
       int pos = 0;
       while (pos < buf.length) {
         int nbytes = is.read(buf, pos, buf.length - pos);

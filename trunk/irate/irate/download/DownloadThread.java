@@ -344,7 +344,9 @@ public class DownloadThread extends Thread {
       System.out.println("Request:");
       System.out.println(str);
       byte[] buf = str.getBytes();
-      os.write(("Content-Length: " + Integer.toString(buf.length) + "\r\n\r\n").getBytes());
+      os.write(("Content-Length: " + Integer.toString(buf.length) + "\r\nContent-Encoding: gzip\r\n\r\n").getBytes());
+      os.flush();
+      os = new java.util.zip.GZIPOutputStream(os);
       os.write(buf);
       os.flush();
       setState("Receiving server reply");
