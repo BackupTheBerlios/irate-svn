@@ -88,7 +88,7 @@ public class TrackInfoDialog {
   }
 
   private Composite createMainGrid(Shell shell) {
-    Composite mainGrid = new Composite(shell, SWT.NONE|SWT.PUSH);
+    Composite mainGrid = new Composite(shell, SWT.NONE);
     GridData data = new GridData();
     data.verticalAlignment = GridData.FILL;
     data.grabExcessVerticalSpace = true;
@@ -102,7 +102,7 @@ public class TrackInfoDialog {
   }
 
   private Composite createInfoGrid(Composite parent) {
-    Composite infoGrid = new Composite(parent, SWT.NONE|SWT.PUSH);
+    Composite infoGrid = new Composite(parent, SWT.NONE);
     GridLayout infoLayout = new GridLayout();
     infoLayout.numColumns = 2;
     infoGrid.setLayout(infoLayout);
@@ -151,7 +151,7 @@ public class TrackInfoDialog {
   }
 
   private Composite createButtonGrid(Composite parent) {
-    Composite buttonGrid = new Composite(parent, SWT.NONE|SWT.PUSH);
+    Composite buttonGrid = new Composite(parent, SWT.NONE);
     GridData data = new GridData();
     data.verticalAlignment = GridData.BEGINNING;
     buttonGrid.setLayoutData(data);
@@ -179,7 +179,7 @@ public class TrackInfoDialog {
   private void buildDialog() {
     shell = createShell();
 
-    trackTitle = new Label(shell, SWT.CENTER|SWT.PUSH);
+    trackTitle = new Label(shell, SWT.CENTER);
     trackTitle.setFont(resizeFontTo(trackTitle.getFont(), 16));
     trackTitle.setText(currentTrack.getTitle());
     GridData data = new GridData();
@@ -187,8 +187,7 @@ public class TrackInfoDialog {
     data.grabExcessHorizontalSpace = true;
     trackTitle.setLayoutData(data);
     
-    Label horiDivider =
-        new Label(shell, SWT.SEPARATOR|SWT.HORIZONTAL|SWT.PUSH);
+    Label horiDivider = new Label(shell, SWT.SEPARATOR|SWT.HORIZONTAL);
     data = new GridData();
     data.horizontalAlignment = GridData.FILL;
     data.grabExcessHorizontalSpace = true;
@@ -202,7 +201,7 @@ public class TrackInfoDialog {
     data.grabExcessHorizontalSpace = true;
     infoGrid.setLayoutData(data);
 
-    Label vertDivider = new Label(mainGrid, SWT.SEPARATOR|SWT.PUSH);
+    Label vertDivider = new Label(mainGrid, SWT.SEPARATOR);
     data = new GridData();
     data.verticalAlignment = GridData.FILL;
     data.grabExcessVerticalSpace = true;
