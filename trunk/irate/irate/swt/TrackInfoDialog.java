@@ -37,6 +37,12 @@ public class TrackInfoDialog {
   private Button wwwLink;
   private Button searchButton;
   private Button licenseButton;
+
+  private Font m_fontHuge;
+
+  private Font m_fontLarge;
+
+  private Font m_fontMedium;
   
   private String creativeLink;
 
@@ -45,17 +51,24 @@ public class TrackInfoDialog {
     this.parent = parent;
   }
 
+  private void createFonts() {
+    Font systemFont = display.getSystemFont();
+    m_fontHuge = resizeFontTo(systemFont, 16);
+    m_fontLarge = resizeFontTo(systemFont, 12);
+    m_fontMedium = resizeFontTo(systemFont, 10);
+  }
+
   private Label createLabel(Composite grid, String tag, String data,
-                            int dataFontSize) {
+                            Font font) {
     Label labelTag = new Label(grid, SWT.HORIZONTAL);
     labelTag.setText(tag);
     GridData gridData = new GridData();
     labelTag.setLayoutData(gridData);
-    labelTag.setFont(resizeFontTo(labelTag.getFont(), 12));
+    labelTag.setFont(font);
     Label labelData = new Label(grid, SWT.HORIZONTAL);
     gridData = new GridData();
     labelData.setLayoutData(gridData);
-    labelData.setFont(resizeFontTo(labelData.getFont(), dataFontSize));
+    labelData.setFont(font);
     labelData.setText(data);
     return labelData;
   }
@@ -95,19 +108,19 @@ public class TrackInfoDialog {
     artist =
       createLabel(infoGrid,
                   getResourceString("TrackInfoDialog.Label.Artist"),
-                  currentTrack.getArtist(), 12);
+                  currentTrack.getArtist(), m_fontLarge);
     album =
       createLabel(infoGrid,
                   getResourceString("TrackInfoDialog.Label.Album"),
-                  currentTrack.getAlbum(), 12);
+                  currentTrack.getAlbum(), m_fontLarge);
     playTime =
       createLabel(infoGrid,
                   getResourceString("TrackInfoDialog.Label.Length"),
-                  currentTrack.getPlayingTimeString(), 12);
+                  currentTrack.getPlayingTimeString(), m_fontLarge);
     copyright =
       createLabel(infoGrid,
                   getResourceString("TrackInfoDialog.Label.Copyright"),
-                  license.getFullText(), 10);
+                  license.getFullText(), m_fontMedium);
     if(license.getIcon() != null && ! license.getIcon().equals("")) {    	
       licenseButton = new Button(infoGrid, SWT.FLAT);      
       try {
@@ -128,7 +141,7 @@ public class TrackInfoDialog {
     comment =
       createLabel(infoGrid,
                   getResourceString("TrackInfoDialog.Label.Comment"),
-                  currentTrack.getComment(), 10);
+                  currentTrack.getComment(), m_fontMedium);
     return infoGrid;
   }
 
@@ -152,8 +165,18 @@ public class TrackInfoDialog {
     return buttonGrid;
   }
 
+  private void disposeFonts() {
+    m_fontHuge.dispose();
+    m_fontHuge = null;
+    m_fontLarge.dispose();
+    m_fontLarge = null;
+    m_fontMedium.dispose();
+    m_fontMedium = null;
+  }
+
   /** This method builds and shows a TrackInfoDialog. */
   private void buildDialog() {
+    createFonts();
     String title =
       getResourceString("TrackInfoDialog.Title") + ": "
       + currentTrack.getTitle();
@@ -162,7 +185,7 @@ public class TrackInfoDialog {
     mainComposite.setLayout(new GridLayout(1, false));
     
     trackTitle = new Label(mainComposite, SWT.CENTER);
-    trackTitle.setFont(resizeFontTo(trackTitle.getFont(), 16));
+    trackTitle.setFont(m_fontHuge);
     trackTitle.setText(currentTrack.getTitle());
     GridData data = new GridData();
     data.horizontalAlignment = GridData.FILL;
@@ -263,6 +286,7 @@ public class TrackInfoDialog {
   private void actionClose() {
     dialog.dispose();
     dialog = null;
+    disposeFonts();
   }
 
   /**
