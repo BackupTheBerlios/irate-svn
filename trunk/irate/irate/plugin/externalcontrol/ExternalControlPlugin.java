@@ -15,10 +15,10 @@ import nanoxml.*;
  * network socket.
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/09/20 11:49:08 $$
+ * Date Updated: $$Date: 2003/09/21 11:26:15 $$
  * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.7 $$
+ * @version $$Revision: 1.8 $$
  */
 
 public class ExternalControlPlugin 
@@ -26,6 +26,7 @@ public class ExternalControlPlugin
 
   private int port;
   private int simConns;
+  private boolean localhostOnly;
   private IOThread socketListener;
   private PluginApplication app;
   /**
@@ -34,6 +35,7 @@ public class ExternalControlPlugin
   public ExternalControlPlugin() {
     port = 12473;  // Default port number (12473 = RATE - sorry :)
     simConns = 20;
+    localhostOnly = true;
   } // ExternalControlPlugin()
 
   /**
@@ -71,14 +73,18 @@ public class ExternalControlPlugin
    * Parses the configuration provided to allow the plugin to be set up
    */
   public void parseConfig(XMLElement elt) {
-   port = Integer.parseInt(elt.getStringAttribute("port"));
+   port = elt.getIntAttribute("port",port);
+   simConns = elt.getIntAttribute("simConns",simConns);
+   localhostOnly = elt.getBooleanAttribute("localhostOnly","yes","no",localhostOnly);
   } // parseConfig(XMLElement elt)
 
   /**
    * Formats the configuration of the plugin by modifying the element
    */
   public void formatConfig(XMLElement elt) {
-    elt.setAttribute("port",Integer.toString(port));
+    elt.setIntAttribute("port",port);
+    elt.setIntAttribute("simConns",simConns);
+    elt.setAttribute("localhostOnly", localhostOnly?"yes":"no");
   } // formatConfig(XMLElement elt)
 
   // --- Accessors and Modifiers ---
@@ -103,6 +109,7 @@ public class ExternalControlPlugin
   public int getSimConnections() {
     return simConns;
   }
+
   /**
    * Sets the simultanious connection limit
    */
@@ -110,15 +117,27 @@ public class ExternalControlPlugin
     simConns = s;
   }
 
+  /**
+   * Returns true if we only bind to the localhost address
+   */
+  public boolean getLocalhostOnly() {
+    return localhostOnly;
+  }
+
+  /**
+   * Specifies whether we want only localhost connections
+   */
+  public void setLocalhostOnly(boolean l) {
+    localhostOnly = l;
+  }
+
   /* --- IOThread class --- */
 
   /**
    * This handles the socket listening. The constructor can be given a
    * callback object, it will pass any connections that it gets to
-   * this. Currently it specifically allows only one connection at a
-   * time. This may change. Maybe.
+   * this.   
    */
-  
   public class IOThread extends Thread {
 
     private boolean terminating = false;
@@ -136,21 +155,33 @@ public class ExternalControlPlugin
      */
     public void run() {
       int myPort = port;
+      boolean myLocalhostOnly = localhostOnly;
       Object timer = new Object();
       try {
-        socket = new ServerSocket(myPort,0, 
-                                  InetAddress.getByName("127.0.0.1")); 
+        if (localhostOnly) {
+          socket = new ServerSocket(myPort,0, 
+                                    InetAddress.getByName("127.0.0.1")); 
+        } else {
+          socket = new ServerSocket(myPort,0);
+        }
       } catch (IOException e) {
         e.printStackTrace();
         prepareToDie();
       }
       while (!terminating) {
         try {
-          if (port != myPort) { // if port changes, we need a new
+          if ((port != myPort) || (localhostOnly != myLocalhostOnly)) { 
+                                // if port or host spec changes, we need a new
                                 // SocketServer
             myPort = port;
-            socket = new ServerSocket(myPort,0, 
-                                      InetAddress.getByName("127.0.0.1"));
+            myLocalhostOnly = localhostOnly;
+            socket.close();
+            if (localhostOnly) {
+              socket = new ServerSocket(myPort,0, 
+                                        InetAddress.getByName("127.0.0.1"));
+            } else {
+              socket = new ServerSocket(myPort,0);
+            }
           }
           socket.setSoTimeout(10000); // Block 10 secs to allow
                                       // termination etc.
@@ -171,6 +202,7 @@ public class ExternalControlPlugin
           comm.start();
         } catch (InterruptedIOException e) {
         } catch (IOException e) {
+          e.printStackTrace();
           prepareToDie();
         }
       }
