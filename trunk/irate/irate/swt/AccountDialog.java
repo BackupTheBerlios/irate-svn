@@ -13,6 +13,7 @@ import java.util.Random;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StackLayout;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
@@ -22,10 +23,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/08/29 05:08:28 $
+ * Date Updated: $Date: 2004/08/29 21:50:06 $
  * @author Creator:	taras
- * @author Updated:	$Author: ajones $
- * @version $Revision: 1.29 $
+ * @author Updated:	$Author: parlabane $
+ * @version $Revision: 1.30 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -207,8 +208,8 @@ public class AccountDialog {
     Label lblIcon = new Label(composite, SWT.NONE);
     try {
       Image image = Resources.getIconImage(display, lblIcon.getBackground());
-      image.setBackground(lblIcon.getBackground());
-      lblIcon.setImage(image);
+      //image.setBackground(lblIcon.getBackground());
+      //lblIcon.setImage(image);
     }
     catch (IOException e) {
       e.printStackTrace();
