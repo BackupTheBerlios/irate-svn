@@ -239,7 +239,7 @@ private abstract class TimeoutWorker implements Runnable{
         OutputStream os = new FileOutputStream(file);
         final byte buf[] = new byte[256000];
         int totalBytes = 0;
-        worker = new TimeoutWorker((Object) is){
+        /*worker = new TimeoutWorker((Object) is){
           public void run() {
             int n;
             try {
@@ -250,17 +250,17 @@ private abstract class TimeoutWorker implements Runnable{
             }
             setOutput(new Integer(n));
           }
-        };
+        };*/
             
         while (true) {
           int nbytes;
-          try {
+          /*try {
             nbytes = ((Integer) worker.runOrTimeout(timeout)).intValue();
           } catch(Exception e) {
             e.printStackTrace();
             return;
-          }
-	    	
+          }*/
+          nbytes = is.read(buf);
           if (nbytes < 0)
             break;
           os.write(buf, 0, nbytes);
