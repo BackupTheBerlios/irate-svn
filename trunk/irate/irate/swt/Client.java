@@ -586,6 +586,8 @@ public class Client extends AbstractClient {
      */
     MenuItem mNewUnrated = new MenuItem(mSettings, SWT.CASCADE);
     skinManager.add(mNewUnrated, "toolbar.menu_item.unrated");
+    mNewUnrated.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.unrated")));
+
     Menu menuNewUnrated = new Menu(mNewUnrated);
     mNewUnrated.setMenu(menuNewUnrated);
 
@@ -609,7 +611,7 @@ public class Client extends AbstractClient {
       //Added for a nicer UI by Allen Tipper 14.9.03
       mRatio.addArmListener(
         new ToolTipArmListener(
-          Resources.getString("toolbar.menu_item.tooltip.unrated") +
+          Resources.getString("toolbar.submenu_item.tooltip.unrated") +
           " " + ratio + "%."));
       //end add
 

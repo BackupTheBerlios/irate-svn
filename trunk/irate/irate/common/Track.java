@@ -431,15 +431,15 @@ public class Track {
 
   public String getState() {
     if (isBroken()) 
-      return "Broken";
+      return Resources.getString("track.rating.broken");
     File file = getFile();
     if (file == null)
-      return "Not downloaded";
+      return Resources.getString("track.rating.notdownloaded");
     if (!file.exists())
-      return "Missing";
+      return Resources.getString("track.rating.missing");
     if (isRated())
       return Integer.toString((int) getRating());
-    return "Unrated";
+    return Resources.getString("track.rating.unrated");
   }
   
   public XMLElement getElement() {
