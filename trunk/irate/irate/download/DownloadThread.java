@@ -25,14 +25,17 @@ public class DownloadThread extends Thread {
   }
 
   public void run() {
-      while (true) {
+    while (true) {
       doCheckAutoDownload();
       
       try {
+	boolean wasReady = false;
 	synchronized (this) {
-	  wait();
+	  if (!ready)
+	    wait();
+          wasReady = ready;
 	}
-	if (ready) {
+	if (wasReady) {
 	  process();
 	  ready = false;
 	}
@@ -224,7 +227,7 @@ public class DownloadThread extends Thread {
         trackDatabase.setAutoDownloadCount(0);
     }
     if (state == null)
-      ready = true;
+      go();
     else
       setState(state);
   }
