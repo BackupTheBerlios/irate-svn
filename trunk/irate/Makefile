@@ -11,8 +11,8 @@ export GCJ=gcj -g -pipe -O2
 IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
 #export PLATFORM=linux-motif
-export PLATFORM=linux-gtk2
-#export PLATFORM=win32
+#export PLATFORM=linux-gtk2
+export PLATFORM=win32
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:lib/jd3lib.jar
 
@@ -50,7 +50,7 @@ IRATE_CLIENT=irate-client.exe
 IRATE_SERVER=irate-server.exe
 #turn on below thing for error messages
 #CLIENT_LINKFLAGS=-Dgnu.gcj.runtime.NameFinder.use_addr2line=false -Dgnu.gcj.runtime.NameFinder.demangle=false
-export GCJ=/usr/local/crossgcc/bin/i586-pc-mingw32-gcj -g -pipe -O0
+export GCJ=gcj -g -pipe -O0
 CLIENT_LIBS += lib/libswt.o icon.o
 CLASSPATH:=$(PWD)/lib/swt.jar:$(CLASSPATH)
 else
@@ -204,7 +204,7 @@ irate-server.o:irate/server/*.java
 icon.o: irate/resources/icon.png
 	png2ico icon.ico $^ 
 	echo irate_icon ICON DISCARDABLE "icon.ico" > icon.rc
-	i586-pc-mingw32-windres -i icon.rc -o $@
+	windres -i icon.rc -o $@
 	rm -f icon.ico icon.rc
 
 %.xpm: %.gif

@@ -7,7 +7,8 @@ my %lookup=("gcj"=>{"description"=>"GNU Java compiler",
 #						"make"=>{"description"=>"GNU Make"},
 #						"ant"=>{"description"=>"Java build tool",
 #										"args"=>"-version"},
-						"libswt-gtk2.so"=>{"description"=>"System-wide SWT library",
+						"libswt-win32-2133.dll"=>{"description"=>"System-wide SWT 
+library",
 						"type"=>"lib"}
 						);
 
