@@ -27,6 +27,13 @@ public class Track {
     elt.setName("Track");
     copy(track);
   }
+
+  public Track(URL url) {
+    elt = new XMLElement(new Properties(), true, false);
+    elt.setName("Track");
+    setURL(url);
+    setTitle(url.getFile());
+  }  
   
   private void copy(Track track) {
     dir = track.dir;

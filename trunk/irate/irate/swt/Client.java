@@ -11,19 +11,27 @@ import irate.plugin.PluginUIFactory;
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DropTarget;
+import org.eclipse.swt.dnd.DropTargetEvent;
+import org.eclipse.swt.dnd.DropTargetListener;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.RTFTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import java.io.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/25 16:33:34 $
+ * Date Updated: $Date: 2003/10/26 15:57:29 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.89 $
+ * @version $Revision: 1.90 $
  */
 public class Client extends AbstractClient {
 
@@ -57,6 +65,7 @@ public class Client extends AbstractClient {
     if (trackDatabase.getNoOfTracks() == 0)
       showAccountDialog();      
     
+    createDropTarget();
     shell.open();    
     downloadThread.start();
     trackTable.addSelectionListener(new SelectionAdapter() {
@@ -64,7 +73,7 @@ public class Client extends AbstractClient {
         setPaused(false);
         playThread.play(trackTable.getSelectedTrack());
       }
-    });
+    });    
   }
 
 	
@@ -785,6 +794,41 @@ public class Client extends AbstractClient {
       lblState.setText(strState = str);
       lblState.pack();
     }
+  }
+  
+  /** Create a DND DropTarger for the Shell. */
+  public void createDropTarget() {
+    DropTarget target = new DropTarget(shell, DND.DROP_LINK);
+    target.setTransfer(new Transfer[] { FileTransfer.getInstance() } );
+    target.addDropListener(new DropTargetListener() {
+      public void dragEnter(DropTargetEvent e) {};
+      public void dragOver(DropTargetEvent e) {};
+      public void dragLeave(DropTargetEvent e) {};
+      public void dragOperationChanged(DropTargetEvent e) {};
+      public void dropAccept(DropTargetEvent e) {};
+      public void drop(DropTargetEvent e) {
+        if (e.data == null)
+          e.detail = DND.DROP_NONE;
+        else {
+          String[] filenames = (String[]) e.data;
+          for (int i = 0; i < filenames.length; i++) {
+            File file = new File(filenames[i]);
+            if (file.exists()) { 
+              System.out.println("Import: " + file);
+              try {
+                Track track = new Track(file.toURL());
+                if (trackDatabase.getTrack(track) == null)
+                  trackDatabase.add(track);
+              }
+              catch (MalformedURLException mue) {
+                mue.printStackTrace();
+              }
+              trackTable.updateTable();
+            }
+          }
+        }
+      }
+    }); 
   }
 
   public static void main(String[] args) throws Exception {

@@ -14,6 +14,12 @@ import java.util.List;
 import java.util.Vector;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.DragSource;
+import org.eclipse.swt.dnd.DragSourceEvent;
+import org.eclipse.swt.dnd.DragSourceListener;
+import org.eclipse.swt.dnd.FileTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Display;
@@ -102,7 +108,7 @@ public class TrackTable {
     });
 
     col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(150);
+    col.setWidth(180);
     col.setText("Last");
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
@@ -121,6 +127,26 @@ public class TrackTable {
     gridData.horizontalSpan = 2;
     table.setLayoutData(gridData);
     table.pack();
+    
+    DragSource source = new DragSource(table, DND.DROP_COPY);
+    source.setTransfer(new Transfer[] { FileTransfer.getInstance() });
+    source.addDragListener(new DragSourceListener() {
+      
+      /** The track that we're dragging. */
+      private Track track;
+      
+      public void dragStart(DragSourceEvent e) {
+        track = getSelectedTrack();
+        e.doit = track != null;
+      }
+      
+      public void dragSetData(DragSourceEvent e) {
+        e.data = new String[] { track.getFile().getAbsoluteFile().getAbsolutePath() };
+      } 
+      
+      public void dragFinished(DragSourceEvent e) {
+      }
+    });
   }
   
   /** Used to create a listener which sorts using the given Comparator.
