@@ -15,18 +15,25 @@ public class SWTClient {
 	static Shell shell;
 	
 	private TrackDatabase trackDatabase;
+  private PlayListManager playListManager;
+  private PlayThread playThread;
   
 	
 	public SWTClient() throws Exception {
-		initGUI();
-		/*File file = new File("trackdatabase.xml");
-		try {
-		  trackDatabase = new TrackDatabase(file);
-		  trackDatabase.purge();
-		}
-		catch (IOException e) {
-		  e.printStackTrace();
-		}*/
+    initGUI();
+    File file = new File("trackdatabase.xml");
+    try {
+      trackDatabase = new TrackDatabase(file);
+      trackDatabase.purge();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    playListManager = new PlayListManager(trackDatabase);
+    
+    playThread = new PlayThread(playListManager);
+    //playPanel = new PlayPanel(playListManager, playThread);
+    playThread.start();
 
 	}
 	
