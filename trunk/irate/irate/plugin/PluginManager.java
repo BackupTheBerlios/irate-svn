@@ -11,6 +11,7 @@ import irate.common.Preferences;
 import irate.plugin.autonormalize.AutoNormalizePlugin;
 import irate.plugin.externalcontrol.ExternalControlPlugin;
 import irate.plugin.lircremote.LircRemoteControlPlugin;
+import irate.plugin.marsyas.MarsyasPlugin;
 import irate.plugin.unratednotifier.UnratedNotifierPlugin;
 
 /**
@@ -54,6 +55,7 @@ public class PluginManager
     plugins.add(new ExternalControlPlugin());
     plugins.add(new LircRemoteControlPlugin());
     plugins.add(new UnratedNotifierPlugin());
+    plugins.add(new MarsyasPlugin());
     try {
       loadConfig();
     }
