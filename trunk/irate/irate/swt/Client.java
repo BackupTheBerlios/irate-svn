@@ -360,7 +360,14 @@ public class Client implements UpdateListener, PluginApplication {
       // called from a thread other than it, such as the remote control thread.
     display.asyncExec(new Runnable() {
       public void run() {
-        pause.setText(pausedFinal.booleanValue() ? "|>" : "||");
+        if (pausedFinal.booleanValue()) {
+          pause.setText("|>");
+          pause.setToolTipText("Resume from pause.");
+        }
+        else {
+          pause.setText("||");
+          pause.setToolTipText("Pause.");
+        }
       }
     });
   }
@@ -727,6 +734,7 @@ public class Client implements UpdateListener, PluginApplication {
     toolbar.setLayoutData(gridData);
 
     item.setText("This sux");
+    item.setToolTipText("Stop playing the current track and never play it again.");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         setRating(getSelectedTrack(), 0);
@@ -735,6 +743,7 @@ public class Client implements UpdateListener, PluginApplication {
     
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText("Yawn");
+    item.setToolTipText("Rate the current track as 2 out of 10.");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         setRating(getSelectedTrack(), 2);
@@ -743,6 +752,7 @@ public class Client implements UpdateListener, PluginApplication {
 
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText("Not bad");
+    item.setToolTipText("Rate the current track as 5 out of 10.");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         setRating(getSelectedTrack(), 5);
@@ -751,6 +761,7 @@ public class Client implements UpdateListener, PluginApplication {
 
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText("Cool");
+    item.setToolTipText("Rate the current track as 7 out of 10.");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         setRating(getSelectedTrack(), 7);
@@ -759,6 +770,7 @@ public class Client implements UpdateListener, PluginApplication {
 
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText("Love it");
+    item.setToolTipText("Rate the current track as 10 out of 10.");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         setRating(getSelectedTrack(), 10);
@@ -768,7 +780,7 @@ public class Client implements UpdateListener, PluginApplication {
     new ToolItem(toolbar,SWT.SEPARATOR);    
     
     pause = new ToolItem(toolbar,SWT.PUSH);
-    pause.setText("||");
+    setPaused(false);
     pause.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         setPaused(!isPaused());
@@ -777,6 +789,7 @@ public class Client implements UpdateListener, PluginApplication {
  
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText(">>");
+    item.setToolTipText("Skip to the next track.");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         skip();
@@ -787,6 +800,7 @@ public class Client implements UpdateListener, PluginApplication {
     volumeScale.setIncrement(VOLUME_RESOLUTION);
     volumeScale.setPageIncrement(VOLUME_RESOLUTION * 2);
     volumeScale.setMaximum(VOLUME_SPAN);
+    volumeScale.setToolTipText("Adjust the volume for the current track.");
     //volumeScale.setThumb(1);
     volumeScale.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
