@@ -64,7 +64,6 @@ public class MplayerPlayer extends ExternalPlayer {
           time += (int) Float.parseFloat(splits[i]);
         }
       } 
-      System.out.println("Time: " + time);
       
       notifyPosition(trackLength - time, trackLength);
     }
