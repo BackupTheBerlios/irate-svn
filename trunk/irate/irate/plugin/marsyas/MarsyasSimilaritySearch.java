@@ -85,7 +85,7 @@ public class MarsyasSimilaritySearch extends Thread  {
     Collections.sort(al);
     
     resultDialog = new MarsyasResultDialog(plugin, selectedTrack, al.subList(0,10));
-    start();
+    //start();
   }
   
   /** most inefficient string escape ever */

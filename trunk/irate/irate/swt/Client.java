@@ -1434,6 +1434,11 @@ public class Client extends AbstractClient {
 	public void addTrackAction(final String name, final SelectionListener listener) {
 	  display.syncExec(new Runnable() {
         public void run() {
+     Menu m = trackTable.getMenu();
+ 		 if(m == null) {
+ 		   System.err.println("trackTable.getMenu() shouldn't be null"); 
+       return;
+     }
  		 MenuItem item = new MenuItem(trackTable.getMenu(), SWT.NONE);
  		 item.setText(name);
 		 item.addSelectionListener(listener);
