@@ -35,6 +35,7 @@ public class Stat {
         }
         if (count != 0)
           System.out.println(count + " " + total / count);      
+        users[i].discard();
       }
       catch (IOException e) {
         e.printStackTrace();
