@@ -107,6 +107,12 @@ ifdef NO_RESOURCE
 	install irate/resources/*.gif $(RES)/irate/resources/
 else
 	install $(IRATE_CLIENT) $(BIN)
+	install -d $(RES)/icons/
+	install irate/resources/icon.xpm $(RES)/icons/irate.xpm
+	install -d $(RES)/gnome/
+	install -d $(RES)/gnome/apps/
+	install -d $(RES)/gnome/apps/Multimedia/
+	install irate/resources/irate-client.desktop $(RES)/gnome/apps/Multimedia/
 endif
 
 ifeq ($(SWT_LIB),)
@@ -143,7 +149,7 @@ lib/libjd3.o:
 lib/libhttpclient.o:
 	$(MAKE) -C lib/ libhttpclient.o
 	
-$(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS)
+$(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS) irate/resources/icon.xpm
 	$(GCJ) $(CLIENT_LINKFLAGS) $(CLIENT_DEPS) $(CLIENT_LIBS) -o $(IRATE_CLIENT) --main=irate.swt.Client
 
 $(IRATE_SERVER): $(SERVER_LIBS) $(SERVER_DEPS) 
@@ -178,6 +184,9 @@ icon.o: irate/resources/icon.png
 	echo irate_icon ICON DISCARDABLE "icon.ico" > icon.rc
 	i586-pc-mingw32-windres -i icon.rc -o $@
 	rm -f icon.ico icon.rc
+
+%.xpm: %.gif
+	convert $^ $@
 
 libmadplayer.o: irate/client/AbstractPlayer.java irate/client/LibMadPlayer.java irate/client/LibMadPlayer.cc
 	gcjh -o irate/client/AbstractPlayer.h irate.client.AbstractPlayer

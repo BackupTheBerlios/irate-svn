@@ -19,8 +19,9 @@ public class PlayThread extends Thread {
   private Speech speech = new Speech();
   private boolean speaking;
   private boolean toKeepPlaying;
-  Vector history = new Vector();
+  private Vector history = new Vector();
   private boolean reverse = false;
+  private boolean stopThread = false;
 	
   public PlayThread(PlayListManager playListManager, PlayerList playerList) {
     this.playListManager = playListManager;
@@ -32,7 +33,7 @@ public class PlayThread extends Thread {
   }
 
   public void run() {
-    while (true) {
+    while (!stopThread) {
       playTrack();
     }
   }
@@ -157,6 +158,11 @@ public class PlayThread extends Thread {
     skipSong(false);			
 	}
 
+  public void shutdown() {
+    stopThread = true;
+    skipSong(false);
+  }
+        
   /** Play the previous song 
   @returns false if we are at the begining */
 	public synchronized boolean goBack(){

@@ -236,7 +236,14 @@ public abstract class AbstractClient
 
   public void quit() {
     trackDatabase.purge();
-    playThread.reject();
+    try {
+      trackDatabase.save();
+    }
+    catch (IOException ioe) {
+      ioe.printStackTrace();
+    }
+    playThread.shutdown();
+    System.exit(0);
   }
 
   protected abstract void createNewAccount();

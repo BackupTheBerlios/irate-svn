@@ -294,23 +294,6 @@ public class Client extends AbstractClient {
     }
   }
 
-  public void quit() {
-    super.quit();
-    try {
-      shell.setVisible(false);
-    }
-    catch (Throwable t) {
-      t.printStackTrace();
-    }
-    try {
-      trackDatabase.save();
-    }
-    catch (IOException ee) {
-      ee.printStackTrace();
-    }
-    System.exit(0);
-  }
-
   void showAccountDialog() {
     strState = "";
     new AccountDialog(display, trackDatabase, downloadThread);
@@ -380,7 +363,7 @@ public class Client extends AbstractClient {
     catch(IOException e) {
       System.out.println("Couldn't load the silly Icon");
     }
-      shell.addShellListener(new ShellAdapter() {
+    shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
         quit();
       }
