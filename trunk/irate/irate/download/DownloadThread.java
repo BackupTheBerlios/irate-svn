@@ -85,10 +85,11 @@ public class DownloadThread extends Thread {
   }
 
   private boolean downloadSinglePending() throws IOException {
-    boolean success = false;
     Track[] tracks = trackDatabase.getTracks();
     //keep queued files there
-    Hashtable downloadTracks = new Hashtable();
+    Vector downloadTracks = new Vector();
+    //download threads keyed by host
+    Hashtable downloadThreads = new Hashtable();
     
     for (int i = 0; i < tracks.length; i++) {
       Track currentTrack = tracks[i];
@@ -100,13 +101,10 @@ public class DownloadThread extends Thread {
               currentTrack.unSetFile();
               trackDatabase.save();
             }
-            //Are we already downloading from this host?
-            String host = currentTrack.getURL().getHost();
-            if(downloadTracks.get(host)!=null)
-              continue;
+            downloadTracks.add(currentTrack);
+            //gcj doesnt like nulls in hashtables..so we later will replace the value with a thread
+            downloadThreads.put(currentTrack.getURL().getHost(), currentTrack.getURL().getHost());
             
-            downloadTracks.put(host, currentTrack);
-            //downloadTracks.add(currentTrack);
           }
           catch (IOException e) {
             e.printStackTrace();
@@ -114,35 +112,38 @@ public class DownloadThread extends Thread {
         }
       }
     }
-    Enumeration keys = downloadTracks.keys();
-    Thread downloadThreads[] = new Thread[5];
     
-    //as long as there are urls in the queue
-    //keep waiting for a free slot to download them
-    boolean stillDownloading = true;
-    while(downloadTracks.size() > 0 || stillDownloading) {
-      stillDownloading = false;
-      
-      for (int i = 0; i < downloadThreads.length; i++) {
-        if(downloadThreads[i]==null || !downloadThreads[i].isAlive()) {
-          if(keys.hasMoreElements()) {
-            String host = (String)keys.nextElement();
-            
-            final Track track = (Track) downloadTracks.get(host);
-            downloadTracks.remove(host);
-            keys = downloadTracks.keys();
-            
+    //can't download anything..should contact server
+    if(downloadTracks.size() == 0) 
+      return false;
+    
+    
+    
+    while(downloadTracks.size() > 0 || downloadThreads.size() > 0) {
+      //loop through current threads &queued downloads
+      Enumeration keyThreads = downloadThreads.keys();
+      while (keyThreads.hasMoreElements()) {
+        String host = (String)keyThreads.nextElement();
+        Object  o = downloadThreads.get(host);
+        TrackDownloader td;
+        //if a slot is empty start a new download
+        if(!(o instanceof TrackDownloader) || !(td=(TrackDownloader)o).isAlive()) {
+          for (Iterator iter = downloadTracks.iterator(); iter.hasNext(); ) {
+            Track track = (Track) iter.next();
+            if(!host.equals(track.getURL().getHost()))
+              continue;
+            iter.remove();
             System.out.println("Simultaniously downloading url "+track.getURL() + " hidden="+track.isHidden());
+            td = new TrackDownloader(this, track);
             //place a new download in the slot
-            downloadThreads[i] = new TrackDownloader(this, track);
             //silly gcj craps out if we call start fromt the TrackDownloader constructor
-            downloadThreads[i].start();
-            stillDownloading = true;
+            td.start();
+            downloadThreads.put(host, td);
           }
-        } else // if there are running threads
-          stillDownloading = true;
-      }//for
-      
+          
+        }
+      }//while
+      //dont bother the system much
       try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
@@ -150,8 +151,7 @@ public class DownloadThread extends Thread {
       }
     }//while
     
-    success = true;
-    return success;
+    return true;
   }
 
   public void process() throws IOException {
