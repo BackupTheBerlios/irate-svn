@@ -59,25 +59,21 @@ public class Client implements UpdateListener {
 	{
 		new AccountDialog(display, trackDatabase);
 		Player players[] = playerList.getPlayers();
+		trackDatabase.setAutoDownload(2);
 		if(players.length > 0)
 			trackDatabase.setPlayer(players[0].getName());
-		/*String players[] = {"madplay","mpg321","mpg123"};
-		String prefixes[] = {"/usr/bin/", "/usr/local/bin/",""};
-		for(int i=0;i<prefixes.length;i++)
-			for(int j=0;j<players.length;j++){
-				String player = prefixes[i] + players[j];
-				if(new File(player).exists()){
-					trackDatabase.setPlayer(player);
-					break;
-				}
-			}*/
-		trackDatabase.setAutoDownload(2);
+			
 	}
     playListManager = new PlayListManager(trackDatabase);
 	playThread = new PlayThread(playListManager, playerList);
  
 	initGUI();
-    
+	if(playerList.getPlayers().length == 0){
+		MessageBox msg = new MessageBox(shell, SWT.ICON_ERROR);
+		msg.setMessage("Couldn't locate a commandline mp3 player. Please install madplay, mpg321 or mpg123 into /usr/bin or /usr/local/bin.\n iRate will be unable to play mp3s.");
+		msg.open();
+	}
+
     playThread.addUpdateListener(this);
     playThread.start();
     
