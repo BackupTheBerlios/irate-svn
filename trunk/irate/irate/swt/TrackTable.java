@@ -236,18 +236,23 @@ public class TrackTable
     table.addMouseListener(new MouseAdapter() {
       public void mouseDown(MouseEvent e) 
       {
-        TableItem item = table.getItem(new Point(e.x, e.y));
-        if (item == null)
-          clickedTrack = null;
-        else
-          clickedTrack = (Track) hashByTableItem.get(item);
-        int x = table.getColumn(0).getWidth() +
-                table.getColumn(1).getWidth();
-        int width = table.getColumn(2).getWidth();
+        int colZeroWidth = table.getColumn(0).getWidth();
+        int colOneWidth = table.getColumn(1).getWidth();
+        int colTwoWidth = table.getColumn(2).getWidth();
+        
+        int x = colZeroWidth + colOneWidth;
+        
+        // The 80 is the hardcoded size of the rating star image.
+        int distanceToColZero = colOneWidth + colTwoWidth + 80;
           // If the user clicked on the rating column, then bring up the
           // pop-up menu.
           // NOTE: WIDTH OF RATING ICON IS HARD-CODED HERE!
-        if (e.x >= x && e.x < (x+width) && e.x < (x+80)) {
+        if (e.x >= x && e.x < (x+colTwoWidth) && e.x < (x+80)) {
+            TableItem item = table.getItem(new Point(e.x - distanceToColZero, e.y));
+            if (item == null)
+              clickedTrack = null;
+            else
+              clickedTrack = (Track) hashByTableItem.get(item);
           if (popupMenu != null && clickedTrack != null) {
             menuSelectedTrack = clickedTrack;
               // Select and scroll to the selected track.
