@@ -24,10 +24,10 @@ import java.net.*;
 /**
  * 
  * Date Created: Sep 13, 2003
- * Date Updated: $Date: 2003/09/20 09:08:32 $
+ * Date Updated: $Date: 2003/09/24 05:58:48 $
  * @author Creator:	Eric Dalquist
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.75 $
+ * @version $Revision: 1.76 $
  */
 public class Client implements UpdateListener, PluginApplication {
   
@@ -664,7 +664,7 @@ public class Client implements UpdateListener, PluginApplication {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item1_4.addArmListener(new ToolTipArmListener("Quit iRate Radio"));
+    item1_4.addArmListener(new ToolTipArmListener("Quit iRATE radio"));
     //end add
 
 
@@ -696,7 +696,7 @@ public class Client implements UpdateListener, PluginApplication {
     mDownload.setText("Auto download");
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mDownload.addArmListener(new ToolTipArmListener("Set number of unrated songs on list to stop automatically downloading at"));
+    mDownload.addArmListener(new ToolTipArmListener("Automatically download"));
     //end add
 
     Menu menu2 = new Menu(mDownload);
