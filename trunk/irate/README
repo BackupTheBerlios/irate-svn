@@ -38,14 +38,22 @@ the moment.
 
 $ ant
 
-To run the SWT version you need to do this:
+To run the SWT version on a *nix platform you need to do this:
 
 $ export LD_LIBRARY_PATH=lib
 $ java -jar irate-client.jar
 
+To run the SWT version on any platform you need to do:
+
+$ java -Djava.library.path=lib -jar irate-client-swt.jar
+
 To run the Swing version you will need to do this:
 
 $ java -jar irate-swing-client.jar
+
+To run the Swing version on any platform you need to do:
+
+$ java -Djava.library.path=lib -jar irate-client-swing.jar
 
 
 BUILDING WITH GCJ

@@ -12,3 +12,5 @@ irate-client
 irate-server
 users
 download
+.classpath
+.project
