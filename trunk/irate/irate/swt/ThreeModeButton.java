@@ -210,7 +210,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
       String key;
       if (isActive) {
         if (isPressed) {
-          key = "activePressed";
+          key = "pressed.active";
         }
         else {
           key = "active";
@@ -221,7 +221,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
         if (isMouseOver) {
           // If the mouse is pressed, display the pressed Hot Image
           if (isPressed) {
-            key = "hotPressed";
+            key = "pressed.hot";
             if(!imageDataHash.containsKey(key)) {
                 key = "pressed";
             }
@@ -288,8 +288,16 @@ public class ThreeModeButton extends Canvas implements Skinable {
 
   private Image createTransparentImage(String key) {
     ImageData imageData = (ImageData) imageDataHash.get(key);
-    if (imageData == null)
-      imageData = (ImageData) imageDataHash.get("");
+    if (imageData == null) {
+      if (key.equals("pressed.hot") || key.equals("pressed.active"))
+        imageData = (ImageData) imageDataHash.get("pressed");
+      if (imageData == null) {
+        if (key.equals("pressed"))
+          imageData = (ImageData) imageDataHash.get("active");          
+        if (imageData == null)
+          imageData = (ImageData) imageDataHash.get("");
+      }
+    }
     ImageData mergedImage = imageMerger.merge(0, 0, imageData);
     return new Image(this.getDisplay(), mergedImage);
   }

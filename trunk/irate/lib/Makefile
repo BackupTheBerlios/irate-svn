@@ -9,25 +9,25 @@ all: libswt.o libnanoxml-lite.o
 #	ar -rcs libswt.a libswt.o
 ifeq ($(PLATFORM),linux-motif)
 swt.jar: swt-2.1.2-linux-motif.zip
-	unzip swt-2.1.2-linux-motif.zip
+	unzip -o swt-2.1.2-linux-motif.zip
 else
 
 ifeq ($(PLATFORM),win32)
 swt.jar: swt-2.1-win32.zip
-	unzip swt-2.1-win32.zip
+	unzip -o swt-2.1-win32.zip
 	touch libswt.o
 else
 
 ifeq ($(PLATFORM),linux-gtk2)
 swt.jar: swt-2.1.1-linux-gtk.zip
-	unzip swt-2.1.1-linux-gtk.zip
+	unzip -o swt-2.1.1-linux-gtk.zip
 #swt.jar: swt-3.0M6-linux-gtk.zip
-#	unzip swt-3.0M6-linux-gtk.zip
+#	unzip -o swt-3.0M6-linux-gtk.zip
 else
 
 ifeq ($(PLATFORM),linux-libswt-gtk2)
 swt.jar: swt-2.1.1-linux-gtk.zip
-	unzip swt-2.1.1-linux-gtk.zip
+	unzip -o swt-2.1.1-linux-gtk.zip
 
 else
 	echo Unknown PLATFORM $(PLATFORM), please specify on commandline && exit 1 

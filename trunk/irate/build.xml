@@ -147,6 +147,7 @@
       <fileset file="irate-swt-client.jar"/>
       <fileset file="irate-client.tar.bz2"/>
       <fileset file="irate-client-installer.exe"/>
+      <fileset file="irate/resources/skin.zip"/>
     </delete>
   </target>
 

@@ -32,8 +32,8 @@ JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CL
 ifndef NO_RESOURCE
 IMAGES_GIF = $(shell find irate/resources/ -name '*.gif')
 IMAGES_PNG = $(shell find irate/resources/ -name '*.png')
-CLIENT_DEPS += $(IMAGES_GIF:.gif=.gifres.o)
-CLIENT_DEPS += $(IMAGES_PNG:.png=.pngres.o)
+CLIENT_DEPS += $(IMAGES_GIF:.gif=.gif.o)
+CLIENT_DEPS += $(IMAGES_PNG:.png=.png.o)
 LOCALES = \
   $(wildcard irate/common/locale*.properties) \
   $(wildcard irate/download/locale*.properties) \
@@ -43,6 +43,7 @@ TXT_RESOURCES = \
   irate/common/timestamp.txt \
   irate/common/version.txt
 CLIENT_DEPS += $(TXT_RESOURCES:.txt=.txt.o)  
+CLIENT_DEPS += irate/resources/skin.zip.o
 endif
 
 ifeq ($(PLATFORM),win32)
@@ -108,15 +109,16 @@ ifdef NO_RESOURCE
 	install irate/swt/locale*.properties $(RES)/irate/swt/
 	install -d $(RES)/irate/resources/
 	install irate/resources/*.gif $(RES)/irate/resources/
+	install irate/resources/skin.zip $(RES)/irate/resources/
 else
 	install $(IRATE_CLIENT) $(BIN)
+endif
 	install -d $(RES)/icons/
 	install irate/resources/icon.xpm $(RES)/icons/irate.xpm
 	install -d $(RES)/gnome/
 	install -d $(RES)/gnome/apps/
 	install -d $(RES)/gnome/apps/Multimedia/
 	install irate/resources/irate-client.desktop $(RES)/gnome/apps/Multimedia/
-endif
 
 ifeq ($(SWT_LIB),)
 ifeq ($(PLATFORM),linux-motif)	
@@ -173,16 +175,19 @@ irate-common.o:	$(JAVA_COMMONSRC)
 irate-server.o:irate/server/*.java
 	$(GCJ) -c irate/server/*.java -o irate-server.o
 
-%.gifres.o: %.gif
+%.gif.o: %.gif
 	$(GCJ) -c --resource $^ $^ -o $@
 
-%.pngres.o: %.png
+%.png.o: %.png
 	$(GCJ) -c --resource $^ $^ -o $@
 
 %.properties.o: %.properties	
 	$(GCJ) -c --resource $^ $^ -o $@
 
 %.txt.o: %.txt
+	$(GCJ) -c --resource $^ $^ -o $@
+
+%.zip.o: %.zip
 	$(GCJ) -c --resource $^ $^ -o $@
 
 icon.o: irate/resources/icon.png
@@ -229,5 +234,5 @@ irate-client-swing.jar:
 	jar -cmf META-INF/manifest.irate-client irate-client-swing.jar $(JAVA_OBJS) $(HELPFILES)
 
 clean:
-	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o setup.exe -R irate-linux-i586*
+	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o setup.exe -R irate-linux-i586* irate/client/skin.zip
 	$(MAKE) -C lib clean
