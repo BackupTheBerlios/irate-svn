@@ -24,7 +24,7 @@ public class Client implements UpdateListener {
   static Label lblTitle;
   static Label lblState;
   static Table tblSongs;
-  static Display display;
+  static Display display = new Display();
   static Shell shell;
   static ProgressBar progressBar;
 
@@ -33,7 +33,6 @@ public class Client implements UpdateListener {
   private PlayListManager playListManager;
   private PlayThread playThread;
   private DownloadThread downloadThread;
-  private ToolItem pause;
 
   private String strState = "                                                                     ";
   // private PlayThread playThread;
@@ -42,26 +41,37 @@ public class Client implements UpdateListener {
   public Client() {
    
     File file = new File("trackdatabase.xml");
-    boolean needToSetupAccount = false;
-
+	
     try {
       trackDatabase = new TrackDatabase(file);
       trackDatabase.purge();
     }
     catch (IOException e) {
-		needToSetupAccount = true;
-		System.out.println("Exception so set needToSetupAccount ="+ needToSetupAccount);
-	//	e.printStackTrace();
+		e.printStackTrace();
     }
+    
+    //try to do a nice initial experience for theuser
+   	//do as much handholding as possible
+	if(!file.exists())
+	{
+		new AccountDialog(display, trackDatabase);
+		String players[] = {"madplay","mpg321","mpg123"};
+		String prefixes[] = {"/usr/bin/", "/usr/local/bin/",""};
+		for(int i=0;i<prefixes.length;i++)
+			for(int j=0;j<players.length;j++){
+				String player = prefixes[i] + players[j];
+				if(new File(player).exists()){
+					trackDatabase.setPlayer(player);
+					break;
+				}
+			}
+		trackDatabase.setAutoDownload(2);
+	}
     playListManager = new PlayListManager(trackDatabase);
-    playThread = new PlayThread(playListManager, new PlayerList());
+    playThread = new PlayThread(playListManager);
  
 	initGUI();
     
-	//if(needToSetupAccount==true)
-		new AccountDialog(display, trackDatabase);
-
-	System.out.println("needToSetupAccount ="+ needToSetupAccount);
     playThread.addUpdateListener(this);
     playThread.start();
     
@@ -113,6 +123,9 @@ public class Client implements UpdateListener {
     });
     downloadThread.start();
   
+  	//if this is the first run of irate do that
+  	if(!file.exists())
+  		downloadThread.go();
 
   }
   
@@ -167,11 +180,6 @@ public class Client implements UpdateListener {
     synchronizePlaylist(playListManager, tblSongs);
     update();
   } 
-  
-  public void setPaused(boolean paused) {
-    playThread.setPaused(paused);
-    pause.setText(paused ? ">" : "||");
-  }
   
   void SortTableByStringColumn(int column_index, Table table)
   {
@@ -260,7 +268,6 @@ public class Client implements UpdateListener {
   }
   
   void initGUI(){
-  	display = new Display();
     shell = new Shell(display);
     shell.setText("iRATE radio");
     shell.addShellListener(new ShellAdapter()
@@ -321,15 +328,15 @@ public class Client implements UpdateListener {
     Menu menu2 = new Menu(item2);
     item2.setMenu(menu2);
     
-    MenuItem item2_1 = new MenuItem(menu2,SWT.PUSH);
-    item2_1.setText("Account");
+    //MenuItem item2_1 = new MenuItem(menu2,SWT.PUSH);
+    //item2_1.setText("Account");
     
     MenuItem mDownload = new MenuItem(menu2, SWT.CASCADE);
 	mDownload.setText("Auto Download");
 	menu2 = new Menu(mDownload);
 	mDownload.setMenu(menu2);
 	
-	int counts[] = new int[] {0, 5, 11, 17, 23, 29};
+	int counts[] = new int[] {0,2, 5, 11, 17, 23, 29};
 	int autoDownload = trackDatabase.getAutoDownload(); 
 	for(int i=0;i< counts.length;i++){
         MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
@@ -457,13 +464,9 @@ public class Client implements UpdateListener {
 
     new ToolItem(toolbar,SWT.SEPARATOR);    
     
-    pause = new ToolItem(toolbar,SWT.PUSH);
-    pause.setText("||");
-    pause.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        setPaused(!playThread.isPaused());
-      }
-    });
+    item = new ToolItem(toolbar,SWT.PUSH);
+    item.setText("||");
+    item.setEnabled(false);
     
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText(">>");

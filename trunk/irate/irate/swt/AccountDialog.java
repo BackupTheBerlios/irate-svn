@@ -19,10 +19,18 @@ import irate.common.*;
  * Window&gt;Preferences&gt;Java&gt;Code Generation&gt;Code and Comments
  */
 public class AccountDialog {
+	boolean done = false;
 	
 	public AccountDialog(Display display, TrackDatabase trackDatabase)
 	{
 		final Shell shell = new Shell(display);
+		shell.addShellListener(new ShellAdapter()
+		{
+		  public void shellClosed(ShellEvent e){
+			done=true;
+		  }
+		});
+
 		shell.setText("Account Settings");
 		GridLayout layout = new GridLayout(2, false);
 		shell.setLayout(layout);
@@ -57,22 +65,27 @@ public class AccountDialog {
 			  	finTrackDatabase.setPassword(txtPassword.getText());
 			  	finTrackDatabase.setHost(txtHost.getText());
 			  	finTrackDatabase.setPort(Integer.parseInt(txtPort.getText()));
-			  	//shell.close();
+			  	done = true;
 			  }
 			});    
 		
 		Button btnCancel = new Button(shell, SWT.NONE);
 		btnCancel.setText("Cancel");
-		btnSave.addSelectionListener(new SelectionAdapter(){
+		btnCancel.addSelectionListener(new SelectionAdapter(){
 		  public void widgetSelected(SelectionEvent e){
+			done = true;
 			if(finTrackDatabase.getUserName().length() == 0 || finTrackDatabase.getPassword().length() == 0)
 				System.exit(0);
-			shell.close();
 		  }
 		});    
 		
 		shell.pack();    
 		shell.open();
+		while (!done) {
+			if (!display.readAndDispatch()) display.sleep();
+		}	
+		shell.close();
+		shell.dispose();
 	}
 	
 	
