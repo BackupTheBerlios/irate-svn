@@ -92,7 +92,8 @@ public class LircRemoteControlConfigurator
     ok.setLayoutData(gd);
     ok.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        done = true;
+        setup();
+        shell.close();
       }
     });
     shell.pack();    
@@ -100,13 +101,11 @@ public class LircRemoteControlConfigurator
     while (!done) {
       if (!display.readAndDispatch()) display.sleep();
     } 
-    setup();
 
     if (wasAttached)
       plugin.attach(app);
     plugin.removeLircRemoteControlListener(this);
 
-    shell.close();
     shell.dispose();
   }
 
