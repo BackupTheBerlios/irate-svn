@@ -276,7 +276,12 @@ public class Client implements UpdateListener, PluginApplication {
    */
   public void setPaused(boolean paused) {
     playThread.setPaused(paused);
-    pause.setText(paused ? "|>" : "||");
+    final Boolean pausedFinal = new Boolean(paused);
+    display.asyncExec(new Runnable() {
+      public void run() {
+        pause.setText(pausedFinal.booleanValue() ? "|>" : "||");
+      }
+    });
   }
 
   /**
