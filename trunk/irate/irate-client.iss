@@ -19,25 +19,25 @@ Source: "swt-win32-2133.dll"; DestDir: "{app}"
 Source: "README"; DestDir: "{app}"
 Source: "COPYING"; DestDir: "{app}"
 ;Flags: isreadme
-Source: "irate\client\help\missingplayer.txt"; DestDir: "{app}\irate\client\help\missingplayer.txt";
-Source: "irate\client\help\about.txt"; DestDir: "{app}\irate\client\help\about.txt";
-Source: "irate\client\help\connectionfailed.txt"; DestDir: "{app}\irate\client\help\connectionfailed.txt"
-Source: "irate\client\help\connectionrefused.txt"; DestDir: "{app}\irate\client\help\connectionrefused.txt"
-Source: "irate\client\help\connectiontimeout.txt"; DestDir: "{app}\irate\client\help\connectiontimeout.txt"
-Source: "irate\client\help\empty.txt"; DestDir: "{app}\irate\client\help\empty.txt"
-Source: "irate\client\help\getstuffed.txt"; DestDir: "{app}\irate\client\help\getstuffed.txt"
-Source: "irate\client\help\gettingstarted.txt"; DestDir: "{app}\irate\client\help\gettingstarted.txt"
-Source: "irate\client\help\hostnotfound.txt"; DestDir: "{app}\irate\client\help\hostnotfound.txt"
-Source: "irate\client\help\malformedurl.txt"; DestDir: "{app}\irate\client\help\malformedurl.txt"
-Source: "irate\client\help\password.txt"; DestDir: "{app}\irate\client\help\password.txt"
-Source: "irate\client\help\user.txt"; DestDir: "{app}\irate\client\help\user.txt"
+Source: "irate\client\help\missingplayer.txt"; DestDir: "{app}\irate\client\help";
+Source: "irate\client\help\about.txt"; DestDir: "{app}\irate\client\help";
+Source: "irate\client\help\connectionfailed.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\connectionrefused.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\connectiontimeout.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\empty.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\getstuffed.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\gettingstarted.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\hostnotfound.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\malformedurl.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\password.txt"; DestDir: "{app}\irate\client\help"
+Source: "irate\client\help\user.txt"; DestDir: "{app}\irate\client\help"
 
 ;Source: "lib\jl020.jar"; DestDir: "{app}\lib\jl020.jar"
 ;Source: "lib\nanoxml-lite-2.2.3.jar"; DestDir: "{app}\lib\nanoxml-lite-2.2.3.jar"
 
 
 [Icons]
-Name: "{group}\iRate radio"; Filename: "{app}\irate-client.exe"
+Name: "{group}\iRate radio"; Filename: "{app}\irate-client.exe"; WorkingDir: "{app}"
 
 ; NOTE: Most apps do not need registry entries to be pre-created. If you
 ; don't know what the registry is or if you need to use it, then chances are
