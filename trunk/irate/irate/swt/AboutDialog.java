@@ -104,7 +104,7 @@ public class AboutDialog {
   }
 
   private Label createText(Composite parent, String s) {
-    Label label = new Label(parent, SWT.WRAP);
+    Label label = new Label(parent, SWT.NONE);
     label.setText(s);
     return label;
   }

@@ -20,10 +20,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/01/21 15:15:23 $
+ * Date Updated: $Date: 2004/01/22 02:08:08 $
  * @author Creator:	taras
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.21 $
+ * @version $Revision: 1.22 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -77,14 +77,14 @@ public class AccountDialog {
     group.setLayout(new GridLayout(2, false));
     Label lblIcon = new Label(group, SWT.NONE);
     lblIcon.setImage(Resources.getIconImage(display));
-    Label label = new Label(group, SWT.WRAP);
+    Label label = new Label(group, SWT.NONE);
 //    txt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL));
     label.setText(getResourceString("AccountDialog.Intro"));
     
     group = new Group(steps, SWT.NONE);
     controls[1] = group;
     group.setText("Account Settings");
-    label = new Label(group, SWT.WRAP);
+    label = new Label(group, SWT.NONE);
     GridData data = new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL);
     data.horizontalSpan = 4;
     label.setLayoutData(data);

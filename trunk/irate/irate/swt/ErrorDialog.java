@@ -69,7 +69,7 @@ public class ErrorDialog {
   }
 
   private void createText(String s) {
-    Label label = new Label(dialog.getMainComposite(), SWT.WRAP);
+    Label label = new Label(dialog.getMainComposite(), SWT.NONE);
     GridData data =
         new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
 //    final int numberLinesShown = 10;
