@@ -6,7 +6,7 @@
       <classpath>
         <pathelement path="lib/HTTPClient.jar"/>
         <pathelement path="lib/nanoxml-lite-2.2.3.jar"/>
-        <pathelement path="lib/jl020.jar"/>
+        <pathelement path="lib/jl030.jar"/>
         <pathelement path="lib/swt.jar"/>
         <pathelement path="lib/swt-pi.jar"/>
       </classpath>
@@ -14,15 +14,15 @@
   </target>
 
   <target name="jar" depends="compile">
-<!--    <jar jarfile="irate-swing-client.jar" manifest="META-INF/manifest.irate-client" compress="false">
+    <jar jarfile="irate-client-swing.jar" manifest="META-INF/manifest.irate-client" compress="true">
       <fileset dir="." includes="irate/swing/*.class"/>
       <fileset dir="." includes="irate/client/*.class"/>
       <fileset dir="." includes="irate/client/help/*.html"/>
       <fileset dir="." includes="irate/common/*.class"/>
       <fileset dir="." includes="irate/download/*.class"/>
-    </jar> -->
+    </jar>
     
-    <jar jarfile="irate-client.jar" manifest="META-INF/manifest.irate-swt-client" compress="false">
+    <jar jarfile="irate-client-swt.jar" manifest="META-INF/manifest.irate-swt-client" compress="true">
       <fileset dir="." includes="irate/swt/*.class"/>
       <fileset dir="." includes="irate/client/*.class"/>
       <fileset dir="." includes="irate/client/help/*.txt"/>
@@ -46,7 +46,7 @@
   </target>
 
   <target name="gzip" depends="jar">
-    <tar destfile="irate-client.tar.gz" basedir=".." includes="irate/irate-swt-client.jar,lib/irate/jl020.jar,irate/lib/nanoxml-lite-2.2.3.jar,irate/lib/swt.jar,irate/lib/libswt-*motif-3009.so" compression="gzip"/>
+    <tar destfile="irate-client.tar.gz" basedir=".." includes="irate/irate-swt-client.jar,lib/irate/jl030.jar,irate/lib/nanoxml-lite-2.2.3.jar,irate/lib/swt.jar,irate/lib/libswt-*motif-3009.so" compression="gzip"/>
   </target>
   
     <!-- Windoze installer -->
@@ -66,30 +66,23 @@
     </exec>
   </target>
 
-    <!-- Mac ZIP file -->
-  <target name="mac" depends="jar">
-    <zip destfile="irate-client-macosx.zip">
-      <zipfileset prefix="irate"     dir="." includes="irate-swt-client.jar"/>
-      <zipfileset prefix="irate/lib" dir="." includes="jl020.jar"/>
-      <zipfileset prefix="irate/lib" dir="." includes="nanoxml-lite-2.2.3.jar"/>
-      <zipfileset prefix="irate/lib" src="lib/swt-2.1-macosx-carbon.zip" includes="swt.jar,libswt-carbon-2133.jnilib"/>
-    </zip>
-  </target>
-
-  <target name="all" depends="gzip,mac,nsis">
+  <target name="all" depends="gzip,nsis">
   </target>
 
   <target name="clean">
     <delete>
       <fileset dir="." includes="**/*.class"/>
       <fileset file="irate-server.jar"/>
-      <fileset file="irate-client.jar"/>
+      <fileset file="irate-client-swing.jar"/>
+      <fileset file="irate-client-swt.jar"/>
       <fileset file="irate-client.tar"/>
       <fileset file="irate-client-linux.tar.gz"/>
-      <fileset file="irate-client-macosx.zip"/>
       <fileset file="irate-client-win32.exe"/>
       
       <!-- Old files no longer used -->
+      <fileset file="irate-client-macosx.zip"/>
+      <fileset file="irate-client.jar"/>
+      <fileset file="irate-swing-client.jar"/>
       <fileset file="irate-swt-client.jar"/>
       <fileset file="irate-client.tar.bz2"/>
       <fileset file="irate-client-installer.exe"/>
