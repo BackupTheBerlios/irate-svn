@@ -6,6 +6,7 @@ package irate.client;
 import java.io.File;
 import java.io.IOException;
 
+import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
 import irate.download.DownloadThread;
@@ -81,6 +82,90 @@ public abstract class AbstractClient implements UpdateListener, PluginApplicatio
     });
   }
   
+	/**
+	 * PluginApplication interface:
+	 * Get the track that is currently being played.
+	 */
+	public Track getPlayingTrack() {
+		return playThread.getCurrentTrack();
+	}
+	
+	/**
+	 * PluginApplication interface:
+	 * Set rating for the specified track.
+	 */
+	public void setRating(final Track track, int rating) {
+		final Integer ratingInt = new Integer(rating);
+			
+		// Update the Track Rating
+		track.setRating(ratingInt.intValue());
+		 
+		if (ratingInt.intValue() == 0 && track == getSelectedTrack()) {
+			playThread.reject();
+		}
+
+	  // Save the database with the updated rating
+		try {
+			trackDatabase.save();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void setVolume(final int volume) {
+		
+		final Integer volumeInt = new Integer(volume);
+
+		playThread.setVolume(volumeInt.intValue());
+
+		//save the updated volume
+		try {
+			trackDatabase.save();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * PluginApplication interface:
+	 * Return true if music play is paused.
+	 */
+	public boolean isPaused() {
+		return playThread.isPaused();
+	}
+	
+	/**
+	 * PluginApplication interface:
+	 * Pause or unpause music play.
+	 */
+	public void setPaused(boolean paused) {
+		playThread.setPaused(paused);
+	}
+	
+	/**
+	 * PluginApplication interface:
+	 * Skip to the next song.
+	 */
+	public void skip() {
+		skip(false);
+	}
+
+	public void skip(boolean reverse) {
+		setPaused(false);
+		if (!reverse) {
+			playThread.reject();
+			downloadThread.checkAutoDownload();
+		}
+	}
+	
+	public void quit() {
+		trackDatabase.purge();
+		playThread.reject();
+	}
+	
+	public abstract Track getSelectedTrack();
   public abstract void handleError(String code, String urlString);
   public abstract void setState(String state);
   public abstract void updateTrackTable();
