@@ -24,7 +24,7 @@ public class ExternalControlConfigurator {
   private ExternalControlPlugin plugin;
   private boolean done = false;
   private Text port;
-  private Label status;
+  private Text simConn;
 
   public ExternalControlConfigurator(Display display_, PluginApplication app_, Plugin plugin_)
   {
@@ -68,6 +68,12 @@ public class ExternalControlConfigurator {
     port.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));;
     port.setText(Integer.toString(plugin.getPort()));
     port.addModifyListener(callSetup);
+
+    new Label(shell, SWT.NONE).setText("Simultanious connections");
+    simConn = new Text(shell, SWT.SINGLE | SWT.BORDER);
+    simConn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));;
+    simConn.setText(Integer.toString(plugin.getSimConnections()));
+    simConn.addModifyListener(callSetup);
 
     /*    new Label(shell, SWT.NONE).setText("Status");
     status = new Label(shell, SWT.SINGLE | SWT.BORDER);
@@ -114,8 +120,10 @@ public class ExternalControlConfigurator {
   {
     //    plugin.setHost(host.getText());
     try {
-      if (!done)
+      if (!done) {
         plugin.setPort(Integer.parseInt(port.getText()));
+        plugin.setSimConnections(Integer.parseInt(simConn.getText()));
+      }
     }
     catch (NumberFormatException e) {
     }

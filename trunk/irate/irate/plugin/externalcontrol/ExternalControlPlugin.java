@@ -21,6 +21,7 @@ public class ExternalControlPlugin
   extends Plugin {
 
   private int port;
+  private int simConns;
   private IOThread socketListener;
   private PluginApplication app;
   /**
@@ -28,6 +29,7 @@ public class ExternalControlPlugin
    */
   public ExternalControlPlugin() {
     port = 12473;  // Default port number (12473 = RATE - sorry :)
+    simConns = 20;
   } // ExternalControlPlugin()
 
   /**
@@ -91,6 +93,19 @@ public class ExternalControlPlugin
     port = p;
   }
 
+  /**
+   * Returns the current simultanious connection limit
+   */
+  public int getSimConnections() {
+    return simConns;
+  }
+  /**
+   * Sets the simultanious connection limit
+   */
+  public void setSimConnections(int s) {
+    simConns = s;
+  }
+
   /* --- IOThread class --- */
 
   /**
@@ -117,28 +132,36 @@ public class ExternalControlPlugin
      */
     public void run() {
       int myPort = port;
+      Object timer = new Object();
       try {
-        socket = new ServerSocket(myPort,1, 
+        socket = new ServerSocket(myPort,0, 
                                   InetAddress.getByName("127.0.0.1")); 
       } catch (IOException e) {
         e.printStackTrace();
         prepareToDie();
       }
       while (!terminating) {
-        System.out.println("Number of connections: "+ExternalControlCommunicator.instanceCount);
         try {
           if (port != myPort) { // if port changes, we need a new
                                 // SocketServer
             myPort = port;
-            socket = new ServerSocket(myPort,1, 
+            socket = new ServerSocket(myPort,0, 
                                       InetAddress.getByName("127.0.0.1"));
           }
           socket.setSoTimeout(10000); // Block 10 secs to allow
                                       // termination etc.
+          while (ExternalControlCommunicator.instanceCount >= simConns) {
+            // We may need to wait until one of the connected clients
+            // disconnects
+            try {
+              synchronized (timer) {
+                timer.wait(5000); // Pause 5 seconds
+              }
+            } catch (InterruptedException e) {}
+          }
           Socket s = socket.accept();
           // Past this point means we have gotten a connection. Yay us!
-          // If at some stage we want multiple connections, we'd probably
-          // spawn off a new thread here.
+          // Spawn a new thread of the communicator.
           ExternalControlCommunicator comm = 
             new ExternalControlCommunicator(app, s);
           comm.start();
