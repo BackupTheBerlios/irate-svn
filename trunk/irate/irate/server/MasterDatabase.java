@@ -28,7 +28,7 @@ public class MasterDatabase extends ServerDatabase {
   private final int peerRetries = 30;
   
     /** The numebr of users to compare each user to. */
-  private final int noOfUsersToCompare = ServerDatabase.noOfFriendsToRecord * 5;
+  private final int noOfUsersToCompare = ServerDatabase.noOfFriendsToRecord * 3;
   
   private UserList userList;
   private Random random = new Random();

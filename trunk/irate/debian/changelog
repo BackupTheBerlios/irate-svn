@@ -1,10 +1,15 @@
+irate (0.3-0pre1) unstable; urgency=low
+
+  * Prerelease version 0.3.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Wed, 17 Sep 2003 15:42:12 +0800
+
 irate (0.2-8) unstable; urgency=low
 
   * Made it so that the account dialog opens if you haven't downloaded any
-  * tracks.
-  * 
+    tracks.
 
- -- Anthony Jones <ajones@clear.net.nz>  Thu, 28 Aug 2003 21:30:10 +0800
+ -- Anthony Jones <ajones@clear.net.nz>  Wed, 17 Sep 2003 15:40:44 +0800
 
 irate (0.2-7) unstable; urgency=low
 
