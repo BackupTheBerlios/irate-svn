@@ -360,8 +360,16 @@ public class TrackDatabase {
   public void purge() {
     for (int i = tracks.size() - 1; i >= 0; i--) {
       Track track = (Track) tracks.elementAt(i);
-      if (track.isHidden())
+      if (track.isHidden()){
+        File f = track.getFile();
+        if(f.exists())
+        	try {
+                f.delete();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         tracks.remove(i);
+      }
     }
   }
 
