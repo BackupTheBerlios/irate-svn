@@ -145,12 +145,15 @@ public class TrackTable {
    * @param column     The table column to add the column listener to.
    * @param comparator The comparator used to sort by the specified column.
    */
-  private void addColumnListener(TableColumn column, final Comparator comparator) {
+  private void addColumnListener(TableColumn column, final TrackComparator comparator) {
     //final Integer colNo = new Integer(columnNumber);
     column.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event e) {
-          TrackTable.this.comparator = (TrackComparator)comparator;
-          updateTable();
+        if (TrackTable.this.comparator == comparator)
+          comparator.setDirection(!comparator.direction);
+        else
+          TrackTable.this.comparator = comparator;
+        updateTable();
       } 
     });
   }
@@ -165,7 +168,6 @@ public class TrackTable {
       if (!track.isHidden()) 
         listOfTracks.add(track);
     }
-    comparator.setDirection(!comparator.direction);
     sort();
   }
   
