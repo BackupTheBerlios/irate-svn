@@ -41,6 +41,7 @@ public class DownloadThread extends Thread {
     downloadDir = trackDatabase.getDownloadDirectory();
     if (!downloadDir.exists())
       downloadDir.mkdir();
+    setDaemon(true);
   }
 
   public void run() {
@@ -73,6 +74,7 @@ public class DownloadThread extends Thread {
     }
   }
 
+  // This seems to be the sanctioned way of signalling that we should do stuff.
   public void checkAutoDownload()
   {
     synchronized (this) {
@@ -80,6 +82,7 @@ public class DownloadThread extends Thread {
     }
   }
 
+  // Appears to not be called externally. Could be made private
   public void go() {
     synchronized (this) {
       ready = true;
@@ -87,6 +90,7 @@ public class DownloadThread extends Thread {
     }
   }
 
+  // Appears to not be called externally. Could be made private
   public void setContinuous(boolean continuous) {
     this.continuous = continuous;
   }
@@ -172,6 +176,7 @@ public class DownloadThread extends Thread {
     return true;
   }
 
+  // Appears to not be called externally. Could be made private
   public void process() throws IOException {
     if (!downloadSinglePending()) {
       contactServer(trackDatabase);
@@ -203,11 +208,10 @@ public class DownloadThread extends Thread {
     int index = urlString.lastIndexOf('/');
     if (index > 0)
       urlString = urlString.substring(index + 1);
-    while (true) {
-      index = urlString.indexOf("%20"); //$NON-NLS-1$
-      if (index < 0)
-        break;
-      urlString = urlString.substring(0, index) + " " + urlString.substring(index + 3); //$NON-NLS-1$
+    try {
+      urlString = URLDecoder.decode(urlString, "UTF-8"); //$NON-NLS-1$
+    } catch (UnsupportedEncodingException e) {
+      // Should never happen -- UTF-8 is built-in
     }
     return new File(trackDatabase.getDownloadDirectory(), urlString);
   }
@@ -504,6 +508,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
   }
 
   //Made public for UI Tweak by Allen Tipper 14.9.03
+  // Appears to not be called externally any more, could be made private
   public void doCheckAutoDownload() {
     int noOfRated = trackDatabase.getNoOfRated();
     int noOfUnrated = trackDatabase.getNoOfUnrated();
@@ -571,6 +576,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
     public TrackDownloader(DownloadThread dthread, Track t) {
       track = t;
       dt = dthread;
+      setDaemon(true); // This means the JVM is permitted to exit in the middle of a transfer
     }
     
     public void run() {
@@ -580,7 +586,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
         ioe.printStackTrace();
       } 
     }
-  };
+  }
 }
 
 // Local Variables:
