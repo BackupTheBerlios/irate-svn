@@ -281,10 +281,19 @@ public class TrackDatabase {
 
   public void save() throws IOException {
     synchronized (this) {
+      File temporaryFile = new File(file.getPath()+"~");
       FileWriter fw = null;
       try {
-        fw = new FileWriter(file);
+        fw = new FileWriter(temporaryFile);
+	fw.write("<?xml version=\"1.0\"?>\n");
         fw.write(toString());
+	fw.close();
+	fw = null;
+	  // If we wrote the file successfully, then rename the temporary
+	  // file to the real name of the configuration file.  This makes
+	  // the writing of the new file effectively atomic.
+	if (!temporaryFile.renameTo(file))
+	  throw new IOException("Failed to rename "+temporaryFile+" to "+file);
       }
       finally {
         if (fw != null) try { fw.close(); } catch (IOException e) { e.printStackTrace(); }

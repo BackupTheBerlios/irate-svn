@@ -61,6 +61,11 @@ public class PluginManager
     return new File(configDir, "irate.xml");
   }
 
+  private File getConfigFileTemporary()
+  {
+    return new File(configDir, "irate.xml~");
+  }
+
   private void loadConfig()
     throws IOException
   {
@@ -111,14 +116,22 @@ public class PluginManager
       elt.setAttribute("attached", plugin.isAttached()?"true":"false");
       plugin.formatConfig(elt);
     }
-    FileWriter fw = new FileWriter(getConfigFile());
+    FileWriter fw = new FileWriter(getConfigFileTemporary());
     try {
       fw.write("<?xml version=\"1.0\"?>\n");
       fw.write(docElt.toString());
       fw.write("\n");
+      fw.close();
+      fw = null;
+        // If we wrote the file successfully, then rename the temporary
+	// file to the real name of the configuration file.  This makes
+	// the writing of the new file effectively atomic.
+      if (!getConfigFileTemporary().renameTo(getConfigFile()))
+	throw new IOException("Failed to rename "+getConfigFileTemporary()+" to "+getConfigFile());
     }
     finally {
-      fw.close();
+      if (fw != null)
+	fw.close();
     }
   }
 }
