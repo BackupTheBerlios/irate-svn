@@ -119,12 +119,12 @@ public abstract class AbstractClient
     };
 
     downloadThread.addDownloadListener(new DownloadListener() {
-      public void downloadStarted(Track track) {}
+      public void downloadStarted(Track track) { updateTrack(track); }
       public void downloadProgressed(Track track, int percentComplete, String state) {
         updateDownloadInfo(track, state, percentComplete);
       }
       public void downloadData(Track track, byte[] buffer, int offset, int length) {}
-      public void downloadFinished(Track track, boolean succeeded) {}
+      public void downloadFinished(Track track, boolean succeeded) { updateTrack(track); }
     });
 
     pluginManager = new PluginManager(this, dir);

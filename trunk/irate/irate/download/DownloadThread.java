@@ -234,7 +234,11 @@ public class DownloadThread extends Thread {
     if (finishedFile.exists()) {
       // We've already successfully downloaded the file. Set the file to the 
       // correct name.
+      for (int i = 0; i < downloadListeners.size(); i++)
+        ((DownloadListener)downloadListeners.get(i)).downloadStarted(track);
       track.setFile(finishedFile);
+      for (int i = 0; i < downloadListeners.size(); i++)
+        ((DownloadListener)downloadListeners.get(i)).downloadFinished(track, true);
       return;
     }
     final File downloadingFile = new File(finishedFile.toString() + ".part");
