@@ -429,7 +429,7 @@ public class Client extends AbstractClient {
     shell = new Shell(display);
     shell.setText("iRATE Radio - Initializing");
     try {
-      shell.setImage(Resources.getIconImage(display));
+      shell.setImage(Resources.getIconImage(display, shell.getBackground()));
     } 
     catch(IOException e) {
       System.out.println("Couldn't load the silly Icon");

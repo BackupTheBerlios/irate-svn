@@ -16,35 +16,19 @@
     </javac>
   </target>
 
-  <target name="irate-client-swing">
-    <jar jarfile="irate-client-swing.jar" manifest="META-INF/manifest.irate-client" compress="true">
-      <fileset dir="." includes="irate/swing/*.class"/>
-      <fileset dir="." includes="irate/swing/locale*.properties"/>
-      <fileset dir="." includes="irate/swing/*.gif"/>
-      <fileset dir="." includes="irate/client/*.class"/>
-      <fileset dir="." includes="irate/client/locale*.properties"/>
-      <fileset dir="." includes="irate/client/help/*.html"/>
-      <fileset dir="." includes="irate/common/*.class"/>
-      <fileset dir="." includes="irate/common/locale*.properties"/>
-      <fileset dir="." includes="irate/download/*.class"/>
-      <fileset dir="." includes="irate/download/locale*.properties"/>
-      <fileset dir="." includes="irate/resources/*.class"/>
-      <fileset dir="." includes="javazoom/jlGui/*.class"/>
-    </jar>
-  </target>
-  
   <target name="skin">
     <zip destfile="irate/resources/skin.zip">
       <fileset dir="irate/resources/skin/" includes="*.png"/>
     </zip>
   </target>
     
-  <target name="jar" depends="compile,skin,irate-client-swing,timestamp">
+  <target name="jar" depends="compile,skin,timestamp">
     <jar jarfile="irate-client-swt.jar" manifest="META-INF/manifest.irate-swt-client" compress="true">
       <fileset dir="." includes="irate/swt/*.class"/>
       <fileset dir="." includes="irate/swt/locale*.properties"/>
       <fileset dir="." includes="irate/resources/*.class"/>
       <fileset dir="." includes="irate/resources/*.gif"/>
+      <fileset dir="." includes="irate/resources/*.png"/>
       <fileset dir="." includes="irate/resources/*.mp3"/>
       <fileset dir="." includes="irate/resources/skin.zip"/>
       <fileset dir="." includes="irate/client/*.class"/>
@@ -89,16 +73,6 @@
         <include name="irate/lib/jl030.jar"/>
         <include name="irate/lib/nanoxml-lite-2.2.3.jar"/>
         <include name="irate/lib/swt.jar"/>
-      </tarfileset>
-    </tar>
-    <tar destfile="irate-client-swing.tar.gz" compression="gzip">
-      <tarfileset dir=".." mode="755">
-        <include name="irate/irate-client-swing.sh"/>
-      </tarfileset>
-      <tarfileset dir="..">
-        <include name="irate/irate-client-swing.jar"/>
-        <include name="irate/lib/jl030.jar"/>
-        <include name="irate/lib/nanoxml-lite-2.2.3.jar"/>
       </tarfileset>
     </tar>
   </target>

@@ -22,10 +22,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/06/05 06:57:41 $
+ * Date Updated: $Date: 2004/07/03 02:45:10 $
  * @author Creator:	taras
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.27 $
+ * @version $Revision: 1.28 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -61,7 +61,7 @@ public class AccountDialog {
     this.display = display;
 
     try {
-      shell.setImage(Resources.getIconImage(display));
+      shell.setImage(Resources.getIconImage(display, shell.getBackground()));
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -83,8 +83,7 @@ public class AccountDialog {
     group.setLayout(new GridLayout(2, false));
     Label lblIcon = new Label(group, SWT.NONE);
     try {
-      Image image = Resources.getIconImage(display);
-      image.setBackground(lblIcon.getBackground());
+      Image image = Resources.getIconImage(display, lblIcon.getBackground());
       lblIcon.setImage(image);
     }
     catch (IOException e) {
@@ -207,7 +206,7 @@ public class AccountDialog {
     composite.setLayout(new GridLayout(2, false));
     Label lblIcon = new Label(composite, SWT.NONE);
     try {
-      Image image = Resources.getIconImage(display);
+      Image image = Resources.getIconImage(display, lblIcon.getBackground());
       image.setBackground(lblIcon.getBackground());
       lblIcon.setImage(image);
     }

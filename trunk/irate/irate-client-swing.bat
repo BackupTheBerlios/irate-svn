@@ -1,1 +1,0 @@
-java -Djava.library.path=lib -jar irate-client-swing.jar

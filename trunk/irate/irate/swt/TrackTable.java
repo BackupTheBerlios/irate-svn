@@ -288,6 +288,7 @@ public class TrackTable {
   	Image image = (Image) imageHash.get(state);
   	if (image == null) 
   	{
+  	  System.out.println("Creating image " + state);
       ImageData stateImageData = basicSkinable.getImageData(state);
       if (stateImageData != null) {
         ImageData mergedImageData = imageMerger.merge(background, stateImageData);
