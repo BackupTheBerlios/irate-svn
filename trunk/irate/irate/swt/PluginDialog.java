@@ -16,60 +16,27 @@ public class PluginDialog
 {
   private PluginManager pluginManager;
   private boolean done = false;
-
-  public PluginDialog(Display display, PluginManager pluginManager, final PluginApplication app)
+	private Shell shell;
+  private PluginApplication app;
+		
+	public PluginDialog(Display display, PluginManager pluginManager, final PluginApplication app)
   {
     this.pluginManager = pluginManager;
-    final Shell shell = new Shell(display);
-    shell.setText("Plug-in settings");
+		this.app = app;
+    shell = new Shell(display);
+    shell.setText("Settings");
     shell.addShellListener(new ShellAdapter()
     {
       public void shellClosed(ShellEvent e){
         done=true;
       }
     });
-    GridLayout layout = new GridLayout(2, false);
-    shell.setLayout(layout);
-
-    Label heading = new Label(shell, SWT.NONE);
-    heading.setText("Select the plugins you wish to enable");
-    GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
-    gd.horizontalSpan = 2;
-    heading.setLayoutData(gd);
-
-    java.util.List plugins = pluginManager.getPlugins();
-    for (int i = 0; i < plugins.size(); i++) {
-      final Plugin plugin = (Plugin) plugins.get(i);
-      final Button checkbox = new Button(shell, SWT.CHECK);
-      checkbox.setText(plugin.getDescription());
-      checkbox.setSelection(plugin.isAttached());
-      checkbox.addSelectionListener(new SelectionAdapter(){
-	public void widgetSelected(SelectionEvent e){
-	  if (checkbox.getSelection())
-	    plugin.attach(PluginDialog.this.pluginManager.getApp());
-          else
-	    plugin.detach();
-	}
-      });
-      Button configure = new Button(shell, SWT.NONE);
-      configure.setText("Configure");
-      configure.addSelectionListener(new SelectionAdapter(){
-	public void widgetSelected(SelectionEvent e){
-	  app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
-	}
-      });
-    }
-
-    Button ok = new Button(shell, SWT.NONE);
-    ok.setText("OK");
-    gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
-    gd.horizontalSpan = 2;
-    ok.setLayoutData(gd);
-    ok.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        shell.close();
-      }
-    });
+		TabFolder tabs = new TabFolder(shell, SWT.NONE);
+		TabItem tabItem = new TabItem(tabs, SWT.NONE);
+		tabItem.setText("Plugins");
+		tabItem.setControl(createPluginPage(tabs));
+		tabs.pack();
+		
     shell.pack();    
     shell.open();
     while (!done) {
@@ -84,4 +51,52 @@ public class PluginDialog
     }
     shell.dispose();
   }
+	
+	public Composite createPluginPage(Composite parent) 
+	{
+		Composite comp = new Composite(parent, SWT.NONE);
+    GridLayout layout = new GridLayout(2, false);
+    comp.setLayout(layout);
+
+    Label heading = new Label(comp, SWT.NONE);
+    heading.setText("Select the plugins you wish to enable");
+    GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_BEGINNING);
+    gd.horizontalSpan = 2;
+    heading.setLayoutData(gd);
+
+    java.util.List plugins = pluginManager.getPlugins();
+    for (int i = 0; i < plugins.size(); i++) {
+      final Plugin plugin = (Plugin) plugins.get(i);
+      final Button checkbox = new Button(comp, SWT.CHECK);
+      checkbox.setText(plugin.getDescription());
+      checkbox.setSelection(plugin.isAttached());
+      checkbox.addSelectionListener(new SelectionAdapter(){
+	public void widgetSelected(SelectionEvent e){
+	  if (checkbox.getSelection())
+	    plugin.attach(PluginDialog.this.pluginManager.getApp());
+          else
+	    plugin.detach();
+	}
+      });
+      Button configure = new Button(comp, SWT.NONE);
+      configure.setText("Configure");
+      configure.addSelectionListener(new SelectionAdapter(){
+	public void widgetSelected(SelectionEvent e){
+	  app.getUIFactory().lookup(plugin, PluginUIFactory.CONFIGURATOR);
+	}
+      });
+    }
+
+    Button ok = new Button(comp, SWT.NONE);
+    ok.setText("OK");
+    gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+    gd.horizontalSpan = 2;
+    ok.setLayoutData(gd);
+    ok.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        shell.close();
+      }
+    });
+		return comp;
+	}
 }
