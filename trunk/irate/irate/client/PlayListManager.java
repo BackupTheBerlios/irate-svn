@@ -35,10 +35,11 @@ public class PlayListManager {
   public synchronized Track chooseTrack() {
     int playListLength = trackDatabase.getPlayListLength();
     int unratedPlayListRatio = trackDatabase.getUnratedPlayListRatio();
-//Added by EBD - 11.09.2003
-//Maybe use ceiling instead of round?
+    
+      //Added by EBD - 11.09.2003
+      //Maybe use ceiling instead of round?
     int unratedPlayListCount = (int)Math.round(((double)playListLength) * (((double)unratedPlayListRatio) / 100.0));
-
+    
       // Remove the track we've just played if necessary.
     if (playListIndex < playList.size()) {
       Track track = (Track) playList.get(playListIndex);
@@ -56,22 +57,22 @@ public class PlayListManager {
 
       // Maintain a 'toOmit' hash table, which is used to make the choosing
       // of tracks not choose ones we have already got on the list.
-    Hashtable toOmit = new Hashtable();
+    Set toOmit = new HashSet();
     int noOfUnrated = 0;
     for (int i = 0; i < playList.size(); i++) {
       Track track = (Track) playList.get(i);
-      if (!track.isOnPlayList()) {
-        if (track.getRating() == 0) {
-          playList.remove(i);
-          if (i < playListIndex)
-            --playListIndex;
-        }
-      }
-      else {
-    toOmit.put(track, track);
+//      if (!track.isOnPlayList()) {
+//        if (track.getRating() == 0) {
+//          playList.remove(i);
+//          if (i < playListIndex)
+//            --playListIndex;
+//        }
+//      }
+//      else {
+        toOmit.add(track);
         if (!track.isRated())
           noOfUnrated++;
-      }
+//      }
     }
 
       // Loop around one time for each track which needs to be added to the
@@ -88,17 +89,19 @@ public class PlayListManager {
  */
         if (noOfUnrated <= unratedPlayListCount && playList.size() != 0)
           track = trackDatabase.chooseUnratedTrack(random, toOmit);
-
+          
         if (track == null)
           track = trackDatabase.chooseTrack(random, toOmit);
 
-        if (track != null) {
-          if (!track.isRated())
-            noOfUnrated++;
+          // We couldn't find a track so give up looking.
+        if (track == null)
+          break;
+          
+        if (!track.isRated())
+          noOfUnrated++;
 
-      toOmit.put(track, track);
-      playList.add(track);
-        }
+        toOmit.add(track);
+        playList.add(track);
       }
     }
 
@@ -135,6 +138,8 @@ public class PlayListManager {
       Track track = (Track) playList.get(i);
       if (i == playListIndex)
         System.out.print("* ");
+      else
+        System.out.print("| ");
       System.out.println(track.toString());
     }
 

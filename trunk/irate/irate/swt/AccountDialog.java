@@ -5,6 +5,7 @@ import java.util.Random;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
+import org.eclipse.swt.graphics.Point;
 //import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.SWT;
 import irate.common.*;
@@ -14,13 +15,14 @@ import irate.download.DownloadThread;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/09/26 17:18:30 $
+ * Date Updated: $Date: 2003/09/29 11:19:13 $
  * @author Creator:	taras
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.8 $
+ * @version $Revision: 1.9 $
  */
 public class AccountDialog {
-  boolean done = false;
+  private boolean done = false;
+  private boolean success = false;
 
   private Shell shell;
   private TrackDatabase trackDatabase;
@@ -39,6 +41,7 @@ public class AccountDialog {
   public AccountDialog(Display display, TrackDatabase trackDatabase, DownloadThread downloadThread) {
     this.shell = new Shell(display);
     this.trackDatabase = trackDatabase;
+    this.downloadThread = downloadThread;
 
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
@@ -57,7 +60,7 @@ public class AccountDialog {
     createUserInfo();
 
     new Label(shell, SWT.NONE).setText("Password");
-    final Text txtPassword = new Text(shell, SWT.SINGLE | SWT.BORDER);
+    txtPassword = new Text(shell, SWT.SINGLE | SWT.BORDER);
     txtPassword.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     String password = trackDatabase.getPassword();
     if (password.length() == 0)
@@ -76,25 +79,28 @@ public class AccountDialog {
       new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     txtPort.setText(Integer.toString(trackDatabase.getPort()));
 
-    createAcceptButton();
-
     Button btnCancel = new Button(shell, SWT.NONE);
     btnCancel.setText("Cancel");
     btnCancel.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         done = true;
-        System.exit(0);
       }
     });
+    createAcceptButton();
 
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
         done = true;
-        System.exit(0);
       }
     });
 
     shell.pack();
+    Point size = shell.getSize();
+    if (size.x < 320)
+      size.x = 320;
+    shell.setSize(size);
+//    shell.setLocation();
+    
     shell.open();
     while (!done) {
       if (!display.readAndDispatch())
@@ -102,6 +108,8 @@ public class AccountDialog {
     }
     shell.close();
     shell.dispose();
+    if (!success)
+      System.exit(0);
   }
 
   /** Create the user input field. */
@@ -128,8 +136,11 @@ public class AccountDialog {
         trackDatabase.setHost(txtServer.getText());
         trackDatabase.setPort(Integer.parseInt(txtPort.getText()));
         downloadThread.contactServer(trackDatabase);
-        if (trackDatabase.getNoOfTracks() != 0)
+        if (trackDatabase.getNoOfTracks() != 0) {
           done = true;
+          success = true;
+          trackDatabase.setAutoDownload(5);
+        }
       }
     });
   }

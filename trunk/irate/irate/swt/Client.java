@@ -22,15 +22,15 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/09/26 17:15:16 $
+ * Date Updated: $Date: 2003/09/29 11:19:13 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.77 $
+ * @version $Revision: 1.78 $
  */
-public class Client implements UpdateListener, PluginApplication {
+public class Client extends AbstractClient {
 
   private static final int VOLUME_RESOLUTION = 3;
   private static final int VOLUME_SPAN = 30;
@@ -44,136 +44,82 @@ public class Client implements UpdateListener, PluginApplication {
   private Scale volumeScale;
 
   private Hashtable hashSongs = new Hashtable();
-  private TrackDatabase trackDatabase;
-  private PlayListManager playListManager;
-  private PlayerList playerList;
-  private PlayThread playThread;
-  private DownloadThread downloadThread;
   private ToolItem pause;
   private ToolItem previous;
   private Track previousTrack;
-  private ErrorDialog errorDialog;
-  private PluginManager pluginManager;
   private Help help = new Help();
+  private ErrorDialog errorDialog;
 
   private String strState = "";
 
   private SWTPluginUIFactory uiFactory;
 
   public Client() {
-    File home = new File(System.getProperties().getProperty("user.home"));
-
-    // Check the current directory for an existing trackdatabase.xml for
-    // compatibility reasons only.
-    File dir = new File(".");
-    File file = new File(dir, "trackdatabase.xml");
-    if (!file.exists()) {
-      dir = new File("/irate");
-      file = new File(dir, "trackdatabase.xml");
-      if (!file.exists()) {
-        dir = new File(home, "irate");
-        if (!dir.exists())
-          dir.mkdir();
-        file = new File(dir, "trackdatabase.xml");
-      }
-    }
-
-    try {
-      trackDatabase = new TrackDatabase(file);
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-
-    playerList = new PlayerList();
-    playListManager = new PlayListManager(trackDatabase);
-    playThread = new PlayThread(playListManager, playerList);
-
-    uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
-    pluginManager = new PluginManager(this, dir);
-
     initGUI();
-    errorDialog = new ErrorDialog(display, shell);
-
-    if (playerList.getPlayers().length == 0)
-      errorDialog.show(getResource("help/missingplayer.html"));
-
-    playThread.addUpdateListener(this);
-    playThread.start();
-
-    downloadThread = new DownloadThread(trackDatabase) {
-      public void process() throws IOException {
-        super.process();
-        // perhapsDisableAccount();
-      }
-
-      public void handleError(String code, String urlString) {
-        //actionSetContinuousDownload(false);
-        Reader r;
-        try {
-          if (urlString.indexOf(':') < 0) {
-            r = getResource("help/" + urlString);
-            if (r == null)
-              throw new NullPointerException();
-          }
-          else
-            try {
-              r = new InputStreamReader(new URL(urlString).openStream());
-            }
-            catch (MalformedURLException e) {
-              e.printStackTrace();
-              r = getResource("help/malformedurl.html");
-            }
-        }
-        catch (IOException e) {
-          r = getResource("help/errorerror.txt");
-        }
-        final Reader finalReader = r;
-        display.asyncExec(new Runnable() {
-          public void run() {
-            errorDialog.show(finalReader);
-          }
-        });
-      }
-    };
-
-    downloadThread.addUpdateListener(new UpdateListener() {
-      boolean newState = false;
-      public void actionPerformed() {
-        String state = downloadThread.getState();
-        newState = false;
-        if (!strState.equals(state)) {
-          strState = state;
-          newState = true;
-        }
-        display.asyncExec(new Runnable() {
-          public void run() {
-            int n = downloadThread.getPercentComplete();
-            boolean barVisible = progressBar.getVisible();
-            if (n > 0 && n < 100) {
-              lblState.setText(strState + " " + n + "%");
-              progressBar.setSelection(n);
-              if (!barVisible)
-                progressBar.setVisible(true);
-            }
-            else {
-              lblState.setText(strState);
-              if (barVisible)
-                progressBar.setVisible(false);
-            }
-            lblState.pack();
-            if (newState)
-              synchronizePlaylist(playListManager, tblSongs);
-          }
-        });
-      }
-    });
-
+    uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
+    
     if (trackDatabase.getNoOfTracks() == 0)
       showAccountDialog();      
     
+    shell.open();    
     downloadThread.start();
-    shell.open();
+  }
+
+  public void handleError(String code, String urlString) {
+    if (errorDialog == null)
+      errorDialog = new ErrorDialog(display, shell);
+    
+    //actionSetContinuousDownload(false);
+    Reader r;
+    try {
+      if (urlString.indexOf(':') < 0) {
+        r = getResource("help/" + urlString);
+        if (r == null)
+          throw new NullPointerException();
+      }
+      else
+        try {
+          r = new InputStreamReader(new URL(urlString).openStream());
+        }
+        catch (MalformedURLException e) {
+          e.printStackTrace();
+          r = getResource("help/malformedurl.html");
+        }
+    }
+    catch (IOException e) {
+      r = getResource("help/errorerror.txt");
+    }
+    final Reader finalReader = r;
+    display.asyncExec(new Runnable() {
+      public void run() {
+        errorDialog.show(finalReader);
+      }
+    });
+  }
+  
+  public void setState(String state) {
+    final boolean newState = !strState.equals(state);
+    strState = state;
+    display.asyncExec(new Runnable() {
+      public void run() {
+        int n = downloadThread.getPercentComplete();
+        boolean barVisible = progressBar.getVisible();
+        if (n > 0 && n < 100) {
+          lblState.setText(strState + " " + n + "%");
+          progressBar.setSelection(n);
+          if (!barVisible)
+            progressBar.setVisible(true);
+        }
+        else {
+          lblState.setText(strState);
+          if (barVisible)
+            progressBar.setVisible(false);
+        }
+        lblState.pack();
+        if (newState)
+          synchronizePlaylist(playListManager, tblSongs);
+      }
+    });
   }
 
   public void update() {
@@ -181,9 +127,9 @@ public class Client implements UpdateListener, PluginApplication {
       public void run() {
         //synchronizePlaylist(playListManager, tblSongs);
         Track track = playThread.getCurrentTrack();
-        String s = track.toString();
-        //    lblTitle.setText(s);
-        shell.setText("iRATE radio - " + s);
+        if (track == null)
+          return;
+        shell.setText("iRATE radio" + (track == null ? "" : " - " + track.toString()));
         volumeScale.setSelection(
           (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
         TableItem item = (TableItem) hashSongs.get(track);

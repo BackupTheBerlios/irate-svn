@@ -387,6 +387,11 @@ public class Track {
     return getTitle().compareToIgnoreCase(track.getTitle());
   }
   
+  public boolean exists() {
+    File file = getFile();
+    return file != null && file.exists();
+  }
+  
   public boolean equals(Track track) {
     return getURL().equals(track.getURL());
   }

@@ -203,7 +203,6 @@ public class TrackDatabase {
     setAttribute(userElementName, "host", host);
   }
 
-//JDR \/ \/ \/ \/ \/ \/
   public String getHTTPProxy() { //JDR
     return getAttribute(userElementName, "HTTPProxy"); //JDR
   } //JDR
@@ -224,7 +223,6 @@ public class TrackDatabase {
   public void setHTTPProxyPort(int proxyPort) { //JDR
     setAttribute(userElementName, "HTTPProxyPort", Integer.toString(proxyPort)); //JDR
   } //JDR
-//JDR /\ /\ /\ /\ /\ /\
 
   public int getPort() {
     try {
@@ -451,7 +449,7 @@ public class TrackDatabase {
   }
 
   public float getProbability(Track track) {
-    if (track.getFile() == null)
+    if (!track.exists())
       return 0;
     return track.getProbability();
   }
@@ -465,7 +463,7 @@ public class TrackDatabase {
    * Choose a track from the track database, excluding tracks in 'toOmit'.
    * Ignore toOmit if it is null.
    */
-  public Track chooseTrack(Random random, Hashtable toOmit) {
+  public Track chooseTrack(Random random, Set toOmit) {
     Track[] tracks = getTracks();
     while (true) {
       float[] probs = new float[tracks.length];
@@ -478,7 +476,7 @@ public class TrackDatabase {
         Track track = tracks[i];
           float rating = track.getRating();
 
-        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track)))
+        if (rating >= minRating && (toOmit == null || !toOmit.contains(track)))
           totalProb += getProbability(track);
 
         probs[i] = totalProb;
@@ -492,7 +490,7 @@ public class TrackDatabase {
         while (true) {
           float rand = Math.abs(random.nextFloat()) * totalProb;
           for (int i = 0; i < tracks.length; i++) {
-            if (toOmit != null && toOmit.containsKey(tracks[i]))
+            if (toOmit != null && toOmit.contains(tracks[i]))
               continue;
             if (rand <= probs[i])
               return tracks[i];
@@ -506,13 +504,15 @@ public class TrackDatabase {
    * Choose an unrated track from the track database, excluding tracks in
    * 'toOmit'. Ignore toOmit if it is null.
    */
-  public Track chooseUnratedTrack(Random random, Hashtable toOmit) {
+  public Track chooseUnratedTrack(Random random, Set toOmit) {
     Track[] tracks = getTracks();
     List list = new Vector();
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
-      if (!track.isRated() && (toOmit == null || !toOmit.containsKey(track)) && track.getFile() != null)
+      if (!track.isRated() && (toOmit == null || !toOmit.contains(track)) && track.exists()) {
+        System.out.println("::" + track.getName());
         list.add(track);
+      }
     }
 
       // If there are no unrated tracks then return null.
@@ -528,7 +528,7 @@ public class TrackDatabase {
     Track[] tracks = getTracks();
     int noOfUnrated = 0;
     for (int i = 0; i < tracks.length; i++)
-      if (!tracks[i].isHidden() && !tracks[i].isRated() && tracks[i].getFile() != null)
+      if (!tracks[i].isHidden() && !tracks[i].isRated() && tracks[i].exists())
         noOfUnrated++;  
     return noOfUnrated;  
   }
