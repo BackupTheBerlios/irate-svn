@@ -441,7 +441,7 @@ System.out.println("DownloadThread.java:326: " + errorCode); //$NON-NLS-1$
     updateListeners.add(updateListener);
   }
 
-  private void removeUpdateListener(UpdateListener updateListener) {
+  public void removeUpdateListener(UpdateListener updateListener) {
     for (int i = 0; i < updateListeners.size(); i++)
       if(updateListeners.elementAt(i)==updateListener) {
         updateListeners.removeElementAt(i);
