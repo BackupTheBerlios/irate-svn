@@ -192,7 +192,7 @@ public class Client implements UpdateListener, PluginApplication {
         String s = track.toString();
     //    lblTitle.setText(s);
         shell.setText("iRATE radio - " + s);
-        volumeScale.setSelection(track.getVolume() + VOLUME_OFFSET);
+        volumeScale.setSelection((track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
         TableItem item = (TableItem)hashSongs.get(track);
         tblSongs.select(tblSongs.indexOf(item));
         tblSongs.showItem(item);    
@@ -797,14 +797,13 @@ public class Client implements UpdateListener, PluginApplication {
     });
     
     volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
-    volumeScale.setIncrement(VOLUME_RESOLUTION);
-    volumeScale.setPageIncrement(VOLUME_RESOLUTION * 2);
-    volumeScale.setMaximum(VOLUME_SPAN);
+    volumeScale.setIncrement(1);
+    volumeScale.setPageIncrement(1);
+    volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
     volumeScale.setToolTipText("Adjust the volume for the current track.");
-    //volumeScale.setThumb(1);
     volumeScale.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setVolume(volumeScale.getSelection() - VOLUME_OFFSET);
+        setVolume(volumeScale.getSelection() * VOLUME_RESOLUTION - VOLUME_OFFSET);
       }
     });
     gridData = new GridData();
