@@ -33,7 +33,7 @@ public class Server {
   }
 
   public void run() throws IOException {
-    System.out.println("iRATE server started");
+    System.out.println("iRATE server started - " + masterDatabase.getNoOfTracks() + " tracks");
     while (true) {
       Socket socket = serverSocket.accept();
       requestHandler.process(socket);
