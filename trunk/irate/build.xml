@@ -9,6 +9,7 @@
         <pathelement path="lib/jl030.jar"/>
         <pathelement path="lib/swt.jar"/>
         <pathelement path="lib/swt-pi.jar"/>
+        <pathelement path="lib/jlGui2.2.jar"/>
       </classpath>
     </javac>
   </target>
