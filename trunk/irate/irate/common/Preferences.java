@@ -46,43 +46,24 @@ public class Preferences {
    * @return the directory location of where the trackdatabase.xml file is stored
    */
   public static String getUserDownloadDirectoryPreference() {
-   
+    return getUserPreference("downloadDir");
+  }
+  
+  public static String getUserPreference(String prefName) {
     try {    
-      
       XMLElement docElt = getConfigFileAsXML();
-      
+  
       Enumeration e = docElt.enumerateChildren();
       while(e.hasMoreElements()) {
         XMLElement elt = (XMLElement)e.nextElement();
         if (elt.getName().equals("preference")) {
           String identifier = elt.getStringAttribute("id");
-          if(identifier.equals("downloadDir")) {
+          if(identifier.equals(prefName)) {
             return elt.getContent();
           }
         }
       }
       return null;
-    } catch (IOException e) {
-      return null;    
-    }
-  }
-  
-  public static String getUserPreference(String prefName) 
-  {
-    try {    
-     XMLElement docElt = getConfigFileAsXML();
-  
-     Enumeration e = docElt.enumerateChildren();
-     while(e.hasMoreElements()) {
-       XMLElement elt = (XMLElement)e.nextElement();
-       if (elt.getName().equals("preference")) {
-        String identifier = elt.getStringAttribute("id");
-        if(identifier.equals(prefName)) {
-          return elt.getContent();
-        }
-      }
-    }
-    return null;
     } catch (IOException e) {
       return null;    
     }   
