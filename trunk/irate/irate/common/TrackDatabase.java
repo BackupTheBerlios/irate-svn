@@ -3,10 +3,7 @@ package irate.common;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-import org.w3c.dom.ls.*;
-import org.xml.sax.*;
+import nanoxml.XMLElement;
 
 public class TrackDatabase {
   
@@ -21,20 +18,21 @@ public class TrackDatabase {
   private Vector tracks = new Vector();
   private Hashtable hash = new Hashtable();
   private File file;
-  private DocumentBuilderFactory dbf;
+ /* private DocumentBuilderFactory dbf;
   private DocumentBuilder db;
   private DOMImplementationLS dil;
   private DOMWriter dw;
   private Document doc;
   private Element docElt;
-  
+  */
+  private XMLElement docElt;
+    
   public TrackDatabase() {
     create();
   }
 
   public TrackDatabase(File file) throws IOException {
     try {
-      createDOM();
       load(file);
     }
     catch (Exception e) {
@@ -47,7 +45,6 @@ public class TrackDatabase {
 
   public TrackDatabase(InputStream is) throws IOException {
     try {
-      createDOM();
       load(is);
     }
     catch (Exception e) {
@@ -62,10 +59,8 @@ public class TrackDatabase {
     try {
       tracks = new Vector();
       hash = new Hashtable();
-      createDOM();
-      doc = db.newDocument();
-      docElt = doc.createElement(docElementName);
-      doc.appendChild(docElt);
+      docElt = new XMLElement();
+      docElt.setName(docElementName);
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -76,8 +71,8 @@ public class TrackDatabase {
     synchronized (this) {
       Track copy;
       if ((copy = getTrack(track)) == null) {
-        copy = new Track((Element) doc.importNode(track.getElement(), false));
-        docElt.appendChild(copy.getElement());
+        copy = new Track((XMLElement) track.getElement());
+        docElt.addChild(copy.getElement());
         tracks.add(copy);
         hash.put(copy.getKey(), copy);
       }
@@ -105,30 +100,39 @@ public class TrackDatabase {
     return tracks.size();
   }
 
-  private Element getElement(String eltName) {
-    NodeList nodeList = docElt.getElementsByTagName(eltName);
+  private XMLElement getElement(String eltName) {
+    Enumeration enum = docElt.enumerateChildren();
+    while(enum.hasMoreElements())
+    {
+      return (XMLElement) enum.nextElement();
+    }
+    return null;
+    /*NodeList nodeList = docElt.getElementsByTagName(eltName);
+	  
     if (nodeList.getLength() != 0) {
       Node node = nodeList.item(0);
       if (node instanceof Element) 
         return (Element) node;
     }
-    return null;
+    return null;*/
   }
 
   protected String getAttribute(String name, String attName) {
-    Element elt = getElement(name);
+    XMLElement elt = getElement(name);
     if (elt == null)
       return "";
-    return elt.getAttribute(attName);
+    return elt.getStringAttribute(attName);
   }
 
   protected void setAttribute(String name, String attName, String attValue) {
-    Element elt = getElement(name);
+    XMLElement elt = getElement(name);
     if (elt == null) {
-      elt = doc.createElement(name);
-      docElt.appendChild(elt);
+      elt = new XMLElement();
+      elt.setName(name);
+      docElt.addChild(elt);
     }
     elt.setAttribute(attName, attValue);
+  //  System.out.println("name="+name + " '" +attName+"="+attValue+" "+elt); 
   }
   
   public String getUserName() {
@@ -218,29 +222,23 @@ public class TrackDatabase {
     this.file = file;
   }
 
-  private void createDOM() throws ParserConfigurationException {
-    if (dbf == null) { 
-      dbf = DocumentBuilderFactory.newInstance();
-      db = dbf.newDocumentBuilder();
-      dil = (DOMImplementationLS) db.getDOMImplementation();
-      dw = dil.createDOMWriter();
-    }
-  }
 
-  public void load(File file) throws IOException, ParserConfigurationException,
-      SAXException {
+  public void load(File file) throws IOException {
     this.file = file;
     load(new FileInputStream(file));
   }
       
-  public void load(InputStream is) throws IOException, ParserConfigurationException,
-      SAXException {
-    doc = db.parse(is);
-    docElt = doc.getDocumentElement();
+  public void load(InputStream is) throws IOException {    
+    if(docElt == null)
+      create();
+    docElt.parseFromReader(new InputStreamReader(is));
     if (docElt.getTagName().equals(docElementName)) {
-      NodeList nl = docElt.getElementsByTagName(trackElementName);
-      for (int i = 0; i < nl.getLength(); i++) {
-        Element elt = (Element) nl.item(i);
+      Enumeration enum = docElt.enumerateChildren();
+      while(enum.hasMoreElements())
+      {
+        XMLElement elt = (XMLElement)enum.nextElement();
+        if(!elt.getTagName().equals(trackElementName)) continue;
+        //System.out.println(elt.toString());
         Track track = new Track(elt);
         tracks.add(track);
         hash.put(track.getKey(), track);
@@ -262,7 +260,7 @@ public class TrackDatabase {
   }
 
   public String toString() {
-    return dw.writeToString(docElt);
+    return docElt.toString();
   }
 
   public Track getTrack(String key) {

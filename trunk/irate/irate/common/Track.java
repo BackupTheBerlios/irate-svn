@@ -4,16 +4,16 @@ import java.io.*;
 import java.net.*;
 import java.text.*;
 import java.util.*;
-import org.w3c.dom.*;
+import nanoxml.XMLElement;
 
 public class Track {
 
   private final int DEFAULT_RATING = 7;
   private final int INITIAL_RATING = 10;
   
-  private Element elt;
+  private XMLElement elt;
   
-  public Track(Element elt) {
+  public Track(XMLElement elt) {
     this.elt = elt;
   }
 
@@ -44,7 +44,7 @@ public class Track {
    */
   private float getRawRating() {
     try {
-      return Float.parseFloat(elt.getAttribute("rating"));
+      return Float.parseFloat(elt.getStringAttribute("rating"));
     }
     catch (NumberFormatException e) {
     }
@@ -65,7 +65,7 @@ public class Track {
 
   public int getNoOfTimesPlayed() {
     try {
-      return Integer.parseInt(elt.getAttribute("played"));
+      return Integer.parseInt(elt.getStringAttribute("played"));
     }
     catch (NumberFormatException e) {
     }
@@ -87,7 +87,7 @@ public class Track {
   }
 
   public String getLastPlayed() {
-    return elt.getAttribute("last");
+    return elt.getStringAttribute("last");
   }
 
   public void setRating(float rating) {
@@ -108,7 +108,7 @@ public class Track {
 
   public float getWeight() {
     try {
-      return Integer.parseInt(elt.getAttribute("weight"));
+      return Integer.parseInt(elt.getStringAttribute("weight"));
     }
     catch (NumberFormatException e) {
     }
@@ -120,7 +120,7 @@ public class Track {
   }
 
   public boolean isBroken() {
-    String s = elt.getAttribute("broken");
+    String s = elt.getStringAttribute("broken");
     return s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true");
   }
 
@@ -129,16 +129,16 @@ public class Track {
   }
 
   public String getArtist() {
-    return elt.getAttribute("artist");
+    return elt.getStringAttribute("artist");
   }
 
   public String getTitle() {
-    return elt.getAttribute("title");
+    return elt.getStringAttribute("title");
   }
 
   public URL getURL() {
     try {
-      return new URL(elt.getAttribute("url"));
+      return new URL(elt.getStringAttribute("url"));
     }
     catch (MalformedURLException e) {
       e.printStackTrace();
@@ -147,11 +147,11 @@ public class Track {
   }
 
   public String getKey() {
-    return elt.getAttribute("url");
+    return elt.getStringAttribute("url");
   }
 
   public File getFile() {
-    String filename = elt.getAttribute("file");
+    String filename = elt.getStringAttribute("file");
     if (filename.length() == 0) {
       URL url = getURL();
       if (url.getProtocol().equals("file"))
@@ -177,7 +177,7 @@ public class Track {
     return prob;
   }
 
-  public Element getElement() {
+  public XMLElement getElement() {
     return elt;
   }
 

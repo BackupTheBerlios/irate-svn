@@ -4,8 +4,7 @@
   <target name="compile">
     <javac srcdir="." debug="true" debuglevel="lines,vars,source">
       <classpath>
-        <pathelement path="xercesImpl.jar"/>
-        <pathelement path="xmlParserAPIs.jar"/>
+        <pathelement path="lib/nanoxml-lite-2.2.3.jar"/>
         <pathelement path="jl020.jar"/>
       </classpath>
     </javac>
@@ -31,7 +30,7 @@
   </target>
 
   <target name="tar" depends="jar">
-    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/xercesImpl.jar,irate/xmlParserAPIs.jar,irate/MAD/libs/linux-i386/madplay.so,irate/MAD/libs/sunos-sparc/madplay.so"/>
+    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/MAD/libs/linux-i386/madplay.so,irate/MAD/libs/sunos-sparc/madplay.so"/>
   </target>
 
   <target name="gzip" depends="tar">
