@@ -528,10 +528,13 @@ public class TrackTable {
     }
     
     public int magicStringCompare(String str0, String str1) {
+      // If the strings are not equal and not empty ...
       if (!str0.equals(str1) && str0.length() != 0 && str1.length() != 0)
       {
+        // Get the first character of each
         char c0 = str0.charAt(0);
         char c1 = str1.charAt(0);
+        // If both characters are digits, we can compare these strings as numbers
         if (Character.isDigit(c0) && Character.isDigit(c1)) {
           int i0 = valueOf(str0);
           int i1 = valueOf(str1);
@@ -540,7 +543,19 @@ public class TrackTable {
           if (i0 > i1)
           	return 1;
         }
+        
+        // However, one of them might be a string.  If we're comparing a string
+        // and a number, the number will always be smaller.
+        if (Character.isDigit(c0) && !Character.isDigit(c1)) 
+        {
+            return 1;
+        }
+        if (!Character.isDigit(c0) && Character.isDigit(c1)) 
+        {
+            return -1;
+        }
       }
+      // Finally, if we compare two strings, it's easy.
       return str0.compareToIgnoreCase(str1);
     }
           
