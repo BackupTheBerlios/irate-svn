@@ -1,4 +1,3 @@
-GCJ=gcj -g -pipe -march=i586 -mcpu=i586 -O2
 
 all: libswt.o libnanoxml-lite.o 
 
