@@ -4,12 +4,9 @@ package irate.swt;
 
 import irate.common.TrackDatabase;
 import irate.common.Track;
-import irate.common.UpdateListener;
 import irate.client.*;
 import irate.swt.plugin.SWTPluginUIFactory;
-import irate.download.DownloadThread;
 import irate.plugin.PluginApplication;
-import irate.plugin.PluginManager;
 import irate.plugin.PluginUIFactory;
 
 import org.eclipse.swt.*;
@@ -22,13 +19,13 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/02 06:19:21 $
+ * Date Updated: $Date: 2003/10/04 05:23:34 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.80 $
+ * @version $Revision: 1.81 $
  */
 public class Client extends AbstractClient {
 
@@ -498,6 +495,7 @@ public class Client extends AbstractClient {
     synchronizePlaylist(playListManager, tblSongs);
     tblSongs.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
+        setPaused(false);
         playThread.play(getTrackByTableItem(tblSongs.getSelection()[0]));
       }
     });
