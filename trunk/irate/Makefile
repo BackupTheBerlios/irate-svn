@@ -22,7 +22,7 @@ CLIENT_LIBS = lib/libnanoxml-lite.o lib/libjd3.o
 JAVA_SWTSRC=irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
 JAVA_SWINGSRC=irate/swing/*.java
 JAVA_CLIENT=irate/client/*.java
-JAVA_COMMONSRC=irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java
+JAVA_COMMONSRC=irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java irate/resources/*.java
 JAVA_DOWNLOAD=irate/download/*.java
 HELPFILES=irate/client/help/*.html
 JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CLIENT:.java=.class) $(JAVA_DOWNLOAD:.java=.class)
@@ -32,6 +32,11 @@ JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CL
 ifndef NO_RESOURCE
 IMAGES = $(shell find irate/resources/ -name '*.gif')
 CLIENT_DEPS += $(IMAGES:.gif=.gifres.o)
+LOCALES = \
+  $(wildcard irate/common/locale*.properties) \
+  $(wildcard irate/download/locale*.properties) \
+  $(wildcard irate/swt/locale*.properties)
+CLIENT_DEPS += $(LOCALES:.properties=.properties.o)  
 endif
 
 ifeq ($(PLATFORM),win32)
@@ -67,8 +72,7 @@ CLIENT_FILES = \
 	irate/client/Speech.java \
 	irate/client/Help.java \
 	irate/client/AbstractPlayer.java \
-	irate/client/PlayerListener.java \
-	irate/resources/Resources.java
+	irate/client/PlayerListener.java
 #	irate/client/LibMadPlayer.java
 #	irate/client/AudioDevice.java 
 #	irate/client/JavaSoundAudioDevice.java 
@@ -143,6 +147,9 @@ irate-server.o:irate/server/*.java
 	$(GCJ) -c irate/server/*.java -o irate-server.o
 
 %.gifres.o: %.gif
+	$(GCJ) -c --resource $^ $^ -o $@
+
+%.properties.o: $.properties	
 	$(GCJ) -c --resource $^ $^ -o $@
 
 libmadplayer.o: irate/client/AbstractPlayer.java irate/client/LibMadPlayer.java irate/client/LibMadPlayer.cc

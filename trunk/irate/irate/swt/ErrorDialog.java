@@ -2,8 +2,6 @@
 
 package irate.swt;
 
-import irate.resources.Resources;
-
 import java.io.Reader;
 
 import org.eclipse.swt.SWT;
@@ -98,7 +96,7 @@ public class ErrorDialog {
    * class.
    */
   private String getResourceString(String key) {
-    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
+    return Resources.getString(key); 
   }
   
 }

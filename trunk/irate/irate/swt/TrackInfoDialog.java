@@ -4,7 +4,6 @@ package irate.swt;
 
 import irate.common.LicensingScheme;
 import irate.common.Track;
-import irate.resources.Resources;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -55,7 +54,7 @@ public class TrackInfoDialog {
     
     try {
       ImageData icon =
-        new ImageData(Resources.getResourceAsStream("icon.gif")); 
+        new ImageData(irate.resources.BaseResources.getResourceAsStream("icon.gif")); 
         int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
         icon.transparentPixel = whitePixel;
         shell.setImage(new Image(display, icon));
@@ -197,7 +196,7 @@ public class TrackInfoDialog {
     	licenseButton = new Button(leftGrid,SWT.FLAT);
       
       try {
-        Image licenseImage = new Image(shell.getDisplay(), Resources.getResourceAsStream(license.getIcon()));
+        Image licenseImage = new Image(shell.getDisplay(), irate.resources.BaseResources.getResourceAsStream(license.getIcon()));
         licenseButton.setImage(licenseImage);
       }
       catch (IOException e) {
@@ -388,7 +387,7 @@ public class TrackInfoDialog {
    * class.
    */
   private String getResourceString(String key) {
-    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
+    return Resources.getString(key); 
   }
   
 }

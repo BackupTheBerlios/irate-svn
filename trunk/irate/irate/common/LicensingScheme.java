@@ -1,7 +1,5 @@
 package irate.common;
 
-import irate.resources.Resources;
-
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -25,7 +23,7 @@ public class LicensingScheme {
   public LicensingScheme(String copyrightData) {
     buildImageTable();
     if(copyrightData == null || copyrightData.equals("")) { //$NON-NLS-1$
-      initializeLicensingScheme(null, "", getResourceString("LicensingScheme.No_Copyright_Information_Available"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+      initializeLicensingScheme(null, "", Resources.getString("LicensingScheme.No_Copyright_Information_Available"), ""); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
     }
     else {	
       String urlFound = findURLInText(copyrightData);
@@ -92,13 +90,5 @@ public class LicensingScheme {
 
   public String getFullText() {
     return fullText;
-  }
-  
-  /**
-   * Get a resource string from the properties file associated with this 
-   * class.
-   */
-  private String getResourceString(String key) {
-    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
   }
 }

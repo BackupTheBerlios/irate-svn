@@ -25,14 +25,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/05 04:11:33 $
+ * Date Updated: $Date: 2003/12/05 07:15:58 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.122 $
+ * @version $Revision: 1.123 $
  */
 public class Client extends AbstractClient {
 
@@ -182,7 +182,7 @@ public class Client extends AbstractClient {
     if (track == null)
       return;
     shell.setText(
-      (track == null ? "" : track.toString() + " - ") + getResourceString("titlebar.program_name"));
+      (track == null ? "" : track.toString() + " - ") + Resources.getString("titlebar.program_name"));
     volumeScale.setSelection(
       (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
     trackTable.select(track);
@@ -228,11 +228,11 @@ public class Client extends AbstractClient {
       public void run() {
         if (pausedFinal.booleanValue()) {
           setToolItemSkin(pause, "button.resume");
-          pause.setToolTipText(getResourceString("button.resume.tooltip"));
+          pause.setToolTipText(Resources.getString("button.resume.tooltip"));
         }
         else {
           setToolItemSkin(pause, "button.pause");
-          pause.setToolTipText(getResourceString("button.pause.tooltip"));
+          pause.setToolTipText(Resources.getString("button.pause.tooltip"));
         }
       }
     });
@@ -297,11 +297,11 @@ public class Client extends AbstractClient {
 
   public void createShell() {
     shell = new Shell(display);
-    shell.setText(getResourceString("titlebar.program_name"));
+    shell.setText(Resources.getString("titlebar.program_name"));
 
     try {
       ImageData icon =
-        new ImageData(irate.resources.Resources.getResourceAsStream("icon.gif"));
+        new ImageData(irate.resources.BaseResources.getResourceAsStream("icon.gif"));
       int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
       icon.transparentPixel = whitePixel;
       shell.setImage(new Image(display, icon));
@@ -409,7 +409,7 @@ public class Client extends AbstractClient {
     shell.setMenuBar(menubar);
 
     MenuItem item1 = new MenuItem(menubar, SWT.CASCADE);
-    item1.setText(getResourceString("toolbar.menu_title.action"));
+    item1.setText(Resources.getString("toolbar.menu_title.action"));
 
     Menu menu1 = new Menu(item1);
     //Added for a nicer UI by Allen Tipper 14.9.03
@@ -423,27 +423,27 @@ public class Client extends AbstractClient {
     item1.setMenu(menu1);
 
     MenuItem item1_1 = new MenuItem(menu1, SWT.PUSH);
-    item1_1.setText(getResourceString("toolbar.menu_item.download"));
+    item1_1.setText(Resources.getString("toolbar.menu_item.download"));
     item1_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         downloadThread.go();
       }
     });
     //Added for a nicer UI by Allen Tipper 16.9.03
-    item1_1.addArmListener(new ToolTipArmListener(getResourceString("toolbar.menu_item.tooltip.download")));
+    item1_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.download")));
     //end add
 
     MenuItem item_undo = new MenuItem(menu1, SWT.PUSH);
-    item_undo.setText(getResourceString("toolbar.menu_item.undo"));
+    item_undo.setText(Resources.getString("toolbar.menu_item.undo"));
     item_undo.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         undoLastRating();
       }
     });
-    item_undo.addArmListener(new ToolTipArmListener(getResourceString("toolbar.menu_item.tooltip.undo")));
+    item_undo.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.undo")));
 
     MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
-    item1_4.setText(getResourceString("toolbar.menu_item.quit"));
+    item1_4.setText(Resources.getString("toolbar.menu_item.quit"));
     item1_4.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         quit();
@@ -451,11 +451,11 @@ public class Client extends AbstractClient {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item1_4.addArmListener(new ToolTipArmListener(getResourceString("toolbar.menu_item.tooltip.quit")));
+    item1_4.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.quit")));
     //end add
 
     MenuItem item2 = new MenuItem(menubar, SWT.CASCADE);
-    item2.setText(getResourceString("toolbar.menu_title.settings"));
+    item2.setText(Resources.getString("toolbar.menu_title.settings"));
 
     Menu mSettings = new Menu(item2);
     //Added for a nicer UI by Allen Tipper 14.9.03
@@ -468,10 +468,10 @@ public class Client extends AbstractClient {
     item2.setMenu(mSettings);
 
     MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
-    mDownload.setText(getResourceString("toolbar.menu_item.auto_download"));
+    mDownload.setText(Resources.getString("toolbar.menu_item.auto_download"));
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mDownload.addArmListener(new ToolTipArmListener(getResourceString("toolbar.menu_item.tooltip.auto_download")));
+    mDownload.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.auto_download")));
     //end add
 
     Menu menu2 = new Menu(mDownload);
@@ -483,7 +483,7 @@ public class Client extends AbstractClient {
       MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
       final Integer acount = new Integer(counts[i]);
       final int dummy = 0; // workaround for gcj-3.0.4 bug
-      mTimes.setText(i == 0 ? getResourceString("toolbar.sub_menu_item.auto_download.disabled") : "< " + acount + " " + getResourceString("toolbar.sub_menu_item.auto_download.unrated_tracks"));
+      mTimes.setText(i == 0 ? Resources.getString("toolbar.sub_menu_item.auto_download.disabled") : "< " + acount + " " + Resources.getString("toolbar.sub_menu_item.auto_download.unrated_tracks"));
       mTimes.setSelection(acount.intValue() == autoDownload);
       mTimes.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
@@ -499,17 +499,17 @@ public class Client extends AbstractClient {
       //Added for a nicer UI by Allen Tipper 14.9.03
       mTimes.addArmListener(
         new ToolTipArmListener(
-          getResourceString("toolbar.sub_menu_item.auto_download.tooltip.unrated_tracks")
+          Resources.getString("toolbar.sub_menu_item.auto_download.tooltip.unrated_tracks")
           + " " + acount));
       //end add
 
     }
 
     MenuItem mPlayList = new MenuItem(mSettings, SWT.CASCADE);
-    mPlayList.setText(getResourceString("toolbar.menu_item.play_list"));
+    mPlayList.setText(Resources.getString("toolbar.menu_item.play_list"));
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mPlayList.addArmListener(new ToolTipArmListener(getResourceString("toolbar.menu_item.tooltip.play_list")));
+    mPlayList.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.play_list")));
     //end add
 
     Menu menuPlayList = new Menu(mPlayList);
@@ -521,7 +521,7 @@ public class Client extends AbstractClient {
       MenuItem mTimes = new MenuItem(menuPlayList, SWT.CHECK, i);
       final int dummy = 0; // workaround for gcj-3.0.4 bug
       final Integer pcount = new Integer(counts[i]);
-      mTimes.setText(pcount + " " + getResourceString("toolbar.sub_menu_item.play_list.tracks"));
+      mTimes.setText(pcount + " " + Resources.getString("toolbar.sub_menu_item.play_list.tracks"));
       mTimes.setSelection(pcount.intValue() == playListLength);
       mTimes.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
@@ -534,7 +534,7 @@ public class Client extends AbstractClient {
 
       //Added for a nicer UI by Allen Tipper 14.9.03
       mTimes.addArmListener(
-        new ToolTipArmListener(getResourceString("toolbar.sub_menu_item.play_list.tooltip.tracks") + " " + pcount));
+        new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.play_list.tooltip.tracks") + " " + pcount));
       //end add
 
     }
@@ -545,7 +545,7 @@ public class Client extends AbstractClient {
      * Allows the user to select the number of unrated tracks to add to each playlist generation
      */
     MenuItem mNewUnrated = new MenuItem(mSettings, SWT.CASCADE);
-    mNewUnrated.setText(getResourceString("toolbar.menu_item.unrated"));
+    mNewUnrated.setText(Resources.getString("toolbar.menu_item.unrated"));
     Menu menuNewUnrated = new Menu(mNewUnrated);
     mNewUnrated.setMenu(menuNewUnrated);
 
@@ -569,7 +569,7 @@ public class Client extends AbstractClient {
       //Added for a nicer UI by Allen Tipper 14.9.03
       mRatio.addArmListener(
         new ToolTipArmListener(
-          getResourceString("toolbar.menu_item.tooltip.unrated") +
+          Resources.getString("toolbar.menu_item.tooltip.unrated") +
           " " + ratio + "%."));
       //end add
 
@@ -577,12 +577,12 @@ public class Client extends AbstractClient {
     /****/
 
     MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
-    mPlayers.setText(getResourceString("toolbar.menu_item.player"));
+    mPlayers.setText(Resources.getString("toolbar.menu_item.player"));
     menu2 = new Menu(mPlayers);
     mPlayers.setMenu(menu2);
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mPlayers.addArmListener(new ToolTipArmListener(getResourceString("toolbar.menu_item.tooltip.player")));
+    mPlayers.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.player")));
     //end add
 
     Player players[] = playerList.getPlayers();
@@ -605,11 +605,11 @@ public class Client extends AbstractClient {
         }
       });
       mPlayer.addArmListener(
-        new ToolTipArmListener(getResourceString("toolbar.sub_menu_item.tooltip.player") + " " + player));
+        new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.tooltip.player") + " " + player));
     }
 
     MenuItem item2_1 = new MenuItem(mSettings, SWT.PUSH);
-    item2_1.setText(getResourceString("toolbar.menu_item.advanced"));
+    item2_1.setText(Resources.getString("toolbar.menu_item.advanced"));
     item2_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         showSettingDialog(SettingDialog.PLUGIN_PAGE);
@@ -617,11 +617,11 @@ public class Client extends AbstractClient {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item2_1.addArmListener(new ToolTipArmListener(getResourceString("toolbar.menu_item.tooltip.advanced")));
+    item2_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.advanced")));
     //end add
 
     MenuItem item3 = new MenuItem(menubar, SWT.CASCADE);
-    item3.setText(getResourceString("toolbar.menu_title.info"));
+    item3.setText(Resources.getString("toolbar.menu_title.info"));
 
     Menu menu3 = new Menu(item3);
 
@@ -634,13 +634,13 @@ public class Client extends AbstractClient {
     item3.setMenu(menu3);
 
     MenuItem item3_1 = new MenuItem(menu3, SWT.PUSH);
-    item3_1.setText(getResourceString("toolbar.menu_item.credits"));
+    item3_1.setText(Resources.getString("toolbar.menu_item.credits"));
     item3_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         actionAbout();
       }
     });
-    item3_1.addArmListener(new ToolTipArmListener(getResourceString("toolbar.menu_item.tooltip.credits")));
+    item3_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.credits")));
   }
 
   public void createToolBar() {
@@ -655,7 +655,7 @@ public class Client extends AbstractClient {
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       ToolItem item = new ToolItem(toolbar, SWT.PUSH);
-      item.setToolTipText(getResourceString(rf.getName() + ".tooltip"));
+      item.setToolTipText(Resources.getString(rf.getName() + ".tooltip"));
       final int value = rf.getValue();
       item.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
@@ -676,7 +676,7 @@ public class Client extends AbstractClient {
     });
 
     previous = new ToolItem(toolbar, SWT.PUSH);
-    previous.setToolTipText(getResourceString("button.previous.tooltip"));
+    previous.setToolTipText(Resources.getString("button.previous.tooltip"));
     previous.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         skip(true);
@@ -685,7 +685,7 @@ public class Client extends AbstractClient {
     previous.setEnabled(false);
 
     next = new ToolItem(toolbar, SWT.PUSH);
-    next.setToolTipText(getResourceString("button.next.tooltip"));
+    next.setToolTipText(Resources.getString("button.next.tooltip"));
     next.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         skip();
@@ -695,7 +695,7 @@ public class Client extends AbstractClient {
     new ToolItem(toolbar, SWT.SEPARATOR);
 
     info = new ToolItem(toolbar, SWT.PUSH);
-    info.setToolTipText(getResourceString("button.info.tooltip"));
+    info.setToolTipText(Resources.getString("button.info.tooltip"));
     final Client clientToPass = this;
     info.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -712,7 +712,7 @@ public class Client extends AbstractClient {
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(1);
     volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
-    volumeScale.setToolTipText(getResourceString("slider.volume.tooltip"));
+    volumeScale.setToolTipText(Resources.getString("slider.volume.tooltip"));
     volumeScale.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         setVolume(
@@ -746,7 +746,7 @@ public class Client extends AbstractClient {
   }
 
   public Image getSkinImage(String name) throws IOException {
-    ImageData icon = new ImageData(irate.resources.Resources.getResourceAsStream(name));
+    ImageData icon = new ImageData(irate.resources.BaseResources.getResourceAsStream(name));
 //    int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
 //    icon.transparentPixel = whitePixel;
     return new Image(display, icon);
@@ -911,10 +911,6 @@ public class Client extends AbstractClient {
 
   protected void createNewAccount() {
     showAccountDialog();
-  }
-  
-  private String getResourceString(String key) {
-    return Resources.getString(key);
   }
   
 }

@@ -13,9 +13,9 @@ import java.util.ResourceBundle;
 /**
  * @author Anthony Jones
  */
-public class Resources {
+public class BaseResources {
   
-  private static Class cls = new Resources().getClass();
+  private static Class cls = new BaseResources().getClass();
   private static Hashtable cachedBundles = new Hashtable();
 
   public static URL getResource(String name) {

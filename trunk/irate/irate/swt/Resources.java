@@ -11,6 +11,6 @@ public class Resources {
    * package.
    */
   public static String getString(String key) {
-    return irate.resources.Resources.getString("irate.swt.locale", key);
+    return irate.resources.BaseResources.getString("irate.swt.locale", key);
   }
 }

@@ -5,7 +5,6 @@ package irate.swt;
 
 import irate.common.Track;
 import irate.common.TrackDatabase;
-import irate.resources.Resources;
 
 import java.util.*;
 import java.util.List;
@@ -320,7 +319,7 @@ public class TrackTable {
    * class.
    */
   private String getResourceString(String key) {
-    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
+    return Resources.getString(key); 
   }
 
 }

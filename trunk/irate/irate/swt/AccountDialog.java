@@ -3,7 +3,6 @@ package irate.swt;
 import irate.common.Preferences;
 import irate.common.TrackDatabase;
 import irate.download.DownloadThread;
-import irate.resources.Resources;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,10 +19,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/12/01 03:48:28 $
+ * Date Updated: $Date: 2003/12/05 07:15:58 $
  * @author Creator:	taras
- * @author Updated:	$Author: parlabane $
- * @version $Revision: 1.15 $
+ * @author Updated:	$Author: ajones $
+ * @version $Revision: 1.16 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -236,7 +235,7 @@ public class AccountDialog {
    * class.
    */
   private String getResourceString(String key) {
-    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
+    return Resources.getString(key); 
   }
   
 }

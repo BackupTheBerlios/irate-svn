@@ -5,7 +5,7 @@ package irate.download;
 import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
-import irate.resources.Resources;
+import irate.resources.BaseResources;
 
 import java.io.*;
 import java.net.*;
@@ -459,6 +459,6 @@ System.out.println("DownloadThread.java:326: " + errorCode); //$NON-NLS-1$
    * to be stated explicitly.
    */
   private String getResourceString(String key) {
-    return Resources.getString(LOCALE_RESOURCE_LOCATION, key); 
+    return BaseResources.getString(LOCALE_RESOURCE_LOCATION, key); 
   }
 }

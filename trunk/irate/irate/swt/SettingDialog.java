@@ -4,7 +4,6 @@ package irate.swt;
 
 import irate.common.Preferences;
 import irate.plugin.*;
-import irate.resources.Resources;
 
 import java.io.IOException;
 
@@ -15,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/01 03:48:28 $
+ * Date Updated: $Date: 2003/12/05 07:15:58 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.14 $
+ * @version $Revision: 1.15 $
  */
 public class SettingDialog
 {
@@ -275,7 +274,7 @@ public class SettingDialog
    * class.
    */
   private String getResourceString(String key) {
-    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
+    return Resources.getString(key); 
   }
  
 }
