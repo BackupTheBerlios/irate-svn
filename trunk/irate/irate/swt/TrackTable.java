@@ -235,7 +235,9 @@ public class TrackTable extends BasicSkinable {
   
   /** Loads the Track into the TableItem. */
   private void updateTableItem(TableItem tableItem, Track track) {
+    
     String state = track.getState();
+    //System.out.println("WOOT: " + state);
     ImageData stateImageData = getImageData(state);
     if (stateImageData != null) {
        state = "";
@@ -243,6 +245,11 @@ public class TrackTable extends BasicSkinable {
        if (stateImage == null)
          imageCache.put(stateImageData, stateImage = new Image(display, stateImageData));
        tableItem.setImage(2, stateImage);
+    }
+    else {
+        if(tableItem.getImage(2) != null) {
+            tableItem.setImage(2, null);
+        }
     }
     
     tableItem.setText(new String[] {
