@@ -286,8 +286,11 @@ public class ThreeModeButton extends Canvas implements Skinable {
         if (imageData == null)
           imageData = (ImageData) imageDataHash.get("");
       }
-    }    
-    ImageData mergedImage = imageMerger.merge(0, 0, imageData);
+    }
+    Rectangle bounds = getBounds();
+    int x = (bounds.width - imageData.width) / 2;
+    int y = (bounds.height - imageData.height) / 2;
+    ImageData mergedImage = imageMerger.merge(x, y, imageData);
     
     /* Look up our ImageData in our cache. */
     ImageHandle imageHandle = (ImageHandle) cache.get(mergedImage);
@@ -308,28 +311,24 @@ public class ThreeModeButton extends Canvas implements Skinable {
     this.imageMerger = new ImageMerger(this.transparencyManager, this);
   }
 
-  public void setText(String text) {
-    if (transparencyManager != null) {
-      ImageData imgData = transparencyManager.getBackground(this);
+  public void setText(String key, String text) {
+    if (textBackground == null) {
+      if (transparencyManager != null) {
+        ImageData imgData = transparencyManager.getBackground(this);
 
-      if (imgData != null) {
-        textBackground = new Image(this.getDisplay(), imgData);
+        if (imgData != null) {
+          textBackground = new Image(this.getDisplay(), imgData);
+        }
       }
     }
-    normalText = text;
+    if (key.equals("")) normalText = text;
+    if (key.equals("pressed")) pressedText = text;
     computeSize(0, 0, false);
   }
-
-  public void setPressedText(String text) {
-    if (transparencyManager != null) {
-      ImageData imgData = transparencyManager.getBackground(this);
-
-      if (imgData != null) {
-        textBackground = new Image(this.getDisplay(), imgData);
-      }
-    }
-    pressedText = text;
-    computeSize(0, 0, false);
+  
+  public void setToolTipText(String key, String text) {
+    if (key.equals(""))
+      setToolTipText(text);
   }
 
   public boolean isEnabled() {

@@ -95,7 +95,7 @@ all: make.configure lib $(IRATE_CLIENT) $(IRATE_SERVER)
 make.configure:
 	touch $@
 
-install: $(IRATE_CLIENT)
+install: $(IRATE_CLIENT) irate/resources/skin.zip
 	install -d $(BIN) $(LIB)
 ifdef NO_RESOURCE
 	install $(IRATE_CLIENT) $(BIN)/irate-client-bin
@@ -159,7 +159,10 @@ $(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS) irate/resources/icon.xpm
 
 $(IRATE_SERVER): $(SERVER_LIBS) $(SERVER_DEPS) 
 	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o $(IRATE_SERVER) --main=irate.server.Server
-	
+
+irate/resources/skin.zip: irate/resources/skin/*.png
+	cd irate/resources/skin && zip ../skin.zip *.png
+
 irate-swt.o: irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java lib/swt.jar
 	$(GCJ) -c $(JAVA_SWTSRC) -o irate-swt.o
 
@@ -234,5 +237,5 @@ irate-client-swing.jar:
 	jar -cmf META-INF/manifest.irate-client irate-client-swing.jar $(JAVA_OBJS) $(HELPFILES)
 
 clean:
-	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o setup.exe -R irate-linux-i586* irate/client/skin.zip
+	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o setup.exe -R irate-linux-i586* irate/resources/skin.zip
 	$(MAKE) -C lib clean

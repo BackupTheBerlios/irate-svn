@@ -43,10 +43,10 @@ public class Client extends AbstractClient {
 
   private Composite topPanel;
   private Composite bottomPanel;
-  private Label lblState;
+  private AlphaLabel lblState;
   private Display display;;
   private Shell shell;
-  private Label trackLabel;
+  private AlphaLabel trackLabel;
   private ProgressBar progressBar;
   private Scale volumeScale;
 //  private TrackProgressBar songProgressBar;
@@ -721,7 +721,8 @@ public class Client extends AbstractClient {
     trackGroup.setLayoutData(gridData);    
     trackGroup.setLayout(new GridLayout(2, false));
     
-    trackLabel = new Label(trackGroup, SWT.CENTER);
+    trackLabel = new AlphaLabel(trackGroup, SWT.CENTER);
+    skinManager.add(trackLabel, "label.track");
     gridData = new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL);
     gridData.horizontalSpan = 2;
     trackLabel.setLayoutData(gridData);
@@ -752,9 +753,9 @@ public class Client extends AbstractClient {
 //    new ToolItem(trackToolbar, SWT.SEPARATOR);
 
     ThreeModeButton info = new ThreeModeButton(topPanel, SWT.NONE);
-    gridData = new GridData();
-    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
-    info.setLayoutData(gridData);
+//    gridData = new GridData();
+//    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+//    info.setLayoutData(gridData);
     final Client clientToPass = this;
     info.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -789,9 +790,9 @@ public class Client extends AbstractClient {
     previous = new ThreeModeButton(topPanel, SWT.NONE);
     previous.setEnabled(false);
 
-    gridData = new GridData();
-    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
-    previous.setLayoutData(gridData);
+//    gridData = new GridData();
+//    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+//    previous.setLayoutData(gridData);
     
     previous.addMouseListener(new MouseListener() {
       public void mouseDoubleClick(MouseEvent arg0) {}
@@ -808,9 +809,9 @@ public class Client extends AbstractClient {
     /************ PLAY / PAUSE BUTTON  ****************/
     play = new ThreeModeButton(topPanel, SWT.NONE);
     
-    gridData = new GridData();
-    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
-    play.setLayoutData(gridData);
+//    gridData = new GridData();
+//    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+//    play.setLayoutData(gridData);
     
     play.addMouseListener(new MouseListener() {
       public void mouseDoubleClick(MouseEvent arg0) {}
@@ -825,9 +826,9 @@ public class Client extends AbstractClient {
     /************ NEXT BUTTON  ****************/
     ThreeModeButton next = new ThreeModeButton(topPanel, SWT.NONE);
     
-    gridData = new GridData();
-    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
-    next.setLayoutData(gridData);
+//    gridData = new GridData();
+//    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+//    next.setLayoutData(gridData);
     
     next.addMouseListener(new MouseListener() {
       public void mouseDoubleClick(MouseEvent arg0) {}
@@ -915,7 +916,8 @@ public class Client extends AbstractClient {
   }
 
   public void createState() {
-    lblState = new Label(bottomPanel, SWT.NONE);
+    lblState = new AlphaLabel(bottomPanel, SWT.NONE);
+    skinManager.add(lblState, "label.status");
     lblState.setText(strState);
 
     GridData gridData = new GridData();
@@ -1076,10 +1078,10 @@ public class Client extends AbstractClient {
 
     if (skin == null)
       try {
-          skin = BaseResources.getResourceAsStream("skin.zip");
+        skin = BaseResources.getResourceAsStream("skin.zip");
       }
       catch (IOException e) {
-          e.printStackTrace();
+        e.printStackTrace();
       }    
       
     if (skin != null)

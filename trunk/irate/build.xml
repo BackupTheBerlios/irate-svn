@@ -139,6 +139,7 @@
       <fileset file="irate-client.tar"/>
       <fileset file="irate-client-linux.tar.gz"/>
       <fileset file="irate-client-win32.exe"/>
+      <fileset file="irate/resources/skin.zip"/>
       
       <!-- Old files no longer used -->
       <fileset file="irate-client-macosx.zip"/>

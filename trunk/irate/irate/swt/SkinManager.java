@@ -56,14 +56,12 @@ public class SkinManager {
       public void setTransparencyManager(TransparencyManager tm) {
       }
 
-      public void setText(String text) {
+      public void setText(String key, String text) {
       }
 
-      public void setPressedText(String text) {
-      }
-
-      public void setToolTipText(String text) {
-        control.setToolTipText(text);
+      public void setToolTipText(String key, String text) {
+        if (key.equals(""))
+          control.setToolTipText(text);
       }
 
       public void setImage(String key, ImageData imageData) {
@@ -82,14 +80,11 @@ public class SkinManager {
       public void setTransparencyManager(TransparencyManager tm) {
       }
 
-      public void setText(String text) {
+      public void setText(String key, String text) {
         item.setText(text);
       }
 
-      public void setPressedText(String text) {
-      }
-
-      public void setToolTipText(String text) {
+      public void setToolTipText(String key, String text) {
         if (item instanceof ToolItem)
           ((ToolItem) item).setToolTipText(text);
       }
@@ -97,7 +92,7 @@ public class SkinManager {
       public void setImage(String key, ImageData imageData) {
         if (key.equals("")) {
           item.setImage(new Image(item.getDisplay(), imageData));
-          item.setText("");
+//          item.setText("");
         }
       }
 
@@ -184,17 +179,17 @@ public class SkinManager {
     
     private void applyText(Skinable skinable) {
       String text = Resources.getString(name);
-      skinable.setText(text);
+      skinable.setText("", text);
 
       String pressed = Resources.getString(name+".pressed");
       if (pressed.startsWith("!"))
         pressed = text;
-      skinable.setPressedText(pressed);
+      skinable.setText("pressed", pressed);
       
       String toolTip = Resources.getString(name + ".tooltip");
       if (toolTip.startsWith("!"))
         toolTip = "";
-      skinable.setToolTipText(toolTip);
+      skinable.setToolTipText("", toolTip);
     }
 
     void pre() {

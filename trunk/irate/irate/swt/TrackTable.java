@@ -69,15 +69,6 @@ public class TrackTable {
     table.setEnabled(false);
 
     TableColumn col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(70);
-    addColumnListener(col, comparator = new TrackComparator() {
-      public int compareTrack(Track track0, Track track1) {
-          return licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
-      }        
-    });
-    skinManager.addItem(col, "TrackTable.Heading.License"); 
-
-    col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
     addColumnListener(col, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
@@ -114,7 +105,7 @@ public class TrackTable {
     skinManager.addItem(col, "TrackTable.Heading.Plays");
 
     col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(180);
+    col.setWidth(120);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return track0.getLastPlayed().compareTo(track1.getLastPlayed());
@@ -123,6 +114,15 @@ public class TrackTable {
     table.setHeaderVisible(true);
     skinManager.addItem(col, "TrackTable.Heading.Last"); 
 
+    col = new TableColumn(table, SWT.LEFT);
+    col.setWidth(55);
+    addColumnListener(col, new TrackComparator() {
+      public int compareTrack(Track track0, Track track1) {
+          return licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
+      }        
+    });
+    skinManager.addItem(col, "TrackTable.Heading.License"); 
+    
     updateTable();    
 
     GridData gridData = new GridData();
@@ -236,13 +236,17 @@ public class TrackTable {
   /** Loads the Track into the TableItem. */
   private void updateTableItem(TableItem tableItem, Track track) {
     tableItem.setText(new String[] {
-      "",
       track.getArtist(),
       track.getTitle(),
       track.getState(),
       String.valueOf(track.getNoOfTimesPlayed()),
-      track.getLastPlayed().toString()
+      track.getLastPlayed().toString(),
+      ""
     });
+    
+    /*
+     * Get the license image.
+     */
     String icon = licenseIndex.get(track).getIcon();
     ImageHandle imageHandle = (ImageHandle) imageCache.get(icon);
     if (imageHandle == null && icon.length() != 0) {
@@ -262,9 +266,9 @@ public class TrackTable {
       }
     }
     if (imageHandle != null)
-      tableItem.setImage(0, imageHandle.getImage());
+      tableItem.setImage(5, imageHandle.getImage());
     else
-      tableItem.setImage(0, null);
+      tableItem.setImage(5, null);
   }
   
   /** Remove the specified track from the table. */
