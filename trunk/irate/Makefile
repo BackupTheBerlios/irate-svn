@@ -1,4 +1,5 @@
-export CLASSPATH=.:lib/nanoxml-lite-2.2.3.jar:lib/swt.jar
+#export CLASSPATH=.:lib/nanoxml-lite-2.2.3.jar:lib/swt.jar
+export CLASSPATH=.:lib/nanoxml-lite-2.2.3.jar:thisiscool-gcc/swt/win32/lib/swt.jar
 
 CLIENT_DEPS = irate-swt.o irate-common.a irate-client.o irate-download.o
 CLIENT_LIBS = lib/libswt.a lib/libnanoxml-lite.a
@@ -18,6 +19,10 @@ CLIENT_FILES = \
 SERVER_DEPS = irate-server.o irate-common.a
 SERVER_LIBS = lib/libnanoxml-lite.a
 
+# You need to set this as executable by going:
+# chmod a+x `find thisiscool-gcc/ -name \*.exe`
+
+GCJ_WIN32 = thisiscool-gcc/gcc-3.3/bin/gcj.exe  
 
 all: lib irate-client irate-server
 
@@ -53,6 +58,18 @@ irate-common.o:irate/common/*.java
 
 irate-server.o:irate/server/*.java
 	gcj -c irate/server/*.java -o irate-server.o
-	
+
+#using gcj from http://thisiscool.com/gcc33_mingw.htm
+win32:
+	$(GCJ_WIN32) \
+	$(CLIENT_FILES) \
+	irate/swt/*.java \
+	irate/common/*.java \
+	irate/download/*.java \
+	thisiscool-gcc/swt/win32/lib/libswt.a \
+	lib/nanoxml-lite-2.2.3.jar \
+	--main=irate.swt.Client \
+	-g -O2 -mwindows -o irate-client.exe
+
 clean:
 	rm -f $(DEPS) irate-client irate-server *.a *.o
