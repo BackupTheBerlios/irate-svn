@@ -27,10 +27,10 @@ import org.eclipse.swt.widgets.Text;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/11/21 23:48:17 $
+ * Date Updated: $Date: 2003/11/29 05:56:45 $
  * @author Creator:	taras
- * @author Updated:	$Author: parlabane $
- * @version $Revision: 1.10 $
+ * @author Updated:	$Author: eythian $
+ * @version $Revision: 1.11 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -112,7 +112,7 @@ public class AccountDialog {
         DirectoryDialog dialog = new DirectoryDialog (shell);
         dialog.setMessage("Choose the location for iRATE downloads -- The directory 'irate' will be created in this location");
         String result = dialog.open();
-        if(!result.equals("")) {
+        if(result != null) {
           txtDirectory.setText(result);
         }
       }
