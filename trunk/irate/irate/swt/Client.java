@@ -531,6 +531,7 @@ public class Client implements UpdateListener, PluginApplication {
     col = new TableColumn(tblSongs,SWT.LEFT);
     col.setWidth(100);
     col.setText("Last");
+    addColumnListener(col, new MagicComparator(4));
     col.setWidth(150);
     tblSongs.setHeaderVisible(true);
     synchronizePlaylist(playListManager, tblSongs);

@@ -206,14 +206,15 @@ public class DownloadThread extends Thread {
         };
         URLConnection conn;
         Integer intContentLength;
-        try{
-          Vector v =  (Vector) worker.runOrTimeout(timeout);
+        try {
+          Vector v = (Vector) worker.runOrTimeout(timeout);
           conn = (URLConnection) v.elementAt(0);
           intContentLength = (Integer) v.elementAt(1);
-        }catch(Exception e) {
-        	setState("Could not connect: "+ e);
+        }
+        catch (Exception e) {
+          setState("Could not connect: " + e);
           e.printStackTrace();
-        	return;
+          return;
         }
         //get rid of the problem where tracks are downloaded but in reality they are 404 messages or some other html crud
 		String contentType = conn.getContentType();
@@ -352,11 +353,16 @@ public class DownloadThread extends Thread {
   }
 
   private void doCheckAutoDownload() {
-    int autoDownload = trackDatabase.getAutoDownload();
-    int noOfUnrated = trackDatabase.getNoOfUnrated();
-    if (noOfUnrated >= autoDownload) 
-      setState(noOfUnrated + " unrated track" + (noOfUnrated == 1 ? "" : "s"));
-    else
-      go();
+    if (!trackDatabase.hasRatedEnoughTracks()) {
+      setState("Not enough rated tracks");
+    }
+    else {
+      int autoDownload = trackDatabase.getAutoDownload();
+      int noOfUnrated = trackDatabase.getNoOfUnrated();
+      if (noOfUnrated >= autoDownload) 
+        setState(noOfUnrated + " unrated track" + (noOfUnrated == 1 ? "" : "s"));
+      else
+        go();
+    }
   }
 }

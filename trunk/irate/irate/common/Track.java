@@ -4,12 +4,13 @@ package irate.common;
 
 import java.io.*;
 import java.net.*;
-import java.text.*;
 import java.util.*;
+
 import nanoxml.XMLElement;
 
 public class Track {
 
+  private static final TimeZone UTC = new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC");
   private final int DEFAULT_RATING = 6;
   
   private XMLElement elt;
@@ -103,12 +104,26 @@ public class Track {
     return 0;
   }
   
+  private static String format(int i, int length) {
+    String s = Integer.toString(i);
+    while (s.length() < length) 
+      s = "0" + s;
+    return s;
+  }
+  
   public void incNoOfTimesPlayed() {
     synchronized (this) {
       elt.setAttribute("played", Integer.toString(getNoOfTimesPlayed() + 1));
       try {
-        Date d = new Date();
-        elt.setAttribute("last", new SimpleDateFormat().format(d));
+        Calendar c = new GregorianCalendar(UTC);
+        elt.setAttribute("last",
+          format(c.get(Calendar.YEAR), 4) +
+          format(c.get(Calendar.MONTH), 2) +
+          format(c.get(Calendar.DAY_OF_MONTH), 2) +
+          format(c.get(Calendar.HOUR), 2) +
+          format(c.get(Calendar.MINUTE), 2) +
+          format(c.get(Calendar.SECOND), 2)
+        );
       } 
       catch(Exception e) {
         e.printStackTrace();
@@ -125,7 +140,7 @@ public class Track {
 
   public String getLastPlayed() {
     String s = elt.getStringAttribute("last");
-    if (s == null)
+    if (s == null || s.indexOf(':') >= 0 || s.indexOf('/') >= 0 || s.indexOf('-') >= 0)
       return "";
     return s;
   }

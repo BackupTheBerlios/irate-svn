@@ -458,18 +458,9 @@ public class TrackDatabase {
     Track[] tracks = getTracks();
     int noOfUnrated = 0;
     for (int i = 0; i < tracks.length; i++)
-      if (!tracks[i].isRated())
+      if (!tracks[i].isHidden() && !tracks[i].isRated())
         noOfUnrated++;  
     return noOfUnrated;  
-  }
-  
-  public int getNoOfRated() {
-    Track[] tracks = getTracks();
-    int noOfRated = 0;
-    for (int i = 0; i < tracks.length; i++)
-      if (tracks[i].isRated())
-        noOfRated++;  
-    return noOfRated;  
   }
   
   private int compare(Track track0, Track track1) {
@@ -485,6 +476,17 @@ public class TrackDatabase {
   }
   
   public boolean hasRatedEnoughTracks() {
-    return getNoOfTracks() < MAX_NO_OF_UNRATED || getNoOfRated() >= MIN_NO_OF_RATED;
+    Track[] tracks = getTracks();
+    int noOfRated = 0;
+    int noOfValidTracks = 0;
+    for (int i = 0; i < tracks.length; i++) {
+      Track track = tracks[i];
+      if (track.getFile() != null) {
+        noOfValidTracks++;
+        if (tracks[i].isRated())
+          noOfRated++;  
+      }
+    }
+    return noOfValidTracks < MAX_NO_OF_UNRATED || noOfRated >= MIN_NO_OF_RATED;
   }
 }
