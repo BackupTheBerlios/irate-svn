@@ -235,7 +235,7 @@ public class Client implements UpdateListener {
   void initGUI(){
     display = new Display();
     shell = new Shell(display);
-    shell.setText("iRate");
+    shell.setText("iRATE radio");
     shell.addShellListener(new ShellAdapter()
     {
       public void shellClosed(ShellEvent e){
