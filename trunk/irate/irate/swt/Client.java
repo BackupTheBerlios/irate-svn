@@ -85,12 +85,17 @@ public class Client implements UpdateListener {
         if (!strState.equals(state)) {
           strState = state;
         }
-        client.actionPerformed();
-      }
-    });
-    playThread.addUpdateListener(new UpdateListener() {
-      public void actionPerformed() {
-        downloadThread.checkAutoDownload();
+        display.asyncExec(new Runnable() {
+          public void run() {
+            int n = downloadThread.getPercentComplete();
+            if(n > 0 && n < 100)
+            {
+              lblState.setText(strState + " "+n +"%");
+              progressBar.setSelection(n);
+            }else
+              lblState.setText(strState);            
+          }
+        });
       }
     });
     downloadThread.start();
@@ -99,23 +104,16 @@ public class Client implements UpdateListener {
   }
   
   public void update(){    
+    synchronizePlaylist(playListManager, tblSongs);
     Track track = playThread.getCurrentTrack();
     lblTitle.setText(""+track);
     TableItem item = (TableItem)hashSongs.get(track);
     tblSongs.select(tblSongs.indexOf(item));
-    tblSongs.showItem(item);
-    int n = downloadThread.getPercentComplete();
-    if(n > 0 && n < 100)
-    {
-      lblState.setText(strState + " "+n +"%");
-      progressBar.setSelection(n);
-    }else
-      lblState.setText(strState);
-    
-    synchronizePlaylist(playListManager, tblSongs);
-    
+    tblSongs.showItem(item);    
+    downloadThread.checkAutoDownload();    
   }
   
+  //called from playThread.addUpdateListener(this);
   public void actionPerformed(){
   // now update the UI. We don't depend on the result,
   // so use async.  
