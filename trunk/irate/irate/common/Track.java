@@ -106,6 +106,10 @@ public class Track implements TrackDetails {
   
   public String toString() {
     String ratingStr = getState();
+    if (ratingStr.equals("10")) ratingStr = "****"; else
+    if (ratingStr.equals("7")) ratingStr = "***"; else
+    if (ratingStr.equals("5")) ratingStr = "**"; else
+    if (ratingStr.equals("2")) ratingStr = "*";
     String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ")";
     String s = getName() + rating;
     if (getFile() == null)
