@@ -40,6 +40,34 @@ public class BaseDialog extends Shell {
     return button;
   }
 
+  /** Center this shell on a parent shell or on display if parent == null. */
+  public void centerOn(Shell parent) {
+    Rectangle displaySize = getDisplay().getClientArea();
+    Point size = getSize();
+    int x, y;
+    if (parent == null) {
+      x = displaySize.x + (displaySize.width - size.x) / 2;
+      y = displaySize.y + (displaySize.height - size.y) / 2;
+    }
+    else {
+      Point parentLocation = parent.getLocation();
+      Point parentSize = parent.getSize();
+      x = parentLocation.x + (parentSize.x - size.x) / 2;
+      y = parentLocation.y + (parentSize.y - size.y) / 2;    
+    }
+    int xMax = displaySize.x + displaySize.width - size.x;
+    if (x < displaySize.x)
+      x = displaySize.x;
+    else if (x > xMax)
+      x = xMax;
+    int yMax = displaySize.y + displaySize.height - size.y;
+    if (y < displaySize.y)
+      y = displaySize.y;
+    else if (y > yMax)
+      y = yMax;
+    setLocation(x, y);
+  }
+
   private Composite buttonsComposite;
 
   private void setImage(Display display) {

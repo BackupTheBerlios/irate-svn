@@ -31,14 +31,8 @@ public class ErrorDialog {
       createText(r);
       createCloseButton();
       Point size = dialog.getSize();
-      if(parent != null) {
-        Point ploc = parent.getLocation();
-        Point psize = parent.getSize();
-      }
-      //dialog.setLocation(ploc.x + (psize.x - size.x) / 2, ploc.y + (psize.y - size.y) / 2);
-
-        // Open the window and process the events.
       dialog.pack();
+      dialog.centerOn(parent);
       dialog.open();
     }
   }

@@ -38,6 +38,7 @@ public class AboutDialog {
       text.setLayoutData(data);
       createCloseButton();
       dialog.pack();
+      dialog.centerOn(parent);
       dialog.open();
     }
   }

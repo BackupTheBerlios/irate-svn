@@ -197,9 +197,10 @@ public class TrackInfoDialog {
     closeButton =
       dialog.addButton(getResourceString("TrackInfoDialog.Button.Close"));
 
-    dialog.pack();
-
     addListeners();
+
+    dialog.pack();
+    dialog.centerOn(parent);
     dialog.open();    
   }
 
