@@ -1,2 +1,2 @@
-?package(irate-client):needs=X11 section=Apps/Sound\
+?package(irate-client-motif):needs=X11 section=Apps/Sound\
   title="iRATE client" command="/usr/bin/irate-client"
