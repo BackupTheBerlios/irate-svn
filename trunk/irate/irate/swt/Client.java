@@ -52,7 +52,7 @@ public class Client extends AbstractClient {
   private Shell shell;
   private AlphaLabel trackLabel;
   private ProgressBar progressBar;
-  private Scale volumeScale;
+//  private Scale volumeScale;
 //  private TrackProgressBar songProgressBar;
 
 //  private SkinManager.SkinItem pauseSkin;
@@ -272,13 +272,13 @@ public class Client extends AbstractClient {
       shell.setText(track.toString() + " - " + 
         Resources.getString("titlebar.program_name"));
     trackLabel.setText(Resources.getString("title.now_playing") + " " + track.getArtist() + " / " + track.getTitle());
-    for (int i = 0; i < ratingFunctions.length; i++) {
-      RatingFunction rf = ratingFunctions[i];
-      ThreeModeButton item = rf.getItem();
-      item.setSelection(i != 0 && track.isRated() && rf.getValue() <= track.getRating());
-    }
-    volumeScale.setSelection(
-      (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
+//    for (int i = 0; i < ratingFunctions.length; i++) {
+//      RatingFunction rf = ratingFunctions[i];
+//      ThreeModeButton item = rf.getItem();
+//      item.setSelection(i != 0 && track.isRated() && rf.getValue() <= track.getRating());
+//    }
+//    volumeScale.setSelection(
+//      (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
     trackTable.select(track);
     if (track != previousTrack) {
       if (previousTrack != null)
@@ -911,28 +911,28 @@ public class Client extends AbstractClient {
     gridData.horizontalSpan = 2;
     trackLabel.setLayoutData(gridData);
     
-    Composite trackToolbar = new Composite(trackGroup, SWT.FLAT);
-    skinManager.addControl(trackToolbar, "panel.trackToolbar");
-    trackToolbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));    
-    trackToolbar.setLayout(new GridLayout(6, true));
-    final ThreeModeButton[] ratingButtons = new ThreeModeButton[ratingFunctions.length];
-    for (int i = 0; i < ratingFunctions.length; i++) {
-      RatingFunction rf = ratingFunctions[i];
-      ThreeModeButton button = ratingButtons[i] = new ThreeModeButton(trackToolbar, SWT.FLAT);
-      button.setLayoutData(new GridData(GridData.FILL_BOTH));
-      final int value = rf.getValue();
-      button.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          for (int i = 0; i < ratingButtons.length; i++) {
-            ThreeModeButton button = ratingButtons[i];
-            button.setSelection(button == e.widget);
-          }
-          setRating(getSelectedTrack(), value);
-        }
-      });
-      rf.setItem(button);
-      skinManager.add(button, rf.getName());
-    }
+//    Composite trackToolbar = new Composite(trackGroup, SWT.FLAT);
+//    skinManager.addControl(trackToolbar, "panel.trackToolbar");
+//    trackToolbar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));    
+//    trackToolbar.setLayout(new GridLayout(6, true));
+//    final ThreeModeButton[] ratingButtons = new ThreeModeButton[ratingFunctions.length];
+//    for (int i = 0; i < ratingFunctions.length; i++) {
+//      RatingFunction rf = ratingFunctions[i];
+//      ThreeModeButton button = ratingButtons[i] = new ThreeModeButton(trackToolbar, SWT.FLAT);
+//      button.setLayoutData(new GridData(GridData.FILL_BOTH));
+//      final int value = rf.getValue();
+//      button.addSelectionListener(new SelectionAdapter() {
+//        public void widgetSelected(SelectionEvent e) {
+//          for (int i = 0; i < ratingButtons.length; i++) {
+//            ThreeModeButton button = ratingButtons[i];
+//            button.setSelection(button == e.widget);
+//          }
+//          setRating(getSelectedTrack(), value);
+//        }
+//      });
+//      rf.setItem(button);
+//      skinManager.add(button, rf.getName());
+//    }
   
 //    new ToolItem(trackToolbar, SWT.SEPARATOR);
 
@@ -940,34 +940,34 @@ public class Client extends AbstractClient {
 //    gridData = new GridData();
 //    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
 //    info.setLayoutData(gridData);
-    final Client clientToPass = this;
-    info.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        Track track = getSelectedTrack();
-        if (track == null)
-          return;
-        
-        TrackInfoDialog trackInfoDialog = new TrackInfoDialog(display, shell);
-        trackInfoDialog.displayTrackInfo(track, clientToPass);   
-      }
-    });
-    skinManager.add(info, "button.info");
+//    final Client clientToPass = this;
+//    info.addSelectionListener(new SelectionAdapter() {
+//      public void widgetSelected(SelectionEvent e) {
+//        Track track = getSelectedTrack();
+//        if (track == null)
+//          return;
+//        
+//        TrackInfoDialog trackInfoDialog = new TrackInfoDialog(display, shell);
+//        trackInfoDialog.displayTrackInfo(track, clientToPass);   
+//      }
+//    });
+//    skinManager.add(info, "button.info");
 
-    volumeScale = new Scale(trackGroup, SWT.HORIZONTAL | SWT.FLAT);
-    volumeScale.setIncrement(1);
-    volumeScale.setPageIncrement(1);
-    volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
-    volumeScale.setToolTipText(Resources.getString("slider.volume.tooltip"));
-    volumeScale.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setVolume(
-          volumeScale.getSelection() * VOLUME_RESOLUTION - VOLUME_OFFSET);
-      }
-    });
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.END;
-    gridData.grabExcessHorizontalSpace = false;
-    volumeScale.setLayoutData(gridData);
+//    volumeScale = new Scale(trackGroup, SWT.HORIZONTAL | SWT.FLAT);
+//    volumeScale.setIncrement(1);
+//    volumeScale.setPageIncrement(1);
+//    volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
+//    volumeScale.setToolTipText(Resources.getString("slider.volume.tooltip"));
+//    volumeScale.addSelectionListener(new SelectionAdapter() {
+//      public void widgetSelected(SelectionEvent e) {
+//        setVolume(
+//          volumeScale.getSelection() * VOLUME_RESOLUTION - VOLUME_OFFSET);
+//      }
+//    });
+//    gridData = new GridData();
+//    gridData.horizontalAlignment = GridData.END;
+//    gridData.grabExcessHorizontalSpace = false;
+//    volumeScale.setLayoutData(gridData);
     
     
     /************ PREVIOUS BUTTON (<<) ****************/
@@ -1010,10 +1010,6 @@ public class Client extends AbstractClient {
     /************ NEXT BUTTON  ****************/
     ThreeModeButton next = new ThreeModeButton(topPanel, SWT.NONE);
     
-//    gridData = new GridData();
-//    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
-//    next.setLayoutData(gridData);
-    
     next.addMouseListener(new MouseListener() {
       public void mouseDoubleClick(MouseEvent arg0) {}
       public void mouseDown(MouseEvent arg0) {}
@@ -1024,40 +1020,6 @@ public class Client extends AbstractClient {
     
     skinManager.add(next, "button.next");
     
-//    ToolBar toolbar = new ToolBar(topPanel, SWT.FLAT);
-//    gridData = new GridData();
-//    gridData.horizontalAlignment = GridData.CENTER;
-//    gridData.grabExcessHorizontalSpace = true;
-//    gridData.horizontalSpan = 1;
-//    toolbar.setLayoutData(gridData);
-//
-//    previous = new ToolItem(toolbar, SWT.PUSH);
-//    previous.setToolTipText(Resources.getString("button.previous.tooltip"));
-//    previous.addSelectionListener(new SelectionAdapter() {
-//      public void widgetSelected(SelectionEvent e) {
-//        skip(true);
-//      }
-//    });
-//    previous.setEnabled(false);
-//    skinManager.add(previous, "button.previous");
-//
-//    pause = new ToolItem(toolbar, SWT.PUSH);
-//    setPaused(false);
-//    pause.addSelectionListener(new SelectionAdapter() {
-//      public void widgetSelected(SelectionEvent e) {
-//        setPaused(!isPaused());
-//      }
-//    });
-//    pauseSkin = skinManager.add(pause, "button.pause");
-//
-//    ToolItem next = new ToolItem(toolbar, SWT.PUSH);
-//    next.setToolTipText(Resources.getString("button.next.tooltip"));
-//    next.addSelectionListener(new SelectionAdapter() {
-//      public void widgetSelected(SelectionEvent e) {
-//        skip();
-//      }
-//    });
-//    skinManager.add(next, "button.next");
     
     
 //    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
@@ -1338,7 +1300,7 @@ public class Client extends AbstractClient {
     
     private int value;
     private String name;
-    private ThreeModeButton item;
+//    private ThreeModeButton item;
     
     public RatingFunction(int value, String name) {
       this.value = value;
@@ -1348,8 +1310,8 @@ public class Client extends AbstractClient {
     public int getValue() { return value; }
     public String getName() { return name; }
     
-    public void setItem(ThreeModeButton item) { this.item = item; }
-    public ThreeModeButton getItem() { return item; }    
+//    public void setItem(ThreeModeButton item) { this.item = item; }
+//    public ThreeModeButton getItem() { return item; }    
   }
   /**
    * This method is called whenever the track time changes, and it
