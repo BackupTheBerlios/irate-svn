@@ -7,7 +7,7 @@
 ;
 
 ; The name of the installer
-Name "iRATE radio"
+Name "iRATE radio 0.1"
 
 ; The file to write
 OutFile "irate-client-installer.exe"
@@ -39,7 +39,7 @@ Section "iRATE radio"
   WriteUninstaller "uninstall.exe"
 SectionEnd ; end the section
 
-UninstallText "This will uninstall Survey View. Select next to continue."
+UninstallText "This will uninstall Survey View."
 
 Section "Uninstall"
   DeleteRegKey HKLM SOFTWARE\linetrek_ipaqdate
