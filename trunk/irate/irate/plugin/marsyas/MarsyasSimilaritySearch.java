@@ -159,8 +159,12 @@ public class MarsyasSimilaritySearch extends Thread  {
         track = new Track(new URL(str_data[URL_ID]));
         track.setArtist(str_data[ARTIST_ID]);
         track.setTitle(str_data[TITLE_ID]);
+        //the way things are done right now..
+        //these will just get ignored by track db :(
         track.setProperty("copyright",str_data[COPYRIGHT_ID]);
         track.setProperty("marsyas",str_data[FEATURES_ID]);
+        dbg("Trying to add "+track);
+        plugin.addTrack(track);
         } catch (MalformedURLException e) {
         e.printStackTrace();
         return false;

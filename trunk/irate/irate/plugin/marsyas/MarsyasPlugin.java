@@ -123,6 +123,11 @@ implements TrackLifeCycleListener
       getApp().playTrack(t);
   }
   
+  /** Utility method to let other parts of the plugin add tracks */
+  public void addTrack(Track t) {
+    getApp().addTrack(t);
+  }
+  
   void dbg(String msg) {
     System.err.println("MarsyasSimilaritySearch: "+msg);
   }
