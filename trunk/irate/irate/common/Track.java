@@ -472,6 +472,10 @@ public class Track {
     return getURL().hashCode();
   }
 
+  /**
+   * Gets the name of the album associated with this track
+   * @return A string representing the album in the track's ID3 tag
+   */
   public String getAlbum() {
     try {
       MP3File mp3 = new MP3File(this.getFile());
@@ -483,6 +487,26 @@ public class Track {
     }
   }
   
+  /**
+   * Gets the comment associated with this track
+   * @return A string representing the comment in the track's ID3 tag
+   */
+  public String getComment() {
+    try {
+      MP3File mp3 = new MP3File(this.getFile());
+      return mp3.getComment();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return "";
+    }
+  }
+  
+ 
+  /**
+   * Gets the copyright info for this track
+   * @return A string representing the copyright info in the track's ID3 tag
+   */
   public String getCopyrightInfo() {
     try {
       MP3File mp3 = new MP3File(this.getFile());
@@ -494,6 +518,10 @@ public class Track {
     return null;
   }
 
+  /**
+   * Gets a string reperesentation of the playing time of this track
+   * @return A string representing the playing time in the track's ID3 tag
+   */
   public String getPlayingTimeString() {
     try {
       MP3File mp3 = new MP3File(this.getFile());

@@ -29,30 +29,42 @@ public class TrackInfoDialog {
   private Label album;
   private Label playTime;
   private Label copyright;
+  private Label comment;
   private Button closeButton;
   private Button wwwLink;
   private Button searchButton;
   private Button licenseButton;
   
   private String creativeLink;
-  
-  private final int NUMBER_OF_COLUMNS = 4;
 
   public TrackInfoDialog(Display display, Shell parent) {
     this.display = display;
     this.parent = parent;
   }
 
-  public void buildDialog() {
+  /**
+   * This method builds and shows a TrackInfoDialog.
+   */
+  private void buildDialog() {
     
     // Create the shell and setup the layout
     shell = new Shell(display);
-    GridLayout layout = new GridLayout(NUMBER_OF_COLUMNS, false);
-    layout.makeColumnsEqualWidth = false;
-    layout.horizontalSpacing = 5;
-    layout.verticalSpacing = 5;
+    GridLayout layout = new GridLayout(2, false);
     shell.setLayout(layout);
-    shell.setSize(450, 300);
+    
+    try {
+      ImageData icon =
+        new ImageData(Resources.getResourceAsStream("icon.gif"));
+        int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
+        icon.transparentPixel = whitePixel;
+        shell.setImage(new Image(display, icon));
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    
+    shell.setSize(480, 350);
     
     // Print the title of the current track across the top of the window
     trackTitle = new Label(shell,SWT.HORIZONTAL|SWT.CENTER);
@@ -60,163 +72,128 @@ public class TrackInfoDialog {
     trackTitle.setText(currentTrack.getTitle());
     
     GridData data = new GridData(GridData.FILL_HORIZONTAL);
-    data.horizontalSpan = NUMBER_OF_COLUMNS;
+    data.horizontalSpan = 2;
     trackTitle.setLayoutData(data);
     
     trackTitle.pack();
     
-    // Create a horizontal divider
+    // Create a horizontal divider, beneath the title.
     Label horiDivider = new Label(shell, SWT.SEPARATOR|SWT.HORIZONTAL);
     data = new GridData();
-    data.horizontalSpan = NUMBER_OF_COLUMNS;
-    data.widthHint = 450;
+    data.horizontalSpan = 2;
+    data.widthHint = 465;
     horiDivider.setLayoutData(data);
     horiDivider.pack();
     
-    // Create an 'Artist:' label
-    Label artistLabel = new Label(shell, SWT.HORIZONTAL);
-    artistLabel.setText("Artist:");
+    // Create the grid for the left hand side of the dialog
+    // This grid is 2 columns wide -- one column will have a label and
+    // the second the related information
+    Composite leftGrid = new Composite(shell, SWT.NONE);
     
     GridData gridData = new GridData();
+    gridData.verticalAlignment = SWT.TOP;
+    leftGrid.setLayoutData(gridData);
+    
+    GridLayout leftGridLayout = new GridLayout(2, false);
+    leftGridLayout.horizontalSpacing = 10;
+    leftGridLayout.verticalSpacing = 5;
+    leftGrid.setLayout(leftGridLayout);
+     
+    // Left Grid, Column 1, Row 1: Create an 'Artist:' label
+    Label artistLabel = new Label(leftGrid, SWT.HORIZONTAL);
+    artistLabel.setText("Artist:");
+    
+    gridData = new GridData();
     gridData.widthHint = 80;
     artistLabel.setLayoutData(gridData);
     
     artistLabel.setFont(resizeFontTo(artistLabel.getFont(),12));
     artistLabel.pack();
     
-    // Create a label with the artist in it.
-    artist = new Label(shell,SWT.HORIZONTAL);
+    // Left Grid, Column 2, Row 1: Label with the artist's name
+    artist = new Label(leftGrid,SWT.HORIZONTAL);
+    
     gridData = new GridData();
     gridData.widthHint = 300;
+    
     artist.setLayoutData(gridData);
     artist.setFont(resizeFontTo(artist.getFont(),12));
     artist.setText(currentTrack.getArtist());
     artist.pack();
     
-    // Create a vertical divider
-    Label divider = new Label(shell, SWT.SEPARATOR | SWT.VERTICAL);
-    gridData = new GridData();
-    gridData.verticalSpan = 5;
-    gridData.heightHint = 200;
-    divider.setLayoutData(gridData);
-    divider.pack();
-    
-    // Create a search button
-    searchButton = new Button(shell,0);
-    try {
-      Image image = new Image(shell.getDisplay(), Resources.getResourceAsStream("magnify-icon.gif"));
-      image.setBackground(searchButton.getBackground());
-      searchButton.setImage(image);
-    } catch (IOException e) {
-      e.printStackTrace();
-      searchButton.setText("Search"); 
-    }
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.END;
-    searchButton.setLayoutData(gridData);
-    
-    searchButton.pack();
-    
-    // Create the 'Album:' label
-    Label albumLabel = new Label(shell, SWT.HORIZONTAL);
+  
+    // Left Grid, Column 1, Row 2: 'Album:' label
+    Label albumLabel = new Label(leftGrid, SWT.HORIZONTAL);
     albumLabel.setText("Album:");
     albumLabel.setFont(resizeFontTo(albumLabel.getFont(),12));
+    
     gridData = new GridData();
     gridData.widthHint = 80;
+    
     albumLabel.setLayoutData(gridData);
     albumLabel.pack();
     
-    // Create label that displays the album
-    album = new Label(shell,SWT.HORIZONTAL);
+    // Left Grid, Column 2, Row 2: Album Label
+    album = new Label(leftGrid,SWT.HORIZONTAL);
     gridData = new GridData();
     gridData.widthHint = 300;
     album.setLayoutData(gridData);
+    
     album.setFont(resizeFontTo(album.getFont(),12));
     album.setText(currentTrack.getAlbum());
     album.pack();
     
-    // Create a WWW link
-    wwwLink = new Button(shell,0);
-    wwwLink.setText("WWW");
-    
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.END;
-    gridData.widthHint = searchButton.getSize().x;
-    gridData.heightHint = searchButton.getSize().y;
-    wwwLink.setLayoutData(gridData);
-    
-    wwwLink.pack();
-    
-    
-    // Create the 'Length:' label
-    Label playTimeLabel = new Label(shell, SWT.HORIZONTAL);
+    // Left Grid, Column 1, Row 3: 'Length:' label
+    Label playTimeLabel = new Label(leftGrid, SWT.HORIZONTAL);
     playTimeLabel.setText("Length:");
     playTimeLabel.setFont(resizeFontTo(playTimeLabel.getFont(),12));
+    
     gridData = new GridData();
     gridData.widthHint = 80;
-    gridData.heightHint = searchButton.getSize().y;
+   
     playTimeLabel.setLayoutData(gridData);
     playTimeLabel.pack();
     
-    //	Create label that displays the playing time
-    playTime = new Label(shell,SWT.HORIZONTAL);
+    //	Left Grid, Column 2, Row 3: Playing time label
+    playTime = new Label(leftGrid,SWT.HORIZONTAL);
+   
     gridData = new GridData();
     gridData.widthHint = 300;
-    gridData.heightHint = searchButton.getSize().y;
     playTime.setLayoutData(gridData);
+   
     playTime.setFont(resizeFontTo(album.getFont(),12));
     playTime.setText(currentTrack.getPlayingTimeString());
     playTime.pack();
     
-    // Add a CLOSE button
-    closeButton = new Button(shell,0);
-    closeButton.setText("Close");
-    
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.END;
-    gridData.widthHint = searchButton.getSize().x;
-    gridData.heightHint = searchButton.getSize().y;
-    closeButton.setLayoutData(gridData);
-    
-    closeButton.pack();
-    	
-    //	Create the 'Copyright:' label
-    Label copyrightLabel = new Label(shell, SWT.HORIZONTAL);
+    //	Left Grid, Column 1, Row 4: 'Copyright:' label
+    Label copyrightLabel = new Label(leftGrid, SWT.HORIZONTAL);
     copyrightLabel.setText("Copyright:");
     copyrightLabel.setFont(resizeFontTo(copyrightLabel.getFont(),12));
+    
     gridData = new GridData();
     gridData.widthHint = 80;
     gridData.heightHint = 60;
     copyrightLabel.setLayoutData(gridData);
+    
     copyrightLabel.pack();
     
-    // Display the copyright information
-    copyright = new Label(shell,SWT.HORIZONTAL|SWT.WRAP|SWT.TOP);
+    // Left Grid, Column 1, Row 4: Copyright information
+    copyright = new Label(leftGrid,SWT.HORIZONTAL|SWT.WRAP);
+    
     gridData = new GridData();
     gridData.widthHint = 300;
     gridData.heightHint = 60;
+    gridData.verticalAlignment = SWT.BOTTOM;
     copyright.setLayoutData(gridData);
+    
     copyright.setFont(resizeFontTo(album.getFont(),10));
     copyright.setText(license.getFullText());
     copyright.pack();
     
-    Label blank2 = new Label(shell,0);
-    gridData = new GridData();
-    gridData.heightHint = 60;
-    blank2.setLayoutData(gridData);
-    blank2.pack(); 
-    
-    Label blank3 = new Label(shell,0);
-    gridData = new GridData();
-    //gridData.heightHint = 60;
-    //gridData.horizontalSpan = 3;
-    blank3.setLayoutData(gridData);
-    blank3.pack(); 
-    
     // If this track has an icon associated with the license, then display it.
     if(license.getIcon() != null && !license.getIcon().equals("")) {	
     	
-    	licenseButton = new Button(shell,SWT.FLAT);
+    	licenseButton = new Button(leftGrid,SWT.FLAT);
       
       try {
         Image licenseImage = new Image(shell.getDisplay(), Resources.getResourceAsStream(license.getIcon()));
@@ -227,17 +204,103 @@ public class TrackInfoDialog {
         licenseButton.setText(license.getName());
       }
     	gridData = new GridData();
-    	licenseButton.setLayoutData(gridData);
+      gridData.horizontalSpan = 2;
+      gridData.horizontalAlignment = SWT.RIGHT;
+      gridData.horizontalIndent = 85;
+      licenseButton.setLayoutData(gridData);
+      
     	licenseButton.pack();
     
     }
-  // Add the listeners and open the shell
-  addListeners();
-  shell.open();
     
-}
+    // Left Grid, Column 1, Row 5: 'Comment:' label
+    Label commentLabel = new Label(leftGrid, SWT.HORIZONTAL);
+    commentLabel.setText("Comment:");
+    commentLabel.setFont(resizeFontTo(commentLabel.getFont(),12));
+    
+    gridData = new GridData();
+    gridData.widthHint = 80;
+    gridData.heightHint = 60; 
+    gridData.horizontalSpan = 1;
+    commentLabel.setLayoutData(gridData);
+    
+    commentLabel.pack();
 
-private void addListeners() {
+    // Left Grid, Column 2, Row 5: Track Comment
+    comment = new Label(leftGrid,SWT.WRAP);
+    gridData = new GridData();
+    gridData.widthHint = 300;
+    gridData.heightHint = 60;
+    comment.setLayoutData(gridData);
+    
+    comment.setFont(resizeFontTo(album.getFont(),10));
+    comment.setText(currentTrack.getComment());
+    
+    comment.pack();
+    
+    // Build the grid for the right side of the dialog.
+    // This grid will have a vertical divider down the first column, and
+    // a column of buttons in the other.
+    Composite rightGrid = new Composite(shell, SWT.NONE);
+    
+    gridData = new GridData();
+    gridData.verticalAlignment = SWT.TOP;
+    rightGrid.setLayoutData(gridData);
+    
+    GridLayout rightGridLayout = new GridLayout(2, false);
+    rightGrid.setLayout(rightGridLayout);
+    
+    // Right Grid, Column 1, Row 1-8: Vertical divider
+    Label divider = new Label(rightGrid, SWT.SEPARATOR | SWT.VERTICAL);
+    gridData = new GridData();
+    gridData.verticalSpan = 8;
+    gridData.heightHint = 250;
+    divider.setLayoutData(gridData);
+    divider.pack();
+      
+    // Right Grid, Column 2, Row 2: Search button
+    searchButton = new Button(rightGrid,0);
+    searchButton.setText("Search");
+    searchButton.pack();
+    
+    // Right Grid, Column 2, Row 2: WWW Button
+    wwwLink = new Button(rightGrid,0);
+    wwwLink.setText("WWW");
+      
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.END;
+    gridData.widthHint = searchButton.getSize().x;
+    gridData.heightHint = searchButton.getSize().y;
+    wwwLink.setLayoutData(gridData);
+    
+    // If the website isn't available, grey out this area.  
+    if(currentTrack.getArtistWebsite() == null || currentTrack.getArtistWebsite().equals("")) 
+    {
+      wwwLink.setEnabled(false);
+    }
+    wwwLink.pack();
+    
+    // Right Grid, Column 2, Row 3: Close Button
+    closeButton = new Button(rightGrid,0);
+    closeButton.setText("Close");
+      
+    gridData = new GridData();
+    gridData.widthHint = searchButton.getSize().x;
+    gridData.heightHint = searchButton.getSize().y;
+    closeButton.setLayoutData(gridData);
+      
+    closeButton.pack();
+
+    // Add the listeners and open the shell
+    addListeners();
+    shell.open();
+    
+  }
+
+  /**
+   * Add the various listeners to the buttons on the dialogue.
+   */
+  private void addListeners() {
 	
   // Add a listener on the shell so it will close properly
   shell.addShellListener(new ShellAdapter() {
@@ -288,18 +351,29 @@ private void addListeners() {
     } 
 	}
 	
+  /**
+   * Dispose of the shell when a user closes the dialogue box.
+   */
   private void actionClose() {
     shell.dispose();
     shell = null;
   }
 
-  protected void displayTrackInfo(Track track, Client client) {
+  /**
+   * Display a dialogue box based on the information about the
+   * currently playing track.
+   */
+  public void displayTrackInfo(Track track, Client client) {
   	license = new LicensingScheme(track.getCopyrightInfo());
   	parentClient = client;
   	currentTrack = track;
     buildDialog();
   }
   
+  /*
+   *  Given a Font object, this method resizes that font to the given value.
+   *  This method was taken off the Eclipse site.
+   */
   private Font resizeFontTo(Font currentFont, int endSize) {
     FontData[] fontData = currentFont.getFontData();
     for (int i = 0; i < fontData.length; i++) {
