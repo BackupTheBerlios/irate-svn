@@ -103,7 +103,12 @@ public class Client implements UpdateListener {
             e.printStackTrace();
             url = getResource("help/malformedurl.html");
           }
-        errorDialog.showURL(url);
+        final URL final_url=url;
+        display.asyncExec(new Runnable() {
+          public void run() {
+            errorDialog.showURL(final_url);
+          }
+        });
       }
     };
     
