@@ -4,7 +4,8 @@ include make.configure
 
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
-JAVAC=javac
+JPATH=.:lib/nanoxml-lite-2.2.3.jar:lib/skinlf.jar:lib/jl030.jar:lib/jlGui2.2.jar
+JAVAC=javac -classpath $(JPATH)
 export GCJ=gcj -g -pipe -O0
 IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
@@ -20,10 +21,11 @@ CLIENT_LIBS = lib/libnanoxml-lite.o
 
 JAVA_SWTSRC=irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
 JAVA_SWINGSRC=irate/swing/*.java
+JAVA_CLIENT=irate/client/*.java
 JAVA_COMMONSRC=irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java
 JAVA_DOWNLOAD=irate/download/*.java
 HELPFILES=irate/client/help/*.html
-JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(CLIENT_FILES:.java=.class) $(JAVA_DOWNLOAD:.java=.class)
+JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CLIENT:.java=.class) $(JAVA_DOWNLOAD:.java=.class)
 
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
@@ -144,7 +146,7 @@ tarball: $(IRATE_CLIENT)
 irate-client-swing.jar:
 	$(JAVAC) $(JAVA_COMMONSRC)
 	$(JAVAC) $(JAVA_SWINGSRC)
-	$(JAVAC) $(CLIENT_FILES)
+	$(JAVAC) $(JAVA_CLIENT)
 	$(JAVAC) $(JAVA_DOWNLOAD)
 	jar -cmf META-INF/manifest.irate-client irate-client-swing.jar $(JAVA_OBJS) $(HELPFILES)
 
