@@ -328,6 +328,14 @@ public abstract class AbstractClient
     } 
     notifyStartingToPlay(track);
   }
+  
+  /**
+   * Called by PlayThread when a new track is played, but not as useful as
+   * newTrackStarted, because it doesn't tell us which track.
+   */
+  public void actionPerformed()
+  {
+  }
 
   /**
    * PluginApplication interface:

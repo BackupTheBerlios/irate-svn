@@ -122,9 +122,11 @@ public class Client extends AbstractClient {
     shell.open();
     downloadThread.start();
     trackTable.addSelectionListener(new SelectionAdapter() {
+        // Play track if the user double-clicks on it (or whatever the equivalent
+        // is on the target platform).
       public void widgetDefaultSelected(SelectionEvent e) {
         setPaused(false);
-        playThread.play(trackTable.getSelectedTrack());
+        playThread.play(trackTable.getClickedTrack());
       }
     });
     setPaused(false);
@@ -267,22 +269,40 @@ public class Client extends AbstractClient {
     });
   }
 
-  public void update() {
+  /**
+   * Show the currently playing track on the title bar and select it in the track
+   * table.  Also checks to see if auto-download should happen.
+   */
+  public void update()
+  {
+    update(playThread.getCurrentTrack(), false);
+  }
+
+  /**
+   * Show the currently playing track on the title bar and select it in the track
+   * table.  Also checks to see if auto-download should happen.
+   * @param track The currently playing track.
+   * @param newTrackStarted True if a new track has started playing.  This causes
+   *     the trackTable to scroll to the new track.
+   */
+  private void update(Track track, boolean newTrackStarted) {
     if(trackGroup != null && trackGroup.isEnabled()==false) {
       trackGroup.setEnabled(true);
       trackTable.enable();
     }
-    
+
     //synchronizePlaylist(playListManager, tblSongs);
-    Track track = playThread.getCurrentTrack();
-    if (track == null)
+    if (track == null) {
+      trackTable.select(null, false);
       return;
+    }
     if (isMac())
       shell.setText(track.toString());
     else
       shell.setText(track.toString() + " - " + 
         Resources.getString("titlebar.program_name"));
     trackLabel.setText(Resources.getString("title.now_playing") + " " + track.getArtist() + " / " + track.getTitle());
+    System.out.println("RATING FUNCTIONS: " +track+" isRated="+track.isRated());  /* ### */
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       ThreeModeButton item = rf.getItem();
@@ -290,7 +310,10 @@ public class Client extends AbstractClient {
     }
 //    volumeScale.setSelection(
 //      (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
-    trackTable.select(track);
+
+      // Scroll the track table to the new track if update() if we have just started a new
+      // track.
+    trackTable.select(track, newTrackStarted);
     if (track != previousTrack) {
       if (previousTrack != null)
         trackTable.updateTrack(previousTrack);
@@ -300,15 +323,14 @@ public class Client extends AbstractClient {
     previous.setEnabled(playThread.hasHistory());
   }
   
-  /** called from playThread.addUpdateListener(this); */
-  public void actionPerformed() {
-    System.out.println("actionPerformed()");
+  /**
+   * Called from the playThread to indicate that a new track has started playing.
+   */
+  public void newTrackStarted(final Track track) {
+    super.newTrackStarted(track);
     display.asyncExec(new Runnable() {
       public void run() {
-        update();
-        Track track = playThread.getCurrentTrack();
-        if (track != null)
-          trackTable.updateTrack(track);
+        update(track, true);
       }
     });
   }
@@ -403,8 +425,8 @@ public class Client extends AbstractClient {
     createToolBar();
     //    createTitle();
     trackTable = new TrackTable(shell, trackDatabase, skinManager);
-    createTableMenu();
-    
+    trackTable.setMenu(new TrackTableMenu(shell, skinManager, this, ratingFunctions));
+
     bottomPanel = new Composite(shell, SWT.FLAT);
     skinManager.addControl(bottomPanel, "panel.status");
     
@@ -588,7 +610,7 @@ public class Client extends AbstractClient {
         undoLastRating();
       }
     });
-    item_undo.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.undo")));
+    item_undo.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.undo")));
     skinManager.addItem(item_undo, "toolbar.menu_item.undo");
     item_undo.setAccelerator('Z' + accel);
 
@@ -629,15 +651,69 @@ public class Client extends AbstractClient {
       }
     });
  
-   MenuItem sep2 = new MenuItem(menu1, SWT.SEPARATOR);
+    MenuItem sep2 = new MenuItem(menu1, SWT.SEPARATOR);
+
+// ------ start of "Sort by" submenu ------
+
+    // SWT for Carbon doesn't pass table column clicks, so can't sort.
+    // https://bugs.eclipse.org/bugs/show_bug.cgi?id=34160
+    // hack added Brion Vibber 2004-05-26
+    // Moved here by Stephen Blackheath, and made non-Mac-specific.
+    MenuItem view = new MenuItem(menu1, SWT.CASCADE);
+    skinManager.addItem(view, "toolbar.menu_title.sort");
     
-   if (isMac()) {
+    Menu mView = new Menu(view);
+    view.setMenu(mView);
+    
+    MenuItem mSortArtist = new MenuItem(mView, SWT.PUSH);
+    mSortArtist.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        trackTable.setSortColumn(0);
+      }
+    });
+    skinManager.addItem(mSortArtist, "TrackTable.Heading.Artist");
+    
+    MenuItem mSortTrack = new MenuItem(mView, SWT.PUSH);
+    mSortTrack.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        trackTable.setSortColumn(1);
+      }
+    });
+    skinManager.addItem(mSortTrack, "TrackTable.Heading.Track");
+    
+    MenuItem mSortRating = new MenuItem(mView, SWT.PUSH);
+    mSortRating.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        trackTable.setSortColumn(2);
+      }
+    });
+    skinManager.addItem(mSortRating, "TrackTable.Heading.Rating");
+    
+    MenuItem mSortPlays = new MenuItem(mView, SWT.PUSH);
+    mSortPlays.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        trackTable.setSortColumn(3);
+      }
+    });
+    skinManager.addItem(mSortPlays, "TrackTable.Heading.Plays");
+    
+    MenuItem mSortLast = new MenuItem(mView, SWT.PUSH);
+    mSortLast.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        trackTable.setSortColumn(4);
+      }
+    });
+    skinManager.addItem(mSortLast, "TrackTable.Heading.Last");
+
+// ------ end of "Sort by" submenu ------
+
+    if (isMac()) {
       // Drag-n-drop is broken on SWT/Carbon; need another way to
       // let users get at the files behind their tracks.
       MenuItem mShowFile = new MenuItem(menu1, SWT.PUSH);
       mShowFile.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
-          Track track = trackTable.getSelectedTrack();
+          Track track = getSelectedTrack();
           File trackfile = track.getFile();
           if (trackfile.exists()) {
             System.out.println("Show track file: " + trackfile);
@@ -675,7 +751,7 @@ public class Client extends AbstractClient {
       skinManager.addItem(item1_4, "toolbar.menu_item.quit");
 
       //Added for a nicer UI by Allen Tipper 14.9.03
-      item1_4.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.quit")));
+      item1_4.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.quit")));
       //end add
     }
 
@@ -699,7 +775,7 @@ public class Client extends AbstractClient {
      */
     MenuItem mNewUnrated = new MenuItem(mSettings, SWT.CASCADE);
     skinManager.addItem(mNewUnrated, "toolbar.menu_item.unrated");
-    mNewUnrated.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.unrated")));
+    mNewUnrated.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.unrated")));
 
     Menu menuNewUnrated = new Menu(mNewUnrated);
     mNewUnrated.setMenu(menuNewUnrated);
@@ -723,7 +799,7 @@ public class Client extends AbstractClient {
 
       //Added for a nicer UI by Allen Tipper 14.9.03
       mRatio.addArmListener(
-        new ToolTipArmListener(
+        new ToolTipArmListener(this,
           Resources.getString("toolbar.submenu_item.tooltip.unrated") +
           " " + ratio + "%."));
       //end add
@@ -739,7 +815,7 @@ public class Client extends AbstractClient {
       mPlayers.setMenu(menu2);
   
       //Added for a nicer UI by Allen Tipper 14.9.03
-      mPlayers.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.player")));
+      mPlayers.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.player")));
       //end add
   
       for (int i = 0; i < players.length; i++) {
@@ -761,7 +837,7 @@ public class Client extends AbstractClient {
           }
         });
         mPlayer.addArmListener(
-          new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.tooltip.player") + " " + player));
+          new ToolTipArmListener(this, Resources.getString("toolbar.sub_menu_item.tooltip.player") + " " + player));
       }
     }
     
@@ -784,7 +860,7 @@ public class Client extends AbstractClient {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item2_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.advanced")));
+    item2_1.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.advanced")));
     //end add
 
     MenuItem item3 = new MenuItem(menubar, SWT.CASCADE);
@@ -832,7 +908,7 @@ public class Client extends AbstractClient {
         actionAbout();
       }
     });
-    item3_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.credits")));
+    item3_1.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.credits")));
     
     if (isMac()) {
       try {
@@ -893,6 +969,15 @@ public class Client extends AbstractClient {
     */
     
     trackLabel = new AlphaLabel(trackGroup, SWT.NONE);
+    
+      // If you click on the title of the playing track, then the track table will
+      // jump to that track.
+    trackLabel.addMouseListener(new MouseAdapter() {
+      public void mouseDown(MouseEvent e) 
+      {
+        trackTable.select(getSelectedTrack(), true);
+      }
+    });
     skinManager.add(trackLabel, "label.track");
     gridData = new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL);
     trackLabel.setLayoutData(gridData);
@@ -1107,94 +1192,8 @@ public class Client extends AbstractClient {
   */
   
   
-  
-  /**
-   * Creates the menu that is presented when a track is right-clicked on.
-   */
-  public void createTableMenu() {
-    Menu menu = new Menu(shell, SWT.POP_UP);
-    trackTable.setMenu(menu);
-    if (isMac()) {
-      // SWT for Carbon doesn't pass table column clicks, so can't sort.
-      // https://bugs.eclipse.org/bugs/show_bug.cgi?id=34160
-      // hack added Brion Vibber 2004-05-26
-      MenuItem view = new MenuItem(menu, SWT.CASCADE);
-      skinManager.addItem(view, "toolbar.menu_title.sort");
-      
-      Menu mView = new Menu(view);
-      view.setMenu(mView);
-      
-      MenuItem mSortArtist = new MenuItem(mView, SWT.PUSH);
-      mSortArtist.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          trackTable.setSortColumn(0);
-        }
-      });
-      skinManager.addItem(mSortArtist, "TrackTable.Heading.Artist");
-      
-      MenuItem mSortTrack = new MenuItem(mView, SWT.PUSH);
-      mSortTrack.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          trackTable.setSortColumn(1);
-        }
-      });
-      skinManager.addItem(mSortTrack, "TrackTable.Heading.Track");
-      
-      MenuItem mSortRating = new MenuItem(mView, SWT.PUSH);
-      mSortRating.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          trackTable.setSortColumn(2);
-        }
-      });
-      skinManager.addItem(mSortRating, "TrackTable.Heading.Rating");
-      
-      MenuItem mSortPlays = new MenuItem(mView, SWT.PUSH);
-      mSortPlays.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          trackTable.setSortColumn(3);
-        }
-      });
-      skinManager.addItem(mSortPlays, "TrackTable.Heading.Plays");
-      
-      MenuItem mSortLast = new MenuItem(mView, SWT.PUSH);
-      mSortLast.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          trackTable.setSortColumn(4);
-        }
-      });
-      skinManager.addItem(mSortLast, "TrackTable.Heading.Last");
-      // end add
-    }
-    MenuItem info = new MenuItem(menu, SWT.NONE);
-    info.addArmListener(new ToolTipArmListener(Resources.getString("button.info.tooltip")));
-    final Client clientToPass = this;
-    info.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          Track track = trackTable.getSelectedTrack();
-          if (track == null)
-            return;
-          
-          TrackInfoDialog trackInfoDialog = 
-            new TrackInfoDialog(display, shell);
-          trackInfoDialog.displayTrackInfo(track, clientToPass);   
-        }
-      });
-    skinManager.addItem(info, "button.info");
 
-    for (int i = 0; i < ratingFunctions.length; i++) {
-      RatingFunction rf = ratingFunctions[i];
-      MenuItem item = new MenuItem(menu, SWT.NONE);
-      item.addArmListener(new ToolTipArmListener(Resources.getString(rf.getName() + ".tooltip")));
-      final int value = rf.getValue();
-      item.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          setRating(trackTable.getSelectedTrack(), value);
-        }
-      });
-      skinManager.addItem(item, rf.getName());
-    }
-  }
-  
+ 
   
   
   public void createTrayItem() {
@@ -1208,7 +1207,7 @@ public class Client extends AbstractClient {
       final int value = rf.getValue();
       rate[i].addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
-          setRating(trackTable.getSelectedTrack(), value);
+          setRating(getSelectedTrack(), value);
         }
       });
       if(i == 0) {
@@ -1329,18 +1328,6 @@ public class Client extends AbstractClient {
     settingDialog.open(display);
   }
 
-  /** Class to show tooltips in the statusbar */
-  class ToolTipArmListener implements ArmListener {
-    private String str;
-    public ToolTipArmListener(String str) {
-      this.str = str;
-    }
-    public void widgetArmed(ArmEvent e) {
-      lastStatusMessage = null;
-      lblState.setText(str);
-    }
-  }
-
   /** Create a DND DropTarger for the Shell. */
   public void createDropTarget() {
     DropTarget target = new DropTarget(shell, DND.DROP_LINK | DND.DROP_MOVE);
@@ -1381,23 +1368,6 @@ public class Client extends AbstractClient {
     });
   }
 
-  private static class RatingFunction {
-    
-    private int value;
-    private String name;
-    private ThreeModeButton item;
-    
-    public RatingFunction(int value, String name) {
-      this.value = value;
-      this.name = name;
-    }
-    
-    public int getValue() { return value; }
-    public String getName() { return name; }
-    
-    public void setItem(ThreeModeButton item) { this.item = item; }
-    public ThreeModeButton getItem() { return item; }    
-  }
   /**
    * This method is called whenever the track time changes, and it
    * updates the progress bar.

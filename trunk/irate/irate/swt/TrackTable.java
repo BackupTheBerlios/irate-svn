@@ -19,7 +19,13 @@ import org.eclipse.swt.dnd.DragSourceEvent;
 import org.eclipse.swt.dnd.DragSourceListener;
 import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.MenuListener;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.FontData;
@@ -36,11 +42,15 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Control;
 
 /**
- * @author Anthony Jones
+ * @author Creator: Anthony Jones
+ * @author Updated: Stephen Blackheath
  */
-public class TrackTable {
+public class TrackTable
+  implements MenuListener
+{
   
   /** The SWT display object associated with the Shell and Table. */
   private Display display;
@@ -65,6 +75,18 @@ public class TrackTable {
   
   /** The currently selected track. */
   private Track selected;
+  
+  /**
+   * The track that the user has clicked on.  This is used temporarily while
+   * handling mouse events.
+   */
+  private Track clickedTrack;
+
+  /**
+   * The track that is currently selected with a pop-up menu, or null if the pop-up
+   * menu is not active.
+   */
+  private Track menuSelectedTrack;
 
   /** Used to reduce the number of instances of LicensingScheme. */
   private LicenseIndex licenseIndex = new LicenseIndex();
@@ -77,6 +99,8 @@ public class TrackTable {
   
   /** Stores skinable images automagically */
   private BasicSkinable basicSkinable; 
+  
+  private TrackTableMenu popupMenu;
   
   /** Constructor to create a table contained in the given Shell where the
    * tracks are updated from the given TrackDatabase. 
@@ -192,7 +216,7 @@ public class TrackTable {
       private Track track;
       
       public void dragStart(DragSourceEvent e) {
-        track = getSelectedTrack();
+        track = clickedTrack;
         e.doit = track != null;
       }
       
@@ -208,6 +232,52 @@ public class TrackTable {
       public void dragFinished(DragSourceEvent e) {
       }
     });
+
+    table.addMouseListener(new MouseAdapter() {
+      public void mouseDown(MouseEvent e) 
+      {
+        TableItem item = table.getItem(new Point(e.x, e.y));
+        if (item == null)
+          clickedTrack = null;
+        else
+          clickedTrack = (Track) hashByTableItem.get(item);
+        int x = table.getColumn(0).getWidth() +
+                table.getColumn(1).getWidth();
+        int width = table.getColumn(2).getWidth();
+          // If the user clicked on the rating column, then bring up the
+          // pop-up menu.
+          // NOTE: WIDTH OF RATING ICON IS HARD-CODED HERE!
+        if (e.x >= x && e.x < (x+width) && e.x < (x+80)) {
+          if (popupMenu != null && clickedTrack != null) {
+            menuSelectedTrack = clickedTrack;
+              // Select and scroll to the selected track.
+            select(selected, true);
+              // Put the menu 10 pixels below the mouse position so there is less risk of
+              // choosing "THIS SUX" accidentally.
+            popupMenu.popUp(menuSelectedTrack, table.toDisplay(e.x, e.y+10));
+              // Note: We will now receive a 'widgetSelected' event.  This will call
+              // select(selected, false) - this will ensure the correct track is
+              // highlighted, because menuSelectedTrack overrides the 'selected' track.
+          }
+        }
+      }
+    });
+
+    table.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+          // Prevent the track table from ever having a track other than the
+          // currently playing one selected by switching back to the currently
+          // playing one whenever a track is selected.
+          // (Unless there is a track selected by the pop-up menu.)
+        if (menuSelectedTrack == null)
+          select(selected, false);
+      }
+    });
+  }
+
+  public void addSelectionListener(SelectionListener listener)
+  {
+    table.addSelectionListener(listener);
   }
   
   /** Used to create a listener which sorts using the given Comparator.
@@ -283,7 +353,7 @@ public class TrackTable {
     System.out.println("TrackTable: Done"); //$NON-NLS-1$
     // Make sure the correct track is selected
     if (selected != null)
-      select(selected);
+      select(selected, true);
   }
   
   private Image getStateImage(Color background, String state) {
@@ -436,29 +506,42 @@ public class TrackTable {
       }
     }
   }
-
-  /** Add a lsitener which is notified when a TableItem is selected. The 
-   * listener will need to call #getSelectedTrack() to find out which track
-   * was selected. */
-  public void addSelectionListener(SelectionListener selectionListener) {
-    table.addSelectionListener(selectionListener);
-  }
   
   /** Select a specified Track. */
-  public void select(Track track) {
-    System.out.println("TrackTable.select("+track+")");
+  public void select(Track track, boolean scrollToIt) {
     this.selected = track;
-    TableItem tableItem = (TableItem) hashByTrack.get(track);
+
+      // If the pop-up menu is active, then we select that track instead. 
+    if (menuSelectedTrack != null)
+      track = menuSelectedTrack;
+
+    TableItem tableItem = track != null ? (TableItem) hashByTrack.get(track) : null;
     if (tableItem == null) {
       table.deselectAll();
     }
-    else {      
-      table.setSelection(new TableItem[] { tableItem });
-      table.showItem(tableItem);
+    else {
+        // We would really like the table to select the item without scrolling
+        // to it.  Unfortunately SWT won't do this, so instead, I am having it
+        // just deselect
+      if (scrollToIt) {
+        table.setSelection(new TableItem[] { tableItem });
+        table.showItem(tableItem);
+      }
+      else
+        table.deselectAll();
     }
   }  
+
+  /**
+   * Get the track on which the user has just clicked.  For use during event handlers.
+   */
+  public Track getClickedTrack()
+  {
+    return clickedTrack;
+  }
  
   /** Get the currently selected track. */
+/* THERE IS NO LONGER ANY SUCH THING AS THE SELECTED TRACK.
   public Track getSelectedTrack() {
     final Track[] track = new Track[1];
     final Object[] monitor = new Object[1];
@@ -495,6 +578,7 @@ public class TrackTable {
     }
     return track[0];
   }
+  */
 
   /** A helper class used to make it easy to write clean track comparators
    * without too much casting. */
@@ -574,13 +658,30 @@ public class TrackTable {
           
     public abstract int compareTrack(Track track0, Track track1);  
   }
-  
-    
+
   /** Set the a pop-up menu for the table. */
-  public void setMenu(Menu menu) {
-    table.setMenu(menu);
+  public void setMenu(TrackTableMenu menu) {
+    if (popupMenu != null)
+      popupMenu.removeMenuListener(this);
+    popupMenu = menu;
+    if (popupMenu != null)
+      popupMenu.addMenuListener(this);
+    //table.setMenu(menu);
   }
-  
+
+  public void menuHidden(MenuEvent e)
+  {
+      // When the pop-up menu disappears, we switch back to the selected track.
+    if (menuSelectedTrack != null) {
+      menuSelectedTrack = null;
+      select(selected, false);
+    }
+  }
+
+  public void menuShown(MenuEvent e)
+  {
+  }
+
   /**
    * Get a resource string from the properties file associated with this 
    * class.
