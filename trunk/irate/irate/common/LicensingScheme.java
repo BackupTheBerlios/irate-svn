@@ -3,8 +3,6 @@ package irate.common;
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class LicensingScheme {
 
@@ -56,37 +54,28 @@ public class LicensingScheme {
   private String findNameInURL(String urlFound) {
   	
   	// Search for any name that we have in the hashtable.
-  	StringBuffer buffer = new StringBuffer();
+  	String currentKey = null;
   	Enumeration allKeys = imageTable.keys();
   	 	
 		while (allKeys.hasMoreElements()) {
-  	 		buffer.append((String)allKeys.nextElement());
-				if(allKeys.hasMoreElements()) {
-					buffer.append("|");
-				}
-		}  	 		
-
- 		String regex = "(" + buffer.toString() + ")";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher match = pattern.matcher(urlFound);
-			
-			// If we find one, this is the name
-			if(match.find()) {
-				return match.group();	
-			}
-			return null;
+				currentKey = (String)allKeys.nextElement();
+  	 		if(urlFound.indexOf(currentKey) != -1) 
+  	 		{
+  	 			return currentKey;
+  	 		}
+  	 		
+		}  	 	
+		
+		return null;
   }
 
   private String findURLInText(String copyrightData) {
 			
-		// Find the first web address in the copyright Data. 
-		String regex = "(http://[\\w[.][/]]*)";
-		Pattern pattern = Pattern.compile(regex);
-		Matcher match = pattern.matcher(copyrightData);
-		
-		// If we find one, this is the URL.
-		if(match.find()) {
-			return match.group();	
+		int urlStart = copyrightData.indexOf("http://");
+		int urlEnd = -1;
+		if(copyrightData.indexOf("http://") != -1) {
+				urlEnd = copyrightData.indexOf(" ", urlStart);
+				return copyrightData.substring(urlStart, urlEnd);
 		}
 		return null;
   }
