@@ -277,7 +277,7 @@ public class DownloadThread extends Thread {
                 notifyUpdateListeners(track);
                 for (Iterator iter = downloadListeners.iterator(); iter.hasNext();) {
                   DownloadListener d = (DownloadListener) iter.next();
-                  d.downloadProgressed(track, percent, "downloading songs");
+                  d.downloadProgressed(track, percent, Resources.getString("DownloadThread.Downloading_Tracks"));
                 }
               }
             }
