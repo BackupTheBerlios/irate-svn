@@ -66,8 +66,8 @@ public class Client extends JFrame {
     File dir = new File(".");    
     File file = new File(dir, "trackdatabase.xml");
     if (!file.exists()) {
-      File dir = new File("/irate");
-      File file = new File(dir, "trackdatabase.xml");
+      dir = new File("/irate");
+      file = new File(dir, "trackdatabase.xml");
       if (!file.exists()) {
         dir = new File(home, "irate");
         if (!dir.exists())
