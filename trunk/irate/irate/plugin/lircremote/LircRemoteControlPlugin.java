@@ -259,6 +259,7 @@ public class LircRemoteControlPlugin
 	    // This makes the thread wake up occasionally, which will allow any
 	    // dead threads to be cleaned up.  This can result from disconnect()
 	    // being called at a bad time.
+            // Note that setSoTimeout does NOT work on GCJ (version 3.0).
 	  s.setSoTimeout(10000);
 	  try {
 	    BufferedReader r = new BufferedReader(new InputStreamReader(s.getInputStream()));
