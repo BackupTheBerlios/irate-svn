@@ -13,10 +13,10 @@ import nanoxml.*;
  * network socket.
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/09/23 16:51:25 $$
+ * Date Updated: $$Date: 2003/11/08 04:01:31 $$
  * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
  * @author Updated:	$$Author: ajones $$
- * @version $$Revision: 1.11 $$
+ * @version $$Revision: 1.12 $$
  */
 
 public class ExternalControlPlugin 
@@ -202,7 +202,7 @@ public class ExternalControlPlugin
         }
       } catch (IOException e) {
         e.printStackTrace();
-        prepareToDie();
+        return;
       }
       while (!terminating) {
         try {
