@@ -14,18 +14,19 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.program.*;
 import java.io.*;
 import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/09 22:43:17 $
+ * Date Updated: $Date: 2003/10/10 23:55:46 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.83 $
+ * @version $Revision: 1.84 $
  */
 public class Client extends AbstractClient {
 
@@ -525,6 +526,28 @@ public class Client extends AbstractClient {
     errorDialog.show(getResource("help/about.html"));
   }
 
+	/** launches a web browser 
+	@param url web address!
+	*/
+	public void showURL(String url) {
+			String cmd;
+			Runtime r = Runtime.getRuntime();
+			try {
+				cmd = "kfmclient exec "+ url+"";
+				System.out.println(cmd);
+				r.exec(cmd);
+			}
+			catch(Exception ex) {
+				try {
+						//win32 way
+						cmd = "rundll32 url.dll,FileProtocolHandler " + url;
+						System.out.println(cmd);
+						r.exec(cmd);
+				} catch(Exception eee) {
+						
+				}
+			}
+	}
   public void createMenu() {
     Menu menubar = new Menu(shell, SWT.BAR);
     shell.setMenuBar(menubar);
@@ -841,6 +864,17 @@ public class Client extends AbstractClient {
       }
     });
 
+    new ToolItem(toolbar, SWT.SEPARATOR);
+		
+		item = new ToolItem(toolbar, SWT.PUSH);
+		item.setText("www");
+		item.setToolTipText("Visit artist website");
+		item.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) throws IOException{
+					showURL(getSelectedTrack().getArtistWebsite());
+      }
+		});
+    		
     volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(1);

@@ -396,8 +396,27 @@ public class Track {
     return getURL().equals(track.getURL());
   }
 
-  public int hashCode()
-  {
+  private String replace(String str, String what, String with) {
+    int i=0;
+    while((i = str.indexOf(what,i))!=-1) {
+      str = str.substring(0,i) + with +str.substring(i+what.length());
+      i+= with.length();
+    }
+    return str;
+  }
+  /** Returns artist website */
+  public String getArtistWebsite() {
+    String www = elt.getStringAttribute("www");
+    if(www == null) {
+      www = "\"" +getArtist()+ "\" ";
+      www += "\"" +getTitle()+ "\"";
+      www = "http://www.google.com/search?q="+URLEncoder.encode(www);
+      //www = replace(www, " ", "%20");
+    }
+    return www;
+  }
+	
+  public int hashCode() {
     return getURL().hashCode();
   }
 }
