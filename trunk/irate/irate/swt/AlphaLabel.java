@@ -102,6 +102,12 @@ public class AlphaLabel extends Canvas implements Skinable {
       if (backgroundData == null)
       {
         Rectangle bounds = getBounds();
+        
+        // If the window is minimized then these will be zero. We exit without
+        // worrying about updating the image.
+        if (bounds.width == 0 || bounds.height == 0)
+        	return;
+         
         newImage = new Image(label.getDisplay(), bounds.width, bounds.height);
         gc = new GC(newImage);
         gc.setBackground(getBackground());
