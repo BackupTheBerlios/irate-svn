@@ -129,6 +129,20 @@ public class DownloadThread extends Thread {
     return null;
   }
 
+  private class ChildException extends Exception {
+
+    private Exception e;
+    
+    public ChildException(Exception e) {
+      super(e.toString());
+      this.e = e;
+    }
+
+    public Exception getParent() {
+      return e;
+    }
+  }
+
   private abstract class TimeoutWorker {
     private Thread timeoutThread;
     private Exception exception;
@@ -164,7 +178,7 @@ public class DownloadThread extends Thread {
         Thread.sleep(step);
         timeout -= step;
         if (exception != null)
-          throw new Exception(exception.toString());
+          throw new ChildException(exception);
         if (done)
           return;
       }
@@ -265,7 +279,7 @@ public class DownloadThread extends Thread {
         inputStream = inputStreamArray[0];
       }
       catch (Exception e) {
-        throw new IOException(e.toString());
+        throw new ChildException(e);
       }
       
       /*
@@ -341,14 +355,21 @@ public class DownloadThread extends Thread {
       track.setFile(file);
       trackDatabase.save();
     }
-    catch (FileNotFoundException fnfe) {
-      setState("Broken download: " + track.getName()); //$NON-NLS-1$
-      currentTrack.setBroken();
-    }
-    catch (IOException e) {
-      setState(getResourceString("DownloadThread.Download_failure") + track.getName()); //$NON-NLS-1$
-      currentTrack.increaseDownloadAttempts();
+    catch (Exception e) {
+      while (e instanceof ChildException) 
+        e = ((ChildException) e).getParent();
       e.printStackTrace();
+      if (e instanceof FileNotFoundException) {
+        setState("Broken download: " + track.getName()); //$NON-NLS-1$
+        currentTrack.setBroken();
+      } else
+      if (e instanceof IOException) {
+        setState(getResourceString("DownloadThread.Download_failure") + track.getName()); //$NON-NLS-1$
+        currentTrack.increaseDownloadAttempts();
+      }
+      else {
+        System.out.println("Exception not handled");
+      }
     }
     finally {
       percentComplete = 0;
