@@ -154,7 +154,11 @@ public class TrackTable
     col.setWidth(50);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-        return new Integer(track0.getNoOfTimesPlayed()).compareTo(new Integer(track1.getNoOfTimesPlayed()));
+        int plays0 = track0.getNoOfTimesPlayed();
+        int plays1 = track1.getNoOfTimesPlayed();
+        if (plays0 < plays1) return -1;
+        if (plays0 > plays1) return 1;
+        return 0;
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.Plays");
@@ -173,7 +177,7 @@ public class TrackTable
     col.setWidth(60);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-          return licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
+        return licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.License");
