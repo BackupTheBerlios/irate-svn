@@ -5,14 +5,15 @@
 
 Name: irate-client-gtk
 Summary: The iRATE music database client
-Version: snapshot1
-Release: 20031108
+Version: 0.3pre
+Release: 20031115
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
 BuildRoot: /tmp/build-%{name}
 Source: irate-src.tar.gz
-Requires: mad
+Requires: mad, libswt-gtk2, libgcj3
+BuildRequires: gcc-java
 
 %description
 iRATE radio is a collaborative filtering mp3 player/downloader. The client logs into
@@ -39,14 +40,17 @@ mkdir -p $RPM_BUILD_DIR/irate
 if [ $IRATE_SRC ]; then
 cd $IRATE_SRC
 fi
-make PLATFORM=linux-gtk2 irate-client
+./configure
+PLATFORM=linux-libswt-gtk2 make
 
 %install
 if [ $IRATE_SRC ]; then
 cd $IRATE_SRC
 fi
-make PLATFORM=linux-gtk2 DESTDIR=$RPM_BUILD_ROOT install
+make PLATFORM=linux-libswt-gtk2 DESTDIR=$RPM_BUILD_ROOT install
 mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
+
+rmdir $RPM_BUILD_ROOT/usr/lib
 
 mkdir -p $RPM_BUILD_ROOT/usr/lib/menu
 cp rpm/mdk91/menu-mdk91 $RPM_BUILD_ROOT/usr/lib/menu/irate-client-gtk
@@ -84,11 +88,15 @@ rm -rf $RPM_BUILD_DIR/irate
 %docdir /usr/share/doc/%{name}-%{version}
 /usr/share/doc/%{name}-%{version}
 /usr/bin
-/usr/lib
+/usr/lib/menu
 /usr/share/man
 /usr/share/icons
 
 %changelog
+* Sat Nov 15 2003 Todd Pytel <tppytel@sophrosune.org> 0.3pre-20031115
+- Added Requires and build instructions for separate libswt-gtk2 RPM
+- Changed versioning to better match Anthony's debs
+
 * Sat Nov 08 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031108
 - Added icon
 
