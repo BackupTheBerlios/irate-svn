@@ -22,7 +22,7 @@ public class PlayThread extends Thread {
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
-//    player = new JavaLayerPlayer();
+    player = new JavaLayerPlayer();
   }
 
   public boolean isSpeechSupported() {
