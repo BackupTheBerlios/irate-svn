@@ -44,7 +44,7 @@ swt-2.1-motif-linux.zip:
 swt-2.1-win32.zip:
 	wget http://download2.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-win32.zip
 
-swt.jar: swt-2.1.1-linux-gtk.zip
+swt-2.1.1-linux-gtk.zip:
 	wget http://download2.eclipse.org/downloads/drops/R-2.1.1-200306271545/swt-2.1.1-linux-gtk.zip
 
 libswt.o: swt.jar
