@@ -44,6 +44,9 @@ public class Client extends AbstractClient {
   private static final int VOLUME_SPAN = 30;
   private static final int VOLUME_OFFSET = 0;
 
+  private static final int UNRATED_ON_PLAYLIST_VALUE = 13;
+  private static final int UNRATED_NOT_ON_PLAYLIST_VALUE = 0;
+  
   private Composite topPanel;
   private Composite bottomPanel;
   private AlphaLabel lblState;
@@ -73,9 +76,6 @@ public class Client extends AbstractClient {
 
   private SWTPluginUIFactory uiFactory;
   private SkinManager skinManager;
-  
-  private final int UNRATED_ON_PLAYLIST_VALUE = 13;
-  private final int UNRATED_NOT_ON_PLAYLIST_VALUE = 0;
   
   private RatingFunction[] ratingFunctions = new RatingFunction[] {
     new RatingFunction(0, "button.this_sux"),
@@ -883,12 +883,16 @@ public class Client extends AbstractClient {
       MenuItem mRoboJock = new MenuItem(mSettings, SWT.CHECK);
       skinManager.addItem(mRoboJock, "toolbar.menu_item.robojock");
       mRoboJock.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.robojock")));
-      if (playListManager.getTrackDatabase().isRoboJockEnabled())
+      if (Preferences.isRoboJockEnabled())
         mRoboJock.setSelection(true);
       mRoboJock.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
           MenuItem self = (MenuItem) e.getSource();
-          playListManager.getTrackDatabase().setRoboJockEnabled(self.getSelection());
+          try {
+            Preferences.setRoboJockEnabled(self.getSelection());
+          } catch (IOException ioe) {
+            ioe.printStackTrace(); // Couldn't save preferences. RoboJock is enabled for this session only.
+          }
         }
       });
     }
@@ -1460,15 +1464,15 @@ public class Client extends AbstractClient {
     target.setTransfer(new Transfer[] { FileTransfer.getInstance()});
     target.addDropListener(new DropTargetListener() {
       public void dragEnter(DropTargetEvent e) {
-      };
+      }
       public void dragOver(DropTargetEvent e) {
-      };
+      }
       public void dragLeave(DropTargetEvent e) {
-      };
+      }
       public void dragOperationChanged(DropTargetEvent e) {
-      };
+      }
       public void dropAccept(DropTargetEvent e) {
-      };
+      }
       public void drop(DropTargetEvent e) {
         if (e.data == null)
           e.detail = DND.DROP_NONE;
