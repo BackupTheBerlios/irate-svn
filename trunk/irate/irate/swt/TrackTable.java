@@ -141,7 +141,12 @@ public class TrackTable {
       }
       
       public void dragSetData(DragSourceEvent e) {
-        e.data = new String[] { track.getFile().getAbsoluteFile().getAbsolutePath() };
+        try {
+          e.data = new String[] { track.getFile().getAbsoluteFile().getAbsolutePath() };
+        }
+        catch (Exception ex) {
+          ex.printStackTrace();
+        }
       } 
       
       public void dragFinished(DragSourceEvent e) {
