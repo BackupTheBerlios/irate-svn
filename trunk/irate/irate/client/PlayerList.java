@@ -20,7 +20,10 @@ public class PlayerList {
     }
     
     try {
-      players.add(Class.forName("irate.client.MplayerPlayer").newInstance());
+      // Don't try this on Windows -- it will start
+      // "mplayer.exe" which is not what we want at all.
+      if (!System.getProperty("os.name").toLowerCase().startsWith("win"))
+        players.add(Class.forName("irate.client.MplayerPlayer").newInstance());
     }
     catch (Exception e) {
       e.printStackTrace();
