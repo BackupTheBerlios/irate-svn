@@ -9,6 +9,7 @@ import irate.resources.BaseResources;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.Hashtable;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -18,6 +19,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 public class TrackInfoDialog {
+  
+  private static Hashtable infoDialogs = new Hashtable();
   
   private Display display;
 
@@ -309,6 +312,7 @@ public class TrackInfoDialog {
    * Dispose of the shell when a user closes the dialogue box.
    */
   private void actionClose() {
+    infoDialogs.remove(currentTrack.getURL());
     dialog.dispose();
     dialog = null;
     disposeFonts();
@@ -319,10 +323,17 @@ public class TrackInfoDialog {
    * currently playing track.
    */
   public void displayTrackInfo(Track track, Client client) {
-  	license = new LicensingScheme(track.getCopyrightInfo());
-  	parentClient = client;
-  	currentTrack = track;
-    buildDialog();
+    // If there's already a dialog open for this track, raise it
+    TrackInfoDialog info = (TrackInfoDialog)infoDialogs.get(track.getURL());
+    if (info == null) {
+      infoDialogs.put(track.getURL(), this);
+      license = new LicensingScheme(track.getCopyrightInfo());
+      parentClient = client;
+      currentTrack = track;
+      buildDialog();
+    } else {
+      info.dialog.getShell().open();
+    }
   }
   
   /*
