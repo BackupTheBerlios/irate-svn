@@ -4,6 +4,7 @@
 package irate.client;
 
 import irate.common.DiskControl;
+import irate.common.ErrorListener;
 import irate.common.Preferences;
 import irate.common.Track;
 import irate.common.TrackDatabase;
@@ -111,16 +112,12 @@ public abstract class AbstractClient
 
     playThread.addUpdateListener(this);
 
-    downloadThread = new DownloadThread(trackDatabase) {
-      public void process() throws IOException {
-        super.process();
-        // perhapsDisableAccount();
-      }
-
-      public void handleError(String code, String urlString) {
+    downloadThread = new DownloadThread(trackDatabase);
+    downloadThread.addErrorListener(new ErrorListener() {
+      public void errorOccurred(String code, String urlString) {
         AbstractClient.this.handleError(code, urlString);
       }
-    };
+    });
 
     downloadThread.addDownloadListener(new DownloadListener() {
       public void downloadStarted(Track track) { updateTrack(track); }

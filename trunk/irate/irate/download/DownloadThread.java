@@ -2,6 +2,7 @@
 
 package irate.download;
 
+import irate.common.ErrorListener;
 import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
@@ -23,6 +24,7 @@ public class DownloadThread extends Thread {
   private static final String LOCALE_RESOURCE_LOCATION = 
     "irate.download.locale";
   private Vector updateListeners = new Vector();
+  private Vector errorListeners = new Vector();
   private TrackDatabase trackDatabase;
   private File downloadDir;
   private String state;
@@ -65,7 +67,7 @@ public class DownloadThread extends Thread {
       }
       catch (IOException ioe) {
         if (continuous)
-          handleError("continuousfailed", "continuousfailed.html"); //$NON-NLS-1$ //$NON-NLS-2$
+          notifyErrorListeners("continuousfailed", "continuousfailed.html"); //$NON-NLS-1$ //$NON-NLS-2$
         ioe.printStackTrace();
       }
       catch (InterruptedException ie) {
@@ -180,19 +182,18 @@ public class DownloadThread extends Thread {
   // Appears to not be called externally. Could be made private
   public void process() throws IOException {
     if (!downloadSinglePending()) {
-      contactServer(trackDatabase);
-      downloadSinglePending();
+      try {
+		    contactServer(trackDatabase);
+		    downloadSinglePending();
+      }
+      catch (DownloadException e) {
+        try {
+          Thread.sleep(90000);
+        }
+        catch (InterruptedException ie) {
+        }
+      }
     }
-  }
-
-  /** Prints error to System out and pauses execution for 5seconds */
-  public void handleError(String code, String urlString) {
-    System.out.println("Server error: " + code); //$NON-NLS-1$
-    //prevent quick reconnects
-    try {
-      Thread.sleep(5000);
-    }
-    catch(InterruptedException ie) {}
   }
 
   URLConnection openConnection(URL u) throws IOException{
@@ -395,7 +396,7 @@ public class DownloadThread extends Thread {
    *
    * @param trackDatabase the trackdatabase that we work with.
    */
-  public void contactServer(TrackDatabase trackDatabase) {
+  public void contactServer(TrackDatabase trackDatabase) throws DownloadException {
     try {
       setState(getResourceString("DownloadThread.Connecting_to_server")); //$NON-NLS-1$
       Socket socket =
@@ -432,35 +433,27 @@ public class DownloadThread extends Thread {
 //if errorCode == "password" we can give a better prompt.
 System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
       if (errorCode.length() != 0) {
-        handleError(errorCode, reply.getErrorURLString());
-        try {
-          Thread.sleep(90000); // Pause for 15 minutes before trying again.
-        } catch (InterruptedException e) {}
+        throw new DownloadException(errorCode, reply.getErrorURLString());
       } else//if no error incrmement serial
         trackDatabase.incrementSerial();
     }
     catch (UnknownHostException uhe) {
-      handleError("nohost", "hostnotfound.html"); //$NON-NLS-1$ //$NON-NLS-2$
-      try {
-        Thread.sleep(90000);
-      } catch (InterruptedException e) {}
+      throw new DownloadException("nohost", "hostnotfound.html"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     catch (ConnectException ce) {
       if (ce.getMessage().equals("Connection timed out")) //$NON-NLS-1$
-        handleError("conntimeout", "connectiontimeout.html"); //$NON-NLS-1$ //$NON-NLS-2$
+        throw new DownloadException("conntimeout", "connectiontimeout.html"); //$NON-NLS-1$ //$NON-NLS-2$
       else if (ce.getMessage().equals("Connection refused")) //$NON-NLS-1$
-        handleError("connrefused", "connectionrefused.html"); //$NON-NLS-1$ //$NON-NLS-2$
+        throw new DownloadException("connrefused", "connectionrefused.html"); //$NON-NLS-1$ //$NON-NLS-2$
       else
-        handleError("conntimeout", "connectionfailed.html"); //$NON-NLS-1$ //$NON-NLS-2$
-      try {
-        Thread.sleep(90000);
-      } catch (InterruptedException e) {}
+        throw new DownloadException("conntimeout", "connectionfailed.html"); //$NON-NLS-1$ //$NON-NLS-2$
     }
     catch (IOException e) {
-      e.printStackTrace();
-      try {
-        Thread.sleep(90000);
-      } catch (InterruptedException ie) {}
+      throw new DownloadException("serverioerror", "ioerror.html");
+    }
+    catch (DownloadException de) {
+      notifyErrorListeners(de.getCode(), de.getURLString());
+      throw de;
     }
   }
 
@@ -482,11 +475,15 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
   public void addUpdateListener(UpdateListener downloadListener) {
     updateListeners.add(downloadListener);
   }
-
+  
   public void addDownloadListener(DownloadListener downloadListener) {
     downloadListeners.add(downloadListener);
   }
 
+  public void addErrorListener(ErrorListener errorListener) {
+  	errorListeners.add(errorListener);
+  }
+  
   public void removeDownloadListener(DownloadListener downloadListener) {
     downloadListeners.remove(downloadListener);
   }
@@ -499,11 +496,22 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
       }
   }
 
+  public void removeErrorListener(ErrorListener errorListener) {
+  	errorListeners.remove(errorListener);
+  }
+
   private void notifyUpdateListeners(Track track) {
     for (int i = 0; i < updateListeners.size(); i++) {
       UpdateListener updateListener = (UpdateListener) updateListeners.elementAt(i);
       updateListener.actionPerformed();
     }
+  }
+  
+  private void notifyErrorListeners(String code, String urlString) {
+  	for (int i = 0; i < errorListeners.size(); i++) {
+  	  ErrorListener errorListener = (ErrorListener) errorListeners.elementAt(i);
+  	  errorListener.errorOccurred(code, urlString);
+  	}
   }
 
   //Made public for UI Tweak by Allen Tipper 14.9.03

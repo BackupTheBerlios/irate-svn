@@ -1,8 +1,10 @@
 package irate.swt;
 
+import irate.common.ErrorListener;
 import irate.common.Track;
 import irate.common.Preferences;
 import irate.common.TrackDatabase;
+import irate.download.DownloadException;
 import irate.download.DownloadThread;
 import irate.common.UpdateListener;
 
@@ -22,9 +24,9 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/09/05 03:50:57 $
+ * Date Updated: $Date$
  * @author Creator:	taras
- * @author Updated:	$Author: ajones $
+ * @author Updated:	$Author$
  * @version $Revision: 1.31 $
  */
 public class AccountDialog {
@@ -299,8 +301,20 @@ public class AccountDialog {
       };//ul
       downloadThread.addUpdateListener(ul);
 
-      downloadThread.contactServer(trackDatabase);
-      downloadThread.removeUpdateListener(ul);
+      try {
+        downloadThread.contactServer(trackDatabase);
+      }
+      catch (DownloadException e) {
+        e.printStackTrace();
+        try {
+          Thread.sleep(2000);
+        }
+        catch (InterruptedException ie) {
+        }
+      }
+      finally {
+        downloadThread.removeUpdateListener(ul);
+      }
       //System.out.println("grrr");
       if (trackDatabase.getNoOfTracks() != 0) {
         done = true;
