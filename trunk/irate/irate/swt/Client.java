@@ -42,6 +42,7 @@ public class Client extends AbstractClient {
   private Label lblState;
   private Display display;;
   private Shell shell;
+  private Label trackLabel;
   private ProgressBar progressBar;
   private Scale volumeScale;
 //  private TrackProgressBar songProgressBar;
@@ -209,6 +210,12 @@ public class Client extends AbstractClient {
       return;
     shell.setText(
       (track == null ? "" : track.toString() + " - ") + Resources.getString("titlebar.program_name"));
+    trackLabel.setText(Resources.getString("title.now_playing") + " " + track.getArtist() + " / " + track.getTitle());
+    for (int i = 0; i < ratingFunctions.length; i++) {
+      RatingFunction rf = ratingFunctions[i];
+      ToolItem item = rf.getItem();
+      item.setSelection(track.getRating() == rf.getValue());
+    }
     volumeScale.setSelection(
       (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
     trackTable.select(track);
@@ -662,36 +669,20 @@ public class Client extends AbstractClient {
   }
 
   public void createToolBar() {
-    ToolBar toolbar = new ToolBar(shell, SWT.FLAT);
+    Composite composite = new Composite(shell, SWT.FLAT);
     GridData gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = true;
+    gridData.horizontalSpan = 3;
+    composite.setLayoutData(gridData);
+    composite.setLayout(new GridLayout(2, false));
+    
+    ToolBar toolbar = new ToolBar(composite, SWT.FLAT);
+    gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = false;
     gridData.horizontalSpan = 1;
     toolbar.setLayoutData(gridData);
-
-    for (int i = 0; i < ratingFunctions.length; i++) {
-      RatingFunction rf = ratingFunctions[i];
-      ToolItem item = new ToolItem(toolbar, SWT.PUSH);
-      item.setToolTipText(Resources.getString(rf.getName() + ".tooltip"));
-      final int value = rf.getValue();
-      item.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          setRating(getSelectedTrack(), value);
-        }
-      });
-      skinManager.add(item, rf.getName());
-    }
-
-    new ToolItem(toolbar, SWT.SEPARATOR);
-
-    pause = new ToolItem(toolbar, SWT.PUSH);
-    setPaused(false);
-    pause.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setPaused(!isPaused());
-      }
-    });
-    pauseSkin = skinManager.add(pause, "button.pause");
 
     previous = new ToolItem(toolbar, SWT.PUSH);
     previous.setToolTipText(Resources.getString("button.previous.tooltip"));
@@ -703,6 +694,15 @@ public class Client extends AbstractClient {
     previous.setEnabled(false);
     skinManager.add(previous, "button.previous");
 
+    pause = new ToolItem(toolbar, SWT.PUSH);
+    setPaused(false);
+    pause.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        setPaused(!isPaused());
+      }
+    });
+    pauseSkin = skinManager.add(pause, "button.pause");
+
     ToolItem next = new ToolItem(toolbar, SWT.PUSH);
     next.setToolTipText(Resources.getString("button.next.tooltip"));
     next.addSelectionListener(new SelectionAdapter() {
@@ -712,9 +712,39 @@ public class Client extends AbstractClient {
     });
     skinManager.add(next, "button.next");
 
-    new ToolItem(toolbar, SWT.SEPARATOR);
+    Composite trackGroup = new Composite(composite, SWT.BORDER);
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = true;
+    gridData.horizontalSpan = 1;
+    trackGroup.setLayoutData(gridData);    
+    trackGroup.setLayout(new GridLayout(2, false));
+    
+    trackLabel = new Label(trackGroup, SWT.CENTER);
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = true;
+    gridData.horizontalSpan = 2;
+    trackLabel.setLayoutData(gridData);
+    
+    ToolBar trackToolbar = new ToolBar(trackGroup, SWT.FLAT);
+    for (int i = 0; i < ratingFunctions.length; i++) {
+      RatingFunction rf = ratingFunctions[i];
+      ToolItem item = new ToolItem(trackToolbar, SWT.RADIO);
+      item.setToolTipText(Resources.getString(rf.getName() + ".tooltip"));
+      final int value = rf.getValue();
+      item.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          setRating(getSelectedTrack(), value);
+        }
+      });
+      rf.setItem(item);
+      skinManager.add(item, rf.getName());
+    }
+  
+    new ToolItem(trackToolbar, SWT.SEPARATOR);
 
-    ToolItem info = new ToolItem(toolbar, SWT.PUSH);
+    ToolItem info = new ToolItem(trackToolbar, SWT.PUSH);
     info.setToolTipText(Resources.getString("button.info.tooltip"));
     final Client clientToPass = this;
     info.addSelectionListener(new SelectionAdapter() {
@@ -729,7 +759,7 @@ public class Client extends AbstractClient {
     });
     skinManager.add(info, "button.info");
 
-    volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
+    volumeScale = new Scale(trackGroup, SWT.HORIZONTAL | SWT.FLAT);
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(1);
     volumeScale.setMaximum(VOLUME_SPAN / VOLUME_RESOLUTION);
@@ -741,8 +771,8 @@ public class Client extends AbstractClient {
       }
     });
     gridData = new GridData();
-    gridData.horizontalAlignment = GridData.FILL;
-    gridData.grabExcessHorizontalSpace = false;
+    gridData.horizontalAlignment = GridData.END;
+    gridData.grabExcessHorizontalSpace = true;
     volumeScale.setLayoutData(gridData);
     
 //    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
@@ -865,6 +895,7 @@ public class Client extends AbstractClient {
     
     private int value;
     private String name;
+    private ToolItem item;
     
     public RatingFunction(int value, String name) {
       this.value = value;
@@ -873,6 +904,9 @@ public class Client extends AbstractClient {
     
     public int getValue() { return value; }
     public String getName() { return name; }
+    
+    public void setItem(ToolItem item) { this.item = item; }
+    public ToolItem getItem() { return item; }
     
   }
   /**
@@ -909,8 +943,10 @@ public class Client extends AbstractClient {
   public static void main(String[] args) throws Exception {
     Client client = new Client();
     if (args.length == 2) {
-      if (args[0].equals("--skin"))
+      if (args[0].equals("--skin")) {
         client.skinManager.applySkin(new ZipFile(new File(args[1])));
+        client.shell.layout();
+      }
     }
     client.run();
   }
