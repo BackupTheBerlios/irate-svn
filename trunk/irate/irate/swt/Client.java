@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.*;
 public class Client extends AbstractClient {
 
   private static final int VOLUME_RESOLUTION = 1;
-  private static final int VOLUME_SPAN = 15;
+  private static final int VOLUME_SPAN = 30;
   private static final int VOLUME_OFFSET = 0;
 
   private Composite topPanel;
