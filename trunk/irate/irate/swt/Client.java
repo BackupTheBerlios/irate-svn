@@ -598,6 +598,14 @@ public class Client implements UpdateListener, PluginApplication {
     item1.setText("Action");
 
     Menu menu1 = new Menu(item1);
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    menu1.addMenuListener(new MenuAdapter(){
+            public void menuHidden(MenuEvent e){
+                update();
+            }
+        });
+    //end add
+
     item1.setMenu(menu1);
 
     MenuItem item1_1 = new MenuItem(menu1,SWT.PUSH);
@@ -607,6 +615,16 @@ public class Client implements UpdateListener, PluginApplication {
         downloadThread.go();
       }
     });
+
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    item1_1.addArmListener(new ArmListener(){
+            public void widgetArmed(ArmEvent e){
+                strState = "Download a new track";
+                lblState.setText(strState);
+                lblState.pack();
+            }
+        });
+    //end add
 
 /*    MenuItem item1_2 = new MenuItem(menu1,SWT.PUSH);
     item1_2.setText("Purge");
@@ -627,10 +645,28 @@ public class Client implements UpdateListener, PluginApplication {
       }
     });
 
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    item1_4.addArmListener(new ArmListener(){
+            public void widgetArmed(ArmEvent e){
+                strState = "Quit iRate Radio";
+                lblState.setText(strState);
+                lblState.pack();
+            }
+        });
+    //end add
+
+
     MenuItem item2 = new MenuItem(menubar,SWT.CASCADE);
     item2.setText("Settings");
 
     Menu mSettings = new Menu(item2);
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    mSettings.addMenuListener(new MenuAdapter(){
+            public void menuHidden(MenuEvent e){
+                update();
+            }
+        });
+    //end add
     item2.setMenu(mSettings);
 
     //MenuItem item2_1 = new MenuItem(menu2,SWT.PUSH);
@@ -638,6 +674,17 @@ public class Client implements UpdateListener, PluginApplication {
 
     MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
     mDownload.setText("Auto download");
+
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    mDownload.addArmListener(new ArmListener(){
+	    public void widgetArmed(ArmEvent e){
+      strState = "Set number of unrated songs on list to stop automatically downloading at";
+      lblState.setText(strState);
+      lblState.pack();
+            }
+        });
+    //end add
+
     Menu menu2 = new Menu(mDownload);
     mDownload.setMenu(menu2);
 
@@ -658,10 +705,33 @@ public class Client implements UpdateListener, PluginApplication {
           downloadThread.checkAutoDownload();
         }
       });
+
+      //Added for a nicer UI by Allen Tipper 14.9.03
+      mTimes.addArmListener(new ArmListener(){
+              public void widgetArmed(ArmEvent e){
+                  strState = "Set number of unrated songs on list to stop automatically downloading at to " + count;
+                  lblState.setText(strState);
+                  lblState.pack();
+              }
+          });
+      //end add
+
     }
 
     MenuItem mPlayList = new MenuItem(mSettings, SWT.CASCADE);
     mPlayList.setText("Play list");
+
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    mPlayList.addArmListener(new ArmListener(){
+            public void widgetArmed(ArmEvent e){
+                strState = "Set playlist length";
+                lblState.setText(strState);
+                lblState.pack();
+            }
+        });
+    //end add
+
+
     Menu menuPlayList = new Menu(mPlayList);
     mPlayList.setMenu(menuPlayList);
 
@@ -680,6 +750,17 @@ public class Client implements UpdateListener, PluginApplication {
           trackDatabase.setPlayListLength(count);          
         }
       });
+
+      //Added for a nicer UI by Allen Tipper 14.9.03
+      mTimes.addArmListener(new ArmListener(){
+              public void widgetArmed(ArmEvent e){
+                  strState = "Set songs in playlist to " + count;
+                  lblState.setText(strState);
+                  lblState.pack();
+              }
+          });
+      //end add
+
     }
 
 /**
@@ -708,6 +789,17 @@ public class Client implements UpdateListener, PluginApplication {
           trackDatabase.setUnratedPlayListRatio(ratio.intValue());
         }
       });
+
+      //Added for a nicer UI by Allen Tipper 14.9.03
+      mRatio.addArmListener(new ArmListener(){
+              public void widgetArmed(ArmEvent e){
+                  strState = "Set percentage of unrated songs in playlist to " + ratio + "%.";
+                  lblState.setText(strState);
+                  lblState.pack();
+              }
+          });
+      //end add
+
     }
 /****/
 
@@ -715,6 +807,16 @@ public class Client implements UpdateListener, PluginApplication {
     mPlayers.setText("Player");
     menu2 = new Menu(mPlayers);
     mPlayers.setMenu(menu2);
+
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    mPlayers.addArmListener(new ArmListener(){
+            public void widgetArmed(ArmEvent e){
+                strState = "Set mp3 player";
+                lblState.setText(strState);
+                lblState.pack();
+            }
+        });
+    //end add
 
     Player players[] = playerList.getPlayers();
     for(int i=0;i<players.length;i++)
@@ -736,6 +838,17 @@ public class Client implements UpdateListener, PluginApplication {
           downloadThread.checkAutoDownload();
         }
       });
+
+	//Added for a nicer UI by Allen Tipper 14.9.03
+        mPlayer.addArmListener(new ArmListener(){
+                public void widgetArmed(ArmEvent e){
+		    strState = "Set mp3 player to " + player;
+		    lblState.setText(strState);
+		    lblState.pack();
+                }
+            });
+        //end add
+
     }
 
     MenuItem item2_1 = new MenuItem(mSettings,SWT.PUSH);
@@ -746,10 +859,29 @@ public class Client implements UpdateListener, PluginApplication {
       }
     });
 
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    item2_1.addArmListener(new ArmListener(){
+	    public void widgetArmed(ArmEvent e){
+		strState = "Select Plugins";
+		lblState.setText(strState);
+		lblState.pack();
+	    }
+	});
+    //end add
+
     MenuItem item3 = new MenuItem(menubar,SWT.CASCADE);
     item3.setText("Info");
 
     Menu menu3 = new Menu(item3);
+
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    menu3.addMenuListener(new MenuAdapter(){
+            public void menuHidden(MenuEvent e){
+                update();
+            }
+        });
+    //end add
+
     item3.setMenu(menu3);
 
     MenuItem item3_1 = new MenuItem(menu3,SWT.PUSH);
@@ -759,6 +891,18 @@ public class Client implements UpdateListener, PluginApplication {
         actionAbout();
       }
     });
+
+    //Added for a nicer UI by Allen Tipper 14.9.03
+    item3_1.addArmListener(new ArmListener(){
+	    public void widgetArmed(ArmEvent e){
+		strState = "Show the Credits";
+		lblState.setText(strState);
+		lblState.pack();
+	    }
+	});
+    //end add
+
+
   }
 
   public void createToolBar() {
