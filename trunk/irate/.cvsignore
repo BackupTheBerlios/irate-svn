@@ -5,5 +5,9 @@ irate-client.tar.gz
 irate-client.tar.bz2
 trackdatabase.xml
 *.swp
+*.a
+*.o
+irate-client
+irate-server
 users
 download

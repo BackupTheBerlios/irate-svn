@@ -28,4 +28,4 @@ irate-client-nongui.o:irate/client/Play[L]*.java
 	gcj -c irate/client/Play[L]*.java -o irate-client-nongui.o
 	
 clean:
-	rm -f $(DEPS) irate-client irate-common.o 
+	rm -f $(DEPS) irate-client irate-server *.a *.o
