@@ -24,11 +24,14 @@ public class SongProgressBar extends Composite {
     
     currentTimeText = new Label(this, SWT.NONE);
     currentTimeText.setText("---:---");
+    currentTimeText.pack();
     
     progressBar = new ProgressBar(this, SWT.SMOOTH);
+    progressBar.pack();
     
     totalTimeText = new Label(this, SWT.NONE);
     totalTimeText.setText("---:---");
+    totalTimeText.pack();
   }
   
   /**

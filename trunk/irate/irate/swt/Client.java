@@ -25,13 +25,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/17 05:12:50 $
+ * Date Updated: $Date: 2003/11/17 05:30:30 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.101 $
+ * @version $Revision: 1.102 $
  */
 public class Client extends AbstractClient {
 
@@ -675,8 +675,7 @@ public class Client extends AbstractClient {
       }
     });
 
-    songProgressBar = new SongProgressBar(shell, SWT.NONE);
-
+ 
     volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(1);
@@ -692,6 +691,10 @@ public class Client extends AbstractClient {
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = false;
     volumeScale.setLayoutData(gridData);
+    
+    songProgressBar = new SongProgressBar(shell, SWT.NONE);
+
+    
   }
   
   public void createTableMenu() {
@@ -725,6 +728,7 @@ public class Client extends AbstractClient {
     progressBar = new ProgressBar(shell, SWT.HORIZONTAL);
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.END;
+    gridData.horizontalSpan = 2;
     progressBar.setLayoutData(gridData);
     progressBar.setMinimum(0);
     progressBar.setMaximum(100);
