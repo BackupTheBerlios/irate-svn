@@ -1,5 +1,5 @@
-#export CLASSPATH=.:lib/nanoxml-lite-2.2.3.jar:lib/swt.jar
-export CLASSPATH=.:lib/nanoxml-lite-2.2.3.jar:thisiscool-gcc/swt/win32/lib/swt.jar
+PWD=$(shell pwd)
+export CLASSPATH=.:$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
 
 CLIENT_DEPS = irate-swt.o irate-common.a irate-client.o irate-download.o
 CLIENT_LIBS = lib/libswt.a lib/libnanoxml-lite.a
