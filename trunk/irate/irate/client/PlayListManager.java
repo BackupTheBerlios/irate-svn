@@ -80,7 +80,7 @@ public class PlayListManager {
           track = trackDatabase.chooseUnratedTrack(random, toOmit);
         else
           track = trackDatabase.chooseTrack(random, toOmit);
-        if (track != null) {
+        if (track != null && track.getFile() != null) {
           if (!track.isRated())
             noOfUnrated++;
 	  toOmit.put(track, track);
