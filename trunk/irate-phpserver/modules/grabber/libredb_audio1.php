@@ -28,9 +28,6 @@ Class IRS_Grabber_Libredb_Audio1 extends IRS_Grabber {
   $arr=$this->makeXMLTree($matches[$i][0]);
   $id=$arr["Track"][0]["ldbid"][0]."-0";
 
-  $exists=$this->irs->db->getOne("SELECT 1 FROM irate_tracks WHERE id=?",array($this->irs->id2int($id))); 
-
- if (!$exists) {
    $trackid=$this->irs->addTrack(array(
     "artistname"=>$arr["Track"][0]["artistname"][0],
     "id"=>$id,
@@ -45,8 +42,19 @@ Class IRS_Grabber_Libredb_Audio1 extends IRS_Grabber {
    
    $dists=&$arr["Track"][0]["Distributions"][0]["Distribution"];
    for ($y=0;$y<count($dists);$y++) {
+    
+    $sources=&$dists[$y]["Sources"][0]["Source"];
+    $did="";
+     //check if the distribution already exists.
+    for ($z=0;$z<count($sources);$z++) {
+     $did=$this->irs->db->getOne("SELECT distribid FROM irate_sources WHERE protocol=? AND link=?",array($sources[$z]["protocol"][0],$sources[$z]["link"][0]));
+     if (!empty($did)) {
+      $z=9999;
+     }
+    }
 
     $did=$this->irs->addDistribution(array(
+      "id"=>$did,
       "trackid"=>$trackid,
       "crediturl"=>$dists[$y]["crediturl"][0],
       "filesize"=>$dists[$y]["filesize"][0],
@@ -54,9 +62,9 @@ Class IRS_Grabber_Libredb_Audio1 extends IRS_Grabber {
       "codec"=>$dists[$y]["codec"][0]
       ));
 
-    $sources=&$dists[$y]["Sources"][0]["Source"];
+     $this->irs->resetSources($did); //delete all the sources, to add them again.
     for ($z=0;$z<count($sources);$z++) {
-
+     
      $this->irs->addSource(array(
       "distribid"=>$did,
       "protocol"=>$sources[$z]["protocol"][0],
@@ -67,8 +75,6 @@ Class IRS_Grabber_Libredb_Audio1 extends IRS_Grabber {
      
     }
     
-   }
-
 
   }
 

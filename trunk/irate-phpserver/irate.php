@@ -83,7 +83,6 @@ function service() {
 
 
  } else { //admin actions (don't use XMLRPC so that we can call them from a crontable easily)
-  $this->requireAuth();
   $this->requireAdmin();
 
   if ($this->VARS["m"]=="grab") {
@@ -222,7 +221,7 @@ function getNew($number,$include_random=true,$min_old_weight=1) {
 
 function requireAdmin() {
  
- if ($this->user["user"]=!"admin") {
+ if ($_GET["admin_password"]!=$this->cfg["admin_password"]) {
   $this->error(4);
  }
 
@@ -393,9 +392,8 @@ function getratings() {
 function addTrack($data) {
 
   //from libredb
- if (isset($data["id"])) {
+ if (!empty($data["id"])) {
   $id=$this->id2int($data["id"]);
-
   
   //server-specific file
  } else {
@@ -407,8 +405,10 @@ function addTrack($data) {
 
  }
 
- if ($this->db->query("SELECT 1 FROM irate_tracks WHERE id=!",array($id))) {
+ if ($this->db->getOne("SELECT 1 FROM irate_tracks WHERE id=!",array($id))) {
   $this->updateTrack($id,$data);
+  return $id;
+  
  } else {
 
   $q=$this->db->query("INSERT INTO irate_tracks(id,artistname,duration,pubdate,albumname,license,trackname,adddate,crediturl) VALUES (?,?,?,?,?,?,?,now(),?)",array($id,$data["artistname"],$data["duration"],$data["pubdate"],$data["albumname"],$data["license"],$data["trackname"],$data["crediturl"]));
@@ -421,6 +421,8 @@ function addTrack($data) {
 
 function updateTrack($id,$data) {
 
+ $data=array_merge($this->db->getRow("SELECT * FROM irate_tracks WHERE id=!",array($id)),$data);
+ 
  $this->db->query("UPDATE irate_tracks SET artistname=?,duration=?,pubdate=?,albumname=?,license=?,trackname=?,crediturl=? WHERE id=!",array(
  $data["artistname"],
  $data["duration"],
@@ -435,14 +437,42 @@ function updateTrack($id,$data) {
 
 
  function addDistribution($data) {
-  
+
+  if (!empty($data["id"])) {
+   $this->updateDistribution($data["id"],$data);
+   return $data["id"];
+  } else {
+
   $id=$this->db->nextID("irate_distributions");
 
   $this->db->query("INSERT INTO irate_distributions(id,trackid,codec,crediturl,adddate,filesize,hash_sha1) VALUES(?,?,?,?,now(),?,?)",array($id,$data["trackid"],$data["codec"],$data["crediturl"],$data["filesize"],$data["hash_sha1"]));
- 
+  
   return $id;
+ 
+  }
+ 
  }
 
+ function updateDistribution($id,$data) {
+ 
+ $data=array_merge($this->db->getRow("SELECT * FROM irate_distributions WHERE id=!",array($id)),$data);
+
+  $this->db->query("UPDATE irate_distributions SET codec=?,crediturl=?,filesize=?,hash_sha1=? WHERE id=!",array(
+  $data["codec"],
+  $data["crediturl"],
+  $data["filesize"],
+  $data["hash_sha1"],
+  $id
+  ));
+
+
+ }
+
+ function resetSources($distribid) {
+ 
+  $this->db->query("DELETE FROM irate_sources WHERE distribid=!",array($distribid));
+  
+ }
 
 
  function addSource($data) {
@@ -453,6 +483,8 @@ function updateTrack($id,$data) {
   $this->db->query("INSERT INTO irate_sources(id,distribid,media,protocol,link,crediturl,adddate) VALUES(?,?,?,?,?,?,now())",array($i,$data["distribid"],$data["media"],$data["protocol"],$data["link"],$data["crediturl"]));
 
  }
+
+
 
 
  function initGrabber($grabber) {
