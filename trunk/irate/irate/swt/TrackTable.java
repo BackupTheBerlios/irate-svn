@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.*;
 /**
  * @author Anthony Jones
  */
-public class TrackTable {
+public class TrackTable extends BasicSkinable {
   
   /** The SWT display object associated with the Shell and Table. */
   private Display display;
@@ -63,6 +63,7 @@ public class TrackTable {
    *                      table headings. 
    */ 
   public TrackTable(Shell shell, TrackDatabase trackDatabase, SkinManager skinManager) {
+    super(shell.getDisplay());
     this.display = shell.getDisplay();
     this.trackDatabase = trackDatabase;
     table = new Table(shell, SWT.NONE);
@@ -121,10 +122,9 @@ public class TrackTable {
           return licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
       }        
     });
-    skinManager.addItem(col, "TrackTable.Heading.License"); 
+    skinManager.addItem(col, "TrackTable.Heading.License");
+    skinManager.add(this, "TrackTable");
     
-    updateTable();    
-
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
@@ -235,15 +235,25 @@ public class TrackTable {
   
   /** Loads the Track into the TableItem. */
   private void updateTableItem(TableItem tableItem, Track track) {
+    String state = track.getState();
+    ImageData stateImageData = getImageData(state);
+    if (stateImageData != null) {
+       state = "";
+       Image stateImage = (Image) imageCache.get(state);
+       if (stateImage == null)
+         imageCache.put(stateImageData, stateImage = new Image(display, stateImageData));
+       tableItem.setImage(2, stateImage);
+    }
+    
     tableItem.setText(new String[] {
       track.getArtist(),
       track.getTitle(),
-      track.getState(),
+      state,
       String.valueOf(track.getNoOfTimesPlayed()),
       track.getLastPlayed().toString(),
       ""
     });
-    
+       
     /*
      * Get the license image.
      */

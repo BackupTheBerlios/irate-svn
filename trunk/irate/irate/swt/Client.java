@@ -98,6 +98,7 @@ public class Client extends AbstractClient {
   }
   
   public void run() {
+    trackTable.updateTable();
     topPanel.layout();
     shell.layout();
     shell.open();
@@ -345,7 +346,6 @@ public class Client extends AbstractClient {
     createTableMenu();
     
     bottomPanel = new Composite(shell, SWT.FLAT);
-    bottomPanel.setBackground(new Color(display, 222, 222, 222));
     skinManager.addControl(bottomPanel, "panel.status");
     
     gridData = new GridData();
