@@ -1,6 +1,7 @@
 package irate.client;
 
 import irate.common.TrackDatabase;
+import irate.common.Track;
 
 import org.eclipse.swt.*;
 import org.eclipse.swt.widgets.*;
@@ -16,7 +17,7 @@ public class SWTClient {
 	
 	private TrackDatabase trackDatabase;
   private PlayListManager playListManager;
-  private PlayThread playThread;
+ // private PlayThread playThread;
   
 	
 	public SWTClient() throws Exception {
@@ -30,13 +31,32 @@ public class SWTClient {
       e.printStackTrace();
     }
     playListManager = new PlayListManager(trackDatabase);
-    
-    playThread = new PlayThread(playListManager);
+    fillPlaylist(playListManager, tblSongs);
+   // playThread = new PlayThread(playListManager);
     //playPanel = new PlayPanel(playListManager, playThread);
-    playThread.start();
+   // playThread.start();
 
 	}
 	
+  void fillPlaylist(PlayListManager playListManager, Table tblSongs)
+  {
+    int itemCount = tblSongs.getItemCount();
+    TrackDatabase td = playListManager.getPlayList();
+    td.sort();
+    Track tracks[] = td.getTracks();
+    for(int i=0;i<tracks.length;i++){
+      TableItem item = new TableItem(tblSongs,SWT.NULL);
+      String[] data = {tracks[i].getArtist(),
+                       tracks[i].getTitle(),
+                       String.valueOf(tracks[i].getRating()),
+                       String.valueOf(tracks[i].getNoOfTimesPlayed()),
+                       tracks[i].getLastPlayed() };
+      item.setText(data);
+    }
+
+
+  }
+  
 	void initGUI(){
 		display = new Display();
 		shell = new Shell(display);
