@@ -101,7 +101,10 @@ public class PlayListManager {
           noOfUnrated++;
 
         toOmit.add(track);
-        playList.add(track);
+
+        // We want "0% unrated on playlist" to be an absolute.
+        if (unratedPlayListRatio != 0 || track.isRated())
+          playList.add(track);
       }
     }
 
