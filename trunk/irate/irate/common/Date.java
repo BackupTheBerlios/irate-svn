@@ -15,7 +15,17 @@ import java.util.Locale;
  */
 public class Date {
   
-  static DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
+  static DateFormat dateFormat;
+  static { 
+    try {
+      dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.getDefault());
+    }
+    catch (NullPointerException e) {
+      // A null pointer exception is caught in GCJ-3.0.4 when an unsupported
+      // locale is used. The program still works fine if you ignore it.
+      e.printStackTrace();
+    }
+  }
   
   private SoftReference cacheString;
   
