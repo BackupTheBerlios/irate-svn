@@ -48,6 +48,7 @@ endif
 endif
 
 CLIENT_FILES = \
+	irate/client/AbstractClient.java \
 	irate/client/PlayThread.java \
 	irate/client/PlayerException.java \
 	irate/client/PlayListManager.java \
