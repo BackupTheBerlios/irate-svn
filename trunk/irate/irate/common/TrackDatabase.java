@@ -124,7 +124,7 @@ public class TrackDatabase {
   protected void setAttribute(String name, String attName, String attValue) {
     XMLElement elt = getElement(name);
     if (elt == null) {
-      elt = new XMLElement();
+      elt = new XMLElement(new Hashtable(), false, false);
       elt.setName(name);
       docElt.addChild(elt);
     }
@@ -238,6 +238,7 @@ public class TrackDatabase {
         //System.out.println(elt.toString());
         Track track = new Track(elt);
         tracks.add(track);
+		//System.out.println("key="+track.getKey());
         hash.put(track.getKey(), track);
       }
     }
