@@ -395,7 +395,9 @@ public class TrackTable
   /** Sorts the table and loads it into the Table (displays it). */
   private void sort() {
     System.out.println("TrackTable: Sorting"); //$NON-NLS-1$
+    long t = System.currentTimeMillis();
     Collections.sort(listOfTracks, comparator);
+    System.out.println("TrackTable: Sorted in "+(System.currentTimeMillis()-t)+"ms"); //$NON-NLS-1$
     load();
   }
   
