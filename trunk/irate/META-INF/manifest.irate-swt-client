@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
 Main-Class: irate.swt.Client
-Class-Path: lib/nanoxml-lite-2.2.3.jar lib/jl030.jar lib/mp3sp.1.6.jar lib/swt.jar lib/swt-pi.jar lib/jd3lib.jar
+Class-Path: lib/nanoxml-lite-2.2.3.jar lib/jl0.4.jar lib/mp3sp.1.6.jar lib/swt.jar lib/swt-pi.jar lib/jd3lib.jar

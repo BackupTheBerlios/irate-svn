@@ -6,7 +6,7 @@
       <classpath>
         <pathelement path="lib/HTTPClient.jar"/>
         <pathelement path="lib/nanoxml-lite-2.2.3.jar"/>
-        <pathelement path="lib/jl030.jar"/>
+        <pathelement path="lib/jl0.4.jar"/>
         <pathelement path="lib/swt.jar"/>
         <pathelement path="lib/swt-pi.jar"/>
         <pathelement path="lib/skinlf.jar"/>
@@ -70,7 +70,7 @@
       </tarfileset>
       <tarfileset dir="..">
         <include name="irate/irate-client-swt.jar"/>
-        <include name="irate/lib/jl030.jar"/>
+        <include name="irate/lib/jl0.4.jar"/>
         <include name="irate/lib/nanoxml-lite-2.2.3.jar"/>
         <include name="irate/lib/swt.jar"/>
       </tarfileset>
