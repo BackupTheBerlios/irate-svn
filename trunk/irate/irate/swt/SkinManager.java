@@ -140,9 +140,12 @@ public class SkinManager {
 
     private Image getImage(Display display, String name) throws IOException {
       ZipEntry zipEntry = zip.getEntry(name + ".gif"); // Returns null if not found
-      InputStream is = zip.getInputStream(zipEntry);
-      ImageData data = new ImageData(is);
-      return new Image(display, data);
+      if(zipEntry != null) {
+        InputStream is = zip.getInputStream(zipEntry);
+        ImageData data = new ImageData(is);
+        return new Image(display, data);
+      }
+      return null;
     }
 
     public void update() {  
@@ -151,6 +154,12 @@ public class SkinManager {
             try {
             Rectangle clientArea = control.getBounds();
             Image img = getImage(control.getDisplay(), name);
+            
+            if (img == null)
+            {
+              return;
+            }
+            
             ImageData data = img.getImageData();
             img.dispose();
             data = data.scaledTo(clientArea.width, clientArea.height);

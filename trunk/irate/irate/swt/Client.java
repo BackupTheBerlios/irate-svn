@@ -39,6 +39,7 @@ public class Client extends AbstractClient {
   private static final int VOLUME_SPAN = 30;
   private static final int VOLUME_OFFSET = VOLUME_SPAN / 2;
 
+  private Composite topPanel, bottomPanel;
   private Label lblState;
   private Display display;;
   private Shell shell;
@@ -54,6 +55,7 @@ public class Client extends AbstractClient {
   private Help help = new Help();
   private ErrorDialog errorDialog;
   private AboutDialog aboutDialog;
+  
 
   //  private SettingDialog settingDialog;
   private String strState = "";
@@ -325,10 +327,37 @@ public class Client extends AbstractClient {
   void initGUI() {
     createShell();
     createMenu();
+    
+    topPanel = new Composite(shell, SWT.FLAT);
+    skinManager.add(topPanel, "topPanel-background");
+    
+    GridData gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = true;
+    
+    gridData.horizontalSpan = 3;
+    topPanel.setLayoutData(gridData);
+    topPanel.setLayout(new GridLayout(2, false));
+    
     createToolBar();
     //    createTitle();
     trackTable = new TrackTable(shell, trackDatabase, skinManager);
     createTableMenu();
+    
+    bottomPanel = new Composite(shell, SWT.FLAT);
+    bottomPanel.setBackground(new Color(display, 222, 222, 222));
+    skinManager.add(bottomPanel, "bottomPanel-background");
+    
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.verticalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = true;
+    
+    gridData.horizontalSpan = 3;
+    bottomPanel.setLayout(new GridLayout(2, false));
+    bottomPanel.setLayoutData(gridData);
+    
+    
     createState();
     createProgressBar();
 
@@ -344,11 +373,7 @@ public class Client extends AbstractClient {
 
   public void createShell() {
     shell = new Shell(display);
-    shell.setText(Resources.getString("titlebar.program_name"));
-    
-    // Add the shell control so that it can contain a background.
-    skinManager.add(shell, "shell-background");
-    
+
     try {
       shell.setImage(Resources.getIconImage(display));
     } 
@@ -364,7 +389,9 @@ public class Client extends AbstractClient {
     //gridlayout is overkill for this
     GridLayout layout = new GridLayout(3, false);
     layout.horizontalSpacing = 0;
+    layout.verticalSpacing = 0;
     layout.marginWidth = 0;
+    layout.marginHeight = 0;
     // Set the layout into the composite.
     shell.setLayout(layout);
   }
@@ -695,18 +722,12 @@ public class Client extends AbstractClient {
   }
 
   public void createToolBar() {
-//    Composite composite = new Composite(shell, SWT.FLAT);
-      GridData gridData = new GridData();
-//    gridData.horizontalAlignment = GridData.FILL;
-//    gridData.grabExcessHorizontalSpace = true;
-//    gridData.horizontalSpan = 3;
-//    composite.setLayoutData(gridData);
-//    composite.setLayout(new GridLayout(2, false));
+    
     
     
 
-    Composite trackGroup = new Composite(shell, SWT.BORDER);
-    gridData = new GridData();
+    Composite trackGroup = new Composite(topPanel, SWT.BORDER);
+    GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
     gridData.horizontalSpan = 1;
@@ -770,7 +791,7 @@ public class Client extends AbstractClient {
     volumeScale.setLayoutData(gridData);
     
     
-    ToolBar toolbar = new ToolBar(shell, SWT.FLAT);
+    ToolBar toolbar = new ToolBar(topPanel, SWT.FLAT);
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.CENTER;
     gridData.grabExcessHorizontalSpace = true;
@@ -827,7 +848,7 @@ public class Client extends AbstractClient {
   }
 
   public void createState() {
-    lblState = new Label(shell, SWT.NONE);
+    lblState = new Label(bottomPanel, SWT.NONE);
     lblState.setText(strState);
 
     GridData gridData = new GridData();
@@ -838,10 +859,10 @@ public class Client extends AbstractClient {
   }
 
   public void createProgressBar() {
-    progressBar = new ProgressBar(shell, SWT.HORIZONTAL);
+    progressBar = new ProgressBar(bottomPanel, SWT.HORIZONTAL);
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.END;
-    gridData.horizontalSpan = 2;
+    //gridData.horizontalSpan = 2;
     gridData.horizontalIndent = 10;
     progressBar.setLayoutData(gridData);
     progressBar.setMinimum(0);
