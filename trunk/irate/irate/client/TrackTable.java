@@ -60,7 +60,7 @@ public class TrackTable implements TableModel {
         if (track.isRated())
           return Integer.toString((int) track.getRating());
         return "Unrated";
-      case 3: Integer.toString(track.getNoOfTimesPlayed());
+      case 3: return Integer.toString(track.getNoOfTimesPlayed());
       case 4: return "-";
     }
     return "?";
