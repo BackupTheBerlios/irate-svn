@@ -486,7 +486,7 @@ public class Client implements UpdateListener {
     Menu menuPlayList = new Menu(mPlayList);
     mPlayList.setMenu(menuPlayList);
   
-    counts = new int[] { 5, 7, 13, 19, 29 };
+    counts = new int[] { 5, 7, 13, 19, 31 };
     int playListLength = trackDatabase.getPlayListLength();
     for (int i = 0; i < counts.length; i++) {
       MenuItem mTimes = new MenuItem(menuPlayList, SWT.CHECK, i);
