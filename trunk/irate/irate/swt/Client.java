@@ -22,13 +22,13 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/09/29 11:19:13 $
+ * Date Updated: $Date: 2003/10/02 03:43:11 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.78 $
+ * @version $Revision: 1.79 $
  */
 public class Client extends AbstractClient {
 
@@ -56,6 +56,7 @@ public class Client extends AbstractClient {
 
   public Client() {
     initGUI();
+    errorDialog = new ErrorDialog(display, shell);
     uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
     
     if (trackDatabase.getNoOfTracks() == 0)
@@ -66,9 +67,6 @@ public class Client extends AbstractClient {
   }
 
   public void handleError(String code, String urlString) {
-    if (errorDialog == null)
-      errorDialog = new ErrorDialog(display, shell);
-    
     //actionSetContinuousDownload(false);
     Reader r;
     try {
@@ -395,7 +393,12 @@ public class Client extends AbstractClient {
   }
 
   void quit() {
-    shell.setVisible(false);
+    try {
+      shell.setVisible(false);
+    }
+    catch (Throwable t) {
+      t.printStackTrace();
+    }
     try {
       trackDatabase.save();
     }

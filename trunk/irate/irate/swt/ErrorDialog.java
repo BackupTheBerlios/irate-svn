@@ -25,7 +25,8 @@ public class ErrorDialog {
       createShell();
       createText(r);
       createCloseButton();
-      shell.pack();
+      shell.setSize(500, 300);
+//      shell.pack();
       Point size = shell.getSize();
       Point ploc = parent.getLocation();
       Point psize = parent.getSize();
