@@ -509,10 +509,8 @@ public class TrackDatabase {
     List list = new Vector();
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
-      if (!track.isRated() && (toOmit == null || !toOmit.contains(track)) && track.exists()) {
-        System.out.println("::" + track.getName());
+      if (!track.isRated() && (toOmit == null || !toOmit.contains(track)) && track.exists())
         list.add(track);
-      }
     }
 
       // If there are no unrated tracks then return null.
