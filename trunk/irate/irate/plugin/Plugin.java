@@ -7,7 +7,8 @@ import nanoxml.XMLElement;
 /**
  * Base class for all plugins.
  *
- * @author Stephen Blackheath
+ * @author Created: Stephen Blackheath
+ * @author Updated: Robin Sheat
  */
 public abstract class Plugin
 {
@@ -30,6 +31,11 @@ public abstract class Plugin
   {
     return app != null;
   }
+
+  /**
+   * Get a longer description of this plugin, suitable for a tooltip.
+   */
+  public abstract String getLongDescription();
 
   /**
    * Get access to the application instance.

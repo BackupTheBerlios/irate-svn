@@ -12,10 +12,10 @@ import irate.common.Preferences;
 import irate.plugin.*;
 
 /**
- * Date Updated: $Date: 2003/11/29 05:16:35 $
+ * Date Updated: $Date: 2003/11/29 05:46:54 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.10 $
+ * @version $Revision: 1.11 $
  */
 public class SettingDialog
 {
@@ -123,6 +123,7 @@ public class SettingDialog
       final Button checkbox = new Button(comp, SWT.CHECK);
       checkbox.setText(plugin.getDescription());
       checkbox.setSelection(plugin.isAttached());
+      checkbox.setToolTipText(plugin.getLongDescription());
       checkbox.addSelectionListener(new SelectionAdapter(){
           public void widgetSelected(SelectionEvent e){
             if (checkbox.getSelection())
@@ -153,13 +154,16 @@ public class SettingDialog
     class BrowserButton {
       String description; // Button label
       String command;     // Command it generates
+      String tooltip;     // Tooltip for this option
       Button button;
     
-      public BrowserButton(String d, String c) {
+      public BrowserButton(String d, String c, String t) {
         description = d;
         command = c;
+        tooltip = t;
         button = new Button(comp, SWT.RADIO);
         button.setText(description);
+        button.setToolTipText(t);
       }
 
       public void addSelectionListener(SelectionListener s) {
@@ -181,10 +185,16 @@ public class SettingDialog
 
     final BrowserButton[] browsers = { 
       new BrowserButton("Mozilla/Firebird (Linux/UNIX)",
-                        "mozilla -remote openURL(%u,new-window)"),
-      new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec"),
+                        "mozilla -remote openURL(%u,new-window)",
+                        "The Mozilla or Mozilla Firebird browsers on Linux "+
+                        "or UNIX platforms. This will open the link in a "+
+                        "new window."),
+      new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec",
+                        "The default KDE browser, almost certainly "+
+                        "Konqueror."),
       new BrowserButton("Windows Default",
-                        "rundll32 url.dll,FileProtocolHandler")};
+                        "rundll32 url.dll,FileProtocolHandler",
+                        "This will launch the default Windows browser.")};
 
     final Button browserSpecified = new Button(comp, SWT.RADIO);
     final Text browserText = new Text(comp, SWT.NONE);
@@ -231,6 +241,10 @@ public class SettingDialog
     }
 
     browserSpecified.setText("User Specified:");
+    browserSpecified.setToolTipText("Select this and then either enter the browser "+
+                             "into the box below, or browse to it. If '%u' "+
+                             "is included here, it will be replaced with "+
+                             "the URL, otherwise the URL will be appended.");
     browserSpecified.addSelectionListener(sel);
 
     browserText.setText(browser);

@@ -87,6 +87,13 @@ public class LircRemoteControlPlugin
     return "lirc remote control (Linux/Unix)";
   }
 
+  /**
+   * Get a long description of this plugin, for tooltips
+   */
+  public String getLongDescription() 
+  {
+    return "This plugin allows iRATE to be remotely controlled by an infra-red remote control. Linux and UNIX only.";
+  }
 
 // ------ Listeners ----------------------------------------------------
 

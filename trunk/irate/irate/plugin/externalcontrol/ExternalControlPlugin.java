@@ -13,10 +13,10 @@ import nanoxml.*;
  * network socket.
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/11/08 04:01:31 $$
+ * Date Updated: $$Date: 2003/11/29 05:46:54 $$
  * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
- * @author Updated:	$$Author: ajones $$
- * @version $$Revision: 1.12 $$
+ * @author Updated:	$$Author: eythian $$
+ * @version $$Revision: 1.13 $$
  */
 
 public class ExternalControlPlugin 
@@ -53,6 +53,14 @@ public class ExternalControlPlugin
   public String getDescription() {
     return "external control of iRATE";
   } // getDescription()
+
+  /**
+   * Gets a long description of this plugin, for tooltips.
+   */
+  public String getLongDescription() {
+    return "This plugin allows iRATE to be remotely controlled over a "+
+      "network socket.";
+  }
 
   /**
    * Attaches to the running application
