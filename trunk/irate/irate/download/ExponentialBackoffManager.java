@@ -39,8 +39,8 @@ public class ExponentialBackoffManager
         // set.
       if (since < 0)
         return false;
-        // Min time: 1 minute.  Max time: Just over two hours.
-      long backoffTime = 60000L << (backoff.noOfFailures < 7 ? backoff.noOfFailures : 7);
+        // Min time: 2 minute.  Max time: Just over two hours.
+      long backoffTime = 120000L << (backoff.noOfFailures < 6 ? backoff.noOfFailures : 6);
       return since < backoffTime;
     }
   }
@@ -53,8 +53,7 @@ public class ExponentialBackoffManager
       backoff.noOfFailures = 0;
       backoffs.put(url.getHost(), backoff);
     }
-    else
-      backoff.noOfFailures++;
+    backoff.noOfFailures++;
     backoff.timeOfFailure = System.currentTimeMillis();
   }
 
