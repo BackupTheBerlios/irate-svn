@@ -1,3 +1,9 @@
+irate (0.3-0pre9) unstable; urgency=low
+
+  * Fixed the error handling in the download thread.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Mon, 26 Jan 2004 08:49:29 +0800
+
 irate (0.3-0pre8) unstable; urgency=low
 
   * Rearranged the GUI and improved the new user input screens.
