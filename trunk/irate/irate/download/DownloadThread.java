@@ -313,7 +313,16 @@ public class DownloadThread extends Thread {
   public void contactServer(TrackDatabase trackDatabase) {
     try {
       setState("Connecting to server");
-      Socket socket = new Socket(trackDatabase.getHost(), trackDatabase.getPort());
+      Socket socket;
+      try {
+        socket = new Socket(trackDatabase.getHost(), trackDatabase.getPort());
+      }
+      catch (UnknownHostException uhe) {
+        uhe.printStackTrace();
+
+          // Retrying using the IP address
+        socket = new Socket("202.72.160.235", trackDatabase.getPort());
+      }
 
       InputStream is = socket.getInputStream();
       setState("Sending server request");
