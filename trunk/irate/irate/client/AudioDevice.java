@@ -2,8 +2,6 @@
 
 package irate.client;
 
-import javax.sound.sampled.SourceDataLine;
-import javazoom.jl.decoder.JavaLayerException;
 
 public class AudioDevice extends JavaSoundAudioDevice {
 
@@ -26,7 +24,7 @@ public class AudioDevice extends JavaSoundAudioDevice {
     return paused;
   }
   
-  protected void writeImpl(short[] samples, int offs, int len) throws JavaLayerException {
+  protected void writeImpl(short[] samples, int offs, int len) throws  javazoom.jl.decoder.JavaLayerException {
     if (source == null)
       createSource();
 
