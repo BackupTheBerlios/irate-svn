@@ -329,7 +329,7 @@ public class Client extends AbstractClient {
     gridData.horizontalAlignment = GridData.FILL;
     gridData.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
     gridData.grabExcessHorizontalSpace = true;
-    gridData.heightHint = 74;
+//    gridData.heightHint = 74;
     gridData.horizontalSpan = 3;
     
     topPanel.setLayoutData(gridData);

@@ -16,7 +16,8 @@ public class ThreeModeButton extends Canvas implements Skinable {
   private ImageMerger imageMerger;
 
   private Hashtable imageDataHash = new Hashtable();
-  private Hashtable imageCache = new Hashtable();
+  
+  private Cache cache = new Cache();
 
   private String normalText, pressedText;
 
@@ -244,19 +245,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
         }
       }
       try {
-        Image image = null;
-        if(imageCache.containsKey(key)) {
-            image = (Image)imageCache.get(key);
-        }
-        else {
-            image = createTransparentImage(key); 
-            if(image != null) {
-                imageCache.put(key, image);
-            }
-        }
-        
-        gc.drawImage(image, 0, 0);
-        //image.dispose();
+        gc.drawImage(getTransparentImage(key), 0, 0);
       }
       catch (Exception ex) {
         ex.printStackTrace();
@@ -286,7 +275,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
     return new Point(width, height);
   }
 
-  private Image createTransparentImage(String key) {
+  private Image getTransparentImage(String key) {
     ImageData imageData = (ImageData) imageDataHash.get(key);
     if (imageData == null) {
       if (key.equals("pressed.hot") || key.equals("pressed.active"))
@@ -297,9 +286,17 @@ public class ThreeModeButton extends Canvas implements Skinable {
         if (imageData == null)
           imageData = (ImageData) imageDataHash.get("");
       }
-    }
+    }    
     ImageData mergedImage = imageMerger.merge(0, 0, imageData);
-    return new Image(this.getDisplay(), mergedImage);
+    
+    /* Look up our ImageData in our cache. */
+    ImageHandle imageHandle = (ImageHandle) cache.get(mergedImage);
+    if (imageHandle == null) {
+      imageHandle = new ImageHandle(new Image(this.getDisplay(), mergedImage));
+      cache.put(mergedImage, imageHandle);
+    }
+    
+    return imageHandle.getImage();
   }
 
   public boolean isPressed() {

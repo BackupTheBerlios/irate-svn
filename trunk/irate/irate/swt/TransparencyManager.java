@@ -8,6 +8,8 @@ public class TransparencyManager {
 
   private static final String key = "TransparencyManager.background";
   
+  private Cache cache = new Cache();
+  
   public TransparencyManager() {
   }
 
@@ -23,8 +25,17 @@ public class TransparencyManager {
     
     // See if this image exists.
     ImageData imageData = (ImageData) control.getData(key);
-    if (imageData != null)
-      return imageData.scaledTo(bounds.width, bounds.height);
+    if (imageData != null) {
+      Scale scale = new Scale();
+      scale.width = bounds.width;
+      scale.height = bounds.height;
+      ImageData scaledImageData = (ImageData) cache.get(scale);
+      if (scaledImageData == null) {
+         scaledImageData = imageData.scaledTo(bounds.width, bounds.height);
+         cache.put(scale, scaledImageData);
+      }
+      return scaledImageData;
+    }
     
     // If there's no parent composite then we don't have a parent image.
     Composite parent = control.getParent();    
@@ -35,17 +46,57 @@ public class TransparencyManager {
     ImageData parentImageData = getBackground(parent);
     if (parentImageData == null)
       return null;
-
+    
+    Area area = new Area();
+    area.parentImageData = parentImageData;
+    area.bounds = bounds;
+    imageData = (ImageData) cache.get(area);
+    if (imageData == null) {
+      imageData = getArea(area);
+      cache.put(area, imageData);
+    }
+    return imageData;
+  }
+  
+  private ImageData getArea(Area area) {
     // System.err.println("Image size = " + bounds.x + "x" + bounds.y);
-    imageData = new ImageData(bounds.width, bounds.height, parentImageData.depth, parentImageData.palette);
-    int[] data = new int[bounds.width];
-    for (int i = 0; i < bounds.height; i++) {
-      if (bounds.y + i < parentImageData.height) {
-        parentImageData.getPixels(bounds.x, bounds.y + i, data.length, data, 0);
+    ImageData imageData = new ImageData(area.bounds.width, area.bounds.height, 
+        area.parentImageData.depth, area.parentImageData.palette);
+    int[] data = new int[area.bounds.width];
+    for (int i = 0; i < area.bounds.height; i++) {
+      if (area.bounds.y + i < area.parentImageData.height) {
+        area.parentImageData.getPixels(area.bounds.x, area.bounds.y + i, data.length, data, 0);
         imageData.setPixels(0, i, data.length, data, 0);
       }
     }
     return imageData;
   }
+  
+  private class Area {
+    ImageData parentImageData;
+    Rectangle bounds;
+    
+    public boolean equals(Object obj) {
+      if (!(obj instanceof Area))
+        return false;
+      
+      Area area = (Area) obj;
+      return parentImageData == area.parentImageData && bounds.equals(area.bounds);
+    }
+  }
+  
+  private class Scale {
+    int width;
+    int height;    
+    ImageData imageData;
+
+    public boolean equals(Object obj) {
+      if (!(obj instanceof Scale))
+        return false;
+      
+      Scale scale = (Scale) obj;
+      return width == scale.width && height == scale.height && imageData == scale.imageData;
+    }
+}
   
 }
