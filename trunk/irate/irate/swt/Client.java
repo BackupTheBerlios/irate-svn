@@ -35,6 +35,7 @@ public class Client implements UpdateListener {
   private ToolItem pause;
   private Track previousTrack;
   private ErrorDialog errorDialog;
+  private Help help = new Help();
   
   private String strState = "";
   
@@ -78,7 +79,7 @@ public class Client implements UpdateListener {
     errorDialog = new ErrorDialog(display, shell);
     
     if (playerList.getPlayers().length == 0) 
-      errorDialog.showURL(getResource("help/missingplayer.html"));
+      errorDialog.show(getResource("help/missingplayer.html"));
 
     playThread.addUpdateListener(this);
     playThread.start();
@@ -92,21 +93,29 @@ public class Client implements UpdateListener {
 
       public void handleError(String code, String urlString) {
         //actionSetContinuousDownload(false);
-        URL url;
-        if (urlString.indexOf(':') < 0)
-          url = getResource("help/" + urlString);
-        else 
-          try {
-            url = new URL(urlString);
+        Reader r;
+        try {
+          if (urlString.indexOf(':') < 0) {
+            r = getResource("help/" + urlString);
+            if (r == null)
+              throw new NullPointerException();
           }
-          catch (MalformedURLException e) {
-            e.printStackTrace();
-            url = getResource("help/malformedurl.html");
-          }
-        final URL final_url=url;
+          else 
+            try {
+              r = new InputStreamReader(new URL(urlString).openStream());
+            }
+            catch (MalformedURLException e) {
+              e.printStackTrace();
+              r = getResource("help/malformedurl.html");
+            }
+        }
+        catch (IOException e) {
+          r = getResource("help/errorerror.txt");
+        }
+        final Reader finalReader = r;
         display.asyncExec(new Runnable() {
           public void run() {
-            errorDialog.showURL(final_url);
+            errorDialog.show(finalReader);
           }
         });
       }
@@ -415,14 +424,14 @@ public class Client implements UpdateListener {
     tblSongs.pack();
   }
 
-  public URL getResource(String s) {
+  public Reader getResource(String s) {
     if (s.endsWith(".html"))
       s = s.substring(0, s.length() - 5) + ".txt";
-    return playThread.getClass().getResource(s);
+    return new StringReader(help.get(s));
   }
 
   public void actionAbout() {
-    errorDialog.showURL(getResource("help/about.html"));
+    errorDialog.show(getResource("help/about.html"));
   }
   
   public void createMenu() {

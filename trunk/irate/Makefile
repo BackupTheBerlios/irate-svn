@@ -15,7 +15,8 @@ CLIENT_FILES = \
 	irate/client/PlayerList.java \
 	irate/client/ExternalPlayer.java \
 	irate/client/MadplayPlayer.java \
-	irate/client/Speech.java
+	irate/client/Speech.java \
+	irate/client/Help.java
 #	irate/client/AudioDevice.java 
 #	irate/client/JavaSoundAudioDevice.java 
 #	irate/client/JavaLayerPlayer.java 
@@ -83,6 +84,9 @@ win32:
 	lib/nanoxml-lite-2.2.3.jar \
 	--main=irate.swt.Client \
 	-g -O2 -mwindows -o irate-client.exe
+
+deb:
+	dpkg-buildpackage -b -rfakeroot
 
 clean:
 	rm -f $(DEPS) irate-client irate-server *.a *.o

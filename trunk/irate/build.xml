@@ -52,6 +52,14 @@
     </exec>
   </target>
 
+    <!-- Debian deb package -->
+  <target name="deb">
+    <exec executable="dpkg-buildpackage">
+      <arg line="-b"/>
+      <arg line="-rfakeroot"/>
+    </exec>
+  </target>
+
     <!-- Mac ZIP file -->
   <target name="mac" depends="jar">
     <zip destfile="irate-client-macosx.zip">

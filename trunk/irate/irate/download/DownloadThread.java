@@ -183,7 +183,7 @@ public class DownloadThread extends Thread {
         
         //30 second timeout for the impatient
         long timeout = 60000;
-        TimeoutWorker worker = new TimeoutWorker(url) {
+        TimeoutWorker worker = new TimeoutWorker((Object) url) {
         	public void run() {
         		try {
         			URLConnection conn = ((URL)input).openConnection();
@@ -215,7 +215,7 @@ public class DownloadThread extends Thread {
         OutputStream os = new FileOutputStream(file);
         final byte buf[] = new byte[128000];
         int totalBytes = 0;
-        worker = new TimeoutWorker(is){
+        worker = new TimeoutWorker((Object) is){
           public void run() {
             int n;
             try {

@@ -3,7 +3,6 @@
 package irate.swt;
 
 import java.io.*;
-import java.net.*;
 import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
@@ -21,10 +20,10 @@ public class ErrorDialog {
     this.parent = parent;
   }
 
-  public void showURL(URL url) {
+  public void show(Reader r) {
     if (shell == null) {
       createShell();
-      createText(url);
+      createText(r);
       createCloseButton();
       shell.pack();
       Point size = shell.getSize();
@@ -48,13 +47,13 @@ public class ErrorDialog {
     });
   }
 
-  private void createText(URL url) {
+  private void createText(Reader r) {
     try {
       StringBuffer sb = new StringBuffer();
-      InputStream is = url.openStream();
-      byte[] buf = new byte[512];
+      
+      char[] buf = new char[512];
       int nbytes;
-      while ((nbytes = is.read(buf, 0, buf.length)) != -1) 
+      while ((nbytes = r.read(buf, 0, buf.length)) != -1) 
         sb.append(new String(buf, 0, nbytes));
 
       createText(sb.toString());
