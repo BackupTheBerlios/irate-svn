@@ -134,7 +134,7 @@ irate-server.o:irate/server/*.java
 	$(GCJ) -c irate/server/*.java -o irate-server.o
 
 irate-icon.o: irate.png
-	$(GCJ) -c --resource $^ $^ -o $@
+	$(GCJ) -c --resource irate/swt/irate.png $^ -o $@
 
 deb:
 	dpkg-buildpackage -b -rfakeroot
