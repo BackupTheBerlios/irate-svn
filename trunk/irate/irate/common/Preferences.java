@@ -51,6 +51,28 @@ public class Preferences {
     }
   }
   
+  public static String getUserPreference(String prefName) 
+  {
+    try {    
+     XMLElement docElt = getConfigFileAsXML();
+  
+     Enumeration enum = docElt.enumerateChildren();
+     while(enum.hasMoreElements()) {
+       XMLElement elt = (XMLElement)enum.nextElement();
+       if (elt.getName().equals("preference")) {
+        String identifier = elt.getStringAttribute("id");
+        if(identifier.equals(prefName)) {
+          return elt.getContent();
+        }
+      }
+    }
+    return null;
+    } catch (IOException e) {
+      return null;    
+    }   
+  }
+  
+  
   /**
    * This method updates the irate.xml file, given an actual XMLElement.  If
    * the element already exists, it will be replaced.

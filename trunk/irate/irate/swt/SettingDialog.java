@@ -7,6 +7,8 @@ import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.SWT;
 import java.io.IOException;
+
+import irate.common.Preferences;
 import irate.plugin.*;
 
 /**
@@ -21,11 +23,16 @@ public class SettingDialog
 	private Shell shell;
   private PluginApplication app;
   private TabFolder tabs;
+  
+  private String browser;
     
 	public SettingDialog(Display display, PluginManager pluginManager, PluginApplication app) {
     this.pluginManager = pluginManager;
 		this.app = app;
-    
+    browser = Preferences.getUserPreference("browser");
+    if (browser == null) {
+      browser = "";
+    }
     createWidgets(display);
     
   }
@@ -82,6 +89,12 @@ public class SettingDialog
     ok.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_END));
     ok.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
+        try {
+          Preferences.savePreferenceToFile("browser", browser);
+        } catch (IOException ioe) {
+          ioe.printStackTrace();
+          shell.close();
+        }
         shell.close();
       }
     });
@@ -131,9 +144,24 @@ public class SettingDialog
 		Composite comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(1, false);
     comp.setLayout(layout);
-    new Label(comp, SWT.NONE).setText("Browser command(%url will be replaced with the address)");
-    Text t = new Text(comp, SWT.NONE);
-    t.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+    new Label(comp, SWT.NONE).setText("Browser Executable:");
+    
+    final Text browserText = new Text(comp, SWT.NONE);
+    browserText.setText(browser);
+    
+    Button browseButton = new Button(comp, SWT.NONE);
+    browseButton.setText("Browse ...");
+    
+    browseButton.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        FileDialog fd = new FileDialog(shell, SWT.OPEN);
+        fd.open();
+        browserText.setText(fd.getFilterPath() + "/" + fd.getFileName());
+        browser = browserText.getText();
+      }
+    });
+    
+    
     return comp;
   }
 }

@@ -2,6 +2,7 @@
 
 package irate.swt;
 
+import irate.common.Preferences;
 import irate.common.Track;
 import irate.client.*;
 import irate.resources.Resources;
@@ -25,13 +26,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/21 23:48:17 $
+ * Date Updated: $Date: 2003/11/22 21:56:06 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.104 $
+ * @version $Revision: 1.105 $
  */
 public class Client extends AbstractClient {
 
@@ -354,8 +355,10 @@ public class Client extends AbstractClient {
     catch (Exception ex) {
       try {
         //win32 way
-        cmd = "rundll32 url.dll,FileProtocolHandler '" + url + "'";
-        System.out.println(cmd);
+        cmd = Preferences.getUserPreference("browser");
+        if(cmd != null) {
+          cmd = cmd + " " + url;
+        }
         r.exec(cmd);
       }
       catch (Exception eee) {
