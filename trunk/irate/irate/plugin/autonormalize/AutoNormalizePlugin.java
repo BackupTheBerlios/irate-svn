@@ -30,7 +30,7 @@ public class AutoNormalizePlugin
    * Hashtable of piped output streams.
    */
   private Hashtable downloadHash;
-  private HowLoudThread hlThread;
+  private HowLoudThread bgHowLoud;
 
   public AutoNormalizePlugin()
   {
@@ -62,7 +62,7 @@ public class AutoNormalizePlugin
 
   protected void doAttach()
   {
-    hlThread = new HowLoudThread(getApp(), "calculated");
+    bgHowLoud = new HowLoudThread(getApp(), "calculated", true);
     downloadHash = new Hashtable();
     getApp().addTrackLifeCycleListener(this);
     getApp().addDownloadListener(this);
@@ -74,8 +74,8 @@ public class AutoNormalizePlugin
     getApp().removeTrackLifeCycleListener(this);
     getApp().removeDownloadListener(this);
     getApp().removeVolumePolicy(this);
-    hlThread.requestTerminate();
-    hlThread = null;
+    bgHowLoud.requestTerminate();
+    bgHowLoud = null;
       // To do: Clean up any dangling stuff in downloadHash
     downloadHash = null;
   }
@@ -100,6 +100,7 @@ public class AutoNormalizePlugin
    */
   public void addedToPlayList(Track track)
   {
+      // Start calculating how loud it is if we don't already know.
     check(track);
   }
 
@@ -115,6 +116,9 @@ public class AutoNormalizePlugin
    */
   public void startingToPlay(Track track)
   {
+      // Tell it to start calculating how loud it is if we don't already know.
+      // If robo-jock is running, it will be calculating during robo-jock's
+      // announcement.
     check(track);
   }
 
@@ -123,7 +127,7 @@ public class AutoNormalizePlugin
       // If we don't know how loud it is, queue it to be processed.
     if (track.getProperty("loudness") == null) {
       try {
-        hlThread.queue(track);
+        bgHowLoud.queue(track);
       }
       catch (FileNotFoundException e) {
         System.err.println("auto-normalize: Warning - File not found when trying to determine loudness of "+track);
@@ -136,13 +140,13 @@ public class AutoNormalizePlugin
     try {
       PipedInputStream pis = new PipedInputStream();
       PipedOutputStream pos = new PipedOutputStream(pis);
-      HowLoudThread hlThread = new HowLoudThread(getApp(), "downloaded");
-      hlThread.queue(track, pis);
-        // Request this hlThread to terminate once it has emptied its queue.
-      hlThread.requestTerminate();
+      HowLoudThread dlHowLoud = new HowLoudThread(getApp(), "downloaded", false);
+      dlHowLoud.queue(track, pis);
+        // Request this dlHowLoud to terminate once it has emptied its queue.
+      dlHowLoud.requestTerminate();
       Object[] objs = new Object[2];
       objs[0] = pos;
-      objs[1] = hlThread;
+      objs[1] = dlHowLoud;
       downloadHash.put(track, objs);
     }
     catch (IOException e) {
@@ -161,13 +165,13 @@ public class AutoNormalizePlugin
     Object[] objs = (Object[]) downloadHash.get(track);
     if (objs != null) {
       PipedOutputStream pos = (PipedOutputStream) objs[0];
-      HowLoudThread hlThread = (HowLoudThread) objs[1];
+      HowLoudThread dlHowLoud = (HowLoudThread) objs[1];
       try {
         pos.write(buffer, offset, length);
       }
       catch (IOException e) {
         System.err.println("auto-normalize: "+e.toString());
-        hlThread.killProcessing(track);
+        dlHowLoud.killProcessing(track);
         downloadHash.remove(track);
         track.setProperty("loudness", "unknown");
         getApp().saveTrack(track, false);
@@ -181,7 +185,7 @@ public class AutoNormalizePlugin
     Object[] objs = (Object[]) downloadHash.get(track);
     if (objs != null) {
       PipedOutputStream pos = (PipedOutputStream) objs[0];
-      HowLoudThread hlThread = (HowLoudThread) objs[1];
+      HowLoudThread dlHowLoud = (HowLoudThread) objs[1];
       downloadHash.remove(track);
 
       try {
@@ -193,16 +197,16 @@ public class AutoNormalizePlugin
 
       String loudness;
       if (!succeeded) {
-        hlThread.killProcessing(track);
+        dlHowLoud.killProcessing(track);
         track.setProperty("loudness", null);
         getApp().saveTrack(track, false);
       }
       else {
           // Block until the loudness has been determined.
-        synchronized (hlThread.getMutex()) {
+        synchronized (dlHowLoud.getMutex()) {
           while ((loudness = track.getProperty("loudness")) == null) {
             try {
-              hlThread.getMutex().wait();
+              dlHowLoud.getMutex().wait();
             }
             catch (InterruptedException e) {
             }
@@ -225,20 +229,30 @@ public class AutoNormalizePlugin
     String loudness = track.getProperty("loudness");
       // If we don't know how loud it is...
     if (loudness == null) {
-        // Then queue it for processing - top priority.
+        // Then queue it for processing - queue() adds it at the top of the list of
+        // tracks to process (after the current one), even if it is already on the
+        // list.
       try {
-        hlThread.queue(track);
-          // Wait until we have determined how loud it is.
-        synchronized (hlThread.getMutex()) {
-          final String message = "Please wait... Need to determine track loudness";
-          getApp().addStatusMessage(100, message);
-          try {
-            while ((loudness = track.getProperty("loudness")) == null)
-              hlThread.getMutex().wait();
+        bgHowLoud.queue(track);
+          // Notify the thread we are waiting for it, so it will hurry up (i.e.
+          // switch to normal thread priority).
+        bgHowLoud.addWaiter();
+        try {
+            // Wait until we have determined how loud it is.
+          synchronized (bgHowLoud.getMutex()) {
+            final String message = "Please wait... Need to determine track loudness";
+            getApp().addStatusMessage(100, message);
+            try {
+              while ((loudness = track.getProperty("loudness")) == null)
+                bgHowLoud.getMutex().wait();
+            }
+            catch (InterruptedException e) {
+            }
+            getApp().removeStatusMessage(message);
           }
-          catch (InterruptedException e) {
-          }
-          getApp().removeStatusMessage(message);
+        }
+        finally {
+          bgHowLoud.removeWaiter();
         }
       }
       catch (FileNotFoundException e) {

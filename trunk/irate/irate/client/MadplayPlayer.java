@@ -42,7 +42,12 @@ public class MadplayPlayer extends ExternalPlayer {
   
   public String[] formatVolumeArgument()
   {
-    return new String[] { "--amplify", Integer.toString(getVolume()) };
+    int volume = getVolume();
+      // Don't allow the volume to go outside the range accepted by madplay, or it
+      // won't play it.
+    if (volume < -175) volume = -175;
+    if (volume > 18) volume = 18;
+    return new String[] { "--amplify", Integer.toString(volume) };
   }
   
   public String[] formatOtherArguments() 

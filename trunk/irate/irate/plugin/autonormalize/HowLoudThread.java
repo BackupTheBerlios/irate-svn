@@ -25,13 +25,51 @@ public class HowLoudThread
    */
   private Track beingProcessed;
 
-  public HowLoudThread(PluginApplication app, String identifier)
+  private boolean isLowPriority;
+  private Thread thread;
+  private int noOfWaiters = 0;
+
+  /**
+   * @param isLowPriority true if this thread normally runs at low priority.
+   */
+  public HowLoudThread(PluginApplication app, String identifier, boolean isLowPriority)
   {
     this.app = app;
     this.identifier = identifier;
+    this.isLowPriority = isLowPriority;
     toTerminate = false;
-    Thread t = new Thread(this);
-    t.start();
+    thread = new Thread(this);
+    if (isLowPriority)
+      thread.setPriority(Thread.MIN_PRIORITY);
+    thread.start();
+  }
+
+  /**
+   * Tell the thread that someone is waiting for the results of its work.
+   * Normally the thread processes at low priority.  Having waiters causes it to
+   * switch to normal priority until the waiter has finished waiting.
+   */
+  public synchronized void addWaiter()
+  {
+    if (isLowPriority) {
+      if (noOfWaiters == 0)
+        thread.setPriority(Thread.NORM_PRIORITY);
+      noOfWaiters++;
+    }
+  }
+
+  /**
+   * Tell the thread that the other thread has stopped waiting for it.
+   * If there are no threads waiting for the results of this thread's work,
+   * then it switches back into low priority.
+   */
+  public synchronized void removeWaiter()
+  {
+    if (isLowPriority) {
+      noOfWaiters--;
+      if (noOfWaiters == 0)
+        thread.setPriority(Thread.MIN_PRIORITY);
+    }
   }
 
   public void requestTerminate()
