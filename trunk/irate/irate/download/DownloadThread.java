@@ -126,195 +126,216 @@ public class DownloadThread extends Thread {
     return null;
   }
 
-  private abstract class TimeoutWorker implements Runnable {
-    protected Object input;
-    private Object output;
+  private abstract class TimeoutWorker {
     private Thread timeoutThread;
     private Exception exception;
+    private boolean done;
 
-    public TimeoutWorker(Object input) {
-      this.input = input;
-//    workerThread = new Thread(this);
+    public TimeoutWorker() {
     }
 
-    protected void setOutput(Object output) {
-        this.output = output;
-    //  timeoutThread.interrupt();
-    }
+    public abstract void run() throws Exception;
 
-    protected void setException(Exception exception) {
-        this.exception = exception;
-    //  timeoutThread.interrupt();
-    }
-
-    public abstract void run();
-
-    public Object runOrTimeout(long timeout) throws Exception {
+    public void runOrTimeout(long timeout) throws Exception {
       //running thread
       timeoutThread = Thread.currentThread();
       //increment..the bigger the less cpu we use...but slower downloads
       int step = 100;
       //reset outputs
       exception = null;
-      output = null;
+      done = false;
       //start thread with a task that might timeout
-      Thread th = new Thread(this);
-      th.start();
+      new Thread(new Runnable() {
+        public void run() {
+          try {
+            TimeoutWorker.this.run();
+          }
+          catch (Exception e) {
+            e.printStackTrace();
+            TimeoutWorker.this.exception = e;
+          }
+          done = true;
+        }
+      }).start();
       while (timeout > 0) {
         Thread.sleep(step);
         timeout -= step;
         if (exception != null)
           throw exception;
-        else if (output != null)
-          return output;
+        if (done)
+          return;
       }
       //should probably mark th somehow so it doesn't try to set any values once it times out
-      th = null;
       throw new IOException("Timeout exceeded");
     }
   }
+  
+  /**
+   * Get the file name associated with the given URL. 
+   */
+  private File getFileName(URL url) {
+    String urlString = url.toString();
+    int index = urlString.lastIndexOf('/');
+    if (index > 0)
+      urlString = urlString.substring(index + 1);
+    while (true) {
+      index = urlString.indexOf("%20");
+      if (index < 0)
+        break;
+      urlString = urlString.substring(0, index) + " " + urlString.substring(index + 3);
+    }
+    return new File(downloadDir, urlString);
+  }
+  
+  /** 
+   * Create URL which contains any appropriate proxy information.
+   */     
+  private URL getProxyURL(URL url) throws MalformedURLException {
+    String proxy = trackDatabase.getHTTPProxy(); //JDR
+    if ((proxy!=null) && (!proxy.trim().equals("")) ) //JDR
+    {//JDR HTTP proxy *is* defined in xml file.
+      //System.out.println("\nUsing HTTPProxy:"+HTTPProxy+"\n"); //JDR
+      return new URL("http", proxy, trackDatabase.getHTTPProxyPort(), url.toString());//JDR
+      //JDR The URL constructor created this way will cause the URL to go through the proxy.
+      //JDR port -1 = protocol port default (example http uses port 80 unless otherwise specified).
+    }
+    return url;
+  }
 
+  public void download(final Track track) throws IOException {
+    final URL url = getProxyURL(track.getURL());
+    System.out.println(url);
 
-  public void download(Track track) throws IOException {
+    final File file = getFileName(url);
+    setState("Connecting to " + url.getHost());
+
+    //120 second timeout for the impatient
+    long timeout = 120000;
+      
     try {
+      /*
+       * Open the connection and get the content length.
+       */
+      URLConnection conn;
+      int contentLength;
+      long continueOffset;
+      final InputStream inputStream;
       try {
-        URL url = track.getURL();
-
-        String urlString = url.toString();
-        int index = urlString.lastIndexOf('/');
-        if (index > 0)
-          urlString = urlString.substring(index + 1);
-        while (true) {
-          index = urlString.indexOf("%20");
-          if (index < 0)
-            break;
-          urlString = urlString.substring(0, index) + " " + urlString.substring(index + 3);
-        }
-        
-        long continueOffset = 0;
-        File file = new File(downloadDir, urlString);
-        if(file.exists()){
-          //System.out.println("Resuming " +file + " from " + file.length()+ " bytes");
-          continueOffset = file.length();
-        }
-
-        setState("Connecting " + track.getName());
-
-        //120 second timeout for the impatient
-        long timeout = 120000;
-        URL finalUrl = null; //JDR
-        String HTTPProxy = trackDatabase.getHTTPProxy(); //JDR
-        if ((HTTPProxy!=null) && (!HTTPProxy.trim().equals("")) ) //JDR
-        {//JDR HTTP proxy *is* defined in xml file.
-        	//System.out.println("\nUsing HTTPProxy:"+HTTPProxy+"\n"); //JDR
-        	finalUrl = new URL ("http",HTTPProxy,trackDatabase.getHTTPProxyPort(),url.toString());//JDR
-        	//JDR The URL constructor created this way will cause the URL to go through the proxy.
-        	//JDR port -1 = protocol port default (example http uses port 80 unless otherwise specified).
-        } else //JDR
-        {//JDR HTTP proxy is *not* defined in xml file.
-        	//System.out.println("\nNo HTTP proxy in use.\n"); //JDR
-        	finalUrl = url; //JDR
-        } //JDR
-
-        final long offset = continueOffset;
-        TimeoutWorker worker = new TimeoutWorker((Object) finalUrl) {
-
-          public void run() {
-            try {
-              URLConnection conn = ((URL) input).openConnection();
-              if (offset != 0);
-                conn.setRequestProperty("Range", "bytes=" + offset + "-");
-              conn.connect();
-              Vector v = new Vector();
-              v.add(conn);
-              v.add(new Integer(conn.getContentLength()+((int)offset)));
-              setOutput(v);
+        // These values are returned by the Timeout Worker.
+        final URLConnection[] urlConnectionArray = new URLConnection[1];
+        final Integer[] contentLengthArray = new Integer[1];
+        final Long[] continueOffsetArray = new Long[1];
+        final InputStream[] inputStreamArray = new InputStream[1];
+        new TimeoutWorker() {
+          public void run() throws Exception {
+            URLConnection conn = url.openConnection();
+            conn.connect();
+            contentLengthArray[0] = new Integer(conn.getContentLength());
+            
+            long continueOffset = file.exists() ? file.length() : 0;
+            if (continueOffset != 0) {
+              try {
+                URLConnection resumeConn = url.openConnection();
+                resumeConn.setRequestProperty("Range", "bytes=" + continueOffset + "-");
+                resumeConn.connect();
+                inputStreamArray[0] = resumeConn.getInputStream();
+                urlConnectionArray[0] = resumeConn;
+                continueOffsetArray[0] = new Long(continueOffset);
+                return;
+              }
+              catch (IOException e) {
+                e.printStackTrace();
+              }
             }
-            catch (IOException e) {
-              setException(e);
-            }
+              
+            conn = url.openConnection();
+            conn.connect();
+            inputStreamArray[0] = conn.getInputStream();
+            urlConnectionArray[0] = conn;
+            continueOffsetArray[0] = new Long(0);
           }
-        };
-        URLConnection conn;
-        Integer intContentLength;
-        try {
-          Vector v = (Vector) worker.runOrTimeout(timeout);
-          conn = (URLConnection) v.elementAt(0);
-          intContentLength = (Integer) v.elementAt(1);
-        }
-        catch (Exception e) {
-          setState("Could not connect: " + e);
-          e.printStackTrace();
-          return;
-        }
-        //get rid of the problem where tracks are downloaded but in reality they are 404 messages or some other html crud
+        }.runOrTimeout(timeout);
+        conn = urlConnectionArray[0];
+        contentLength = contentLengthArray[0].intValue();
+        continueOffset = continueOffsetArray[0].longValue();
+        inputStream = inputStreamArray[0];
+      }
+      catch (Exception e) {
+        throw new IOException(e.toString());
+      }
+      
+      /*
+       * If the file isn't already the right length, then we need to download.
+       */
+      try {
+        /* 
+         * Get rid of the problem where tracks are downloaded but in reality 
+         * they are 404 messages or some other html crud.
+         */
         String contentType = conn.getContentType();
-        if (contentType.indexOf("text") != -1) {
-          track.setBroken();
-          track.setRating(0);
-          return;
-        }
+        if (contentType.indexOf("text") != -1)
+          throw new FileNotFoundException("Content type is Text");
 
-        worker = null;
-        int contentLength = intContentLength.intValue();
-        setState("Downloading " + track.getName());
-        final InputStream is = conn.getInputStream();
-        //open the file for append
-        OutputStream os = new FileOutputStream(file.toString(), true);
-        final byte buf[] = new byte[128000];
-        int totalBytes = (int)continueOffset;
-        worker = new TimeoutWorker((Object) is){
-          public void run() {
-            int n;
-            try {
-              n = is.read(buf);
-            } catch(Exception e) {
-              setException(e);
-              return;
-            }
-            setOutput(new Integer(n));
-          }
-        };
-
-        while (true) {
-          int nbytes;
+        if (continueOffset != contentLength) {
+          setState("Downloading: " + track.getName());
+          // If the continue offset is non-zero then we open the file in
+          // append mode. If the file on the server is shorter than the one 
+          // we have on disk then we just start again.
+          OutputStream os = new FileOutputStream(file.toString(), continueOffset != 0);
+          final byte buf[] = new byte[128000];
+          int totalBytes = (int)continueOffset;
+          
           try {
-            nbytes = ((Integer) worker.runOrTimeout(timeout)).intValue();
-          } catch(Exception e) {
-            e.printStackTrace();
-            return;
-          }
-
-          if (nbytes < 0)
-            break;
-          os.write(buf, 0, nbytes);
-
-          if (contentLength >= 0) {
-            totalBytes += nbytes;
-            int percent = totalBytes * 100 / contentLength;
-            if (percent != percentComplete) {
-              percentComplete = percent;
-              notifyUpdateListeners();
+            final Integer[] nbytesArray = new Integer[1];
+            while (true) {
+              try {
+                new TimeoutWorker() {
+                  public void run() throws Exception {
+                    nbytesArray[0] = new Integer(inputStream.read(buf));
+                  }
+                }.runOrTimeout(timeout);
+              }
+              catch (Exception e) {
+                throw new IOException(e.toString());
+              }
+    
+              int nbytes = nbytesArray[0].intValue();
+              if (nbytes < 0)
+                break;
+              os.write(buf, 0, nbytes);
+    
+              if (contentLength >= 0) {
+                totalBytes += nbytes;
+                int percent = totalBytes * 100 / contentLength;
+                if (percent != percentComplete) {
+                  percentComplete = percent;
+                  notifyUpdateListeners();
+                }
+              }
             }
           }
+          finally {
+            os.close();
+          }
         }
-        os.close();
-        is.close();
-        track.setFile(file);
-        trackDatabase.save();
       }
       finally {
-        //if (is != null) try { is.close(); } catch (IOException e) { e.printStackTrace(); }
-        //if (os != null) try { os.close(); } catch (IOException e) { e.printStackTrace(); }
-        percentComplete = 0;
+        inputStream.close();
       }
+      track.setFile(file);
+      trackDatabase.save();
     }
     catch (FileNotFoundException fnfe) {
+      setState("Broken download: " + track.getName());
       currentTrack.setBroken();
     }
     catch (IOException e) {
+      setState("Download failure: " + track.getName());
       currentTrack.increaseDownloadAttempts();
       e.printStackTrace();
+    }
+    finally {
+      percentComplete = 0;
     }
   }
 
