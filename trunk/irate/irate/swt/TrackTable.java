@@ -138,7 +138,7 @@ public class TrackTable
     skinManager.addItem(col, "TrackTable.Heading.Track"); 
 
     col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(120);
+    col.setWidth(90);
     // Setting the alighnment to left doesn't seem to make a difference for images on GTK
     col.setAlignment(SWT.LEFT);
     addColumnListener(col, new TrackComparator() {
