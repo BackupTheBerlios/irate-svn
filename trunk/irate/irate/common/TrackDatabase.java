@@ -459,6 +459,21 @@ public class TrackDatabase {
     return chooseTrack(random, null);
   }
 
+  // Choose a track with a rating no larger than 'maxRating' and not in the 'omit'
+  // set.  This is a slow search . . .
+  public Track chooseTrack(int maxRating, Set toOmit) {
+      Track[] tracks = getTracks();
+      for (int i = 0; i < tracks.length; i++) {
+          Track track = tracks[i];
+          float rating = track.getRating();
+
+          if (rating <= maxRating && (toOmit == null || !toOmit.contains(track)) && track.isRated()) {
+              return track;
+          }
+      }
+      return null;    
+}
+
   /**
    * Choose a track from the track database, excluding tracks in 'toOmit'.
    * Ignore toOmit if it is null.

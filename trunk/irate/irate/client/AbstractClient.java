@@ -3,10 +3,8 @@
  */
 package irate.client;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.List;
-
+import irate.common.DiskControl;
+import irate.common.Preferences;
 import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
@@ -15,7 +13,10 @@ import irate.download.DownloadThread;
 import irate.plugin.Plugin;
 import irate.plugin.PluginApplication;
 import irate.plugin.PluginManager;
-import irate.common.Preferences;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
 
 /**
  * @author Anthony Jones
@@ -45,6 +46,7 @@ public abstract class AbstractClient
     File home = new File(System.getProperties().getProperty("user.home"));
     File dir = null;
     File file = null;
+    File downloadDir = null;
 
     // Check to see if the iRATE directory exists in the user's home.
     // This needs to be there.
@@ -59,12 +61,15 @@ public abstract class AbstractClient
     String preference = Preferences.getUserDownloadDirectoryPreference();
     if (preference != null) {
       file = new File(preference);
+      downloadDir = new File(file.getParentFile(), "download/");
+      
     }
     else {
       // If they don't have one set, fall back on the home directory.
       // If it doesn't exist in either location, then the user will need to fill in the
       // registration information.
       dir = new File(home, "irate");
+      downloadDir = new File(dir, "download/");
       file = new File(dir, "trackdatabase.xml");
     }
 
@@ -118,7 +123,17 @@ public abstract class AbstractClient
     if (trackDatabase.getNoOfTracks() == 0) {
       createNewAccount();
     }
-
+    
+    
+    // Deal with some file cleanup here -- if the user has the maximum disk amount
+    // set then we need to mark some files to be deleted.
+    String downloadLimit = Preferences.getUserPreference("downloadLimit");
+    if (downloadLimit != null) {
+        DiskControl dc = new DiskControl(downloadDir, trackDatabase);
+        dc.clearDiskSpace(new Integer(downloadLimit).intValue()); 
+    }
+    
+    
   }
 	
 	/** Called from AbstractClient's constructor so we can intialize 
