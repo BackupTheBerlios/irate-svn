@@ -44,8 +44,10 @@ public abstract class Plugin
    */
   public final void attach(PluginApplication app)
   {
-    this.app = app;
-    doAttach(); 
+    if (this.app == null) {
+      this.app = app;
+      doAttach(); 
+    }
   }
   
   /**
@@ -60,7 +62,8 @@ public abstract class Plugin
   public final void detach()
   {
     try {
-      doDetach();
+      if (app != null)
+	doDetach();
     }
     finally {
       this.app = null;

@@ -7,6 +7,7 @@ import irate.common.Track;
 import java.util.List;
 import java.util.Vector;
 import java.net.Socket;
+import java.net.SocketException;
 import java.io.*;
 
 /**
@@ -103,11 +104,11 @@ public class LircRemoteControlPlugin
       public void perform() {getApp().setRating(getApp().getSelectedTrack(), 10);}
     });
     functions.add(new Function() {
-      public String getName() {return "Rate as 'Pause/Resume'";}
+      public String getName() {return "Pause/Resume";}
       public void perform() {getApp().setPaused(!getApp().isPaused());}
     });
     functions.add(new Function() {
-      public String getName() {return "Rate as 'Skip'";}
+      public String getName() {return "Skip";}
       public void perform() {getApp().skip();}
     });
 
@@ -156,9 +157,9 @@ public class LircRemoteControlPlugin
 
   public void removeLircRemoteControlListener(LircRemoteControlListener listener)
   {
-    listeners.remove(listener);
-    if (listeners.size() == 0)
+    if (listeners.size() == 1 && listeners.contains(listener))
         disconnect();
+    listeners.remove(listener);
   }
 
   private void notifyConnectStatusChanged(boolean connected)
@@ -224,11 +225,11 @@ public class LircRemoteControlPlugin
             timer.notifyAll();
           }
           terminating = true;
-          if (r != null)
-            try {r.close();} catch (IOException e) {}
           if (s != null)
             try {s.close();} catch (IOException e) {}
+	  System.out.println("Joining...");
           ioThread.join();
+	  System.out.println("Joined...");
         }
       }
       catch (InterruptedException e) {
@@ -281,39 +282,46 @@ public class LircRemoteControlPlugin
     while (!terminating) {
       long connectStart = System.currentTimeMillis();
       try {
-          s = new Socket(host, port);
-          try {
-              r = new BufferedReader(new InputStreamReader(s.getInputStream()));
-              try {
-                  notifyConnectStatusChanged(true);
-                  while (true) {
-                      String buttonText = r.readLine();
-                      if (buttonText == null)
-                          break;
-                      int space1 = buttonText.indexOf(' ');
-                      if (space1 >= 0) {
-                          int space2 = buttonText.indexOf(' ', space1+1);
-                          String repeatCountStr = buttonText.substring(space1+1, space2);
-                          String idStr = buttonText.substring(space2+1);
-                          Button button = new Button(idStr, Integer.parseInt(repeatCountStr));
-                          notifyButtonPressed(button);
-                      }
-                  }
+	s = new Socket(host, port);
+	try {
+	    // Work around GCJ bug:  Closing the socket on another thread doesn't
+	    // unblock the socket read, so we make it wake up every 3 seconds
+	    // and check terminating flag. (Doesn't work.)
+	  //s.setSoTimeout(3000);
+	  r = new BufferedReader(new InputStreamReader(s.getInputStream()));
+	  try {
+	    notifyConnectStatusChanged(true);
+	    while (!terminating) {
+	      try {
+		String buttonText = r.readLine();
+		if (buttonText == null)
+		  break;
+		int space1 = buttonText.indexOf(' ');
+		if (space1 >= 0) {
+		  int space2 = buttonText.indexOf(' ', space1+1);
+		  String repeatCountStr = buttonText.substring(space1+1, space2);
+		  String idStr = buttonText.substring(space2+1);
+		  Button button = new Button(idStr, Integer.parseInt(repeatCountStr));
+		  notifyButtonPressed(button);
+		}
               }
-              finally {
-                  notifyConnectStatusChanged(false);
-                  try {r.close();} catch (IOException e) {}
-              }
-          }
-          finally {
-              try {s.close();} catch (IOException e) {}
-          }
+	      catch (InterruptedIOException e) {
+	      }
+	    }
+	  }
+	  finally {
+	    notifyConnectStatusChanged(false);
+	    try {r.close();} catch (IOException e) {}
+	  }
+	}
+	finally {
+	  try {s.close();} catch (IOException e) {}
+	}
       }
       catch (NumberFormatException e) {
           e.printStackTrace();
       }
       catch (IOException e) {
-          System.err.println("Failed to connect to lirc remote control at "+host+":"+port+": "+e.toString());
       }
       if (terminating)
           break;
@@ -379,8 +387,8 @@ public class LircRemoteControlPlugin
           if (getApp() != null)
               function.perform();
       }
-      else
-          System.out.println("lirc remote control: unmapped button "+button);
+      /*else
+          System.out.println("lirc remote control: unmapped button "+button);*/
   }
 }
 

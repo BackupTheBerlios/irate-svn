@@ -4,6 +4,7 @@ package irate.plugin;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Vector;
 
 import irate.plugin.lircremote.LircRemoteControlPlugin;
@@ -26,9 +27,16 @@ public class PluginManager
     this.configDir = configDir;
 
     loadPlugins();
+  }
 
-      // Cheat just to get it working for now...
-    ((Plugin)plugins.get(0)).attach(app);
+  public PluginApplication getApp()
+  {
+    return app;
+  }
+
+  public List getPlugins()
+  {
+    return plugins;
   }
 
   /**
@@ -39,6 +47,13 @@ public class PluginManager
   {
     plugins = new Vector();
     plugins.add(new LircRemoteControlPlugin());
+  }
+
+  /**
+   * Save the configuration of all the plugins.
+   */
+  public void saveConfig()
+  {
   }
 }
 

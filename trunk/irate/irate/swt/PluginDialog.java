@@ -14,20 +14,47 @@ import irate.plugin.*;
  */
 public class PluginDialog
 {
+  private PluginManager pluginManager;
   private boolean done = false;
 
   public PluginDialog(Display display, PluginManager pluginManager)
   {
+    this.pluginManager = pluginManager;
     final Shell shell = new Shell(display);
+    shell.setText("Plug-in settings");
     shell.addShellListener(new ShellAdapter()
     {
       public void shellClosed(ShellEvent e){
         done=true;
       }
     });
-    Button btnCancel = new Button(shell, SWT.NONE);
-    btnCancel.setText("Cancel");
-    btnCancel.addSelectionListener(new SelectionAdapter(){
+    GridLayout layout = new GridLayout(2, false);
+    shell.setLayout(layout);
+
+    java.util.List plugins = pluginManager.getPlugins();
+    for (int i = 0; i < plugins.size(); i++) {
+      final Plugin plugin = (Plugin) plugins.get(i);
+      final Button checkbox = new Button(shell, SWT.CHECK);
+      checkbox.setText(plugin.getDescription());
+      checkbox.setSelection(plugin.isAttached());
+      checkbox.addSelectionListener(new SelectionAdapter(){
+	public void widgetSelected(SelectionEvent e){
+	  if (checkbox.getSelection())
+	    plugin.attach(PluginDialog.this.pluginManager.getApp());
+          else
+	    plugin.detach();
+	}
+      });
+      Button configure = new Button(shell, SWT.NONE);
+      configure.setText("Configure");
+    }
+
+    Button ok = new Button(shell, SWT.NONE);
+    ok.setText("OK");
+    GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
+    gd.horizontalSpan = 2;
+    ok.setLayoutData(gd);
+    ok.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         done = true;
       }
@@ -39,5 +66,5 @@ public class PluginDialog
     } 
     shell.close();
     shell.dispose();
-  }    
+  }
 }
