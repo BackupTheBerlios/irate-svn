@@ -50,9 +50,9 @@ public class Client extends AbstractClient {
   private Scale volumeScale;
 //  private TrackProgressBar songProgressBar;
 
-  private ToolItem pause;
   private SkinManager.SkinItem pauseSkin;
-  private ToolItem previous;
+  private ThreeModeButton pause;
+  private ThreeModeButton previous;
   private Track previousTrack;
   private Help help = new Help();
   private ErrorDialog errorDialog;
@@ -278,11 +278,9 @@ public class Client extends AbstractClient {
     display.asyncExec(new Runnable() {
       public void run() {
         if (pausedFinal.booleanValue()) {
-          pauseSkin.setName("button.resume");
           pause.setToolTipText(Resources.getString("button.resume.tooltip"));
         }
         else {
-          pauseSkin.setName("button.pause");
           pause.setToolTipText(Resources.getString("button.pause.tooltip"));
         }
       }
@@ -293,6 +291,11 @@ public class Client extends AbstractClient {
     super.skip(reverse);
     if (reverse && !playThread.goBack()) {
       previous.setEnabled(false);
+    }
+    // If the play/pause button is pressed, meaning it is paused, then
+    // 'press' the button.  
+    if(pause.isPressed()) {
+      pause.pressButton(null);
     }
   }
 
@@ -314,15 +317,22 @@ public class Client extends AbstractClient {
     createMenu();
     
     topPanel = new Composite(shell, SWT.FLAT);
-    skinManager.add(topPanel, "topPanel-background");
+    skinManager.add(topPanel, "toolbar-bg");
+    
     
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
+    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_BEGINNING;
     gridData.grabExcessHorizontalSpace = true;
-    
+    gridData.heightHint = 74;
     gridData.horizontalSpan = 3;
+    
     topPanel.setLayoutData(gridData);
-    topPanel.setLayout(new GridLayout(2, false));
+    GridLayout gridLayout = new GridLayout(4, false);
+    gridLayout.marginHeight = 7;
+    
+    topPanel.setLayout(gridLayout);
+
     
     createToolBar();
     //    createTitle();
@@ -697,7 +707,7 @@ public class Client extends AbstractClient {
   public void createToolBar() {
     trackGroup = new Composite(topPanel, SWT.BORDER);
     trackGroup.setEnabled(false);
-    skinManager.add(trackGroup, "topPanel-background!");
+    //skinManager.add(trackGroup, "topPanel-background!");
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
@@ -762,40 +772,102 @@ public class Client extends AbstractClient {
     volumeScale.setLayoutData(gridData);
     
     
-    ToolBar toolbar = new ToolBar(topPanel, SWT.FLAT);
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.CENTER;
-    gridData.grabExcessHorizontalSpace = true;
-    gridData.horizontalSpan = 1;
-    toolbar.setLayoutData(gridData);
-
-    previous = new ToolItem(toolbar, SWT.PUSH);
+    /************ PREVIOUS BUTTON (<<) ****************/
+    previous = new ThreeModeButton(topPanel, 32, 32, SWT.NONE);
+    previous.setNormalText(Resources.getString("button.previous.normalText"));
+    previous.setPressedText(Resources.getString("button.previous.pressedText"));
     previous.setToolTipText(Resources.getString("button.previous.tooltip"));
-    previous.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        skip(true);
-      }
-    });
     previous.setEnabled(false);
+
+    gridData = new GridData();
+    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+    previous.setLayoutData(gridData);
+    
+    previous.addMouseListener(new MouseListener() {
+      public void mouseDoubleClick(MouseEvent arg0) {}
+      public void mouseDown(MouseEvent arg0) {}
+      public void mouseUp(MouseEvent arg0) {
+        if(previous.isEnabled()) {
+          skip(true);
+        }
+      }    
+    });
+    
     skinManager.add(previous, "button.previous");
-
-    pause = new ToolItem(toolbar, SWT.PUSH);
-    setPaused(false);
-    pause.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
+    
+    
+    /************ PLAY / PAUSE BUTTON  ****************/
+    pause = new ThreeModeButton(topPanel, 43, 43, SWT.NONE);
+    pause.setNormalText(Resources.getString("button.resume.normalText"));
+    pause.setPressedText(Resources.getString("button.resume.pressedText"));
+    
+    gridData = new GridData();
+    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+    pause.setLayoutData(gridData);
+    
+    pause.addMouseListener(new MouseListener() {
+      public void mouseDoubleClick(MouseEvent arg0) {}
+      public void mouseDown(MouseEvent arg0) {}
+      public void mouseUp(MouseEvent arg0) {
         setPaused(!isPaused());
-      }
+      }    
     });
-    pauseSkin = skinManager.add(pause, "button.pause");
-
-    ToolItem next = new ToolItem(toolbar, SWT.PUSH);
-    next.setToolTipText(Resources.getString("button.next.tooltip"));
-    next.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
+    
+    skinManager.add(pause, "button.resume");
+    
+    /************ NEXT BUTTON  ****************/
+    ThreeModeButton next = new ThreeModeButton(topPanel, 32, 32, SWT.NONE);
+    next.setNormalText(Resources.getString("button.next.normalText"));
+    next.setPressedText(Resources.getString("button.next.pressedText"));
+    
+    gridData = new GridData();
+    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
+    next.setLayoutData(gridData);
+    
+    next.addMouseListener(new MouseListener() {
+      public void mouseDoubleClick(MouseEvent arg0) {}
+      public void mouseDown(MouseEvent arg0) {}
+      public void mouseUp(MouseEvent arg0) {
         skip();
-      }
+      }    
     });
+    
     skinManager.add(next, "button.next");
+    
+//    ToolBar toolbar = new ToolBar(topPanel, SWT.FLAT);
+//    gridData = new GridData();
+//    gridData.horizontalAlignment = GridData.CENTER;
+//    gridData.grabExcessHorizontalSpace = true;
+//    gridData.horizontalSpan = 1;
+//    toolbar.setLayoutData(gridData);
+//
+//    previous = new ToolItem(toolbar, SWT.PUSH);
+//    previous.setToolTipText(Resources.getString("button.previous.tooltip"));
+//    previous.addSelectionListener(new SelectionAdapter() {
+//      public void widgetSelected(SelectionEvent e) {
+//        skip(true);
+//      }
+//    });
+//    previous.setEnabled(false);
+//    skinManager.add(previous, "button.previous");
+//
+//    pause = new ToolItem(toolbar, SWT.PUSH);
+//    setPaused(false);
+//    pause.addSelectionListener(new SelectionAdapter() {
+//      public void widgetSelected(SelectionEvent e) {
+//        setPaused(!isPaused());
+//      }
+//    });
+//    pauseSkin = skinManager.add(pause, "button.pause");
+//
+//    ToolItem next = new ToolItem(toolbar, SWT.PUSH);
+//    next.setToolTipText(Resources.getString("button.next.tooltip"));
+//    next.addSelectionListener(new SelectionAdapter() {
+//      public void widgetSelected(SelectionEvent e) {
+//        skip();
+//      }
+//    });
+//    skinManager.add(next, "button.next");
     
     
 //    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
