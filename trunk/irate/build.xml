@@ -171,6 +171,14 @@
     </exec>
   </target>
   
+  <target name="maclauncher" depends="maczip">
+    <javac srcdir="mac" debug="true" debuglevel="lines,vars,source" deprecation="true"/>
+    <jar jarfile="irate-mac-launcher.jar" manifest="META-INF/manifest.irate-mac-launcher" compress="false">
+      <fileset dir="mac" includes="MacLauncher.class"/>
+      <fileset dir="." includes="irate-client-macosx.zip"/>
+    </jar>
+  </target>
+  
   <target name="all" depends="gzip,nsis">
   </target>
 
