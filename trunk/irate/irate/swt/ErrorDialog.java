@@ -26,11 +26,11 @@ public class ErrorDialog {
       createShell();
       createText(url);
       createCloseButton();
-      shell.pack();
+      //shell.pack();
       Point size = shell.getSize();
       Point ploc = parent.getLocation();
       Point psize = parent.getSize();
-      shell.setLocation(ploc.x + (psize.x - size.x) / 2, ploc.y + (psize.y - size.y) / 2);
+      //shell.setLocation(ploc.x + (psize.x - size.x) / 2, ploc.y + (psize.y - size.y) / 2);
 
         // Open the window and process the events.
       shell.open();
@@ -74,7 +74,7 @@ public class ErrorDialog {
 
   private void createCloseButton() {
     Button close = new Button(shell, SWT.NONE);
-    close.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
+    close.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     close.setText("Close");
     close.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
