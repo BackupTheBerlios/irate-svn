@@ -753,7 +753,7 @@ public class TrackTable
    * @return context menu for this table
    */
   public Menu getMenu() {
-    return table.getMenu();
+    return popupMenu.getMenu();
   }
 
 }

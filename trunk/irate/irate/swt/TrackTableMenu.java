@@ -77,5 +77,11 @@ public class TrackTableMenu
     menu.setLocation(point.x, point.y);
     menu.setVisible(true);
   }
+
+  /** @return swt menu */
+  public Menu getMenu()
+  {
+    return menu;
+  }
 }
 
