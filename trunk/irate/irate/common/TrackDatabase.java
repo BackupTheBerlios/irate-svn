@@ -525,6 +525,17 @@ public class TrackDatabase {
     }
   }
   
+  public void incrementSerial(){
+    String serial = docElt.getStringAttribute("serial");
+    if(serial==null) {
+      docElt.setAttribute("serial","1");
+      return;
+    }
+    int num = Integer.parseInt(serial);
+    num++;
+    docElt.setAttribute("serial",""+num);
+  }
+  
   public boolean hasRatedEnoughTracks() {
     Track[] tracks = getTracks();
     int noOfRated = 0;

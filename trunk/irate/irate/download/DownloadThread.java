@@ -316,8 +316,8 @@ public class DownloadThread extends Thread {
       InputStream is = socket.getInputStream();
       setState("Sending server request");
       OutputStream os = socket.getOutputStream();
-      System.out.println("Request:");
-      System.out.println(trackDatabase.toString());
+      //System.out.println("Request:");
+      //System.out.println(trackDatabase.toString());
       byte[] buf = trackDatabase.toString().getBytes();
       os.write(("Content-Length: " + Integer.toString(buf.length) + "\r\n\r\n").getBytes());
       os.write(buf);
@@ -329,6 +329,7 @@ public class DownloadThread extends Thread {
       System.out.println("reply: ");
       System.out.println(reply.toString());
       trackDatabase.add(reply);
+      trackDatabase.incrementSerial();
       trackDatabase.save();
 
       String errorCode = reply.getErrorCode();
