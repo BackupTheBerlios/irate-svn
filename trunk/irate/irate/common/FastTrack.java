@@ -1,5 +1,7 @@
 package irate.common;
 
+import java.io.File;
+
 import nanoxml.XMLElement;
 
 public class FastTrack extends Track {
