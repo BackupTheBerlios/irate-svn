@@ -26,120 +26,6 @@ public class LircRemoteControlPlugin
   private int port;
   private Vector functions;
 
-  public abstract class Function
-  {
-    public Function()
-    {
-    }
-    
-    public abstract String getID();
-
-    public abstract String getName();
-
-    public abstract void perform();
-
-    public List buttons = new Vector();
-
-    public void clearConfig()
-    {
-      buttons.clear();
-    }
-
-    public void parseXML(XMLElement elt)
-    {
-      buttons.clear();
-      Enumeration enum = elt.enumerateChildren();
-      while (enum.hasMoreElements()) {
-        XMLElement child = (XMLElement) enum.nextElement();
-        if (child.getName().equals("button"))
-          buttons.add(new Button(child));
-      }
-    }
-
-    public XMLElement formatXML()
-    {
-      XMLElement elt = new XMLElement(new Hashtable(), false, false);
-      elt.setName("function");
-      elt.setAttribute("id", getID());
-      for (int i = 0; i < buttons.size(); i++)
-        elt.addChild(((Button)buttons.get(i)).formatXML());
-      return elt;
-    }
-
-    /**
-     * Default repeat policy is: Single button presses only.
-     * Functions such as volume up/down will use Button.REPEAT;
-     */
-    public int getRepeatPolicy() {return Button.SINGLE;}
-  }
-
-  public static class Button
-  {
-    private String id;
-    private int repeatCount;
-    public static final int SINGLE = 0;
-    public static final int REPEAT = -1;
-
-    public Button(String id, int repeatCount)
-    {
-      this.id = id;
-      this.repeatCount = repeatCount;
-    }
-
-    public Button(XMLElement elt)
-    {
-      this.id = elt.getStringAttribute("id");
-      String rcStr = elt.getStringAttribute("repeat");
-      if (rcStr.equals("REPEAT"))
-        this.repeatCount = REPEAT;
-      else {
-        try {
-          this.repeatCount = Integer.parseInt(rcStr);
-        }
-        catch (NumberFormatException e) {
-          this.repeatCount = 0;
-        }
-      }
-    }
-
-    public XMLElement formatXML()
-    {
-      XMLElement elt = new XMLElement(new Hashtable(), false, false);
-      elt.setName("button");
-      elt.setAttribute("id", id);
-      elt.setAttribute("repeat", repeatCount == REPEAT ? "REPEAT" : Integer.toString(repeatCount));
-      return elt;
-    }
-
-    /**
-     * The string that identifies this button.
-     */
-    public String getID() {return id;}
-    /**
-     * Repeat count, which is zero when the button is first pressed.
-     */
-    public int getRepeatCount() {return repeatCount;}
-    
-    public String toString()
-    {
-      return id+"("+repeatCount+")";
-    }
-
-    public boolean equals(Object other_)
-    {
-      if (other_ instanceof Button) {
-        Button other = (Button)other_;
-        if (!id.equals(other.id))
-          return false;
-        if (repeatCount == REPEAT || other.repeatCount == REPEAT)
-          return true;
-        return repeatCount == other.repeatCount;
-      }
-      else
-        return false;
-    }
-  }
-
   public LircRemoteControlPlugin()
   {
     host = "localhost";
@@ -180,15 +66,6 @@ public class LircRemoteControlPlugin
       public String getName() {return "Skip";}
       public void perform() {getApp().skip();}
     });
-
-      // Cheat just to get it going for now...
-    ((Function)functions.get(0)).buttons.add(new Button("tune-down denon-tuner", Button.SINGLE));
-    ((Function)functions.get(1)).buttons.add(new Button("tune-up denon-tuner", Button.SINGLE));
-    ((Function)functions.get(2)).buttons.add(new Button("p.scan denon-tuner", Button.SINGLE));
-    ((Function)functions.get(3)).buttons.add(new Button("chan-up denon-tuner", Button.SINGLE));
-    ((Function)functions.get(4)).buttons.add(new Button("chan-down denon-tuner", Button.SINGLE));
-    ((Function)functions.get(5)).buttons.add(new Button("auto-mute denon-tuner", Button.SINGLE));
-    ((Function)functions.get(6)).buttons.add(new Button("rf-att-on denon-tuner", Button.SINGLE));
   }
 
   public List getFunctions()
@@ -466,7 +343,7 @@ public class LircRemoteControlPlugin
     System.out.println("lirc remote control: "+(connected?"connected":"disconnected"));
   }
 
-  public void buttonPressed(LircRemoteControlPlugin plugin, LircRemoteControlPlugin.Button button)
+  public void buttonPressed(LircRemoteControlPlugin plugin, Button button)
   {
     // System.out.println("lirc remote control: "+button);
     Function function = null;

@@ -6,10 +6,13 @@ import org.eclipse.swt.widgets.*;
 import org.eclipse.swt.layout.*;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Point;
 import irate.common.*;
 import irate.plugin.*;
 import irate.plugin.lircremote.LircRemoteControlPlugin;
 import irate.plugin.lircremote.LircRemoteControlListener;
+import irate.plugin.lircremote.Button;
+import irate.plugin.lircremote.Function;
 
 /**
  * SWT version of the configurator for the Lirc remote control.
@@ -20,6 +23,7 @@ public class LircRemoteControlConfigurator
   implements LircRemoteControlListener
 {
   private Display display;
+  private PluginApplication app;
   private PluginManager pluginManager;
   private LircRemoteControlPlugin plugin;
   private boolean done = false;
@@ -27,10 +31,19 @@ public class LircRemoteControlConfigurator
   private Text port;
   private Label status;
 
-  public LircRemoteControlConfigurator(Display display, PluginApplication app, Plugin plugin_)
+  public LircRemoteControlConfigurator(Display display_, PluginApplication app_, Plugin plugin_)
   {
-    this.display = display;
+    this.display = display_;
+    this.app = app_;
     this.plugin = (LircRemoteControlPlugin) plugin_;
+
+    plugin.addLircRemoteControlListener(this);
+    boolean wasAttached = plugin.isAttached();
+      // Detach from the application while configuring so the remote control
+      // buttons don't affect the application.
+    if (wasAttached)
+      plugin.detach();
+
     final Shell shell = new Shell(display);
     shell.setText("Lirc remote control configuration");
     shell.addShellListener(new ShellAdapter()
@@ -63,14 +76,19 @@ public class LircRemoteControlConfigurator
     status = new Label(shell, SWT.SINGLE | SWT.BORDER);
     setStatus();
 
-    plugin.addLircRemoteControlListener(this);
-    boolean wasAttached = plugin.isAttached();
-      // Detach from the application while configuring so the remote control
-      // buttons don't affect the application.
-    if (wasAttached)
-      plugin.detach();
+    for (int i = 0; i < plugin.getFunctions().size(); i++) {
+      final Function func = (Function) plugin.getFunctions().get(i);
+      new Label(shell, SWT.NONE).setText(func.getName());
+      org.eclipse.swt.widgets.Button setUp = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
+      setUp.setText("Set up");
+      setUp.addSelectionListener(new SelectionAdapter(){
+	public void widgetSelected(SelectionEvent e){
+          new FunctionSetup(display, app, plugin, func);
+        }
+      });
+    }
 
-    Button ok = new Button(shell, SWT.NONE);
+    org.eclipse.swt.widgets.Button ok = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
     ok.setText("OK");
     GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
     gd.horizontalSpan = 2;
@@ -93,6 +111,7 @@ public class LircRemoteControlConfigurator
       plugin.attach(app);
     plugin.removeLircRemoteControlListener(this);
   }
+
 
   private void setup()
   {
@@ -121,7 +140,7 @@ public class LircRemoteControlConfigurator
       });
   }
 
-  public void buttonPressed(LircRemoteControlPlugin plugin, LircRemoteControlPlugin.Button button)
+  public void buttonPressed(LircRemoteControlPlugin plugin, irate.plugin.lircremote.Button button)
   {
   }
 }

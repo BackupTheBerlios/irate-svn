@@ -18,6 +18,6 @@ public interface LircRemoteControlListener
 {
   public void connectStatusChanged(LircRemoteControlPlugin plugin, boolean connected);
 
-  public void buttonPressed(LircRemoteControlPlugin plugin, LircRemoteControlPlugin.Button button);
+  public void buttonPressed(LircRemoteControlPlugin plugin, Button button);
 }
 
