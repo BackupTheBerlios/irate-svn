@@ -100,7 +100,7 @@ public class MarsyasExtractor extends Thread{
      
       } catch (Exception e) {
         err("Failed to process "+track);
-        track.setProperty("marsyas","failed");
+        //track.setProperty("marsyas","failed");
         e.printStackTrace();
         
         return;
