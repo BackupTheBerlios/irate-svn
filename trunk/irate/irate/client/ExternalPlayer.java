@@ -15,6 +15,7 @@ public class ExternalPlayer implements Player {
   private final int ACTION_CLOSE = 2;
   private int action;
   private boolean paused;
+  private int volume;
   private Process process;
   private long playTime;
   
@@ -45,10 +46,28 @@ public class ExternalPlayer implements Player {
 
   public void setPaused(boolean paused) {
     this.paused = paused;
-    if (paused) {
+    if (paused && process != null) {
       action = ACTION_PAUSE;
       process.destroy();
+      try {
+        Thread.sleep(1000);
+      }
+      catch (InterruptedException e) {
+        e.printStackTrace();
+      }
     }
+  }
+
+  public void setVolume(int volume) {
+    this.volume = volume;
+    if (!isPaused()) {
+      setPaused(true);
+      setPaused(false);
+    }
+  }
+  
+  public int getVolume() {
+    return volume;
   }
 
   public boolean isPaused() {
@@ -57,7 +76,11 @@ public class ExternalPlayer implements Player {
 
   public String[] formatResumeArgument()
   {
-    return null;
+    return new String[0];
+  }
+  
+  public String[] formatVolumeArgument() {
+    return new String[0];
   }
 
   /**
@@ -68,22 +91,34 @@ public class ExternalPlayer implements Player {
   {
     return playTime;
   }
+  
+  private String[] joinArray(String[][] a) {
+    int length = 0;
+    for (int i = 0; i < a.length; i++) 
+      length += a[i].length;
+    String[] r = new String[length];
+    int dst = 0;
+    for (int i = 0; i < a.length; i++) {
+      System.arraycopy(a[i], 0, r, dst, a[i].length); 
+      dst += a[i].length;
+    }
+    return r;
+  } 
 
   public void play(File file) throws PlayerException {
     playTime = 0;
     do {
       try {
         action = ACTION_PLAY;
-	String[] resumeArg = formatResumeArgument();
-	String[] args;
-	if (resumeArg == null)
-	  args = new String[2];
-	else {
-	  args = new String[resumeArg.length+2];
-	  System.arraycopy(resumeArg, 0, args, 1, resumeArg.length);
-        }
-	args[0] = path;
-	args[args.length-1] = file.getPath();
+        String[] args = joinArray(new String[][] {
+          new String[] { path },
+          formatResumeArgument(),
+          formatVolumeArgument(),
+          new String[] { file.getPath() } 
+        });
+//        for (int i = 0 ; i < args.length; i++) 
+//          System.out.print(args[i] + " ");
+//        System.out.println();
         process = Runtime.getRuntime().exec(args);
       }
       catch (IOException e) {
@@ -93,27 +128,29 @@ public class ExternalPlayer implements Player {
       long start = System.currentTimeMillis();
       try {
         process.waitFor();
-        if (!paused && process.exitValue() != 0) 
-          throw new PlayerException("extern player returned " + process.exitValue());
+        if (!paused && process.exitValue() != 0)
+          throw new PlayerException(
+            "extern player returned " + process.exitValue());
       }
       catch (InterruptedException e) {
         e.printStackTrace();
       }
       if (paused) {
-	long timePlayed = System.currentTimeMillis() - start;
-	playTime += timePlayed;
+        long timePlayed = System.currentTimeMillis() - start;
+        playTime += timePlayed;
       }
-      while (paused) { 
-        try {
-          Thread.sleep(100);
+        while (paused) {
+          try {
+            Thread.sleep(100);
+          }
+          catch (InterruptedException ie) {
+            ie.printStackTrace();
+          }
         }
-        catch (InterruptedException ie) {
-          ie.printStackTrace();
-        }
-      }
-      if (action == ACTION_CLOSE) 
+      if (action == ACTION_CLOSE)
         throw new PlayerException("extern player closed");
-    } while (action != ACTION_PLAY);
+    }
+    while (action != ACTION_PLAY);
   }
 
   public void close() {

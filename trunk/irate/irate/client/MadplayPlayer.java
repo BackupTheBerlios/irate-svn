@@ -30,4 +30,9 @@ public class MadplayPlayer extends ExternalPlayer {
       "--start="+Integer.toString(hours)+":"+format00(minutes)+":"+format00(seconds)
     };
   }
+  
+  public String[] formatVolumeArgument()
+  {
+    return new String[] { "--amplify", Integer.toString(getVolume()) };
+  }
 }

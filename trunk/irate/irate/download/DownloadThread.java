@@ -351,20 +351,11 @@ public class DownloadThread extends Thread {
   }
 
   private void doCheckAutoDownload() {
-    String state = null;
-    synchronized (trackDatabase) {
-      int autoDownload = trackDatabase.getAutoDownload();
-      int autoDownloadCount = trackDatabase.getAutoDownloadCount();
-      if (autoDownload == 0)
-        state = " ";
-      else if (autoDownloadCount < autoDownload)
-        state = "Download in " + (autoDownload - autoDownloadCount) + " plays";
-      else
-        trackDatabase.setAutoDownloadCount(0);
-    }
-    if (state == null)
-      go();
+    int autoDownload = trackDatabase.getAutoDownload();
+    int noOfUnrated = trackDatabase.getNoOfUnrated();
+    if (noOfUnrated >= autoDownload) 
+      setState(noOfUnrated + " unrated track" + (noOfUnrated == 1 ? "" : "s"));
     else
-      setState(state);
+      go();      
   }
 }

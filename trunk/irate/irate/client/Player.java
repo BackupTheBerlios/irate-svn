@@ -13,6 +13,8 @@ public interface Player {
   public boolean isPaused();
 
   public void play(File file) throws PlayerException;
+  
+  public void setVolume(int volume);
 
   public void close();
 }

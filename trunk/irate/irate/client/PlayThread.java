@@ -35,9 +35,10 @@ public class PlayThread extends Thread {
     }
   }
 
-  private void playFile(File file) throws Exception {
+  private void playFile(File file, int volume) throws Exception {
     player = playerList.getPlayer(playListManager.getTrackDatabase().getPlayer());
     try {
+      player.setVolume(volume);
       player.play(file);
     }
     catch (PlayerException e) {
@@ -87,10 +88,10 @@ public class PlayThread extends Thread {
             }
           }
           if (toKeepPlaying) {
-            playFile(file);
+            playFile(file, currentTrack.getVolume());
             if (toKeepPlaying) {
-              currentTrack.incNoOfTimesPlayed();
               playListManager.getTrackDatabase().incNoOfPlays();
+              currentTrack.incNoOfTimesPlayed();
             }
           }
         }
@@ -141,6 +142,11 @@ public class PlayThread extends Thread {
     if (player == null)
       return false;
     return player.isPaused();
+  }
+  
+  public synchronized void setVolume(int volume) {
+    currentTrack.setVolume(volume);
+    player.setVolume(volume);
   }
 
   public void addUpdateListener(UpdateListener updateListener) {

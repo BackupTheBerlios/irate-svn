@@ -14,7 +14,7 @@ public class TrackDatabase {
   private final String trackElementName = "Track";
   private final String userElementName = "User";
   private final String autoDownloadElementName = "AutoDownload";
-  private final String defaultHost = "takahe.blacksapphire.com";
+  private final String defaultHost = "server.irateradio.org";
   private final int defaultPort = 2278;
   private TreeSet tracks;
   private Hashtable hash;
@@ -170,6 +170,10 @@ public class TrackDatabase {
     String host = getAttribute(userElementName, "host");
     if (host.length() == 0)
       return defaultHost;
+    if (host.equals("takahe.blacksapphire.com")) {
+      setHost(defaultHost);
+      return defaultHost;
+    }
     return host;
   }
 

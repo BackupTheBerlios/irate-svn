@@ -30,6 +30,9 @@ public class JavaLayerPlayer implements Player {
       return audio.isPaused();
     }
   }
+  
+  public void setVolume(int volume) {
+  }
 
   public void play(File file) throws PlayerException {
     this.audio = new AudioDevice();

@@ -314,6 +314,25 @@ public class Client implements UpdateListener, PluginApplication {
       }
     });
   }
+  
+  public void setVolume(final int volume) {
+      // We have to delegate to the SWT event thread, because we might be
+      // called from a thread other than it, such as the remote control thread.
+//    final Integer volumeInt = new Integer(volume);
+    display.asyncExec(new Runnable() {
+      public void run() {
+        playThread.setVolume(volume);
+
+        //save the updated volume
+        try {
+          trackDatabase.save();
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
+      }
+    });
+  }
 
   /**
    * PluginApplication interface:
@@ -595,13 +614,13 @@ public class Client implements UpdateListener, PluginApplication {
     Menu menu2 = new Menu(mDownload);
     mDownload.setMenu(menu2);
   
-    int[] counts = new int[] {0, 2, 5, 11, 17, 23, 29};
+    int[] counts = new int[] {0, 3, 5, 11};
     int autoDownload = trackDatabase.getAutoDownload(); 
     for(int i=0;i< counts.length;i++){
       MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
-      final int count = counts[i];
-      mTimes.setText(i==0?"Disabled":"Every " + count + " times" );
-      mTimes.setSelection(count == autoDownload);
+      final Integer count = new Integer(counts[i]);
+      mTimes.setText(i==0 ? "Disabled" : "< " + count + " unrated tracks" );
+      mTimes.setSelection(count.intValue() == autoDownload);
       mTimes.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
           //stupid trick to make self the only selected item
@@ -609,7 +628,7 @@ public class Client implements UpdateListener, PluginApplication {
           uncheckSiblingMenuItems(self);
           self.setSelection(true);
       
-          trackDatabase.setAutoDownload(count);
+          trackDatabase.setAutoDownload(count.intValue());
           downloadThread.checkAutoDownload();
         }
       });
@@ -624,16 +643,16 @@ public class Client implements UpdateListener, PluginApplication {
     int playListLength = trackDatabase.getPlayListLength();
     for (int i = 0; i < counts.length; i++) {
       MenuItem mTimes = new MenuItem(menuPlayList, SWT.CHECK, i);
-      final int count = counts[i];
+      final Integer count = new Integer(counts[i]);
       mTimes.setText(count + " tracks");
-      mTimes.setSelection(count == playListLength);
+      mTimes.setSelection(count.intValue() == playListLength);
       mTimes.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
           MenuItem self = (MenuItem)e.getSource();
           uncheckSiblingMenuItems(self);
           self.setSelection(true);
           
-          trackDatabase.setPlayListLength(count);          
+          trackDatabase.setPlayListLength(count.intValue());          
         }
       });
     } 
@@ -754,6 +773,20 @@ public class Client implements UpdateListener, PluginApplication {
         skip();
       }
     });
+    
+    new ToolItem(toolbar,SWT.SEPARATOR);
+    
+    for (int i = -12; i <= 12; i += 6) {
+      final int volume = i;
+      
+      item = new ToolItem(toolbar,SWT.PUSH);
+      item.setText((volume > 0 ? "+" : "") + volume + "db");
+      item.addSelectionListener(new SelectionAdapter(){
+        public void widgetSelected(SelectionEvent e){
+          setVolume(volume);
+        }
+      });
+    }    
   }
 
   public void createState() {
