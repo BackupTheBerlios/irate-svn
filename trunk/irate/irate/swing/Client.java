@@ -148,6 +148,12 @@ public class Client extends JFrame {
            playPanel.update();
          }
        }
+       
+       // quick hack for changed interface, 2004-05-25
+       public void downloadStarted(Track track) { }
+       public void downloadFinished(Track track, boolean succeeded) { }
+       public void downloadData(Track track, byte[] buffer, int offset, int length) { }
+       // end quick hack
      });
        playThread.addUpdateListener(new UpdateListener() {
        public void actionPerformed() {

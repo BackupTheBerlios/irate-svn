@@ -8,6 +8,7 @@ package irate.plugin.autonormalize;
 import java.io.*;
 import java.util.Vector;
 import irate.common.Track;
+import irate.plugin.PluginApplication;
 import java.text.DecimalFormat;
 
 public class HowLoudThread
