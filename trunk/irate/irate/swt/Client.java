@@ -124,7 +124,7 @@ public class Client extends AbstractClient {
         // is on the target platform).
       public void widgetDefaultSelected(SelectionEvent e) {
         Track track = trackTable.getClickedTrack();
-        if (track.exists()) {
+        if ((track != null) && track.exists()) {
           setPaused(false);
           playThread.play(track);
         }
