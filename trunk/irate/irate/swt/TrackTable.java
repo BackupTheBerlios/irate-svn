@@ -281,6 +281,7 @@ public class TrackTable {
   
   /** Select a specified Track. */
   public void select(Track track) {
+    System.out.println("TrackTable.select("+track+")");
     this.selected = track;
     TableItem tableItem = (TableItem) hashByTrack.get(track);
     if (tableItem == null) {
