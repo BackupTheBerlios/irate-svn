@@ -31,6 +31,7 @@ public class Client implements UpdateListener {
   private Hashtable hashSongs = new Hashtable();
   private TrackDatabase trackDatabase;
   private PlayListManager playListManager;
+  private PlayerList playerList;
   private PlayThread playThread;
   private DownloadThread downloadThread;
   private ToolItem pause;
@@ -50,13 +51,17 @@ public class Client implements UpdateListener {
     catch (IOException e) {
 		e.printStackTrace();
     }
-    
+	
+	playerList = new PlayerList();
     //try to do a nice initial experience for theuser
    	//do as much handholding as possible
 	if(!file.exists())
 	{
 		new AccountDialog(display, trackDatabase);
-		String players[] = {"madplay","mpg321","mpg123"};
+		Player players[] = playerList.getPlayers();
+		if(players.length > 0)
+			trackDatabase.setPlayer(players[0].getName());
+		/*String players[] = {"madplay","mpg321","mpg123"};
 		String prefixes[] = {"/usr/bin/", "/usr/local/bin/",""};
 		for(int i=0;i<prefixes.length;i++)
 			for(int j=0;j<players.length;j++){
@@ -65,11 +70,11 @@ public class Client implements UpdateListener {
 					trackDatabase.setPlayer(player);
 					break;
 				}
-			}
+			}*/
 		trackDatabase.setAutoDownload(2);
 	}
     playListManager = new PlayListManager(trackDatabase);
-    playThread = new PlayThread(playListManager, new PlayerList());
+	playThread = new PlayThread(playListManager, playerList);
  
 	initGUI();
     
@@ -273,6 +278,13 @@ public class Client implements UpdateListener {
     System.exit(0);
   }
   
+  void uncheckSiblingMenuItems(MenuItem self) {
+	Menu parent = self.getParent();
+	MenuItem items[] = parent.getItems();
+	for(int i = 0;i< parent.getItemCount();i++)
+		parent.getItem(i).setSelection(false);
+  }
+  
   void initGUI(){
     shell = new Shell(display);
     shell.setText("iRATE radio");
@@ -331,15 +343,15 @@ public class Client implements UpdateListener {
     MenuItem item2 = new MenuItem(menubar,SWT.CASCADE);
     item2.setText("Settings");
     
-    Menu menu2 = new Menu(item2);
-    item2.setMenu(menu2);
+    Menu mSettings = new Menu(item2);
+    item2.setMenu(mSettings);
     
     //MenuItem item2_1 = new MenuItem(menu2,SWT.PUSH);
     //item2_1.setText("Account");
     
-    MenuItem mDownload = new MenuItem(menu2, SWT.CASCADE);
+    MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
 	mDownload.setText("Auto Download");
-	menu2 = new Menu(mDownload);
+	Menu menu2 = new Menu(mDownload);
 	mDownload.setMenu(menu2);
 	
 	int counts[] = new int[] {0,2, 5, 11, 17, 23, 29};
@@ -353,10 +365,7 @@ public class Client implements UpdateListener {
 		public void widgetSelected(SelectionEvent e){
 			//stupid trick to make self the only selected item
 			MenuItem self = (MenuItem)e.getSource();
-			Menu parent = self.getParent();
-			MenuItem items[] = parent.getItems();
-			for(int i = 0;i< parent.getItemCount();i++)
-				parent.getItem(i).setSelection(false);
+			uncheckSiblingMenuItems(self);
 			self.setSelection(true);
 			
 			trackDatabase.setAutoDownload(count);
@@ -365,7 +374,33 @@ public class Client implements UpdateListener {
 		});
 	}
     
-    
+	MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
+	mPlayers.setText("Player");
+	menu2 = new Menu(mPlayers);
+	mPlayers.setMenu(menu2);
+	
+	Player players[] = playerList.getPlayers();
+	for(int i=0;i<players.length;i++)
+	{
+		final String player = players[i].getName();
+		
+		MenuItem mPlayer = new MenuItem(menu2, SWT.CHECK, i);
+		mPlayer.setText(player);
+		if(trackDatabase.getPlayer().equals(player))
+			mPlayer.setSelection(true);
+		mPlayer.addSelectionListener(new SelectionAdapter(){
+			public void widgetSelected(SelectionEvent e){
+				//stupid trick to make self the only selected item
+				MenuItem self = (MenuItem)e.getSource();
+				uncheckSiblingMenuItems(self);
+				self.setSelection(true);
+			
+				trackDatabase.setPlayer(player);
+				downloadThread.checkAutoDownload();
+			}
+		});
+	}
+
     
     lblTitle = new Label(shell, SWT.NONE);
     lblTitle.setText("Current song goes here");

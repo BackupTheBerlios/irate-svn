@@ -10,10 +10,14 @@ public class PlayerList {
   
   public PlayerList() {
     Vector players = new Vector();
+    
     try {
-      players.add(Class.forName("irate.client.JavaLayerPlayer").newInstance());
+    	//seems like reflection of classes with unknown members is nicely broken in gcj
+    	if(System.getProperty("java.vm.name").indexOf("gcj") == -1)
+      		players.add(Class.forName("irate.client.JavaLayerPlayer").newInstance());
     } 
     catch (Exception e) {
+    	e.printStackTrace();
     }
     
     try {
