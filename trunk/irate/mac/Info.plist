@@ -27,7 +27,7 @@
 	<key>Java</key>
 	<dict>
 		<key>ClassPath</key>
-		<string>$JAVAROOT/irate-client-swt.jar:$JAVAROOT/jl030.jar:$JAVAROOT/swt.jar:$JAVAROOT/swt-pi.jar:$JAVAROOT/nanoxml-lite-2.2.3.jar:$JAVAROOT/skinlf.jar:$JAVAROOT/jd3lib.jar:$JAVAROOT/mp3sp.1.6.jar:$JAVAROOT/swtdock.jar</string>
+		<string>$JAVAROOT/irate-client-swt.jar:$JAVAROOT/jl0.4.jar:$JAVAROOT/swt.jar:$JAVAROOT/swt-pi.jar:$JAVAROOT/nanoxml-lite-2.2.3.jar:$JAVAROOT/skinlf.jar:$JAVAROOT/jd3lib.jar:$JAVAROOT/mp3sp.1.6.jar:$JAVAROOT/swtdock.jar</string>
 		<key>MainClass</key>
 		<string>irate.swt.Client</string>
 		<key>VMOptions</key>
