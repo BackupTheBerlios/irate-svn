@@ -12,10 +12,10 @@ import irate.common.Preferences;
 import irate.plugin.*;
 
 /**
- * Date Updated: $Date: 2003/11/27 09:03:35 $
+ * Date Updated: $Date: 2003/11/29 05:16:35 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class SettingDialog
 {
@@ -63,20 +63,21 @@ public class SettingDialog
     shell.dispose();
 
   }
-	/** Creates widgets */
-	private void createWidgets(Display display) {
+
+  /** Creates widgets */
+  private void createWidgets(Display display) {
     shell = new Shell(display);
     shell.setText("Settings");
     shell.addShellListener(new ShellAdapter() {
-      public void shellClosed(ShellEvent e){
-        done=true;
-      }
-    });
-		GridLayout layout = new GridLayout(1, false);
+        public void shellClosed(ShellEvent e){
+          done=true;
+        }
+      });
+    GridLayout layout = new GridLayout(1, false);
     shell.setLayout(layout);
     
     tabs = new TabFolder(shell, SWT.NONE);
-		//Pluginpage
+    //Pluginpage
     TabItem tabItem = new TabItem(tabs, SWT.NONE);
     tabItem.setText("Plugins");
     tabItem.setControl(createPluginPage(tabs));
@@ -245,9 +246,12 @@ public class SettingDialog
     browseButton.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
           FileDialog fd = new FileDialog(shell, SWT.OPEN);
+          fd.setText("Select browser to use");
           fd.open();
-          browserText.setText(fd.getFilterPath() + "/" + fd.getFileName());
-          browser = browserText.getText();
+          if (!fd.getFileName().equals("")) {
+            browserText.setText(fd.getFilterPath() + "/" + fd.getFileName());
+            browser = browserText.getText();
+          }
         }
       });
     
