@@ -26,8 +26,13 @@ public class Client extends JFrame {
       UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
     }
     catch (Exception e) {
-      //e.printStackTrace();
+      try {
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+      } catch (Exception exc) {
+        System.err.println("Error loading L&F: " + exc);
+      }
     }
+    
     try {
       Client client = new Client() {
         public void actionClose() {
