@@ -19,8 +19,8 @@ swt.jar: swt-2.1-win32.zip
 else
 
 ifeq ($(PLATFORM),linux-gtk2)
-swt.jar: swt-2.1.1-linux-gtk.zip
-	unzip -o swt-2.1.1-linux-gtk.zip
+swt.jar: swt-2.1.3-linux-gtk.zip
+	unzip -o swt-2.1.3-linux-gtk.zip
 #swt.jar: swt-3.0RC3-linux-gtk.zip
 #	unzip -o swt-3.0RC3-linux-gtk.zip
 else
@@ -38,6 +38,9 @@ endif
 endif
 
 endif
+
+swt-2.1.3-linux-gtk.zip:
+	wget http://mirror.pacific.net.au/eclipse/eclipse/downloads/drops/R-2.1.3-200403101828/swt-2.1.3-linux-gtk.zip
 
 swt-2.1.2-linux-motif.zip:
 	wget http://download.eclipse.org/downloads/drops/R-2.1.2-200311030802/swt-2.1.2-linux-motif.zip
