@@ -85,7 +85,7 @@ public class DownloadThread extends Thread {
       currentTrack = tracks[i];
       if (!currentTrack.isHidden()) {
         File file = currentTrack.getFile();
-        if (file == null || !file.exists()) {
+        if ((file == null || !file.exists()) && currentTrack.getDownloadAttempts() < 10) {
           try {
             if (file != null) {
               currentTrack.unSetFile();
@@ -313,6 +313,7 @@ public class DownloadThread extends Thread {
       currentTrack.setBroken();
     }
     catch (IOException e) {
+      currentTrack.increaseDownloadAttempts();
       e.printStackTrace();
     }
   }
