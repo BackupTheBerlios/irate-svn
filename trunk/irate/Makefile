@@ -27,10 +27,11 @@ JAVA_DOWNLOAD=irate/download/*.java
 HELPFILES=irate/client/help/*.html
 JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CLIENT:.java=.class) $(JAVA_DOWNLOAD:.java=.class)
 
-#requist icon compilation if not gcj 3.0.4
+#request resource compilation if not gcj 3.0.4
 #set in make.configure
 ifndef NO_RESOURCE
-CLIENT_DEPS += irate-icon.o
+IMAGES = $(shell find irate/resources/ -name '*.gif')
+CLIENT_DEPS += $(IMAGES:.gif=.gifres.o)
 endif
 
 ifeq ($(PLATFORM),win32)
@@ -65,7 +66,8 @@ CLIENT_FILES = \
 	irate/client/Speech.java \
 	irate/client/Help.java \
 	irate/client/AbstractPlayer.java \
-	irate/client/PlayerListener.java
+	irate/client/PlayerListener.java \
+	irate/resources/Resources.java
 #	irate/client/LibMadPlayer.java
 #	irate/client/AudioDevice.java 
 #	irate/client/JavaSoundAudioDevice.java 
@@ -139,7 +141,7 @@ irate-common.o:	$(JAVA_COMMONSRC)
 irate-server.o:irate/server/*.java
 	$(GCJ) -c irate/server/*.java -o irate-server.o
 
-irate-icon.o: irate/swt/irate.gif
+%.gifres.o: %.gif
 	$(GCJ) -c --resource $^ $^ -o $@
 
 libmadplayer.o: irate/client/AbstractPlayer.java irate/client/LibMadPlayer.java irate/client/LibMadPlayer.cc
