@@ -26,7 +26,7 @@ public class SkinManager {
 
   private TransparencyManager transparencyManager = new TransparencyManager();
 
-  private final String IMAGE_EXTENSION = ".png";
+  private static final String IMAGE_EXTENSION = ".png";
 
   public SkinManager() {
   }

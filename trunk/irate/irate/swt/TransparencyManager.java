@@ -80,7 +80,7 @@ public class TransparencyManager {
     return imageData;
   }
   
-  private class Area {
+  private static class Area {
     ImageData parentImageData;
     Rectangle bounds;
     
@@ -104,7 +104,7 @@ public class TransparencyManager {
 
   }
   
-  private class Scale {
+  private static class Scale {
     int width;
     int height;    
     ImageData imageData;

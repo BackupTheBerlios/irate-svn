@@ -10,8 +10,6 @@ import java.util.*;
 
 public class PlayListManager {
 
-  private int playListMaximumSize;
-
   private TrackDatabase trackDatabase;
   private List playList;
   private int playListIndex;

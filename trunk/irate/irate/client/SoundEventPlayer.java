@@ -4,20 +4,17 @@ import java.io.*;
 
 /**
  * Date Created: Feb 6, 2004
- * Date Updated: $Date: 2004/02/17 21:11:06 $
+ * Date Updated: $Date: 2004/05/31 04:38:42 $
  * @author Creator: Mathieu Mallet
- * @author Updated: $Author: emh_mark3 $
- * @version $Revision: 1.1 $ */
+ * @author Updated: $Author: eythian $
+ * @version $Revision: 1.2 $ */
 
 public class SoundEventPlayer {
-  private Thread m_thread = null;
-  private boolean bFirstRun = true;
   private Player player;
   private PlayerList playerList;
   private PlayListManager playListManager;
   
   public SoundEventPlayer(PlayListManager playListManager) {
-    bFirstRun = true;
     this.playListManager = playListManager;
     this.playerList = new PlayerList();
   }

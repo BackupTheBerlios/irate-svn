@@ -513,7 +513,7 @@ public class MD5 {
 	 *
 	 * @since ostermillerutils 1.00.00
 	 */
-	private class MD5State {
+	private static class MD5State {
 
 		/**
 		 * True if this state is valid.

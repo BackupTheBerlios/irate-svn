@@ -76,6 +76,7 @@ public class PluginManager
   {
     FileInputStream fis = new FileInputStream(getConfigFile());
     loadConfig(new FileInputStream(getConfigFile()));
+    fis.close();
   }
 
   private void loadConfig(InputStream is)

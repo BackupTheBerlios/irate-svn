@@ -16,14 +16,13 @@ import irate.plugin.externalcontrol.ExternalControlPlugin;
  * SWT version of the configurator for the external control plugin
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/09/21 11:59:03 $$
+ * Date Updated: $$Date: 2004/05/31 04:38:45 $$
  * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.5 $$
+ * @version $$Revision: 1.6 $$
  */
 public class ExternalControlConfigurator {
   private Display display;
-  private PluginApplication app;
   private PluginManager pluginManager;
   private ExternalControlPlugin plugin;
   private boolean done = false;
@@ -36,7 +35,6 @@ public class ExternalControlConfigurator {
   public ExternalControlConfigurator(Display display_, PluginApplication app_, Plugin plugin_)
   {
     this.display = display_;
-    this.app = app_;
     this.plugin = (ExternalControlPlugin) plugin_;
 
     final Shell shell = new Shell(display);

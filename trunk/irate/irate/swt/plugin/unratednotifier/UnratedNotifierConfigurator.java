@@ -9,14 +9,13 @@ import irate.plugin.unratednotifier.*;
 
 /**
  * Date Created: Feb 13, 2004
- * Date Updated: $Date: 2004/02/22 19:45:22 $
+ * Date Updated: $Date: 2004/05/31 04:38:45 $
  * @author Creator: Mathieu Mallet
- * @author Updated: $Author: emh_mark3 $
- * @version $Revision: 1.2 $ */
+ * @author Updated: $Author: eythian $
+ * @version $Revision: 1.3 $ */
 
 public class UnratedNotifierConfigurator {
   private Display display;
-  private PluginApplication app;
   private PluginManager pluginManager;
   private UnratedNotifierPlugin plugin;
   private boolean done = false;
@@ -25,7 +24,6 @@ public class UnratedNotifierConfigurator {
   public UnratedNotifierConfigurator(Display display_, PluginApplication app_, Plugin plugin_)
   {
     this.display = display_;
-    this.app = app_;
     this.plugin = (UnratedNotifierPlugin) plugin_;
 
     final Shell shell = new Shell(display);

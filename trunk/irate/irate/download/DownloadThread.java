@@ -19,7 +19,8 @@ import java.util.zip.GZIPOutputStream;
 
 public class DownloadThread extends Thread {
 
-  private final String LOCALE_RESOURCE_LOCATION = "irate.download.locale";
+  private static final String LOCALE_RESOURCE_LOCATION = 
+    "irate.download.locale";
   private Vector updateListeners = new Vector();
   private TrackDatabase trackDatabase;
   private File downloadDir;
@@ -29,7 +30,8 @@ public class DownloadThread extends Thread {
   private boolean continuous;
   private int contactCount = 0;
   private Vector downloadListeners = new Vector();
-  ExponentialBackoffManager exponentialBackoffManager = new ExponentialBackoffManager();
+  ExponentialBackoffManager exponentialBackoffManager = 
+    new ExponentialBackoffManager();
     
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
@@ -502,7 +504,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
     return BaseResources.getString(LOCALE_RESOURCE_LOCATION, key); 
   }
 
-  private class TrackDownloader extends Thread{
+  private static class TrackDownloader extends Thread{
     private Track track;
     private DownloadThread dt;
     

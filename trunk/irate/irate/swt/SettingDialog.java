@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/03/16 23:35:03 $
+ * Date Updated: $Date: 2004/05/31 04:38:45 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.22 $
+ * @version $Revision: 1.23 $
  */
 public class SettingDialog
 {
@@ -256,17 +256,21 @@ public class SettingDialog
   }
  
   class BrowserButton {
-    String description; // Button label
     String command;     // Command it generates
-    String tooltip;     // Tooltip for this option
     Button button;
     
+    /**
+     * Creates a button to specify a program (in this case browser) to
+     * be launched.
+     *
+     * @param d brief description of this option
+     * @param c the command to run
+     * @param t the tooltip text for this button
+     */
     public BrowserButton(String d, String c, String t) {
-      description = d;
       command = c;
-      tooltip = t;
       button = new Button(comp, SWT.RADIO);
-      button.setText(description);
+      button.setText(d);
       button.setToolTipText(t);
     }
 

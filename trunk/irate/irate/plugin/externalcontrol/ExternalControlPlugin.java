@@ -13,10 +13,10 @@ import nanoxml.*;
  * network socket.
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2003/11/29 05:46:54 $$
+ * Date Updated: $$Date: 2004/05/31 04:38:44 $$
  * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.13 $$
+ * @version $$Revision: 1.14 $$
  */
 
 public class ExternalControlPlugin 
@@ -259,7 +259,9 @@ public class ExternalControlPlugin
       terminating = true;
       try {
         socket.close();
-      } catch (IOException e) {}
+      } catch (IOException e) {
+        System.err.println("ExternalControlPlugin: Error closing socket.");
+      }
     } // prepareToDie()
 
   } // class IOThread

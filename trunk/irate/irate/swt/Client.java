@@ -52,7 +52,7 @@ public class Client extends AbstractClient {
   private Scale volumeScale;
 //  private TrackProgressBar songProgressBar;
 
-  private SkinManager.SkinItem pauseSkin;
+//  private SkinManager.SkinItem pauseSkin;
   private ThreeModeButton play;
   private ThreeModeButton previous;
   private Track previousTrack;
@@ -261,8 +261,8 @@ public class Client extends AbstractClient {
     Track track = playThread.getCurrentTrack();
     if (track == null)
       return;
-    shell.setText(
-      (track == null ? "" : track.toString() + " - ") + Resources.getString("titlebar.program_name"));
+    shell.setText(track.toString() + " - " + 
+      Resources.getString("titlebar.program_name"));
     trackLabel.setText(Resources.getString("title.now_playing") + " " + track.getArtist() + " / " + track.getTitle());
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
@@ -310,7 +310,7 @@ public class Client extends AbstractClient {
    */
   public void setPaused(boolean paused) {
     super.setPaused(paused);
-    final Boolean pausedFinal = new Boolean(paused);
+    final Boolean pausedFinal = Boolean.valueOf(paused);
 
     // We have to delegate to the SWT event thread, because we might be
     // called from a thread other than it, such as the remote control thread.
@@ -1111,7 +1111,7 @@ public class Client extends AbstractClient {
     });
   }
 
-  private class RatingFunction {
+  private static class RatingFunction {
     
     private int value;
     private String name;

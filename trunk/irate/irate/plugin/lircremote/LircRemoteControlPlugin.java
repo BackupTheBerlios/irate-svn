@@ -135,7 +135,6 @@ public class LircRemoteControlPlugin
   private Object timer = new Object();
   private IOThread ioThread;
   private Socket s;
-  private BufferedReader r;
 
   /**
    * Subclasses to override to do real work of attaching.
@@ -211,7 +210,7 @@ public class LircRemoteControlPlugin
     }
   }
 
-  public String getHost()
+  public synchronized String getHost()
   {
     return host;
   }
@@ -221,13 +220,13 @@ public class LircRemoteControlPlugin
     if (!this.host.equals(host)) {
       this.host = host;
       if (isConnected()) {
-	disconnect();
-	connect();
+        disconnect();
+        connect();
       }
     }
   }
 
-  public int getPort()
+  public synchronized int getPort()
   {
     return port;
   }
@@ -289,14 +288,16 @@ public class LircRemoteControlPlugin
 	    }
 	    finally {
 	      if (!terminating) {
-		connectStatus = false;
-		notifyConnectStatusChanged();
-              }
+            connectStatus = false;
+            notifyConnectStatusChanged();
+          }
 	      try {r.close();} catch (IOException e) {}
 	    }
 	  }
 	  finally {
-	    try {s.close();} catch (IOException e) {}
+	    try {s.close();} catch (IOException e) {
+          // Ignoring this.
+        }
 	    s = null;
 	  }
 	}

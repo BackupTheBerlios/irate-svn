@@ -15,10 +15,10 @@ import nanoxml.*;
  *  connections can be handled by different instances.
  *
  * Date Created: 20/9/2003
- * Date Updated: $$Date: 2003/09/21 14:34:04 $$
+ * Date Updated: $$Date: 2004/05/31 04:38:44 $$
  * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
  * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.3 $$
+ * @version $$Revision: 1.4 $$
  */
 
 public class ExternalControlCommunicator
@@ -63,7 +63,10 @@ public class ExternalControlCommunicator
     makeContact();
     try {
       sock.close();
-    } catch (IOException e) {}
+    } catch (IOException e) {
+      System.err.println("ExternalControlCommunicator: Error closing socket. "+
+                         "Shouldn't be a problem.");
+    }
     instanceCount--;
   }
 
@@ -92,7 +95,9 @@ public class ExternalControlCommunicator
         try {
           in.close();
           out.close();
-        } catch (IOException e) {}
+        } catch (IOException e) {
+          System.err.println("ExternalControlCommunicator: error closing socket");
+        }
         return;
       }
     }
@@ -182,7 +187,9 @@ public class ExternalControlCommunicator
     try {
       in.close();
       out.close();
-    } catch (IOException e) {}
+    } catch (IOException e) {
+      // Don't really care if closing fails
+    }
   } // makeContact(InputStream in, OutputStream out)
 
   /**

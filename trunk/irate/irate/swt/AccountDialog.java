@@ -22,10 +22,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/02/17 21:11:07 $
+ * Date Updated: $Date: 2004/05/31 04:38:45 $
  * @author Creator:	taras
- * @author Updated:	$Author: emh_mark3 $
- * @version $Revision: 1.25 $
+ * @author Updated:	$Author: eythian $
+ * @version $Revision: 1.26 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -40,7 +40,6 @@ public class AccountDialog {
   private Text txtServer;
   private Text txtPort;
   private Text txtDirectory;
-  private Button buttonDirectorySelect;
   private Display display;
   private Label lblStatus;
   private Button btnAccept;

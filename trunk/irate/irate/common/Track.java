@@ -143,7 +143,7 @@ public class Track implements TrackDetails {
     return !Float.isNaN(getRawRating()) && (getRawRating() >= 0);
   }
 
-  public float getRating() {
+  public synchronized float getRating() {
     return getRating(DEFAULT_RATING);
   }
 

@@ -12,7 +12,6 @@ import MAD.MadPlayer;
 
 public class LibMadPlayer extends AbstractPlayer implements MadListener {
 
-  Thread playing_Thread;
   MadPlayer player;
   File currentFile;
   private int cachedVolume;

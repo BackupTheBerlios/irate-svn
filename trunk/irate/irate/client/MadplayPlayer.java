@@ -81,6 +81,8 @@ public class MadplayPlayer extends ExternalPlayer {
               out.flush();
             }
           } 
+          in.close();
+          out.close();
         } 
         catch (IOException ioe) {
           //ioe.printStackTrace();

@@ -83,6 +83,6 @@ public class TrackProgressBar extends Composite {
   {
     int minutes = (int) (playTime / 60L);
     int seconds = (int) ((playTime - 60*minutes));
-    return new String(format00(minutes)+":"+format00(seconds));
+    return format00(minutes)+":"+format00(seconds);
   }
 }
