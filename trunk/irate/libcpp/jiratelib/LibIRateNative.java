@@ -161,14 +161,18 @@ public class LibIRateNative implements irate.download.DownloadListener {
 		track.setRating(rating);
 		
 		// Save the database with the updated rating
-		try {
-			trackDatabase.save();
-		}
-		catch (Exception e) {
-			e.printStackTrace();
-		}
-		updateTrack(track);
-		this.downloadThread.checkAutoDownload();
+		new Thread(new Runnable(){
+			public void run(){
+				try {
+					trackDatabase.save();
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+				updateTrack(track);
+				LibIRateNative.this.downloadThread.checkAutoDownload();
+			}
+		}).start();
 	}
 	public void undoLastRating() {
 		
