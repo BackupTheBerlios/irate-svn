@@ -200,6 +200,7 @@ resource_irate_client_*.o:
 	./build-help
 
 setup.exe: $(IRATE_CLIENT)
+	upx irate-client.exe
 	iscc irate-client.iss
 	mv Output/setup.exe .
 
