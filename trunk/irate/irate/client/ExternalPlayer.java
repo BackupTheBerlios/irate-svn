@@ -8,13 +8,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-public class ExternalPlayer extends AbstractPlayer {
+public abstract class ExternalPlayer extends AbstractPlayer {
 
   /** Fudge factor (in ms) that we add to the playing time when restarting 
    * a track.  Compensates for time spent starting and stopping the player. */
   private static final long TIME_PLAYED_FUDGE_FACTOR_MS = 150;
 
-  private String name;
   private String path;
   private boolean playing = false;
   private boolean paused;
@@ -33,15 +32,14 @@ public class ExternalPlayer extends AbstractPlayer {
    * invoked an external player process.  */
   private boolean stateDirty = true;
 
-  public ExternalPlayer(String name, String path) throws FileNotFoundException {
-    this(name, new String[] { path });
+  public ExternalPlayer(String path) throws FileNotFoundException {
+    this(new String[] { path });
   }
 
   /**
   @param name of the mp3 player. Used for display purposes
   @param paths list of possible locations/names of the player. paths[0] should be the executable name */
-  public ExternalPlayer(String name, String[] paths) throws FileNotFoundException {
-    this.name = name;
+  public ExternalPlayer(String[] paths) throws FileNotFoundException {
     for (int i = 0; i < paths.length; i++) {
       if (new File(paths[i]).exists()) {
         this.path = paths[i];
@@ -67,10 +65,6 @@ public class ExternalPlayer extends AbstractPlayer {
       msg.append(paths[i]);
     }
     throw new FileNotFoundException(msg.toString());
-  }
-
-  public String getName() {
-    return name;
   }
 
   /** Notify the player thread (if it exists) of any state changes. */

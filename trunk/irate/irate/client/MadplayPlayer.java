@@ -11,15 +11,16 @@ import java.io.*;
 
 public class MadplayPlayer extends ExternalPlayer {
 
-  private boolean bAcquireNewTrackLength = true;
+  private boolean acquireNewTrackLength = true;
   private int trackLength = 0;
 
   public MadplayPlayer()
-    throws FileNotFoundException
+      throws FileNotFoundException
   {
-    super("madplay", new String[] { "madplay", "madplay.exe" });
+    super(new String[] { "madplay", "madplay.exe" });
   }
 
+  
   private String format00(int number)
   {
     if (number < 10)
@@ -54,7 +55,7 @@ public class MadplayPlayer extends ExternalPlayer {
    * New file is being played -- reset track lenght
    */
   public void play(File file) throws PlayerException {
-    bAcquireNewTrackLength = true;
+    acquireNewTrackLength = true;
     super.play(file);
   }
   
@@ -110,11 +111,11 @@ public class MadplayPlayer extends ExternalPlayer {
       
       time = hours * 3600 + minutes * 60 + seconds;
       
-      if (bAcquireNewTrackLength) {
+      if (acquireNewTrackLength) {
         // if a new track started, use the first event we get from the player to calculate
         // the lenght of the track
         trackLength = time;
-        bAcquireNewTrackLength = false;
+        acquireNewTrackLength = false;
       }
       
       notifyPosition(trackLength - time, trackLength);
@@ -152,4 +153,8 @@ public class MadplayPlayer extends ExternalPlayer {
     return -1;
   }
    
+  public String getName() {
+    return "madplay";
+  }
+
 }

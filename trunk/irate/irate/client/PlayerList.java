@@ -28,6 +28,14 @@ public class PlayerList {
     }
     
     try {
+      players.add(Class.forName("irate.client.MadplayEsdPlayer").newInstance());
+      //players.add(new MadplayPlayer());
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    try {
       players.add(Class.forName("irate.client.StreamPlayer").newInstance());
     }
     catch (Exception e) {
