@@ -97,8 +97,11 @@ public class TrackDatabase {
     Enumeration enum = docElt.enumerateChildren();
     while(enum.hasMoreElements())
     {
-      return (XMLElement) enum.nextElement();
-    }
+      XMLElement elt = (XMLElement) enum.nextElement();
+      if(elt.getName().equals(eltName))
+        return elt;
+      }
+    
     return null;
     /*NodeList nodeList = docElt.getElementsByTagName(eltName);
 	  
@@ -114,9 +117,12 @@ public class TrackDatabase {
     XMLElement elt = getElement(name);
     if (elt == null)
       return "";
+
     String att = elt.getStringAttribute(attName);
-    if (att == null)
+    if (att == null){
+      System.out.println("Can't find attribute "+name+"."+attName+" = "+elt);
       return "";
+    }
     return att;
   }
 
