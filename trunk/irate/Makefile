@@ -30,7 +30,7 @@ JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CL
 #requist icon compilation if not gcj 3.0.4
 #set in make.configure
 ifndef NO_RESOURCE
-CLIENT_LIBS += irate-icon.o
+CLIENT_DEPS += irate-icon.o
 endif
 
 ifeq ($(PLATFORM),win32)
