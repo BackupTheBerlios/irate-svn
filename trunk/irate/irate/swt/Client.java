@@ -2,6 +2,7 @@ package irate.swt;
 
 import irate.common.TrackDatabase;
 import irate.common.Track;
+import irate.common.UpdateListener;
 import irate.client.*;
 import irate.download.DownloadThread;
 
@@ -15,7 +16,7 @@ import java.util.*;
 import java.net.*;
 
 
-public class Client implements UpdateListener{
+public class Client implements UpdateListener {
   static Label lblTitle;
   static Label lblState;
   static Table tblSongs;
