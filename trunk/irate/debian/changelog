@@ -1,3 +1,9 @@
+irate (0.3-1) unstable; urgency=low
+
+  * Created new stable release.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Wed,  4 Feb 2004 08:01:04 +0800
+
 irate (0.3-0pre13) unstable; urgency=low
 
   * Added German translation.
