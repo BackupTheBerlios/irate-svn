@@ -20,6 +20,9 @@ public class MasterDatabase extends ServerDatabase {
 
     /** The number of peer tracks to download before switching to random. */
   private final int peerThreshhold = 14;
+
+    /** The number of times it will pick a user in order to get a random track. */
+  private final int peerRetries = 10;
   
   private UserList userList;
   private Random random = new Random();
@@ -90,13 +93,16 @@ public class MasterDatabase extends ServerDatabase {
 
       // Correlate tracks for new users
     if (reply.getNoOfTracks() == 0 && user.getNoOfTracks() < peerThreshhold) {
-      ServerDatabase peer = userList.randomUser(random, user);
-      if (peer != null) {
-        System.out.println("Peer: " + peer.getUserName());
-        Track track = peer.chooseTrack(random);
-        if (track != null) {
-          System.out.println("Initial: " + track.getName() + " " + track.getRating());
-          reply.add(track);
+      for (int i = 0; i < peerRetries; i++) {
+        ServerDatabase peer = userList.randomUser(random, user);
+        if (peer != null) {
+          System.out.println("Peer: " + peer.getUserName());
+          Track track = peer.chooseTrack(random);
+          if (track != null) {
+            System.out.println("Peer track: " + track.getName() + " " + track.getRating());
+            reply.add(track);
+            break;
+          }
         }
       }
     }
