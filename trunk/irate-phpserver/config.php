@@ -4,7 +4,7 @@
 // PeerMajor.org
 
 
- //database connection
+ //database connection : driver:://user:password@host/databasename
 $cfg["dsn"]="mysql://root:@localhost/irate";
 
 

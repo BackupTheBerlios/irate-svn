@@ -1,68 +1,34 @@
-iRATE server v0.1
+iRATE PHP server v0.1
 GPL licensed
 PeerMajor.org
 
 
+Intro
+-----
+
+This is an iRATE server written in PHP.
+
+It implements a new HTTP protocol for iRATE, as well as new
+SQL backend.
 
 
-INSTALL
+
+Installation
+------------
+
+You basically need an Apache+PHP server, and some SQL database.
+
+Currently, we only tested it with MySQL, but it should work
+with other databases as well.
+
+You need to create a database, and import the database scheme in 
+the file setup.sql
+
+Then edit config.php
+
+Then log in as admin to create the admin account.
 
 
-outdated !!
-
-Database :
-
-CREATE TABLE `users` (
-  `id` int(12) NOT NULL default '0',
-  `user` varchar(32) NOT NULL default '',
-  `pass` varchar(32) NOT NULL default '',
-  `dateinscr` datetime NOT NULL default '0000-00-00 00:00:00',
-  `datelastlogin` datetime NOT NULL default '0000-00-00 00:00:00',
-  `ipinscr` varchar(15) NOT NULL default '',
-  PRIMARY KEY  (`id`)
-) TYPE=MyISAM;
-
-CREATE TABLE `tracks` (
-  `artistname` varchar(64) NOT NULL default '',
-  `trackname` varchar(64) NOT NULL default '',
-  `license` varchar(128) NOT NULL default '',
-  `albumname` varchar(64) NOT NULL default '',
-  `pubdate` date NOT NULL default '0000-00-00',
-  `id` int(16) NOT NULL default '0',
-  `duration` int(4) NOT NULL default '0',
-  `adddate` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`id`)
-) TYPE=MyISAM;
-
-CREATE TABLE `distributions` (
-  `trackid` int(16) NOT NULL default '0',
-  `id` varchar(40) NOT NULL default '',
-  `codec` varchar(16) NOT NULL default '',
-  `averagebitrate` int(4) NOT NULL default '0',
-  `crediturl` varchar(128) NOT NULL default '',
-  `adddate` date NOT NULL default '0000-00-00'
-) TYPE=MyISAM;
-
-CREATE TABLE `ratings` (
-  `id` int(12) NOT NULL default '0',
-  `trackid` int(12) NOT NULL default '0',
-  `userid` int(12) NOT NULL default '0',
-  `rating` int(2) NOT NULL default '0',
-  `ratingdate` datetime NOT NULL default '0000-00-00 00:00:00',
-  `ratingnum` int(4) NOT NULL default '0'
-) TYPE=MyISAM;
-    
-CREATE TABLE `sources` (
-  `id` int(12) NOT NULL default '0',
-  `distribid` int(12) NOT NULL default '0',
-  `trackid` int(16) NOT NULL default '0',
-  `protocol` varchar(32) NOT NULL default '',
-  `link` varchar(128) NOT NULL default '',
-  `crediturl` varchar(64) NOT NULL default '',
-  `adddate` date NOT NULL default '0000-00-00',
-  PRIMARY KEY  (`id`)
-) TYPE=MyISAM;
-  
 
 !! Draft of the new HTTP iRATE protocol
 
