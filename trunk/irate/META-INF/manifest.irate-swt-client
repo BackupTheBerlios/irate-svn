@@ -1,3 +1,3 @@
-Manifest-Version: 0.1
+Manifest-Version: 1.0
 Main-Class: irate.swt.Client
 Class-Path: lib/nanoxml-lite-2.2.3.jar lib/jl020.jar lib/swt.jar lib/HTTPClient.jar
