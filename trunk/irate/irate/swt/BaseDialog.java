@@ -68,13 +68,22 @@ public class BaseDialog extends Shell {
     setLocation(x, y);
   }
 
+  public void dispose() {
+    if (image != null)
+      image.dispose();
+    super.dispose();
+  }
+
   private Composite buttonsComposite;
+
+  private Image image;
 
   private void setImage(Display display) {
     try {
       InputStream stream = BaseResources.getResourceAsStream("icon.gif");
       ImageData imageData = new ImageData(stream); 
-      setImage(new Image(display, imageData));
+      image = new Image(display, imageData);
+      setImage(image);
     }
     catch (Exception e) {
       e.printStackTrace();
