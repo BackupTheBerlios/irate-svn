@@ -309,15 +309,25 @@ public class Client implements UpdateListener {
 	mDownload.setMenu(menu2);
 	
 	int counts[] = new int[] {0, 5, 11, 17, 23, 29};
+	int autoDownload = trackDatabase.getAutoDownload(); 
 	for(int i=0;i< counts.length;i++){
         MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
 		final int count = counts[i];
 		mTimes.setText(i==0?"Disabled":"Every " + count + " times" );
+		mTimes.setSelection(count == autoDownload);
 		mTimes.addSelectionListener(new SelectionAdapter(){
 		public void widgetSelected(SelectionEvent e){
+			//stupid trick to make self the only selected item
+			MenuItem self = (MenuItem)e.getSource();
+			Menu parent = self.getParent();
+			MenuItem items[] = parent.getItems();
+			for(int i = 0;i< parent.getItemCount();i++)
+				parent.getItem(i).setSelection(false);
+			self.setSelection(true);
+			
 			trackDatabase.setAutoDownload(count);
 			downloadThread.checkAutoDownload();
-			}
+		}
 		});
 	}
     
@@ -380,15 +390,8 @@ public class Client implements UpdateListener {
     gridData.horizontalSpan = 2;
     tblSongs.setLayoutData(gridData);
     tblSongs.pack();
-  /*  new Button(shell, SWT.PUSH).setText("This sux");
-    new Button(shell, SWT.PUSH).setText("Yawn");
-    new Button(shell, SWT.PUSH).setText("Not bad");
-    new Button(shell, SWT.PUSH).setText("Cool");
-    new Button(shell, SWT.PUSH).setText("Love it");
-    new Button(shell, SWT.PUSH).setText("||");
-    new Button(shell, SWT.PUSH).setText(">>");
-   */ 
-    ToolBar toolbar = new ToolBar(shell,SWT.FLAT);
+  
+	ToolBar toolbar = new ToolBar(shell,SWT.FLAT);
     ToolItem item;
     item = new ToolItem(toolbar,SWT.PUSH);
     item.setText("This sux");
