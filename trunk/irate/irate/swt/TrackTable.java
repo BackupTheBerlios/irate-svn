@@ -21,6 +21,8 @@ import org.eclipse.swt.dnd.FileTransfer;
 import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
@@ -298,12 +300,23 @@ public class TrackTable {
         /* We need to generate an image for the text */
         GC gc = new GC(table);      
         Point size = gc.stringExtent(state);
-        gc.dispose();
+        Font font = gc.getFont();
 
         int x = 80;
         int y = 20;
+        if(size.x > x) {
+          // Shrink to fit! The downloading messages
+          // are too big on Mac OS X at least.
+          FontData fd = gc.getFont().getFontData()[0];
+          font = new Font(display, fd.name, (int)(fd.height * x / size.x), fd.style);
+          gc.setFont(font);
+          size = gc.stringExtent(state);
+        }
+        gc.dispose();
+
         image = new Image(display, x, y);     
         gc = new GC(image);
+        gc.setFont(font);
         gc.drawText(state, (x - size.x) / 2, (y - size.y) / 2, true);
         gc.dispose();
       }
