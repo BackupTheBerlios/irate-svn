@@ -277,16 +277,6 @@ public class TrackDatabase {
     return (int)Math.ceil(((double)playListLength) * (((double)unratedPlayListRatio) / 100.0));
   }
   
-  public boolean isRoboJockEnabled() {
-    String s = getAttribute("RoboJock", "enabled").toLowerCase();
-    if (s.equals("true") || s.equals("yes"))
-      return true;
-    return false;
-  }
-
-  public void setRoboJockEnabled(boolean enabled) {
-    setAttribute("RoboJock", "enabled", enabled ? "yes" : "no");
-  }
 
   public void setFile(File file) {
     this.file = file;
