@@ -32,7 +32,7 @@ public abstract class AbstractClient
   private int lastTrackPreviousRank;
 
   public AbstractClient() {
-
+		init();
     userPreferences = new Preferences();
 
     lastRatedTrack = null;
@@ -110,13 +110,19 @@ public abstract class AbstractClient
       }
     });
 
-    // If a track database couldn't be loaded from the file system, then we
+    System.out.println("Number of tracks "+trackDatabase.getNoOfTracks() );
+		// If a track database couldn't be loaded from the file system, then we
     // need to create a new account.
     if (trackDatabase.getNoOfTracks() == 0) {
       createNewAccount();
     }
 
   }
+	
+	/** Called from AbstractClient's constructor so we can intialize 
+	the gui in a sensible way. Needed for stuff like errors before 
+	main gui is up*/
+	public abstract void init();
 
   /**
    * PluginApplication interface:

@@ -69,26 +69,21 @@ public class Client extends AbstractClient {
     new RatingFunction(10, "button.love_it")
   };
   
-  public static void main(String[] args) throws Exception {
-    Client client = new Client();
-    if (args.length == 2) {
-      if (args[0].equals("--skin"))
-        client.skinManager.applySkin(new ZipFile(new File(args[1])));
-    }
-    client.run();
-  }
   
   public Client() {
     
-    if(display == null) {
-      display = new Display();
-    }
-    
     initGUI();
-    errorDialog = new ErrorDialog(display, shell);
     aboutDialog = new AboutDialog(display, shell);
+    errorDialog.setParent(shell);
 		uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
     createDropTarget();
+  }
+  
+  /** Init gui. Called from constructor */
+  public void init() {
+    display = new Display();
+    //need this baby to report problems :)
+    errorDialog = new ErrorDialog(display, null);
   }
   
   public void run() {
@@ -135,6 +130,7 @@ public class Client extends AbstractClient {
     }
     if(display != null) {
       final Reader finalReader = r;
+      
       display.asyncExec(new Runnable() {
         public void run() {
           errorDialog.show(finalReader);
@@ -159,6 +155,10 @@ public class Client extends AbstractClient {
   /** This sets the statusbar */
   public void setState(String state) {
     strState = state;
+    if(shell == null) {
+      System.out.println("setState("+state+")");
+      return;
+    }
     display.asyncExec(new Runnable() {
       public void run() {
         int n = downloadThread.getPercentComplete();
@@ -290,7 +290,6 @@ public class Client extends AbstractClient {
   }
 
   void showAccountDialog() {
-    display = new Display();
     strState = "";
     new AccountDialog(display, trackDatabase, downloadThread);
   }
@@ -302,6 +301,7 @@ public class Client extends AbstractClient {
       parent.getItem(i).setSelection(false);
   }
 
+  /** Create the main iRATE window */
   void initGUI() {
     createShell();
     createMenu();
@@ -915,5 +915,14 @@ public class Client extends AbstractClient {
   protected void createNewAccount() {
     showAccountDialog();
   }
-  
+
+  public static void main(String[] args) throws Exception {
+    Client client = new Client();
+    if (args.length == 2) {
+      if (args[0].equals("--skin"))
+        client.skinManager.applySkin(new ZipFile(new File(args[1])));
+    }
+    client.run();
+  }
+    
 }

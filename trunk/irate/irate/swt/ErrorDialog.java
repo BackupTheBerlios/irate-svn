@@ -22,6 +22,7 @@ public class ErrorDialog {
     this.parent = parent;
   }
 
+  /** Display an error message */
   public void show(Reader r) {
     if (shell == null) {
       createShell();
@@ -30,13 +31,20 @@ public class ErrorDialog {
       shell.setSize(500, 300);
 //      shell.pack();
       Point size = shell.getSize();
-      Point ploc = parent.getLocation();
-      Point psize = parent.getSize();
+      if(parent != null) {
+        Point ploc = parent.getLocation();
+        Point psize = parent.getSize();
+      }
       //shell.setLocation(ploc.x + (psize.x - size.x) / 2, ploc.y + (psize.y - size.y) / 2);
 
         // Open the window and process the events.
       shell.open();
     }
+  }
+  
+  /** Sets the silly parent */
+  public void setParent(Shell parent) {
+    this.parent = parent;
   }
   
   private void createShell() {

@@ -19,10 +19,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/12/05 07:15:58 $
+ * Date Updated: $Date: 2004/01/06 01:34:09 $
  * @author Creator:	taras
- * @author Updated:	$Author: ajones $
- * @version $Revision: 1.16 $
+ * @author Updated:	$Author: tglek $
+ * @version $Revision: 1.17 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -38,6 +38,8 @@ public class AccountDialog {
   private Text txtPort;
   private Text txtDirectory;
   private Button buttonDirectorySelect;
+  private Display display;
+    
   /**
    * Creates a new AccountDialog class.
    * 
@@ -48,7 +50,7 @@ public class AccountDialog {
     this.shell = new Shell(display);
     this.trackDatabase = trackDatabase;
     this.downloadThread = downloadThread;
-
+    this.display = display;
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
         done = true;
@@ -163,51 +165,68 @@ public class AccountDialog {
  
   /** Create the OK button. */
   private void createAcceptButton() {
-    Button btnAccept = new Button(shell, SWT.NONE);
+    final Button btnAccept = new Button(shell, SWT.NONE);
     btnAccept.setText(getResourceString("AccountDialog.Button.OK"));  
   
     btnAccept.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
+        //do the gui bits
+        btnAccept.setEnabled(false);
         trackDatabase.setUserName(txtUser.getText());
         trackDatabase.setPassword(txtPassword.getText());
         trackDatabase.setHost(txtServer.getText());
         trackDatabase.setPort(Integer.parseInt(txtPort.getText()));
+        final String txtDirText = txtDirectory.getText();
         
-         // Check the current directory for an existing trackdatabase.xml for
-         // compatibility reasons only.
-         File dir = new File(".");  
-    
-         File file = new File(dir, "trackdatabase.xml");  
-         if (!file.exists()) {
-          dir = new File("/irate");  
-          file = new File(dir, "trackdatabase.xml");  
-          dir = new File(txtDirectory.getText(), "irate");  
+        new Thread(new Runnable(){
+          public void run() {
           
-          if (!dir.exists())
-            dir.mkdir();
           
-          file = new File(dir, "trackdatabase.xml");  
-          dir = new File(dir, "download");  
+           // Check the current directory for an existing trackdatabase.xml for
+           // compatibility reasons only.
+           File dir = new File(".");  
+      
+           File file = new File(dir, "trackdatabase.xml");  
+           if (!file.exists()) {
+            dir = new File("/irate");  
+            file = new File(dir, "trackdatabase.xml");  
+            dir = new File(txtDirText, "irate");  
+            
+            if (!dir.exists())
+              dir.mkdir();
+            
+            file = new File(dir, "trackdatabase.xml");  
+            dir = new File(dir, "download");  
+            
+            if(!dir.exists())
+              dir.mkdir();
+           }
+            
           
-          if(!dir.exists())
-            dir.mkdir();
-         }
+          try {
+            Preferences.savePreferenceToFile("downloadDir", file.toString());  
+          } catch (IOException ioe) {
+            ioe.printStackTrace();
+          }
+          trackDatabase.setFile(file);
+          trackDatabase.setDownloadDir(dir);
           
+          downloadThread.contactServer(trackDatabase);
+          //System.out.println("grrr");
+          if (trackDatabase.getNoOfTracks() != 0) {
+            done = true;
+            success = true;
+            trackDatabase.setAutoDownload(5);
+          }else {
+            display.asyncExec(new Runnable() {
+              public void run() {
+                btnAccept.setEnabled(true);
+              }
+            });
+          }
         
-        try {
-          Preferences.savePreferenceToFile("downloadDir", file.toString());  
-        } catch (IOException ioe) {
-          ioe.printStackTrace();
-        }
-        trackDatabase.setFile(file);
-        trackDatabase.setDownloadDir(dir);
-        
-        downloadThread.contactServer(trackDatabase);
-        if (trackDatabase.getNoOfTracks() != 0) {
-          done = true;
-          success = true;
-          trackDatabase.setAutoDownload(5);
-        }
+          }
+        }).start();
       }
     });
   }
