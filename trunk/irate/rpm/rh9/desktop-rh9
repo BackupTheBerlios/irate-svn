@@ -3,6 +3,7 @@ Encoding=UTF-8
 Name=iRATE Client
 Comment=Download and rate MP3
 Exec=irate-client-gtk
+Icon=irate-client-gtk.png
 Terminal=false
 Type=Application
 Categories=Application;AudioVideo;X-Red-Hat-Extra;

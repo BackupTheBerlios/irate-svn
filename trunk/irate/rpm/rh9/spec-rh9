@@ -1,7 +1,7 @@
 Name: irate-client-gtk
 Summary: The iRATE music database client
 Version: snapshot1
-Release: 20031006
+Release: 20031108
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
@@ -30,9 +30,13 @@ mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
 
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications/
 cp rpm/rh9/desktop-rh9 $RPM_BUILD_ROOT/usr/share/applications/irate-client-gtk.desktop
+
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
 cp debian/irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1
 ln -s irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1/irate-client-gtk.1
+
+mkdir -p $RPM_BUILD_ROOT/usr/share/pixmaps/
+cp irate/swt/irate.png $RPM_BUILD_ROOT/usr/share/pixmaps/irate-client-gtk.png
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -45,8 +49,12 @@ rm -rf $RPM_BUILD_DIR/irate
 /usr/lib
 /usr/share/applications
 /usr/share/man
+/usr/share/pixmaps
 
 %changelog
+* Sat Nov 08 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031108
+- Added icon
+
 * Mon Oct 06 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031006
 - Removed desktop entry as a separate source, since it is now in CVS
 
