@@ -82,12 +82,12 @@ public class DownloadThread extends Thread {
       currentTrack = tracks[i];
       if (!currentTrack.isHidden()) {
         File file = currentTrack.getFile();
-        if (file == null)
-          download(currentTrack);
-        else if (!file.exists()) {
-          currentTrack.unSetFile();
+        if (file == null || !file.exists()) {
           try {
-            trackDatabase.save();
+            if (file != null) {
+              currentTrack.unSetFile();
+              trackDatabase.save();
+            }
             download(currentTrack);
 
               // We've successfully downloaded a track.
