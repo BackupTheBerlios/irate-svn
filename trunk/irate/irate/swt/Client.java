@@ -117,9 +117,12 @@ public class Client implements UpdateListener {
             {
               lblState.setText(strState + " "+n +"%");
               progressBar.setSelection(n);
-            }else
+            }else 
+            {
               lblState.setText(strState);            
-			lblState.pack();
+              progressBar.setSelection(0);
+            }
+            lblState.pack();
           }
         });
       }
@@ -400,7 +403,7 @@ public class Client implements UpdateListener {
 
     
     lblTitle = new Label(shell, SWT.NONE);
-    lblTitle.setText("Current song goes here");
+//    lblTitle.setText("Current song goes here");
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.horizontalSpan = 2;
@@ -558,14 +561,13 @@ public class Client implements UpdateListener {
   
   public void run(){
     while (true) {
-    if (!display.readAndDispatch()) display.sleep();
+      if (!display.readAndDispatch()) display.sleep();
     }		
   }
   
   
   public static void main(String[] args) throws Exception{
-	
-	new Client().run();
+    new Client().run();
   }
 }
 

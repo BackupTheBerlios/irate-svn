@@ -22,8 +22,14 @@ all: lib irate-client irate-server
 
 lib:
 	$(MAKE) -C lib/
+
+lib/libswt.a:
+	$(MAKE) -C lib/ libswt.a
+
+lib/libnanoxml-lite.a:
+	$(MAKE) -C lib/ libnanoxml-lite.a
 	
-irate-client: $(CLIENT_DEPS) 
+irate-client: $(CLIENT_DEPS) $(CLIENT_LIBS)
 	gcj  $(CLIENT_DEPS) $(CLIENT_LIBS) -o irate-client --main=irate.swt.Client
 
 irate-server: $(SERVER_DEPS)

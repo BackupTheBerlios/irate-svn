@@ -1,5 +1,6 @@
 GCJ = gcj
 all: libswt.a libnanoxml-lite.a 
+export CLASSPATH=libswt-pi.jar
 
 #libswt.so:libswt.o
 #	gcj -shared -o libswt.so libswt.o
@@ -8,7 +9,8 @@ all: libswt.a libnanoxml-lite.a
 libswt.a:libswt.o 
 	ar -rcs libswt.a libswt.o
 libswt.o: swt.jar 
-	$(GCJ) -classpath swt-pi.jar -fjni -o libswt.o -march=i586 -mcpu=i586 -Os -pipe -c  swt.jar 
+	$(GCJ) -fjni -o libswt.o -march=i586 -mcpu=i586 -Os -pipe -c  swt.jar 
+#	$(GCJ) -classpath swt-pi.jar -fjni -o libswt.o -march=i586 -mcpu=i586 -Os -pipe -c  swt.jar 
 #libswt-pi.o: swt-pi.jar
 #	$(GCJ)  -fjni -o libswt-pi.o -march=i586 -mcpu=i586 -Os -pipe -c swt-pi.jar
 libnanoxml-lite.o: nanoxml-lite-2.2.3.jar
