@@ -20,6 +20,7 @@ public class PlayThread extends Thread {
   private boolean speaking;
   private boolean toKeepPlaying;
   Vector history = new Vector();
+  private boolean reverse = false;
 	
   public PlayThread(PlayListManager playListManager, PlayerList playerList) {
     this.playListManager = playListManager;
@@ -89,7 +90,15 @@ public class PlayThread extends Thread {
             }
           }
           if (toKeepPlaying) {
+            
             playFile(file, currentTrack.getVolume());
+            if(!reverse){
+              history.add(currentTrack);
+              //System.out.println("Added to history:"+currentTrack+" reverse="+reverse);
+            }else
+              this.reverse = false;
+            
+
             if (toKeepPlaying) {
               playListManager.getTrackDatabase().incNoOfPlays();
               currentTrack.incNoOfTimesPlayed();
@@ -121,14 +130,15 @@ public class PlayThread extends Thread {
     setPaused(false);
    
 		//record current track in history
-		if(reverse)
-			 if(hasHistory()) {
-				  nextTrack = (Track)history.elementAt(history.size()-1);
-				  history.removeElementAt(history.size()-1);
-			 }else
-				  return;
-		else
-				history.add(getCurrentTrack()); 
+		this.reverse = reverse;
+    if(reverse) {
+      if(hasHistory()) {
+        nextTrack = (Track)history.elementAt(history.size()-1);
+        history.removeElementAt(history.size()-1);
+      }
+      else
+        return;
+    }
       // Clear the toKeepPlaying flag to instruct the play thread to co-operatively stop.
     toKeepPlaying = false;
     if (player != null)

@@ -149,7 +149,6 @@ public class TrackDatabase {
 
     String att = elt.getStringAttribute(attName);
     if (att == null){
-      System.out.println("Can't find attribute "+name+"."+attName+" = "+elt);
       return "";
     }
     return att;
