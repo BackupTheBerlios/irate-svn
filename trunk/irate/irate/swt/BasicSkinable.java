@@ -35,7 +35,7 @@ public class BasicSkinable implements Skinable {
     images.put(key, imageData);    
   }
   
-  public void redraw() {
+  public void setImageUpdate(boolean state) {
   }
 
 }

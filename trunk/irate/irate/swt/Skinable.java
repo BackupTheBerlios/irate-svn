@@ -13,5 +13,5 @@ public interface Skinable {
   public void setText(String key, String text);
   public void setToolTipText(String key, String text);
   public void setImage(String key, ImageData imageData);
-  public void redraw();      
+  public void setImageUpdate(boolean state);      
 }

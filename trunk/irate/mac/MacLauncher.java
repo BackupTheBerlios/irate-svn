@@ -1,13 +1,13 @@
+package mac;
+
 // Quick ugly mac launcher; unzips the app bundle and executes it.
 // Java Web Start doesn't currently work directly with SWT apps on Mac OS X as
 // SWT needs a tweaked java launcher.
 //
 // (c) 2004 Brion Vibber, GPL blah blah
 
-import java.util.*;
 import java.io.*;
 import java.util.zip.*;
-import java.net.URL;
 
 public class MacLauncher {
   public static void main (String args[]) {

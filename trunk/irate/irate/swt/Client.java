@@ -67,7 +67,7 @@ public class Client extends AbstractClient {
   private TrackTable trackTable;
 
   private SWTPluginUIFactory uiFactory;
-  private SkinManager skinManager = new SkinManager();
+  private SkinManager skinManager;
   
   private RatingFunction[] ratingFunctions = new RatingFunction[] {
     new RatingFunction(0, "button.this_sux"),
@@ -225,7 +225,6 @@ public class Client extends AbstractClient {
         if (text == null)
           text = "";
         lblState.setText(text);
-        lblState.pack();
       }
     });
   }
@@ -354,6 +353,7 @@ public class Client extends AbstractClient {
   /** Create the main iRATE window */
   void initGUI() {
     createShell();
+    skinManager = new SkinManager(shell);
     createMenu();
     
     topPanel = new Composite(shell, SWT.FLAT);
@@ -422,6 +422,7 @@ public class Client extends AbstractClient {
         quit();
       }
     });
+    
     //probly should use filllayout..but i dont wanna figure it out
     //gridlayout is overkill for this
     GridLayout layout = new GridLayout(3, false);
@@ -1017,9 +1018,7 @@ public class Client extends AbstractClient {
     lblState = new AlphaLabel(bottomPanel, SWT.NONE);
     skinManager.add(lblState, "label.status");
 
-    GridData gridData = new GridData();
-    gridData.horizontalAlignment = GridData.BEGINNING;
-    gridData.grabExcessHorizontalSpace = true;
+    GridData gridData = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_BOTH);
     gridData.horizontalIndent = 5;
     lblState.setLayoutData(gridData);
   }
@@ -1067,7 +1066,6 @@ public class Client extends AbstractClient {
     }
     public void widgetArmed(ArmEvent e) {
       lblState.setText(str);
-      lblState.pack();
     }
   }
 

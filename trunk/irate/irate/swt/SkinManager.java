@@ -27,8 +27,11 @@ public class SkinManager {
   private TransparencyManager transparencyManager = new TransparencyManager();
 
   private static final String IMAGE_EXTENSION = ".png";
+  
+  private final Shell shell;
 
-  public SkinManager() {
+  public SkinManager(Shell shell) {
+    this.shell = shell;
   }
 
   public SkinItem add(Skinable button, String name) {
@@ -70,7 +73,7 @@ public class SkinManager {
           transparencyManager.associate(control, imageData);
       }
 
-      public void redraw() {
+      public void setImageUpdate(boolean state) {
       }
     }, name);
   }
@@ -99,8 +102,7 @@ public class SkinManager {
         }
       }
 
-      public void redraw() {
-          
+      public void setImageUpdate(boolean state) {          
       }
     }, name);
   }
@@ -151,7 +153,9 @@ public class SkinManager {
     } catch (IOException e) {
       e.printStackTrace();
     }
-    
+
+    shell.layout();
+
     for (Iterator itr = itemHash.values().iterator(); itr.hasNext();) {
       SkinItem skinItem = (SkinItem) itr.next();
       skinItem.post();
@@ -198,6 +202,7 @@ public class SkinManager {
     void pre() {
       for (Iterator itr = skinables.iterator(); itr.hasNext(); ) {
         Skinable skinable = (Skinable) itr.next();
+        skinable.setImageUpdate(false);
         applyText(skinable);
       }
       gotImage = false;
@@ -215,7 +220,7 @@ public class SkinManager {
       if (!gotImage) System.err.println("No image: " + name);
       for (Iterator itr = skinables.iterator(); itr.hasNext(); ) {
         Skinable skinable = (Skinable) itr.next();
-        skinable.redraw();
+        skinable.setImageUpdate(true);
       }
     }
   }
