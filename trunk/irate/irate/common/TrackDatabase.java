@@ -396,7 +396,7 @@ public class TrackDatabase {
         Track track = tracks[i];
           float rating = track.getRating();
 
-        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track))) 
+        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track)) && track.getFile() != null) 
           totalProb += getProbability(track);
 
         probs[i] = totalProb;
