@@ -1,5 +1,8 @@
 package irate.swt;
 
+import irate.common.Track;
+import irate.plugin.PluginApplication;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Menu;
