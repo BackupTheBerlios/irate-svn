@@ -17,8 +17,9 @@ public class UserList {
     for (int i = 0; i < files.length; i++)
       if (files[i].getName().toLowerCase().endsWith(".xml")) 
         try {
-          users.add(new ServerDatabase(files[i]));
-          System.out.println("  " + files[i]);
+          ServerDatabase user = new ServerDatabase(files[i]);
+          users.add(user);
+          System.out.println("  " + user.getUserName() + " " + user.getNoOfTracks());
         }
         catch (IOException e) {
           e.printStackTrace();

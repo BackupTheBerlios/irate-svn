@@ -32,7 +32,6 @@ Section "iRATE radio"
   File "xercesImpl.jar"  
   File "xmlParserAPIs.jar"
 ;  File "madplay.exe"
-  Delete "$INSTDIR\madplay.exe"
   
   CreateDirectory "$SMPROGRAMS\iRATE radio"
   CreateShortCut "$SMPROGRAMS\iRate radio\iRATE radio.lnk" "$INSTDIR\irate-client.jar" ""
