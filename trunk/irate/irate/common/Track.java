@@ -45,7 +45,6 @@ public class Track implements TrackDetails {
     setArtist(track.getArtist());
     setRating(track.getRawRating());
     setWeight(track.getWeight());
-    setDeleted(track.getDeleted());
 //    System.out.println(elt);
 //    setWebURL(track.getWebURL());
     // copy other attributes
@@ -77,7 +76,6 @@ public class Track implements TrackDetails {
 
   }
   
-
   public void setTrackDatabase(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
   }
@@ -158,8 +156,8 @@ public class Track implements TrackDetails {
     return defaultRating;
   }
 
-  public synchronized void erase() {
-    if (!isErased()) {
+  public synchronized void delete() {
+    if (!isDeleted()) {
       File f = getFile();
       if (f != null && f.exists()) {
         try {
@@ -168,16 +166,12 @@ public class Track implements TrackDetails {
         catch (Exception e) {
           e.printStackTrace();
         }
-        setFileState("erased");
+        setFileState("deleted");
         elt.setAttribute("file", "");
       }
     }
   }
   
-  public boolean isErased() {
-    return getFileState().equals("erased");
-  }
-
   public synchronized int getNoOfTimesPlayed() {
     try {
       String s = elt.getStringAttribute("played");
@@ -316,12 +310,7 @@ public class Track implements TrackDetails {
   }
 
   public synchronized boolean isBroken() {
-    if (getFileState().equals("broken"))
-      return true;
-
-      // This part is for backwards compatibility
-    String s = elt.getStringAttribute("broken");
-    return s != null && (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true"));
+    return getFileState().equals("broken");
   }
 
   /**
@@ -334,7 +323,11 @@ public class Track implements TrackDetails {
   }
 
   public boolean isDeleted() {
-      return isRated() && this.getDeleted().equals("true");
+      return isRated() && getState().equals("deleted");
+  }
+  
+  public boolean isActive() {
+    return !(isHidden() || isMissing() || isNotDownloaded());
   }
   
   /**
@@ -389,17 +382,6 @@ public class Track implements TrackDetails {
     elt.setAttribute("title", title);
   }
   
-  public synchronized void setDeleted(String trueOrFalse) {
-      elt.setAttribute("deleted", trueOrFalse);
-  }
-  
-  public synchronized String getDeleted() {
-      String deleted = elt.getStringAttribute("deleted");
-      if (deleted == null)
-        return "false";
-      return deleted;
-    }
-
   public synchronized String getTitle() {
     String title = elt.getStringAttribute("title");
     if (title == null)

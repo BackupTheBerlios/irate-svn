@@ -15,6 +15,9 @@ public class TrackDatabase {
   /** The minimum number of tacks that need to be rated. */
   public static final int MIN_NO_OF_RATED = 3;
   
+  /** The maximum number of tracks on the playlist. */
+  public static final int MAX_PLAY_LIST_LENGTH = 37; 
+  
   /** The highest allowable rating. */
   public static final int MAX_RATING = 10;
   
@@ -25,6 +28,7 @@ public class TrackDatabase {
   private static final String playListElementName = "PlayList";
   private static final String defaultHost = "server.irateradio.org";
   private static final int defaultPort = 2278;
+  private Track[] tracksCachedArray;
   private TreeSet tracks;
   private Hashtable hash;
   private File file;
@@ -91,6 +95,7 @@ public class TrackDatabase {
         copy.setDownloadDir(downloadDir);
         docElt.addChild(copy.getElement());
         tracks.add(copy);
+        tracksCachedArray = null;
         hash.put(copy.getKey(), copy);
         /*anthony, should we be doing serial stuff to tracks done through this?*/
         //copy.setTrackDatabase(this);
@@ -106,6 +111,7 @@ public class TrackDatabase {
     synchronized (this) {
       docElt.removeChild(track.getElement());
       tracks.remove(track);
+      tracksCachedArray = null;
       hash.remove(track.getKey());
     }
     return true;
@@ -113,9 +119,11 @@ public class TrackDatabase {
 
   public Track[] getTracks() {
     synchronized (this) {
-      Track[] tracks = new Track[this.tracks.size()];
-      this.tracks.toArray(tracks);
-      return tracks;
+      if (tracksCachedArray == null) {
+        tracksCachedArray = new Track[this.tracks.size()];
+        tracks.toArray(tracksCachedArray);
+      }
+      return tracksCachedArray;
     }
   }
 
@@ -229,39 +237,19 @@ public class TrackDatabase {
     setAttribute(userElementName, "port", Integer.toString(port));
   }
 
-  public int getAutoDownload() {
-    try {
-      return Integer.parseInt(getAttribute(autoDownloadElementName,"setting"));
-    }
-    catch (NumberFormatException e) {
-    }
-    return 0;
-  }
-
-  public void setAutoDownload(int setting) {
-    setAttribute(autoDownloadElementName, "setting", Integer.toString(setting));
-  }
-
-  public int getAutoDownloadCount() {
-    try {
-      return Integer.parseInt(getAttribute(autoDownloadElementName,"count"));
-    }
-    catch (NumberFormatException e) {
-    }
-    return 0;
-  }
-
-  public void setPlayListLength(int length) {
-    setAttribute(playListElementName, "length", Integer.toString(length));
-  }
-
+  /** Get the length of the playlist. See PlayListManager for more info. */
   public int getPlayListLength() {
-    try {
-      return Integer.parseInt(getAttribute(playListElementName, "length"));
+    /* This counts the number of decent tracks, i.e. rated 5.0 or above. */ 
+    Track[] tracks = getTracks();
+    int playListLength = 0;
+    for (int i = 0; i < tracks.length; i++) {
+      Track track = tracks[i];
+      if (track.isActive() && track.isRated() && track.getRating() >= 5) {
+        if (++playListLength == MAX_PLAY_LIST_LENGTH)
+          break;
+      }
     }
-    catch (NumberFormatException e) {
-    }
-    return 19;
+    return playListLength;  
   }
 
 /**
@@ -279,20 +267,16 @@ public class TrackDatabase {
     }
     catch (NumberFormatException e) {
     }
-    return 10;
-  }
-/****/
-
-  public void setAutoDownloadCount(int count) {
-    setAttribute(autoDownloadElementName, "count", Integer.toString(count));
+    return 13;
   }
 
-  public void incNoOfPlays() {
-    synchronized (this) {
-      setAutoDownloadCount(getAutoDownloadCount() + 1);
-    }
+  public int getNoOfUnratedOnPlaylist() {
+    int playListLength = getPlayListLength();
+    int unratedPlayListRatio = getUnratedPlayListRatio();
+    
+    return (int)Math.round(((double)playListLength) * (((double)unratedPlayListRatio) / 100.0));
   }
-
+  
   public boolean isRoboJockEnabled() {
     String s = getAttribute("RoboJock", "enabled").toLowerCase();
     if (s.equals("true") || s.equals("yes"))
@@ -337,6 +321,7 @@ public class TrackDatabase {
         hash.put(track.getKey(), track);
         track.setTrackDatabase(this);
       }
+      tracksCachedArray = null;
     }
   }
 
@@ -483,7 +468,7 @@ public class TrackDatabase {
         Track track = tracks[i];
         float rating = track.getRating();
 
-        if (rating >= minRating && (toOmit == null || !toOmit.contains(track)))
+        if (track.isActive() && rating >= minRating && (toOmit == null || !toOmit.contains(track)))
           totalProb += getProbability(track);
 
         probs[i] = totalProb;
@@ -516,7 +501,7 @@ public class TrackDatabase {
     List list = new Vector();
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
-      if (!track.isRated() && (toOmit == null || !toOmit.contains(track)) && track.exists())
+      if (track.isActive() && !track.isRated() && (toOmit == null || !toOmit.contains(track)))
         list.add(track);
     }
 
@@ -532,12 +517,27 @@ public class TrackDatabase {
   public int getNoOfUnrated() {
     Track[] tracks = getTracks();
     int noOfUnrated = 0;
-    for (int i = 0; i < tracks.length; i++)
-      if (tracks[i].isHidden() || tracks[i].isMissing() || tracks[i].isNotDownloaded() || tracks[i].isRated())
+    for (int i = 0; i < tracks.length; i++){
+      Track track = tracks[i];
+      if (!track.isActive() || track.isRated())
         ;
       else
-        noOfUnrated++;  
+        noOfUnrated++;
+    }
     return noOfUnrated;  
+  }
+
+  public int getNoOfRated() {
+    Track[] tracks = getTracks();
+    int noOfRated = 0;
+    for (int i = 0; i < tracks.length; i++) {
+      Track track = tracks[i];
+      if (!track.isActive() || !track.isRated())
+        ;
+      else
+        noOfRated++;
+    }
+    return noOfRated;  
   }
 
   private int compare(Track track0, Track track1) {
@@ -548,7 +548,7 @@ public class TrackDatabase {
     for (Iterator itr = tracks.iterator(); itr.hasNext(); ) {
       Track track = (Track) itr.next();
       if (track.isPendingPurge())
-        track.erase();
+        track.delete();
     }
   }
   

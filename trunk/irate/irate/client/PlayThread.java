@@ -103,7 +103,6 @@ public class PlayThread extends Thread {
             
 
             if (toKeepPlaying) {
-              playListManager.getTrackDatabase().incNoOfPlays();
               currentTrack.incNoOfTimesPlayed();
             }
           }

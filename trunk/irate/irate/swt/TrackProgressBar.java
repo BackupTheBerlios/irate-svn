@@ -2,6 +2,7 @@ package irate.swt;
 
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
@@ -13,7 +14,8 @@ public class TrackProgressBar extends Composite {
   private Label currentTimeText;
   private Label totalTimeText;
   private ProgressBar progressBar;
-  
+
+  private int currentTimeInSeconds;
   private int currentTotalTime;
   
   public TrackProgressBar(Composite parent, int flags) {
@@ -24,14 +26,12 @@ public class TrackProgressBar extends Composite {
     
     currentTimeText = new Label(this, SWT.NONE);
     currentTimeText.setText("---:---");
-    currentTimeText.pack();
     
     progressBar = new ProgressBar(this, SWT.SMOOTH);
-    progressBar.pack();
+    progressBar.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
     
     totalTimeText = new Label(this, SWT.NONE);
     totalTimeText.setText("---:---");
-    totalTimeText.pack();
   }
   
   /**
@@ -40,9 +40,12 @@ public class TrackProgressBar extends Composite {
    * @param currentTimeInSeconds the current number of seconds into the song
    */
   public void setCurrentTime(int currentTimeInSeconds) {
-    progressBar.setSelection(currentTimeInSeconds);
-    currentTimeText.setText(formatTimeToString(currentTimeInSeconds));
-    currentTimeText.pack();
+    if (this.currentTimeInSeconds != currentTimeInSeconds) {
+      this.currentTimeInSeconds = currentTimeInSeconds; 
+      progressBar.setSelection(currentTimeInSeconds);
+      currentTimeText.setText(formatTimeToString(currentTimeInSeconds));
+      currentTimeText.pack();
+    }
   }
   
   /**

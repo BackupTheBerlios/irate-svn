@@ -484,9 +484,10 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
       setState(getResourceString("DownloadThread.Not_enough_rated_tracks")); //$NON-NLS-1$
     }
     else {
-      int autoDownload = trackDatabase.getAutoDownload();
+      int noOfRated = trackDatabase.getNoOfRated();
       int noOfUnrated = trackDatabase.getNoOfUnrated();
-      if (noOfUnrated >= autoDownload)
+      int noOfUnratedOnPlaylist = trackDatabase.getNoOfUnratedOnPlaylist();
+      if (noOfRated > noOfUnrated / 2 && noOfUnrated < noOfUnratedOnPlaylist)
         setState(noOfUnrated + (noOfUnrated == 1 ? getResourceString("DownloadThread.unrated_track") : getResourceString("DownloadThread.unrated_tracks")));
       else
         go();

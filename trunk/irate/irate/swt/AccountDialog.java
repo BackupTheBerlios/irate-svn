@@ -22,10 +22,10 @@ import org.eclipse.swt.widgets.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/07/03 02:45:10 $
+ * Date Updated: $Date: 2004/08/29 05:08:28 $
  * @author Creator:	taras
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.28 $
+ * @version $Revision: 1.29 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -305,7 +305,6 @@ public class AccountDialog {
       if (trackDatabase.getNoOfTracks() != 0) {
         done = true;
         success = true;
-        trackDatabase.setAutoDownload(5);
       }else {
         display.asyncExec(new Runnable() {
           public void run() {

@@ -34,13 +34,14 @@ public class PlayerList {
     catch (Exception e) {
       e.printStackTrace();
     }
-    
-    try {
-      players.add(Class.forName("irate.client.StreamPlayer").newInstance());
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
+
+// I've removed this because it doesn't really work as well as it should do.
+//    try {
+//      players.add(Class.forName("irate.client.StreamPlayer").newInstance());
+//    }
+//    catch (Exception e) {
+//      e.printStackTrace();
+//    }
 
     this.players = (Player[]) players.toArray(new Player[players.size()]);
   }

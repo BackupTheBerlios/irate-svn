@@ -10,13 +10,6 @@ import irate.plugin.*;
 import irate.common.Track;
 import nanoxml.*;
 import irate.client.TrackLifeCycleListener;
-import irate.client.VolumePolicy;
-import irate.download.DownloadListener;
-import java.util.Hashtable;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 
 public class MarsyasPlugin
   extends Plugin

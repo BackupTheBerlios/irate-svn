@@ -34,11 +34,7 @@ public class PlayListManager {
 
   public synchronized Track chooseTrack() {
     int playListLength = trackDatabase.getPlayListLength();
-    int unratedPlayListRatio = trackDatabase.getUnratedPlayListRatio();
-    
-      //Added by EBD - 11.09.2003
-      //Maybe use ceiling instead of round?
-    int unratedPlayListCount = (int)Math.round(((double)playListLength) * (((double)unratedPlayListRatio) / 100.0));
+    int unratedPlayListCount = trackDatabase.getNoOfUnratedOnPlaylist();
     
       // Remove the track we've just played if necessary.
     if (playListIndex < playList.size()) {
@@ -108,7 +104,7 @@ public class PlayListManager {
         toOmit.add(track);
 
         // We want "0% unrated on playlist" to be an absolute.
-        if (unratedPlayListRatio != 0 || track.isRated()) {
+        if (unratedPlayListCount != 0 || track.isRated()) {
           int insertIndex = Utils.getRandom().nextInt(playList.size() + 1);
           playList.add(insertIndex, track);
           notifyAddedToPlayList(track);

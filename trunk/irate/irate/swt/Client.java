@@ -28,7 +28,6 @@ import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
@@ -692,78 +691,6 @@ public class Client extends AbstractClient {
     //end add
     item2.setMenu(mSettings);
 
-    MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
-    skinManager.addItem(mDownload, "toolbar.menu_item.auto_download");
-
-    //Added for a nicer UI by Allen Tipper 14.9.03
-    mDownload.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.auto_download")));
-    //end add
-
-    Menu menu2 = new Menu(mDownload);
-    mDownload.setMenu(menu2);
-
-    int[] counts = new int[] { 0, 5, 11, 17, 23, 29, 37 };
-    int autoDownload = trackDatabase.getAutoDownload();
-    for (int i = 0; i < counts.length; i++) {
-      MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
-      final Integer acount = new Integer(counts[i]);
-      final int dummy = 0; // workaround for gcj-3.0.4 bug
-      mTimes.setText(i == 0 ? Resources.getString("toolbar.sub_menu_item.auto_download.disabled") : "< " + acount + " " + Resources.getString("toolbar.sub_menu_item.auto_download.unrated_tracks"));
-      mTimes.setSelection(acount.intValue() == autoDownload);
-      mTimes.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          //stupid trick to make self the only selected item
-          MenuItem self = (MenuItem) e.getSource();
-          uncheckSiblingMenuItems(self);
-          self.setSelection(true);
-          trackDatabase.setAutoDownload(acount.intValue());
-          downloadThread.checkAutoDownload();
-        }
-      });
-
-      //Added for a nicer UI by Allen Tipper 14.9.03
-      mTimes.addArmListener(
-        new ToolTipArmListener(
-          Resources.getString("toolbar.sub_menu_item.auto_download.tooltip.unrated_tracks")
-          + " " + acount));
-      //end add
-
-    }
-
-    MenuItem mPlayList = new MenuItem(mSettings, SWT.CASCADE);
-    skinManager.addItem(mPlayList, "toolbar.menu_item.play_list");
-
-    //Added for a nicer UI by Allen Tipper 14.9.03
-    mPlayList.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.play_list")));
-    //end add
-
-    Menu menuPlayList = new Menu(mPlayList);
-    mPlayList.setMenu(menuPlayList);
-
-    counts = new int[] { 13, 19, 31, 49 };
-    int playListLength = trackDatabase.getPlayListLength();
-    for (int i = 0; i < counts.length; i++) {
-      MenuItem mTimes = new MenuItem(menuPlayList, SWT.CHECK, i);
-      final int dummy = 0; // workaround for gcj-3.0.4 bug
-      final Integer pcount = new Integer(counts[i]);
-      mTimes.setText(pcount + " " + Resources.getString("toolbar.sub_menu_item.play_list.tracks"));
-      mTimes.setSelection(pcount.intValue() == playListLength);
-      mTimes.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          MenuItem self = (MenuItem) e.getSource();
-          uncheckSiblingMenuItems(self);
-          self.setSelection(true);
-          trackDatabase.setPlayListLength(pcount.intValue());
-        }
-      });
-
-      //Added for a nicer UI by Allen Tipper 14.9.03
-      mTimes.addArmListener(
-        new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.play_list.tooltip.tracks") + " " + pcount));
-      //end add
-
-    }
-
     /**
      * Added by Eric Dalquist - 11.09.2003
      *
@@ -777,7 +704,7 @@ public class Client extends AbstractClient {
     mNewUnrated.setMenu(menuNewUnrated);
 
     int unratedPlayListRatio = trackDatabase.getUnratedPlayListRatio();
-    counts = new int[] { 0, 13, 29, 47, 63, 79, 97 };
+    int[] counts = new int[] { 0, 13 };
     for (int i = 0; i < counts.length; i++) {
       final Integer ratio = new Integer(counts[i]);
       MenuItem mRatio = new MenuItem(menuNewUnrated, SWT.CHECK, i);
@@ -803,36 +730,38 @@ public class Client extends AbstractClient {
     }
     /****/
 
-    MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
-    skinManager.addItem(mPlayers, "toolbar.menu_item.player");
-    menu2 = new Menu(mPlayers);
-    mPlayers.setMenu(menu2);
-
-    //Added for a nicer UI by Allen Tipper 14.9.03
-    mPlayers.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.player")));
-    //end add
-
     Player players[] = playerList.getPlayers();
-    for (int i = 0; i < players.length; i++) {
-      final String player = players[i].getName();
-
-      MenuItem mPlayer = new MenuItem(menu2, SWT.CHECK, i);
-      mPlayer.setText(player);
-      if (trackDatabase.getPlayer().equals(player))
-        mPlayer.setSelection(true);
-      mPlayer.addSelectionListener(new SelectionAdapter() {
-        public void widgetSelected(SelectionEvent e) {
-          //stupid trick to make self the only selected item
-          MenuItem self = (MenuItem) e.getSource();
-          uncheckSiblingMenuItems(self);
-          self.setSelection(true);
-
-          trackDatabase.setPlayer(player);
-          downloadThread.checkAutoDownload();
-        }
-      });
-      mPlayer.addArmListener(
-        new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.tooltip.player") + " " + player));
+    if (players.length >= 2) {
+      MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
+      skinManager.addItem(mPlayers, "toolbar.menu_item.player");
+      Menu menu2 = new Menu(mPlayers);
+      mPlayers.setMenu(menu2);
+  
+      //Added for a nicer UI by Allen Tipper 14.9.03
+      mPlayers.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.player")));
+      //end add
+  
+      for (int i = 0; i < players.length; i++) {
+        final String player = players[i].getName();
+  
+        MenuItem mPlayer = new MenuItem(menu2, SWT.CHECK, i);
+        mPlayer.setText(player);
+        if (trackDatabase.getPlayer().equals(player))
+          mPlayer.setSelection(true);
+        mPlayer.addSelectionListener(new SelectionAdapter() {
+          public void widgetSelected(SelectionEvent e) {
+            //stupid trick to make self the only selected item
+            MenuItem self = (MenuItem) e.getSource();
+            uncheckSiblingMenuItems(self);
+            self.setSelection(true);
+  
+            trackDatabase.setPlayer(player);
+            downloadThread.checkAutoDownload();
+          }
+        });
+        mPlayer.addArmListener(
+          new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.tooltip.player") + " " + player));
+      }
     }
     
     Menu hidden;
@@ -962,7 +891,7 @@ public class Client extends AbstractClient {
     expandButton.setLayoutData(gridData);
     */
     
-    trackLabel = new AlphaLabel(trackGroup, SWT.CENTER);
+    trackLabel = new AlphaLabel(trackGroup, SWT.NONE);
     skinManager.add(trackLabel, "label.track");
     gridData = new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL);
     trackLabel.setLayoutData(gridData);
