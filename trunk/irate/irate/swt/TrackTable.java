@@ -66,7 +66,7 @@ public class TrackTable {
           return new MagicString(track0.getArtist()).compareTo(new MagicString(track1.getArtist()));
       }        
     });
-    skinManager.add(col, "TrackTable.Heading.Artist"); 
+    skinManager.addItem(col, "TrackTable.Heading.Artist"); 
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
@@ -75,7 +75,7 @@ public class TrackTable {
         return new MagicString(track0.getTitle()).compareTo(new MagicString(track1.getTitle()));
       }        
     });
-    skinManager.add(col, "TrackTable.Heading.Track"); 
+    skinManager.addItem(col, "TrackTable.Heading.Track"); 
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(100);
@@ -84,7 +84,7 @@ public class TrackTable {
         return new MagicString(track0.getState()).compareTo(new MagicString(track1.getState()));
       }        
     });
-    skinManager.add(col, "TrackTable.Heading.Rating");
+    skinManager.addItem(col, "TrackTable.Heading.Rating");
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(50);
@@ -93,7 +93,7 @@ public class TrackTable {
         return new Integer(track0.getNoOfTimesPlayed()).compareTo(new Integer(track1.getNoOfTimesPlayed()));
       }        
     });
-    skinManager.add(col, "TrackTable.Heading.Plays");
+    skinManager.addItem(col, "TrackTable.Heading.Plays");
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(180);
@@ -103,7 +103,7 @@ public class TrackTable {
       }        
     });
     table.setHeaderVisible(true);
-    skinManager.add(col, "TrackTable.Heading.Last"); 
+    skinManager.addItem(col, "TrackTable.Heading.Last"); 
 
     updateTable();    
 

@@ -31,14 +31,21 @@
       <fileset dir="." includes="javazoom/jlGui/*.class"/>
     </jar>
   </target>
+  
+  <target name="skin">
+    <zip destfile="irate/resources/skin.zip">
+      <fileset dir="irate/resources/skin/" includes="*.png"/>
+    </zip>
+  </target>
     
-  <target name="jar" depends="compile,irate-client-swing,timestamp">
+  <target name="jar" depends="compile,skin,irate-client-swing,timestamp">
     <jar jarfile="irate-client-swt.jar" manifest="META-INF/manifest.irate-swt-client" compress="true">
       <fileset dir="." includes="irate/swt/*.class"/>
       <fileset dir="." includes="irate/swt/locale*.properties"/>
       <fileset dir="." includes="irate/resources/*.class"/>
       <fileset dir="." includes="irate/resources/*.gif"/>
       <fileset dir="." includes="irate/resources/*.mp3"/>
+      <fileset dir="." includes="irate/resources/skin.zip"/>
       <fileset dir="." includes="irate/client/*.class"/>
       <fileset dir="." includes="irate/client/locale*.properties"/>
       <fileset dir="." includes="irate/client/help/*.txt"/>

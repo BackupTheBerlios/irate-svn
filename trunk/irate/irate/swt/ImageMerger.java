@@ -30,6 +30,8 @@ public class ImageMerger {
     // Get the background and create a new image which uses the foreground
     // image's palette and depth from the background image. 
     ImageData backgroundData = transparencyManager.getBackground(control);
+    if (backgroundData == null)
+      return foregroundData;
     ImageData destData = new ImageData(backgroundData.width, backgroundData.height,
           foregroundData.depth, foregroundData.palette,
           backgroundData.scanlinePad, backgroundData.data);

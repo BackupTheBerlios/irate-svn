@@ -5,10 +5,11 @@ package irate.swt;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
@@ -19,222 +20,176 @@ import org.eclipse.swt.widgets.*;
  * @author Anthony Jones
  */
 public class SkinManager {
-  
+
   private Vector items = new Vector();
-  private Vector controls = new Vector();
-  private Vector buttons = new Vector();
-  private ZipFile zip;
+
+  private Hashtable itemHash = new Hashtable();
+
   private TransparencyManager transparencyManager = new TransparencyManager();
-  
+
+  private final String IMAGE_EXTENSION = ".png";
+
   public SkinManager() {
   }
-  
-  public SkinControl add(Control control, String name) {
-    SkinControl skinControl = new SkinControl(control, name);
-    add(skinControl);
-    return skinControl;
-  }
-  
-  public SkinItem add(Item item, String name) {
-    SkinItem skinItem = new SkinItem(item, name);
-    add(skinItem);
+
+  public SkinItem add(SkinItem skinItem) {
+    items.add(skinItem);
+    itemHash.put(skinItem.getName(), skinItem);
     return skinItem;
   }
-  
-  public void add(SkinItem skinItem) {
-    items.add(skinItem);
-    skinItem.getItem().setText(Resources.getString(skinItem.getName()));
-  }
-  
-  public void add(SkinControl skinControl) {
-    controls.add(skinControl);
-  }
-  
-  public SkinButton add(ThreeModeButton button, String name) {
-   SkinButton skinButton = new SkinButton(button, name);
-   buttons.add(skinButton);
-   return skinButton;
+
+  public SkinItem add(Skinable button, String name) {
+    return add(new SkinItem(button, name));
   }
 
-  
-  public void applySkin(ZipFile zip) {
-    this.zip = zip;
-    for (Iterator itr = items.iterator(); itr.hasNext(); ) {
-      SkinItem skinItem = (SkinItem) itr.next();
-      skinItem.update();
-    }
-    for (Iterator itr = controls.iterator(); itr.hasNext(); ) {
-      SkinControl skinControl = (SkinControl) itr.next();
-      skinControl.update();
-    }
-    for (Iterator itr = buttons.iterator(); itr.hasNext(); ) {
-      SkinButton skinButton = (SkinButton) itr.next();
-      skinButton.update();
-    }
-  }
-  
-  public class SkinItem {
-  
-    private Item item;
-    private String name;
-
-    public SkinItem(Item item, String name) {
-      this.item = item;
-      this.name = name;
-    }
-  
-    public Item getItem() {
-      return item;
-    }
-  
-    public String getName() {
-      return name;
-    }
+  public SkinItem addControl(final Control control, String name) {
+    control.addPaintListener(new PaintListener() {
+      public void paintControl(PaintEvent e) {
+        ImageData imageData = transparencyManager.getBackground(control);
+        if (imageData == null)
+          return;
+        Image img = new Image(control.getDisplay(), imageData);
+        e.gc.drawImage(img, 0, 0);
+        img.dispose();
+      }
+    });
     
-    public void setName(String name) {
-      this.name = name;
-      update();
-    }
+    return add(new Skinable() {
+      public void setTransparencyManager(TransparencyManager tm) {
+      }
 
-    private Image getImage(Display display, String name) throws IOException {
-      ZipEntry zipEntry = zip.getEntry(name + ".gif"); // Returns null if not found
-      InputStream is = zip.getInputStream(zipEntry);
-      ImageData data = new ImageData(is);
-      return new Image(display, data);
-    }
+      public void setText(String text) {
+      }
 
-    public void update() {  
-      try {
-        Display display = item.getDisplay();
-        item.setImage(getImage(display, name));
+      public void setPressedText(String text) {
+      }
 
+      public void setToolTipText(String text) {
+        control.setToolTipText(text);
+      }
+
+      public void setImage(String key, ImageData imageData) {
+        if (key.equals(""))
+          transparencyManager.associate(control, imageData);
+      }
+
+      public void redraw() {
+      }
+    }, name);
+  }
+
+  public SkinItem addItem(final Item item, String name) {
+    return add(new Skinable() {
+
+      public void setTransparencyManager(TransparencyManager tm) {
+      }
+
+      public void setText(String text) {
+        item.setText(text);
+      }
+
+      public void setPressedText(String text) {
+      }
+
+      public void setToolTipText(String text) {
         if (item instanceof ToolItem)
-          try { 
-            ((ToolItem) item).setHotImage(getImage(display, name + ".hot"));
-          }
-          catch (Exception e) {
-          }
-        
-        item.setText("");
-        return;
+          ((ToolItem) item).setToolTipText(text);
       }
-      catch (Exception e) {
-      }
-      item.setImage(null);
-      if (item instanceof ToolItem)
-        ((ToolItem) item).setHotImage(null);
-      item.setText(Resources.getString(name));
-      System.out.println(name);
-    }
-  }
-  
-  
-  public class SkinControl {
-    
-    private Control control;
-    private String name;
-    private boolean associated = false;
 
-    public SkinControl(Control control, String name) {
-      this.control = control;
-      this.name = name;
-
-      control.addPaintListener(new PaintListener() {
-        public void paintControl(PaintEvent e) {
-          ImageData imageData = transparencyManager.getBackground(SkinControl.this.control);
-          if (imageData == null)
-            return;
-  
-          Image img = new Image(SkinControl.this.control.getDisplay(), imageData);
-          e.gc.drawImage(img, 0, 0);
-          img.dispose();
+      public void setImage(String key, ImageData imageData) {
+        if (key.equals("")) {
+          item.setImage(new Image(item.getDisplay(), imageData));
+          item.setText("");
         }
-      });
-    }
-  
-    public String getName() {
-      return name;
-    }
-    
-    public void setName(String name) {
-      this.name = name;
-      update();
-    }
+      }
 
-    private ImageData getImageData(String name) throws IOException {
-      ZipEntry zipEntry = zip.getEntry(name + ".png"); // Returns null if not found
-      if(zipEntry != null) {
-        InputStream is = zip.getInputStream(zipEntry);
-        return new ImageData(is);
+      public void redraw() {
       }
-      return null;
-    }
-
-    public void update() {
-      try {
-         transparencyManager.associate(control, getImageData(name));
-         control.redraw();
-      }
-      catch (IOException e) {
-        e.printStackTrace();
-      }
-    } 
+    }, name);
   }
-  
-  
-  
-  
-  public class SkinButton {
-    
-    private ISkinableButton button;
+
+  public void applySkin(InputStream is) {
+    for (Iterator itr = items.iterator(); itr.hasNext();) {
+      SkinItem skinItem = (SkinItem) itr.next();
+      skinItem.pre();
+    }
+
+    ZipInputStream zis = new ZipInputStream(is);
+    try {
+      ZipEntry ze;
+      while ((ze = zis.getNextEntry()) != null) {
+        String name = ze.getName();
+        System.out.println("skin: " + name);
+        if (name.endsWith(IMAGE_EXTENSION)) {
+          ImageData imageData = new ImageData(zis);
+          try {
+            int index = name.indexOf('-');
+            String itemName;
+            String key;
+            if (index >= 0) {
+              itemName = name.substring(0, index);
+              key = name.substring(index + 1, name.length()
+                  - IMAGE_EXTENSION.length());
+            }
+            else {
+              itemName = name.substring(0, name.length()
+                  - IMAGE_EXTENSION.length());
+              key = "";
+            }
+            SkinItem skinItem = (SkinItem) itemHash.get(itemName);
+            if (skinItem != null)
+              skinItem.setImage(key, imageData);
+          } catch (Exception e) {
+            e.printStackTrace();
+          }
+        } 
+        else {
+          zis.closeEntry();
+        }
+      }
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    for (Iterator itr = items.iterator(); itr.hasNext();) {
+      SkinItem skinItem = (SkinItem) itr.next();
+      skinItem.post();
+    }
+  }
+
+  public class SkinItem {
+
+    private Skinable skinable;
+
     private String name;
 
-    public SkinButton(ISkinableButton button, String name) {
+    private boolean gotImage;
 
+    public SkinItem(Skinable button, String name) {
       button.setTransparencyManager(transparencyManager);
-      this.button = button;
+      this.skinable = button;
       this.name = name;
+      pre();
+      post();
     }
-    
+
     public String getName() {
       return name;
     }
-    
-    public void setName(String name) {
-      this.name = name;
-      update();
+
+    public void pre() {
+      skinable.setText(Resources.getString(name));
+      skinable.setToolTipText(Resources.getString(name + ".tooltip"));
+      gotImage = false;
     }
 
-    
-    private ImageData getImageData(String name) throws IOException {
-      ZipEntry zipEntry = zip.getEntry(name + ".png"); // Returns null if not found
-      if(zipEntry != null) {
-        InputStream is = zip.getInputStream(zipEntry);
-        return new ImageData(is);
-      }
-      return null;
+    public void setImage(String key, ImageData imageData) {
+      skinable.setImage(key, imageData);
+      gotImage = true;
     }
 
-    public void update() {
-      try {
-        ImageData normalImg = getImageData(Resources.getString(name + ".normalImage"));
-        ImageData pressedImg = getImageData(Resources.getString(name + ".pressedImage"));
-        ImageData activeImg = getImageData(Resources.getString(name + ".activeNormalImage"));
-        ImageData activePressedImg = getImageData(Resources.getString(name + ".activePressedImage"));
-        
-        button.setNormalImage(normalImg);
-        button.setPressedImage(pressedImg);
-        
-        if(activeImg != null) {
-          button.setActiveNormalImage(activeImg);
-        }
-        if(activePressedImg != null) {
-          button.setActivePressedImage(activePressedImg);
-        }
-        
-        button.redraw();
-      } catch (IOException e) { }
-  }
+    public void post() {
+      if (!gotImage) System.err.println("No image: " + name);
+      skinable.redraw();
+    }
   }
 }
-  
