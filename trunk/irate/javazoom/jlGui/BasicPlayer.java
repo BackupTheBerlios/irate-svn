@@ -438,6 +438,7 @@ public class BasicPlayer implements Runnable
     int secondsTotal = Math.round( (float) m_audioFileFormat.getByteLength() / bytesPerSecond);
     // E.B.
     secondsTotal = (int) Math.round(getTotalLengthInSeconds());
+   try {
     while ( (nBytesRead != -1) && (m_status != STOPPED))
     {
       if (m_status == PLAYING)
@@ -524,6 +525,10 @@ public class BasicPlayer implements Runnable
         }
       }
     }
+   }
+   catch (Exception e) {
+     e.printStackTrace();
+   }
     if (m_line != null)
     {
       try
