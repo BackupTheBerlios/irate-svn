@@ -10,8 +10,9 @@ the file ~/.rpmmacros with the single line
 
 %_topdir                /home/tppytel/RPM
 
-The path can point to any directory which is writeable by you. You cannot use
-the ~ shortcut for your home directory, however.
+Substituting your username for "tppytel", of course. The path can point to 
+any directory which is writeable by you. You cannot use the ~ shortcut for 
+your home directory, however.
 
 3) Create the necessary directories:
 
