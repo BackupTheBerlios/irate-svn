@@ -260,8 +260,11 @@ public class LibIRateNative implements irate.download.DownloadListener {
 				public void newTrackStarted(Track track) { }
 			};//ul
 			downloadThread.addUpdateListener(ul);
-			
-			downloadThread.contactServer(trackDatabase);
+			try{
+				downloadThread.contactServer(trackDatabase);
+			} catch (Exception ioe) {
+				ioe.printStackTrace();
+			}
 			downloadThread.removeUpdateListener(ul);
 			//System.out.println("grrr");
 			if (trackDatabase.getNoOfTracks() != 0) {
