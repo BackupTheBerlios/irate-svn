@@ -1,13 +1,25 @@
-#
-# Table structure for table `distributions`
-#
+-- phpMyAdmin SQL Dump
+-- version 2.6.0-pl2
+-- http://www.phpmyadmin.net
+-- 
+-- Host: localhost
+-- Generation Time: Jan 06, 2005 at 07:33 PM
+-- Server version: 4.0.22
+-- PHP Version: 4.3.9
+-- 
+-- Database: `irate`
+-- 
 
-DROP TABLE IF EXISTS `distributions`;
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `distributions`
+-- 
+
 CREATE TABLE `distributions` (
   `trackid` bigint(16) NOT NULL default '0',
   `id` bigint(16) NOT NULL default '0',
   `codec` varchar(16) NOT NULL default '',
-  `averagebitrate` int(4) NOT NULL default '0',
   `crediturl` text NOT NULL,
   `adddate` date NOT NULL default '0000-00-00',
   `filesize` bigint(15) NOT NULL default '0',
@@ -17,13 +29,23 @@ CREATE TABLE `distributions` (
   KEY `hash_sha1` (`hash_sha1`)
 ) TYPE=MyISAM;
 
-# --------------------------------------------------------
+-- --------------------------------------------------------
 
-#
-# Table structure for table `prepare`
-#
+-- 
+-- Table structure for table `distributions_seq`
+-- 
 
-DROP TABLE IF EXISTS `prepare`;
+CREATE TABLE `distributions_seq` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `prepare`
+-- 
+
 CREATE TABLE `prepare` (
   `userid` int(12) NOT NULL default '0',
   `trackid` bigint(16) NOT NULL default '0',
@@ -32,13 +54,12 @@ CREATE TABLE `prepare` (
   KEY `date` (`date`)
 ) TYPE=MyISAM;
 
-# --------------------------------------------------------
+-- --------------------------------------------------------
 
-#
-# Table structure for table `ratings`
-#
+-- 
+-- Table structure for table `ratings`
+-- 
 
-DROP TABLE IF EXISTS `ratings`;
 CREATE TABLE `ratings` (
   `id` int(12) NOT NULL default '0',
   `trackid` bigint(16) NOT NULL default '0',
@@ -53,13 +74,23 @@ CREATE TABLE `ratings` (
   KEY `rating` (`rating`)
 ) TYPE=MyISAM;
 
-# --------------------------------------------------------
+-- --------------------------------------------------------
 
-#
-# Table structure for table `sources`
-#
+-- 
+-- Table structure for table `ratings_seq`
+-- 
 
-DROP TABLE IF EXISTS `sources`;
+CREATE TABLE `ratings_seq` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `sources`
+-- 
+
 CREATE TABLE `sources` (
   `id` int(12) NOT NULL default '0',
   `distribid` bigint(16) NOT NULL default '0',
@@ -72,17 +103,27 @@ CREATE TABLE `sources` (
   KEY `distribid` (`distribid`)
 ) TYPE=MyISAM;
 
-# --------------------------------------------------------
+-- --------------------------------------------------------
 
-#
-# Table structure for table `tracks`
-#
+-- 
+-- Table structure for table `sources_seq`
+-- 
 
-DROP TABLE IF EXISTS `tracks`;
+CREATE TABLE `sources_seq` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `tracks`
+-- 
+
 CREATE TABLE `tracks` (
-  `artistname` varchar(64) NOT NULL default '',
-  `trackname` varchar(128) NOT NULL default '',
-  `license` varchar(128) NOT NULL default '',
+  `artistname` text NOT NULL,
+  `trackname` text NOT NULL,
+  `license` varchar(255) NOT NULL default '',
   `albumname` text NOT NULL,
   `pubdate` date NOT NULL default '0000-00-00',
   `id` bigint(16) NOT NULL default '0',
@@ -92,13 +133,23 @@ CREATE TABLE `tracks` (
   PRIMARY KEY  (`id`,`id`)
 ) TYPE=MyISAM;
 
-# --------------------------------------------------------
+-- --------------------------------------------------------
 
-#
-# Table structure for table `users`
-#
+-- 
+-- Table structure for table `tracks_seq`
+-- 
 
-DROP TABLE IF EXISTS `users`;
+CREATE TABLE `tracks_seq` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `users`
+-- 
+
 CREATE TABLE `users` (
   `id` int(12) NOT NULL default '0',
   `user` varchar(32) NOT NULL default '',
@@ -112,3 +163,15 @@ CREATE TABLE `users` (
   KEY `datelastlogin` (`datelastlogin`),
   KEY `datelastprepare` (`datelastprepare`)
 ) TYPE=MyISAM;
+
+-- --------------------------------------------------------
+
+-- 
+-- Table structure for table `users_seq`
+-- 
+
+CREATE TABLE `users_seq` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  PRIMARY KEY  (`id`)
+) TYPE=MyISAM;
+        

@@ -1,7 +1,7 @@
 <?php
-// iRATE server v0.1
+// iRATE server v0.2
 // GPL licensed
-// PeerMajor.org
+
 
 
 Class irate_server {
@@ -13,6 +13,7 @@ var $correlation_random;
 var $user;
 var $grabber;
 var $options;
+var $xmlrpc;
 
 var $out_status;
 var $out_message;
@@ -30,102 +31,88 @@ function irate_server($options="") {
  $this->VARS=array_merge($argv,$_SESSION,$GLOBALS["HTTP_COOKIE_VARS"],$GLOBALS["HTTP_GET_VARS"],$GLOBALS["HTTP_POST_VARS"]);
  
 
- 
+
  require_once($this->options["root"]."config.php");
 
  $this->cfg=$cfg;
 
   //we use PEAR.
  require_once("DB.php");
+ require_once("XML/RPC/Server.php");
+ require_once("xmlrpcpln.php");
 
  $this->db= DB::connect($this->cfg["dsn"],true);
 
  $this->db->setFetchMode(DB_FETCHMODE_ASSOC);
 
+ $DispMap=array(
+  "irate.rate"=>array("function"=>"IRS_xmlrpc_rate"),
+  "irate.unrate"=>array("function"=>"IRS_xmlrpc_unrate"),
+  "irate.getRatings"=>array("function"=>"IRS_xmlrpc_getRatings"),
+  "irate.getNew"=>array("function"=>"IRS_xmlrpc_getNew"),
+  "irate.getInfo"=>array("function"=>"IRS_xmlrpc_getInfo"),
+  "irate.registerUser"=>array("function"=>"IRS_xmlrpc_registerUser")
+ );
+
+
+
+ $this->xmlrpc=new XML_RPC_Server($DispMap, 0);
+
+ $this->db->query("");
+
 }
 
 
+function service() {
+
+ if (empty($this->VARS["m"])) {
+  $this->xmlrpc->service();
+
+
+
+ } else { //admin actions (don't use XMLRPC so that we can call them from a crontable easily)
+  $this->requireAuth();
+  $this->requireAdmin();
+
+  if ($this->VARS["m"]=="grab") {
+   
+   for ($i=0;$i<count($this->cfg["grabbers"]);$i++) {
+    $this->initGrabber($this->cfg["grabbers"][$i]);
+    $this->grabber->grab();
+   }
+
+  }
+
+ }
+
+
+}
 
 
 
 function error($code) {
 
-$this->out_status="error";
+ global $XML_RPC_erruser; // import user errcode value
 
-$this->out_message=$code;
-
-
-$this->output();
-
-$this->end();
+ $error= new XML_RPC_Response(0, $XML_RPC_erruser+1, // user error 1
+            $code);
 
 
+  //quite dirty todo
+ $payload = "<?xml version=\"1.0\"?>\n" .
+            $error->serialize();
+        header('Content-Length: ' . strlen($payload));
+        header('Content-Type: text/xml');
+        print $payload; 
+
+ die();
 }
 
 
 
 
 
-function parse() {
-
- $this->initAuth($this->VARS["u"],$this->VARS["p"],$this->VARS["h"]);
-
- if ($this->VARS["do"]=="getnew") {
-  $this->initCorrelation(); 
-
-
-  $this->out_status="getnew";
-  $t=$this->getNew($this->VARS["n"]);
-  
-  $this->out_message=$this->correlation->format($this->correlation->gettrackdata($t));
-
- } elseif ($this->VARS["do"]=="rate") {
-  $this->rate($this->VARS["rate"]);
-
-  $this->out_status="rate";
-//  $this->out_message="OK";
-
- } elseif ($this->VARS["do"]=="getratings") {
-  $this->out_status="getratings";
-  $a=$this->getRatings();
-  $this->out_message=$this->formatRatings($a);
- 
- 
-  //admin tasks
- } elseif ($this->VARS["do"]=="admin") {
-  
-  if ($this->user["user"]=="admin") {
-   if ($this->VARS["action"]=="grab") {
-    $this->initGrabber($this->VARS["grab"]);
-    $this->grabber->grab();
-
-     //prepare correlation
-   } elseif ($this->VARS["action"]=="prepare") {
-    if ($this->cfg["prepare"]) {
-     $this->prepareCorrelation();
-    }
-   }
-
-  } else {
-   $this->error("WRONG_ADMIN_USER");
-  }
-
-
-
-  //deprecated functions (for old irate)
- } elseif ($this->VARS["do"]=="OLD_url2id") {
-  $this->out_status="http2id";
-  $this->out_message=$this->OLD_url2id($this->VARS["url"]);
-
- }
-
-
-
-}
-
-
-
-function getNew($number,$include_random=true,$min_old_weight=100) {
+function getNew($number,$include_random=true,$min_old_weight=1) {
 
  if (!$this->init["correlation"]) {
   $this->initCorrelation();
@@ -159,17 +146,21 @@ function getNew($number,$include_random=true,$min_old_weight=100) {
  }
 
  /*
- * STEP 3 : we get the correlated results
+ * STEP 3 : we get the correlated results if needed
  */ 
  
  $old=$this->db->getOne("SELECT count(*) FROM ratings WHERE userid=".$this->user["id"]);
 
  $c=array();
+ 
  if ($number-$num_random>0 AND $old>0) {
+ 
   $c=$this->correlation->get($number-$num_random,$min_old_weight);
+  
   for ($i=0;$i<count($c);$i++) {
    $ids[]=$c[$i];
   }
+  
  }
  /*
  * STEP 4 : we get the random results (wanted, or left)
@@ -193,48 +184,42 @@ function getNew($number,$include_random=true,$min_old_weight=100) {
 
 
 
-function registerUser($username,$password) {
-
-
- //todo preg on username/password
-
-
-
- $this->db->query("INSERT INTO users(id,user,pass,dateinscr,datelastlogin,ipinscr) VALUES(?,?,?,now(),now(),?)",array($this->db->nextID("users"),$username,$password,$_SERVER["REMOTE_ADDR"]));
-
-
-}
-
-
-function initAuth($u,$p,$h) {
-
- if (empty($u) OR (empty($p) AND empty($h))) {
-  $this->error("MUST_LOGIN");
- } else {
-  
-  $user=$this->db->getRow("SELECT * FROM users WHERE user=?",array($u));
-  if (!empty($user)) {
-   if ($user["pass"]==$p OR sha1("irate".$user["pass"])==$h) {
-    $this->user=$user;
-    $this->db->query("UPDATE users SET datelastlogin=now() WHERE user=?",array($u));
-   } else {
-    $this->error("WRONG_PASSWORD");
-   }
-  } elseif (!empty($p)) {
-   if ($this->cfg["allow_registering"]) {
-    $this->registerUser($u,$p);
-   } else {
-    $this->error("REGISTERING_NOT_ALLOWED");
-   }
-   $user=$this->db->getRow("SELECT * FROM users WHERE user=?",array($u));
-   $this->user=$user;
-  } else {
-   $this->error("REGISTERING_NEEDS_PASSWORD");
-  }
+function requireAdmin() {
  
+ if ($this->user["user"]=!"admin") {
+  $this->error("USER_NOT_ADMIN");
  }
 
 }
+
+
+function requireAuth() {
+
+
+ $u=$this->VARS["u"];
+ $h=$this->VARS["h"];
+
+ if (empty($u) OR empty($h)) {
+  $this->error("MUST_LOGIN");
+ }
+ 
+ $user=$this->db->getRow("SELECT * FROM users WHERE user=?",array($u));
+
+ if (empty($user)) {
+  $this->error("UNKNOWN_USER");
+ }
+
+ if (sha1("irate".sha1($user["pass"]))==$h) {
+  $this->user=$user;
+  $this->db->query("UPDATE users SET datelastlogin=now() WHERE user=?",array($u));
+ } else {
+  $this->error("WRONG_PASSWORD");
+ }
+
+}
+
+
+
 
 
 function initCorrelation($corr="") {
@@ -276,49 +261,86 @@ function int2id($int) {
 
 
 
-/*
- * Rate some tracks
- * $ratings : ID:NOTE,ID:NOTE,ID:NOTE,....
 
- */
-function rate($ratings) {
+function findTrackID($params) {
 
- $r=explode(",",$ratings);
+ 
 
- for ($i=0;$i<count($r);$i++) {
-  $rr=explode(":",$r[$i]);
+ if (empty($params["id"])) {
 
-  $this->rateOne($this->id2int($rr[0]),$rr[1]);
-  
+  if (!empty($params["hash_sha1"])) {
+   $params["id"]=$this->db->getOne("SELECT distributions.trackid FROM distributions WHERE hash_sha1=!",array($params["hash_sha1"]));
+  }
+
 
  }
+
+ return $params;
 
 }
 
 
 
 
+function unrateOne($params) {
 
-function rateOne($trackid,$note,$weight=100) {
+ $params=$this->findTrackID($params);
 
- $row=$this->db->getRow("SELECT * FROM ratings WHERE userid=? AND trackid=?",array($this->user["id"],$trackid));
- if (count($row)>0) {
-  if ($weight>=$row["weight"]) {
-   if (empty($note)) { // set unrated.
-    $this->db->query("DELETE FROM ratings WHERE id=!",array($row["id"]));
-   } else { //update the rating.
-    $this->db->query("UPDATE ratings SET weight=?,rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($weight,$note,$row["id"]));
-   }
-  }
- } elseif (!empty($note)) {
-  
-  $rid=$this->db->nextId("ratings");
- 
-  $a=$this->db->query("INSERT INTO ratings(id,trackid,userid,rating,ratingdate,ratingnum,weight) VALUES(?,?,?,?,now(),0,?)",array($rid,$trackid,$this->user["id"],$note,$weight));
+ if (empty($params["id"])) {
+  $this->error("TRACK_NOT_FOUND");
  }
 
-  $this->db->query("DELETE FROM prepare WHERE userid=! AND trackid=!",array($this->user["id"],$trackid));
+ $this->db->query("DELETE FROM ratings WHERE userid=? AND trackid=?",array($this->user["id"],$params["id"]));
 
+}
+
+
+
+function rateOne($params) {
+
+ 
+ //step 1 : get irateID of the track.
+  $params=$this->findTrackID($params);
+
+
+ //if still no ID, bark.
+ if (empty($params["id"])) {
+  $this->error("TRACK_NOT_FOUND");
+ }
+ if (empty($params["rating"])) {
+  $this->error("RATING_MISSING");
+ }
+ if (empty($params["weight"])) {
+  $params["weight"]=1;
+ }
+
+
+ //step 2 : has the user already rated the track ?
+ $row=$this->db->getRow("SELECT * FROM ratings WHERE userid=? AND trackid=?",array($this->user["id"],$params["id"]));
+ 
+ if (count($row)>0) {
+
+   //we update the rating only if the weight is higher than before.
+   //todo : add, avg, and reduce to weight=1 ?
+
+  if ($params["weight"]>=$row["weight"]) {
+    $this->db->query("UPDATE ratings SET weight=?,rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($params["weight"],$params["rating"],$row["id"]));
+  }
+  
+ } else  {
+  
+
+   //new rating
+  $rid=$this->db->nextId("ratings");
+ 
+  $a=$this->db->query("INSERT INTO ratings(id,trackid,userid,rating,ratingdate,ratingnum,weight) VALUES(?,?,?,?,now(),0,?)",array($rid,$params["id"],$this->user["id"],$params["rating"],$params["weight"]));
+ }
+
+ //step 3 : delete track from suggestion cache.
+$this->db->query("DELETE FROM prepare WHERE userid=! AND trackid=!",array($this->user["id"],$params["id"]));
+
+
+return true;
 
 }
 
@@ -326,41 +348,13 @@ function rateOne($trackid,$note,$weight=100) {
 
 function getratings() {
 
- $a=$this->db->getAll("SELECT trackid,rating FROM ratings WHERE userid=?",array($this->user["id"]));
+ $a=$this->db->getAll("SELECT trackid,rating,weight FROM ratings WHERE userid=?",array($this->user["id"]));
 
  return $a;
 
 }
 
 
-
-function output() {
-
- //echo $this->out_status."\n".$this->out_message;
- echo $this->out_message;
-
-}
-
-
-
-function formatRatings($a) {
-
- for ($i=0;$i<count($a);$i++) {
-  $a[$i]=$this->int2id($a[$i]["trackid"]).":".$a[$i]["rating"];
- }
- $a=implode(",",$a);
-
- return $a;
-
-}
-
-
-
-function end() {
- 
- die();
-
-}
 
 
 function addTrack($data) {
@@ -392,7 +386,7 @@ function addTrack($data) {
   
   $id=$this->db->nextID("distributions");
 
-  $this->db->query("INSERT INTO distributions(id,trackid,codec,averagebitrate,crediturl,adddate,filesize,hash_sha1) VALUES(?,?,?,?,?,now(),?,?)",array($id,$data["trackid"],$data["codec"],$data["averagebitrate"],$data["crediturl"],$data["filesize"],$data["hash_sha1"]));
+  $this->db->query("INSERT INTO distributions(id,trackid,codec,crediturl,adddate,filesize,hash_sha1) VALUES(?,?,?,?,now(),?,?)",array($id,$data["trackid"],$data["codec"],$data["crediturl"],$data["filesize"],$data["hash_sha1"]));
  
   return $id;
  }
@@ -410,7 +404,8 @@ function addTrack($data) {
 
 
  function initGrabber($grabber) {
-  
+ 
+
   $name="IRS_Grabber_".$grabber;
 
   require_once($this->options["root"]."modules/grabber/common.php");
@@ -420,18 +415,6 @@ function addTrack($data) {
 
 
  }
-
-
-
- function OLD_url2id($http) {
-  
-  $id=$this->getOne("SELECT distributions.trackid FROM distributions,sources WHERE sources.distribid=distributions.id AND sources.link=?",array($http));
-
-  return $this->int2id($id);
-  
- }
-
-
 
 
 
@@ -475,7 +458,210 @@ function addTrack($data) {
 }
 
 
+
+
+
+
+function getTrackXMLRPC($params) {
+
+ $params=$this->findTrackID($params);
+
+ $a=$this->getTrackArray($params["id"]);
+
+ return XML_RPC_PLN::php2xmlrpc($a);
+
+
 }
+
+function getTrackXMLRPCbyIDs($ids) {
+
+ $a=array();
+ for ($i=0;$i<count($ids);$i++) {
+  $a[$i]=$this->getTrackXMLRPC(array("id"=>$ids[$i]));
+ }
+
+ return new XML_RPC_Value($a,"array");
+
+}
+
+
+
+
+function getTrackArray($trackid) {
+ 
+ $trackrow=$this->db->getRow("SELECT artistname,trackname,license,albumname,pubdate,id,duration,crediturl FROM tracks WHERE id=!",array($trackid));
+ 
+ $distribs=$this->db->getALL("SELECT codec,crediturl,filesize,hash_sha1,id FROM distributions WHERE trackid=!",array($trackid));
+
+
+ for ($i=0;$i<count($distribs);$i++) {
+  $sources=$this->db->getAll("SELECT protocol,link,crediturl FROM sources WHERE distribid=!",array($distribs[$i]["id"]));
+  
+  unset($distribs[$i]["id"]);
+  
+  $distribs[$i]["Sources"]=$sources;
+
+ }
+
+ $trackrow["Distributions"]=$distribs; 
+ 
+ return $trackrow;
+ 
+}
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////
+//
+// XMLRPC functions
+//
+///////////////////
+
+
+function IRS_xmlrpc_registerUser($params) {
+ 
+ global $IRS;
+
+
+ $p=$params->getParam(0);
+ $username=$p->structmem("username");
+ $password=$p->structmem("password");
+
+ //todo preg on username/password
+
+
+if ($IRS->db->getOne("SELECT 1 FROM users WHERE user=?",array($username->scalarval()))) {
+ $IRS->error("USER_ALREADY_EXISTS");
+}
+
+
+$IRS->db->query("INSERT INTO users(id,user,pass,dateinscr,datelastlogin,ipinscr) VALUES(?,?,?,now(),now(),?)",array($IRS->db->nextID("users"),$username->scalarval(),$password->scalarval(),$_SERVER["REMOTE_ADDR"]));
+
+return new XML_RPC_Response(new XML_RPC_Value("OK", "string"));
+
+
+}
+
+
+
+
+
+
+
+function IRS_xmlrpc_unrate($params) {
+
+ global $IRS;
+ 
+ $IRS->requireAuth();
+ 
+ $p=$params->getParam(0);
+ 
+ $arr=XML_RPC_PLN::xmlrpc2php($p);
+  
+  //for each rating
+ for ($i=0;$i<count($arr);$i++) {
+  
+  $IRS->unrateOne($arr[$i]);
+ 
+ }
+ 
+ return new XML_RPC_Response(new XML_RPC_Value("OK", "string"));
+
+}
+
+
+
+function IRS_xmlrpc_rate($params) {
+
+ global $IRS;
+
+ $IRS->requireAuth();
+ 
+ $p=$params->getParam(0);
+
+ $arr=XML_RPC_PLN::xmlrpc2php($p);
+
+  //for each rating
+ for ($i=0;$i<count($arr);$i++) {
+
+  $IRS->rateOne($arr[$i]);
+
+ }
+
+ return new XML_RPC_Response(new XML_RPC_Value("OK", "string"));
+
+}
+
+
+
+function IRS_xmlrpc_getInfo($params) {
+
+ $IRS->requireAuth();
+
+ $p=$params->getParam(0);
+
+ $ids=array();
+
+
+ $r2=array();
+ while (list($k,$v)=$p->structeach()) {
+  $r2[$k]=$v->scalarval();
+ }
+	  
+ return new XML_RPC_Response($IRS->getTrackXMLRPC($r2));
+
+}
+
+
+
+function IRS_xmlrpc_getNew($params) {
+
+ global $IRS;
+
+ $IRS->requireAuth();
+
+ $p=$params->getParam(0);
+
+ $num=$p->structmem("n");
+
+ if (!preg_match("/^[0-9]+$/",$num->scalarval())) {
+  $IRS->error("BAD_INPUT");
+ }
+ 
+ $ids=$IRS->getNew($num->scalarval());
+ 
+ return new XML_RPC_Response($IRS->getTrackXMLRPCbyIDS($ids));
+
+}
+
+
+
 
 
 ?>

@@ -1,18 +1,15 @@
 <?php
-// iRATE server v0.1
+// iRATE server v0.2
 // GPL licensed
-// PeerMajor.org
 
 
 
 require_once("irate.php");
 
 
-$i=new irate_server();
+$GLOBALS["IRS"]=new irate_server();
 
-$i->parse();
-$i->output();
-$i->end();
+$GLOBALS["IRS"]->service();
 
 
 

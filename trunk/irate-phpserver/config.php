@@ -1,24 +1,21 @@
 <?php
-// iRATE server v0.1
+// iRATE server v0.2
 // GPL licensed
-// PeerMajor.org
+
+
+
+/////////
+//
+// Basic settings
+//
+////////////////////
 
 
  //database connection : driver:://user:password@host/databasename
 $cfg["dsn"]="mysql://root:@localhost/irate";
 
- //can users register only by logging in with a new username ?
-$cfg["allow_registering"]=true;
-
- //the default correlation algorithm
-$cfg["dft_correlation"]="sylvinus1"; //hoping for a better one :)
-
  //the probability (0-100) of a random track being sent to the client
 $cfg["random_frequency"]=2;
-
- //Location of LibreDB_audio1 file
-$cfg["grabber_libredb_audio1_url"]="http://www.libredb.org/pub/audio1.xml.gz";
-//$cfg["grabber_libredb_audio1_url"]="/home/sylvinus/cvsroot/libredb/site/libredb/pub/peermajor1.xml.gz";
 
  //Activate the prepare function (compute correlation in background, needs cron)
 $cfg["prepare"]=true;
@@ -33,6 +30,29 @@ $cfg["prepare_tracks"]=10;
 $cfg["prepare_expire"]=20;
 
  //How long after the user's last login tracks stop being prepared (days)
-$cfg["prepare_idle"]=6*30;
+$cfg["prepare_idle"]=2*30;
+
+ //the default correlation algorithm
+$cfg["dft_correlation"]="sylvinus1"; //hoping for a better one :)
+
+
+
+
+/////////
+//
+// Advanced settings
+//
+////////////////////
+
+// //can users register only by logging in with a new username ?
+//$cfg["allow_registering"]=true;
+
+
+ //Registered grabbers
+$cfg["grabbers"][]="libredb_audio1";
+
+ //Location of LibreDB_audio1 file
+$cfg["grabber_libredb_audio1_url"]="http://pub1.jamendo.com/libredb/audio1.xml.gz";
+
 
 ?>

@@ -3,11 +3,11 @@ Crash Course
 ***************************
 
 
-What is this ? => iRATE PHP server v0.1 "Simonika"
+What is this ? => iRATE PHP server v0.2 "Anaella"
 
 Which license ? => GPL licensed, baby
 
-Who wrote it ? => PeerMajor.org (nice place for free music)
+Who wrote it ? => jamendo.com (nice place for free music)
 
 
 
@@ -27,7 +27,7 @@ SQL backend.
 Installation
 ***************************************
 
-You basically need an Apache+PHP server, and some SQL database.
+You basically need an Apache+PHP4 server, and some SQL database.
 
 Currently, we only tested it with MySQL, but it should work
 with other databases as well.
@@ -41,6 +41,11 @@ password:
 > use irate;
 > source setup.sql;
 > exit;
+
+
+Then you'll need to install some PEAR PHP modules :
+
+# pear install -o XML_RPC DB
 
 
 Then edit config.php, and fix the DSN with your database password.
@@ -83,72 +88,80 @@ The Protocol
 *************************
 
 Actually communicating with the iRATE server is very easy :
-it can be done with a web browser for testing purposes, and
-with any HTTP library for your third-party apps.
+It's XML-RPC (www.xmlrpc.org). There are libraries for
+almost every language out there, so we'll hopefully see
+new irate-enabled software, websites, whatever.
 
-The variables can be sent in GET or POST mode (POST is better
-for long ones)
-
-The server replies with XML data.
+A pseudo-code client is included at the end of the README.
 
 
 Here are the main things you can do with irate-phpserver :
 
+
+* Connecting
+------------
+
+Just connect to the host where the irate-phpserver is installed.
+
+For instance : http://localhost/myprojects/irate-phpserver/
+
+The port is 80.
+
+
 * Logging in
 ------------
 
- GET http://irate.server.org/?u=myuser&p=mypass
+The login isn't done via xmlrpc to simplify the protocol.
 
-"u=myuser&p=mypass" : The client connects with login/pass : myuser/mypass.
- If the user "myuser" doesn't exists, it'll be automatically created
- with the given password.
+You have to send the username and a hash of the password.
 
- After the first login, the client can only send a hash of this password
- to the server.
- 
- The Holly hash is : SHA1("irate".$password); Great, moo ?
+The hash is : sha1( "irate" . sha1 ( $password ) );
 
- So now we get "?u=myuser&h=HASH" instead of "?u=myuser&p=mypass"
+So to connect to irate server, just query the XMLRPC location :
+
+  http://localhost/myprojects/irate-phpserver/?u=[username]&h=[sha1_hash]
+
+If the login failed, an XMLRPC error will be thrown.
+
+
+* Registering
+-------------
+
+Registering doesn't need auth. (so don't include ?u=...&h=.... in the address
+for this query)
+
+XMLRPC function : irate.register
+XMLRPC params : 
+ * struct 
+    - username => .....  (irate username)
+    - password => .....  (clear password)
+
+
+The function will return "OK" or an error.
+
+
 
 
 * Asking for new tracks
 -----------------------
 
- GET http://../?u=myuser&h=HASH&do=getnew&n=5
-
-"do=getnew&n=5" : The client asks for 5 new tracks to rate.
 
 
-Server replies :
- (HTTP Headers)
- 
- <tracks>
-  <track>
-  <id>XXXX</id>
-  <artistname>XXXX</artistname>
-  <albumname>XXXX</albumname>
-  ...
-  <distributions>
-   <distribution>
-    <hash_sha1>SHA1</hash_sha1>
-    <codec>VORBIS</codec>
-    <averagebitrate>128</averagebitrate>
-    <crediturl>http://www.magnatune.com/artists/XXXX</crediturl>
-    ...
-    <sources>
-     <source>
-      <protocol>http</protocol>
-      <link>http://../XXX.mp3</link>
-      ...
-     </source>
-     ...
-    </sources>
-   </distribution>
-   ...
-  <distributions>
- </track>
- ...
-</tracks>
+XMLRPC function : irate.getNew
+XMLRPC params :
+ * struct
+    - n => 6      (the number of new tracks you want)
+
+
+The function will return an array of new tracks, with a
+struct for each one, describing it and where it can be downloaded.
+
+
+
+[TODO example of struct return]
+
+
+
 
 
 So we have 3 hierarchical things : track, distribution and source.
@@ -179,7 +192,6 @@ these IDs.)
 
 * crediturl : string
 * codec : string (http://www.matroska.org/technical/specs/codecid/)
-* averagebitrate : int (indicative)
 * hash_sha1 : string(40)
 * filesize : int
 
@@ -193,22 +205,69 @@ these IDs.)
 The shown crediturl should be the first available from source, distribution and then track.
 
 
+
 * Rating tracks
 ---------------
 
- GET http://../?u=myuser&h=HASH&do=rate&rate=XX:6,YY:9
+You can rate multiple track with only one XMLRPC query.
 
-"do=rate&t=99:6,33:9" : Rate the tracks XX and YY to 6/10 and 9/10 
+XMLRPC function : irate.rate
+XMLRPC params :
+ * array
+    - {rating 1}
+    - {rating 2}
+    - etc....
 
- Replace XX and YY by track IDs like 1043-001-34-0
+Each {rating X} is a struct with the following elements :
+ - rating => integer (0-10)
+ - weight => double (0-1), defaults to 1
+ - id => irate ID of the track (optional)
+ - hash_sha1 => sha1 hash of the track (optional)
+ - protocol => string (http, bittorrent,...) (optional)
+ - link => string (where the track was downloaded : http://www.iuma.com/mp3/...) (optional)
 
- Note that you can cancel a previous rating you've done by giving
- an empty note. For instance : "..&rate=XX:,YY:" will cancel both
- ratings.
+
+Please note that id,hash_sha1,protocol and link are needed
+to identify the track you're rating.
+
+id SHOULD be given if you have it.
+
+If you don't (iRATE <0.4 clients), the advice is to send
+ protocol="http" and link="http://..."
+
+
+
+
+* Unrating tracks
+-----------------
+
+You can unset ratings you've done previously.
+
+XMLRPC function : irate.unrate
+XMLRPC params :
+ * array
+  - {rating 1}
+  - {rating 2}
+  - etc....
+
+each {rating} is the same as before with irate.rate, but of course
+"rating" and "weight" are not to be set.
+
+
 
 
 * Getting all the ratings back to the client
 --------------------------------------------
+
+
+TBC
+
+
+
+
+
+---- Outdated past this ----
+
 
 Client : GET http://../&u=myuser&h=HASH&do=getratings
 
@@ -281,8 +340,8 @@ What's next ?
 That's all folks, if you have any ideas/comments/suggestions/... ,
 feel free to contact the right man, that's to say :
 
- * webmaster@irate.sf.net : for iRATE related stuff
- * irate@peermajor.org : For iRATE-phpserver specific stuff
+ * ajones@users.sourceforge.net : for iRATE related stuff
+ * irate@jamendo.com : For iRATE-phpserver specific stuff
  * root@localhost : For personal stuff.
 
 
