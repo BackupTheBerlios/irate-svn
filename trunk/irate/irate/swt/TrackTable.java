@@ -452,16 +452,33 @@ public class TrackTable
     if (image == null) 
     {
       System.out.println("Creating image " + state);
+      
       ImageData stateImageData = basicSkinable.getImageData(state);
       if (stateImageData != null) {
         ImageData mergedImageData = imageMerger.merge(background, stateImageData);
         image = new Image(display, mergedImageData);
       }
       else {
+        // This creates an image to display on the table. Table images don't
+        // support alpha transparency so we draw the image with the correct
+        // background colour then make that colour transparent. When the table
+        // row is unselected the anti-aliasing on the fonts will look OK but
+        // when the item is selected (although we avoid allowing people to 
+        // select tracks) the transparency will work but the anti-aliasing 
+        // will still be broken. Unfortunately we can't do anything about the
+        // anti-aliasing for selected items without having support for alpha
+        // blending.
+        
         final int width = 80;
         final int height = 20;
-        image = new Image(display, width, height);     
+        
+        image = new Image(display, width, height);
         GC gc = new GC(image);
+        
+        // Set the background colour
+        gc.setBackground(background);
+        gc.fillRectangle(0, 0, width, height);
+        
         if (state.startsWith("%")) {
           int percent = Integer.parseInt(state.substring(1));
           int barY = height / 4;
@@ -486,6 +503,12 @@ public class TrackTable
           gc.drawText(state, (width - size.x) / 2, (height - size.y) / 2, true);
         }
         gc.dispose();
+        
+        // Create a new image with a transparent background
+        ImageData imageData = image.getImageData();
+        imageData.transparentPixel = imageData.palette.getPixel(background.getRGB());        
+        image.dispose();
+        image = new Image(display, imageData);
       }
       imageHash.put(state, image);
     }
