@@ -39,7 +39,7 @@ public class TrackTable {
   private Hashtable hashByTableItem;
   
   /** The current comparitor used to sort the table. */
-  private Comparator comparator;
+  private TrackComparator comparator;
   
   /** The currently selected track. */
   private Track selected;
@@ -61,7 +61,7 @@ public class TrackTable {
     col.setText(getResourceString("TrackTable.Heading.Artist")); 
     addColumnListener(col, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-        return new MagicString(track0.getArtist()).compareTo(new MagicString(track1.getArtist()));
+          return new MagicString(track0.getArtist()).compareTo(new MagicString(track1.getArtist()));
       }        
     });
 
@@ -147,10 +147,8 @@ public class TrackTable {
     //final Integer colNo = new Integer(columnNumber);
     column.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event e) {
-        if (TrackTable.this.comparator != comparator) {
-          TrackTable.this.comparator = comparator;
+          TrackTable.this.comparator = (TrackComparator)comparator;
           updateTable();
-        }
       } 
     });
   }
@@ -171,6 +169,7 @@ public class TrackTable {
   /** Sorts the table and loads it into the Table (displays it). */
   private void load() {
     // Sort first
+    comparator.setDirection(!comparator.direction);
     Collections.sort(listOfTracks, comparator);
     
     System.out.println("TrackTable: Resizing"); //$NON-NLS-1$
@@ -295,11 +294,30 @@ public class TrackTable {
   /** A helper class used to make it easy to write clean track comparators
    * without too much casting. */
   private abstract class TrackComparator implements Comparator {
+    
+    private boolean direction = false;
+    
+    public void setDirection(boolean direction) {
+      this.direction = direction; 
+    }
+    
     public int compare(Object o0, Object o1) {
       int comp = compareTrack((Track) o0, (Track) o1);
-      if (comp != 0)
-        return comp;
-      return compareURL((Track) o0, (Track) o1);
+      
+      if(direction) {
+        if (comp != 0)
+          return comp;
+        return compareURL((Track) o0, (Track) o1);
+      } else {
+        if(comp < 0)
+          return Math.abs(comp);
+        else if (comp > 0) {
+          return -1*comp;   
+        }
+        else {
+          return compareURL((Track) o0, (Track) o1);
+        } 
+      }
     }
 
     public int compareURL(Track track0, Track track1) {
@@ -309,6 +327,7 @@ public class TrackTable {
     public abstract int compareTrack(Track track0, Track track1);  
   }
   
+    
   /** Set the a pop-up menu for the table. */
   public void setMenu(Menu menu) {
     table.setMenu(menu);
