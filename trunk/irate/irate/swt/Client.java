@@ -26,14 +26,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/24 21:48:36 $
+ * Date Updated: $Date: 2004/01/04 00:37:03 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.127 $
+ * @version $Revision: 1.128 $
  */
 public class Client extends AbstractClient {
 
@@ -158,8 +158,6 @@ public class Client extends AbstractClient {
 
   /** This sets the statusbar */
   public void setState(String state) {
-    if(strState.equals(state))
-      return;
     strState = state;
     display.asyncExec(new Runnable() {
       public void run() {
