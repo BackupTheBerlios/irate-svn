@@ -457,7 +457,7 @@ public class TrackDatabase {
     Track[] tracks = getTracks();
     int noOfUnrated = 0;
     for (int i = 0; i < tracks.length; i++)
-      if (!tracks[i].isHidden() && !tracks[i].isRated())
+      if (!tracks[i].isHidden() && !tracks[i].isRated() && tracks[i].getFile() != null)
         noOfUnrated++;  
     return noOfUnrated;  
   }
