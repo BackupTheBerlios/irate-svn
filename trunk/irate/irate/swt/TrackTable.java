@@ -115,7 +115,7 @@ public class TrackTable
     display = composite.getDisplay();
     this.trackDatabase = trackDatabase;
     basicSkinable = new BasicSkinable(this.display);
-    table = new Table(composite, SWT.NONE);
+    table = new Table(composite, SWT.FULL_SELECTION);
     table.setEnabled(false);
 
     TableColumn col = new TableColumn(table, SWT.LEFT);
