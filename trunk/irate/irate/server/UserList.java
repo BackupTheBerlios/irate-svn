@@ -45,9 +45,16 @@ public class UserList {
     return (ServerDatabase[]) users.toArray(new ServerDatabase[users.size()]);
   }
   
-  public ServerDatabase randomUser(Random random) {
+  public ServerDatabase randomUser(Random random, ServerDatabase user) {
     if (users.size() == 0) 
       return null; 
-    return (ServerDatabase) users.elementAt((random.nextInt() & 0x7fffffff) % users.size());
+    if (users.size() == 1 && users.elementAt(0) == user)
+      return null;
+    
+    while (true) {
+      ServerDatabase peer = (ServerDatabase) users.elementAt((random.nextInt() & 0x7fffffff) % users.size());
+      if (peer != user) 
+        return peer;
+    }
   }
 }

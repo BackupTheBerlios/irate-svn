@@ -66,6 +66,18 @@ public class Track {
     }
     return 0;
   }
+  
+  public void incNoOfTimesPlayed() {
+    synchronized (this) {
+      elt.setAttribute("played", Integer.toString(getNoOfTimesPlayed() + 1));
+    }
+  }
+
+  public void unSetNoOfTimesPlayed() {
+    synchronized (this) {
+      elt.setAttribute("played", "");
+    }
+  }
 
   public void setRating(float rating) {
     elt.setAttribute("rating", Float.toString(rating));
@@ -90,12 +102,6 @@ public class Track {
     catch (NumberFormatException e) {
     }
     return Float.NaN;
-  }
-
-  public void incNoOfTimesPlayed() {
-    synchronized (this) {
-      elt.setAttribute("played", Integer.toString(getNoOfTimesPlayed() + 1));
-    }
   }
 
   public String getArtist() {

@@ -75,7 +75,7 @@ public class MasterDatabase extends ServerDatabase {
 
     if (user.getNoOfTracks() == 0) {
       for (int i = 0; i < initialTracks; i++) {
-        ServerDatabase peer = userList.randomUser(random);
+        ServerDatabase peer = userList.randomUser(random, user);
         if (peer != null) {
           System.out.println("Peer: " + peer.getUserName());
           Track track = peer.chooseTrack(random);
@@ -170,6 +170,7 @@ public class MasterDatabase extends ServerDatabase {
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
       track.unSetRating();
+      track.unSetNoOfTimesPlayed();
       track.unSetFile();
       track.unSetWeight();
     }
