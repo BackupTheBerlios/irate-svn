@@ -9,6 +9,7 @@ import irate.common.*;
 public class PlayThread extends Thread {
  
   private Track currentTrack;
+  private Track nextTrack;
   private Player player;
   private PlayListManager playListManager;
   private Vector actionListeners = new Vector();
@@ -27,7 +28,7 @@ public class PlayThread extends Thread {
     }
   }
 
-  public void playFile(File file) throws Exception {
+  private void playFile(File file) throws Exception {
     if (externalPlayer.length() != 0) {
       playerProcess = Runtime.getRuntime().exec(new String[] { externalPlayer, file.getPath() });
       try {
@@ -44,10 +45,20 @@ public class PlayThread extends Thread {
       player.play();
     }
   }
+
+  public void play(Track track)
+  {
+    nextTrack = track;
+    reject();
+  }
   
-  public void playTrack() {
+  private void playTrack() {
     try {
-      currentTrack = playListManager.chooseTrack();
+        // If a next track has been chosen by the user, use that, otherwise
+	// pick one intelligently.
+      currentTrack = nextTrack != null ? nextTrack : playListManager.chooseTrack();
+      nextTrack = null;
+
       if (currentTrack != null) {
         notifyActionListeners();
         File file = currentTrack.getFile();

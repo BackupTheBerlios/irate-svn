@@ -30,6 +30,24 @@ public class PlayPanel extends JPanel {
     currentSongLabel.setFont(new Font("Serif", Font.PLAIN, 16));
     add(currentSongLabel, BorderLayout.NORTH);
 
+      // If you click on the current song label, it clears the list selection.
+    currentSongLabel.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+	list.clearSelection();
+      }
+    });
+
+      // Double click to play a specified track.
+    list.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+	if (e.getClickCount() == 2) {
+	  int index = list.getSelectedIndex();
+	  if (index >= 0)
+	    PlayPanel.this.playThread.play(tracks[index]);
+	}
+      }
+    });
+
     add(new JScrollPane(list), BorderLayout.CENTER);
 
     add(createButtonPanel(), BorderLayout.SOUTH);
