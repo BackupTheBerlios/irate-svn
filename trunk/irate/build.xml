@@ -13,7 +13,7 @@
     </javac>
   </target>
 
-  <target name="jar" depends="compile">
+  <target name="irate-client-swing">
     <jar jarfile="irate-client-swing.jar" manifest="META-INF/manifest.irate-client" compress="true">
       <fileset dir="." includes="irate/swing/*.class"/>
       <fileset dir="." includes="irate/client/*.class"/>
@@ -21,7 +21,9 @@
       <fileset dir="." includes="irate/common/*.class"/>
       <fileset dir="." includes="irate/download/*.class"/>
     </jar>
+  </target>
     
+  <target name="jar" depends="compile,irate-client-swing">
     <jar jarfile="irate-client-swt.jar" manifest="META-INF/manifest.irate-swt-client" compress="true">
       <fileset dir="." includes="irate/swt/*.class"/>
       <fileset dir="." includes="irate/client/*.class"/>
