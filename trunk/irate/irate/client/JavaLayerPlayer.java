@@ -70,8 +70,8 @@ public class JavaLayerPlayer implements Player {
           }          
         });
       player.setDataSource(file);
-      setPlayerVolume(volume);
       player.startPlayback();
+      setPlayerVolume(volume);
       if (paused)
         player.pausePlayback();
         
