@@ -17,7 +17,7 @@ public class Preferences {
   private static File config;
   private static File temp;
 
-  public Preferences() {
+  static {
     File dir = getPrefsDirectory();
     config = new File(dir, "irate.xml");
     temp = new File(dir, "irate.xml~");
@@ -49,6 +49,14 @@ public class Preferences {
     return getUserPreference("downloadDir");
   }
   
+  public static boolean isRoboJockEnabled() {
+    return isUserPreference("RoboJock");
+  }
+
+  public static void setRoboJockEnabled(boolean enabled) throws IOException {
+    setUserPreference("RoboJock", enabled);
+  }
+
   public static String getUserPreference(String prefName) {
     try {    
       XMLElement docElt = getConfigFileAsXML();
@@ -68,8 +76,31 @@ public class Preferences {
       return null;    
     }   
   }
+
   
-  
+  /**
+   * Returns true if the named user preference is set to true.
+   *
+   * @param prefName the preference name
+   * @return true if the preference is set to true.
+   */
+  public static boolean isUserPreference(String prefName) {
+    String value = getUserPreference(prefName);
+    return (value != null) && Boolean.valueOf(value).booleanValue();
+  }
+
+
+  /**
+   * Sets a boolean user preference.
+   *
+   * @param prefName the preference name
+   * @param enabled the boolean preference value.
+   */
+  public static void setUserPreference(String prefName, boolean enabled) throws IOException {
+    savePreferenceToFile(prefName, Boolean.toString(enabled));
+  }
+
+
   /**
    * This method updates the irate.xml file, given an actual XMLElement.  If
    * the element already exists, it will be replaced.
@@ -82,11 +113,8 @@ public class Preferences {
     boolean foundFlag = false;
     
     if(config.exists()) {
-      
       docElt = getConfigFileAsXML();
-    
       Enumeration e = docElt.enumerateChildren();
-      
       while(e.hasMoreElements()) {
         XMLElement elt = (XMLElement)e.nextElement();
           if (elt.getName().equals(child.getName())) {
@@ -106,9 +134,7 @@ public class Preferences {
        }
        docElt.addChild(child);
      }
-     
      writeConfigToFile(docElt);
-     
   }
 
   
@@ -119,44 +145,13 @@ public class Preferences {
    * @throws IOException
    */
   public static void savePreferenceToFile(String prefName, String prefValue) throws IOException {
-    
-    boolean foundFlag = false;
-
-    XMLElement docElt = new XMLElement(new Hashtable(), false, false);
-    
-    if(config.exists()) {
-      
-     
-     docElt = getConfigFileAsXML();
-     
-     
-     Enumeration e = docElt.enumerateChildren();
-      while(e.hasMoreElements()) {
-        XMLElement elt = (XMLElement)e.nextElement();
-        if (elt.getName().equals("preference")) {
-          String identifier = elt.getStringAttribute("id");
-          if(identifier.equals(prefName)) {
-            elt.setContent(prefValue);
-            foundFlag = true;
-          }
-        }
-      }
-    }
-    
-    if(!config.exists() || foundFlag == false) {
-      if(!config.exists()) {
-        docElt.setName("irate");
-      }
-      XMLElement newPref = new XMLElement(new Hashtable(), false, false);
-      newPref.setName("preference");
-      newPref.setAttribute("id", prefName);
-      newPref.setContent(prefValue);
-      docElt.addChild(newPref);
-    }
-    
-    writeConfigToFile(docElt);
-    
+    XMLElement pref = new XMLElement(new Hashtable(), false, false);
+    pref.setName("preference");
+    pref.setAttribute("id", prefName);
+    pref.setContent(prefValue);
+    updateWithChild(pref);
   }
+
   
   /**
    * Generate the irate.xml file based upon an an XMLElement representation
@@ -207,5 +202,5 @@ public class Preferences {
     return docElt;
     
   }
-  
+
 }
