@@ -22,10 +22,10 @@ import org.eclipse.swt.graphics.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/01/06 04:42:51 $
+ * Date Updated: $Date: 2004/01/16 05:02:35 $
  * @author Creator:	taras
- * @author Updated:	$Author: tglek $
- * @version $Revision: 1.18 $
+ * @author Updated:	$Author: ajones $
+ * @version $Revision: 1.19 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -70,14 +70,19 @@ public class AccountDialog {
     Composite composite = new Composite(tabs, SWT.NONE);
     tabItem.setControl(composite);
     composite.setLayout(new GridLayout());
-    Text txt = new Text(composite, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP
-                         | SWT.V_SCROLL);
+    Text txt = new Text(composite, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
     txt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL));
-    txt.setText("Short intro + instructions go here");
+    txt.setText(getResourceString("AccountDialog.Intro"));
     
     tabItem = new TabItem(tabs, SWT.NONE);
     tabItem.setText("Account Settings");
     composite = new Composite(tabs, SWT.NONE);
+    txt = new Text(composite, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
+    GridData data = new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL);
+    data.horizontalSpan = 4;
+    txt.setLayoutData(data);
+    txt.setText(getResourceString("AccountDialog.Settings"));
+
     createMain(composite);
     tabItem.setControl(composite);
     
@@ -86,8 +91,6 @@ public class AccountDialog {
     composite = new Composite(tabs, SWT.NONE);
     tabItem.setControl(composite);
     createStatus(composite);
-      
-
   
     
     Composite buttonComposite = new Composite(shell, SWT.NONE);
