@@ -129,7 +129,7 @@
     <copy file="mac/PkgInfo"
       todir="mac/dist/iRATE.app/Contents" overwrite="true"/>
     <mkdir dir="mac/dist/iRATE.app/Contents/MacOS"/>
-    <copy file="mac/bin/java_swt"
+    <copy file="lib/java_swt"
       todir="mac/dist/iRATE.app/Contents/MacOS"
       overwrite="true" preservelastmodified="true"/>
     <chmod file="mac/dist/iRATE.app/Contents/MacOS/java_swt" perm="755"/>
