@@ -119,10 +119,10 @@ public class Client extends AbstractClient {
     trackTable.updateTable();
     topPanel.layout();
     
-
-    
     shell.layout();
     
+    String maximize = Preferences.getUserPreference("isMaximized");
+       
     String length = Preferences.getUserPreference("shellLength");
     String height = Preferences.getUserPreference("shellHeight");
     if(length != null && height != null) {
@@ -135,6 +135,11 @@ public class Client extends AbstractClient {
     if(xLocation != null && yLocation != null) {
         shell.setLocation(new Integer(xLocation).intValue(),new Integer(yLocation).intValue());
       }
+    
+    if(maximize != null && maximize.equals("true")) {
+        shell.setMaximized(true);
+    }
+    
     
     String volumeLevel = Preferences.getUserPreference("volumeLevel");
     if(volumeLevel != null) {
@@ -174,12 +179,19 @@ public class Client extends AbstractClient {
   public void quit() {
     Point closingSize = shell.getSize();
     Point closingLocation = shell.getLocation();
+    Boolean isMaximized = new Boolean(shell.getMaximized());
     try {
-        Preferences.savePreferenceToFile("shellLength", new Integer(closingSize.x).toString());
-        Preferences.savePreferenceToFile("shellHeight", new Integer(closingSize.y).toString());  
-        Preferences.savePreferenceToFile("shellX",new Integer(closingLocation.x).toString());
-        Preferences.savePreferenceToFile("shellY",new Integer(closingLocation.y).toString());
+        Preferences.savePreferenceToFile("isMaximized",isMaximized.toString());
+        
+        if (!isMaximized.booleanValue()) {
+            Preferences.savePreferenceToFile("shellLength", new Integer(closingSize.x).toString());
+            Preferences.savePreferenceToFile("shellHeight", new Integer(closingSize.y).toString());  
+            Preferences.savePreferenceToFile("shellX",new Integer(closingLocation.x).toString());
+            Preferences.savePreferenceToFile("shellY",new Integer(closingLocation.y).toString());
+        }
+        
         Preferences.savePreferenceToFile("volumeLevel",new Integer(getVolumeSlider()).toString());
+        
     } catch (IOException io) {}
     super.quit();
   }
