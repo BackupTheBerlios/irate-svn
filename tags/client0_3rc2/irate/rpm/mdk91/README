@@ -1,0 +1,9 @@
+*** Mandrake 9.1 README ***
+
+The iRATE client depends upon libswt-gtk2. A package can be found at
+
+http://www.sophrosune.org/irate/mdk91
+
+Note that the iRATE package on that page is the stable version. If you're
+building from these CVS materials, you don't want the iRATE package from 
+there, only the libswt-gtk2 package.
