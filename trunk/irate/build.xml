@@ -11,6 +11,7 @@
         <pathelement path="lib/swt-pi.jar"/>
         <pathelement path="lib/skinlf.jar"/>
         <pathelement path="lib/jd3lib.jar"/>
+        <pathelement path="lib/swtdock.jar"/>
       </classpath>
     </javac>
   </target>
@@ -142,7 +143,7 @@
     </copy>
     <mkdir dir="iRATE.app/Contents/Resources/Java/dll"/>
     <copy todir="iRATE.app/Contents/Resources/Java/dll" preservelastmodified="true">
-      <fileset dir="lib" includes="libswt-*carbon-*.jnilib"/>
+      <fileset dir="lib" includes="*.jnilib"/>
     </copy>
     <mkdir dir="iRATE.app/Contents/Resources Disabled"/>
   </target>

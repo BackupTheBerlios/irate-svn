@@ -35,6 +35,7 @@ import org.eclipse.swt.widgets.*;
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
+ * @author Updated: Brion Vibber
  */
 public class Client extends AbstractClient {
 
@@ -416,6 +417,8 @@ public class Client extends AbstractClient {
     shell.setBounds(rec);
 
     progressBar.setVisible(false);
+    
+    createTrayItem();
 
   }
 
@@ -742,8 +745,18 @@ public class Client extends AbstractClient {
       mPlayer.addArmListener(
         new ToolTipArmListener(Resources.getString("toolbar.sub_menu_item.tooltip.player") + " " + player));
     }
+    
+    Menu hidden;
+    if (isMac()) {
+      // On the Mac, we put some items in the application menu.
+      // We use a hidden popup Menu to stick the MenuItems with
+      // the selection listeners.
+      hidden = new Menu(shell, SWT.POP_UP);
+    } else {
+      hidden = null;
+    }
 
-    MenuItem item2_1 = new MenuItem(mSettings, SWT.PUSH);
+    MenuItem item2_1 = new MenuItem(isMac() ? hidden : mSettings, SWT.PUSH);
     skinManager.addItem(item2_1, "toolbar.menu_item.advanced");
     item2_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -768,7 +781,32 @@ public class Client extends AbstractClient {
 
     item3.setMenu(menu3);
 
-    MenuItem item3_1 = new MenuItem(menu3, SWT.PUSH);
+    MenuItem helpItem = new MenuItem(menu3, SWT.PUSH);
+    if (isMac()) {
+      helpItem.setAccelerator('?' | SWT.COMMAND);
+      skinManager.addItem(helpItem, "toolbar.menu_item.help_mac");
+	} else {
+      helpItem.setAccelerator(SWT.F1);
+      skinManager.addItem(helpItem, "toolbar.menu_item.help");
+    }
+    helpItem.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        try {
+          // Might be nice to have more thorough docs stored locally.
+          // For the mac app bundle version, they can be stored in the
+          // app bundle and accessed through Help Viewer.
+          showURL(new URL("http://irate.sourceforge.net/documentation.gettingstarted.html"));
+        } catch (MalformedURLException ex) {
+          ex.printStackTrace();
+        }
+      }
+    });
+    
+    if(System.getProperty("os.name").toLowerCase().startsWith("win")) {
+      MenuItem helpSep = new MenuItem(menu3, SWT.SEPARATOR);
+    }
+    
+    MenuItem item3_1 = new MenuItem(isMac() ? hidden : menu3, SWT.PUSH);
     skinManager.addItem(item3_1, "toolbar.menu_item.credits");
     item3_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
@@ -776,6 +814,40 @@ public class Client extends AbstractClient {
       }
     });
     item3_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.credits")));
+    
+    if (isMac()) {
+      try {
+        /* Touch up the application menu on Mac OS X
+         * I apologize for the reflection ugliness! --brion
+         */
+        Class appMenuClass = Class.forName("com.leuksman.swtdock.ApplicationMenu");
+        Method enablePreferences = appMenuClass.getMethod(
+          "enablePreferences", new Class[] {});
+        Method insertMenuItem = appMenuClass.getMethod("insertMenuItem",
+          new Class[] {String.class, java.lang.Integer.TYPE, String.class});
+        Method insertSeparator = appMenuClass.getMethod(
+          "insertSeparator", new Class[] {java.lang.Integer.TYPE});
+        
+        Class commandHandlerClass = Class.forName("com.leuksman.swtdock.CommandHandler");
+        Method setAndListenFor = commandHandlerClass.getMethod("setAndListenFor",
+          new Class[] {String.class, MenuItem.class});
+        
+        /* Add the 'About' item and enable 'Preferences' */
+        Object appmenu = appMenuClass.newInstance();
+        enablePreferences.invoke(appmenu, new Object[] {});
+        insertMenuItem.invoke(appmenu, new Object[] {
+          Resources.getString("toolbar.menu_item.credits"),
+          new Integer(0), "abou" });
+        insertSeparator.invoke(appmenu, new Object[] {new Integer(1)});
+        
+        /* Attach these commands to the existing MenuItems */
+        Object handler = commandHandlerClass.newInstance();
+        setAndListenFor.invoke(handler, new Object[] {"abou", item3_1});
+        setAndListenFor.invoke(handler, new Object[] {"pref", item2_1});
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
   }
 
   public void createToolBar() {
@@ -1032,6 +1104,94 @@ public class Client extends AbstractClient {
         }
       });
       skinManager.addItem(item, rf.getName());
+    }
+  }
+  
+  public void createTrayItem() {
+    final Menu trayMenu = new Menu(shell, SWT.POP_UP);
+    
+    char[] stars = {'\u2605', '\u2605', '\u2605', '\u2605', '\u2605'};
+    MenuItem[] rate = new MenuItem[ratingFunctions.length];
+    for (int i = 0; i < ratingFunctions.length; i++) {
+      RatingFunction rf = ratingFunctions[i];
+      rate[i] = new MenuItem(trayMenu, SWT.NONE);
+      final int value = rf.getValue();
+      rate[i].addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          setRating(trackTable.getSelectedTrack(), value);
+        }
+      });
+      if(i == 0) {
+        // this sux
+	    rate[i].setText(Resources.getString(rf.getName()));
+	  } else {
+	    // stars
+	    rate[i].setText(new String(stars, 0, i));
+	  }
+    }
+    
+    MenuItem sep = new MenuItem(trayMenu, SWT.SEPARATOR);
+    
+    MenuItem play = new MenuItem(trayMenu, SWT.PUSH);
+    play.setText("Play/Pause");
+    play.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        setPaused(!isPaused());
+      }
+    });
+    
+    MenuItem next = new MenuItem(trayMenu, SWT.PUSH);
+    next.setText("Next");
+    next.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        skip(false);
+      }
+    });
+
+    MenuItem prev = new MenuItem(trayMenu, SWT.PUSH);
+    prev.setText("Previous");
+    prev.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        skip(true);
+      }
+    });
+    
+    if (isMac()) {
+      /* Use the dock tile's menu
+       * I apologize for the reflection ugliness... --brion
+       */
+      try {
+        Class commandHandlerClass = Class.forName("com.leuksman.swtdock.CommandHandler");
+        Method setAndListenFor = commandHandlerClass.getMethod("setAndListenFor",
+          new Class[] {String.class, MenuItem.class});
+        
+        Class dockTileClass = Class.forName("com.leuksman.swtdock.DockTile");
+        Method setMenu = dockTileClass.getMethod(
+          "setMenu", new Class[] {Menu.class});
+        
+        Object dock = dockTileClass.newInstance();
+        setMenu.invoke(dock, new Object[] {trayMenu});
+        
+        Object handler = commandHandlerClass.newInstance();
+        for (int i = 0; i < ratingFunctions.length; i++) {
+          setAndListenFor.invoke(handler, new Object[] {"Rat" + i, rate[i]});
+        }
+        setAndListenFor.invoke(handler, new Object[] {"Play", play});
+        setAndListenFor.invoke(handler, new Object[] {"Next", next});
+        setAndListenFor.invoke(handler, new Object[] {"Prev", prev});
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    } else {
+      /*
+      // Try this out later... Requires SWT 3.0
+      TrayItem tray = new TrayItem(display.getSystemTray(), SWT.NONE);
+      tray.addListener (SWT.Selection, new Listener() {
+        public void handleEvent (Event event) {
+          trayMenu.setVisible(true);
+        }
+      });
+      */
     }
   }
 
