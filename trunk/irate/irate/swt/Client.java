@@ -597,7 +597,38 @@ public class Client extends AbstractClient {
       }
     });
     
-    if (isMac()) {
+    MenuItem sep = new MenuItem(menu1, SWT.SEPARATOR);
+    
+    MenuItem play = new MenuItem(menu1, SWT.PUSH);
+    play.setText("Play/Pause");
+    play.setAccelerator(' ');
+    play.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        setPaused(!isPaused());
+      }
+    });
+    
+    MenuItem next = new MenuItem(menu1, SWT.PUSH);
+    next.setText("Next");
+    next.setAccelerator(SWT.ARROW_RIGHT + accel);
+    next.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        skip(false);
+      }
+    });
+
+    MenuItem prev = new MenuItem(menu1, SWT.PUSH);
+    prev.setText("Previous");
+    prev.setAccelerator(SWT.ARROW_LEFT + accel);
+    prev.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        skip(true);
+      }
+    });
+ 
+   MenuItem sep2 = new MenuItem(menu1, SWT.SEPARATOR);
+    
+   if (isMac()) {
       // Drag-n-drop is broken on SWT/Carbon; need another way to
       // let users get at the files behind their tracks.
       MenuItem mShowFile = new MenuItem(menu1, SWT.PUSH);
