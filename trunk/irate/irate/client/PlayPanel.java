@@ -30,6 +30,10 @@ public class PlayPanel extends JPanel {
     currentSongLabel.setFont(new Font("Serif", Font.PLAIN, 16));
     add(currentSongLabel, BorderLayout.NORTH);
 
+      // Work around annoying bug whereby swing makes some of the rows in the
+      // list ridiculously large for no good reason.
+    list.setPrototypeCellValue("XXX");
+
       // If you click on the current song label, it clears the list selection.
     currentSongLabel.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
