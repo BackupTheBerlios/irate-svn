@@ -148,6 +148,7 @@ public class SettingDialog
     
     final Text browserText = new Text(comp, SWT.NONE);
     browserText.setText(browser);
+    browserText.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL));
     
     Button browseButton = new Button(comp, SWT.NONE);
     browseButton.setText("Browse ...");
