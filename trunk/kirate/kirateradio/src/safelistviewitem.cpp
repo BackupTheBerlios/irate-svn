@@ -53,7 +53,9 @@ SafeListViewItem::SafeListViewItem(QListView *parent, TrackInfo* mtrack, const Q
 	
 	//Check if download needed
 	this->track->setProperty("probs","0%");
-	if(track->property("file",QString::null).isEmpty()&&track->property("state",QString::null).isEmpty()&&(track->property("deleted")=="false"||!track->isProperty("deleted"))) {
+	//This has been checked before <We can safely ignore this check now
+	//track->property("state",QString::null).isEmpty()&&(track->property("deleted")=="false"||!track->isProperty("deleted"))&&
+	if(track->property("file",QString::null).isEmpty()||!QFile::exists(track->property("file"))) {
 		KURL url(this->track->getURL());
 		QString localfilename=irateDir+"download/"+url.fileName(true);
 		//printf("LocalFilename is %s\n",localfilename.latin1());
@@ -64,13 +66,14 @@ SafeListViewItem::SafeListViewItem(QListView *parent, TrackInfo* mtrack, const Q
 		this->setText(IR_DOWNLOAD_COL,i18n("Queued"));
 		DownloadCenter::instance()->enqueue(this, url, localfilename);
 	} else if(track->isProperty("file")) {
-		PlaylistItemData::added();
+		
 		KURL tmpURL(track->property("file"));
 		this->mUrl=tmpURL.url();
 		//setOn(true);
 		this->setEnabled(true);
 		//this->setProperty("enabled","true");
 		//this->setUrl(this->track->property("file"));
+		PlaylistItemData::added();
 	}
 	int rate=(int)this->track->property("rating","20").toFloat();
 	switch(rate) {
