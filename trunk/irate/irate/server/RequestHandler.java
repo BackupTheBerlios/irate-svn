@@ -5,10 +5,6 @@ import irate.common.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import javax.xml.parsers.*;
-import org.w3c.dom.*;
-import org.w3c.dom.ls.*;
-import org.xml.sax.*;
 
 public class RequestHandler {
   

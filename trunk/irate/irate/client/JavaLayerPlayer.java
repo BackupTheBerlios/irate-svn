@@ -41,8 +41,11 @@ public class JavaLayerPlayer implements Player {
 
   public void close() {
     synchronized (this) {
-      player.close();
-      audio = null;
+      if (player != null) {
+        player.close();
+        audio = null;
+        player = null;
+      }
     }
   }
 

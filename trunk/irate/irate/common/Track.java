@@ -44,7 +44,10 @@ public class Track {
    */
   private float getRawRating() {
     try {
-      return Float.parseFloat(elt.getStringAttribute("rating"));
+      String s = elt.getStringAttribute("rating");
+      if (s == null)
+        s = "";
+      return Float.parseFloat(s);
     }
     catch (NumberFormatException e) {
     }
@@ -65,7 +68,10 @@ public class Track {
 
   public int getNoOfTimesPlayed() {
     try {
-      return Integer.parseInt(elt.getStringAttribute("played"));
+      String s = elt.getStringAttribute("played");
+      if (s == null)
+        s = "";
+      return Integer.parseInt(s);
     }
     catch (NumberFormatException e) {
     }
@@ -87,7 +93,10 @@ public class Track {
   }
 
   public String getLastPlayed() {
-    return elt.getStringAttribute("last");
+    String s = elt.getStringAttribute("last");
+    if (s == null)
+      return "";
+    return s;
   }
 
   public void setRating(float rating) {
@@ -108,7 +117,10 @@ public class Track {
 
   public float getWeight() {
     try {
-      return Integer.parseInt(elt.getStringAttribute("weight"));
+      String s = elt.getStringAttribute("weight");
+      if (s == null)
+        s = "";
+      return Integer.parseInt(s);
     }
     catch (NumberFormatException e) {
     }
@@ -144,7 +156,10 @@ public class Track {
 
   public URL getURL() {
     try {
-      return new URL(elt.getStringAttribute("url"));
+      String url = elt.getStringAttribute("url");
+      if (url == null)
+        url = "";
+      return new URL(url);
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -153,7 +168,10 @@ public class Track {
   }
 
   public String getKey() {
-    return elt.getStringAttribute("url");
+    String key = elt.getStringAttribute("url");
+    if (key == null)
+      return "";
+    return key;
   }
 
   public File getFile() {

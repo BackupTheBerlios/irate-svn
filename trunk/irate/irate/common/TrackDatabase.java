@@ -117,7 +117,6 @@ public class TrackDatabase {
     String att = elt.getStringAttribute(attName);
     if (att == null)
       return "";
-    System.out.println(att);
     return att;
   }
 
