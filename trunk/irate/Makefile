@@ -110,9 +110,9 @@ else
 endif
 
 ifeq ($(PLATFORM),linux-motif)	
-	install lib/libswt-gnome-motif-3009.so $(LIB)
-	install lib/libswt-kde-motif-3009.so $(LIB)
-	install lib/libswt-motif-3009.so $(LIB)
+	install lib/libswt-gnome-motif-2133.so $(LIB)
+	install lib/libswt-kde-motif-2133.so $(LIB)
+	install lib/libswt-motif-2133.so $(LIB)
 else
 ifeq ($(PLATFORM),linux-gtk2)
 	install lib/libswt-gnome-gtk-2135.so $(LIB)

@@ -1,3 +1,9 @@
+irate (0.3-0pre8) unstable; urgency=low
+
+  * Rearranged the GUI and improved the new user input screens.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Sat, 24 Jan 2004 16:03:35 +0800
+
 irate (0.3-0pre7) unstable; urgency=low
 
   * Added missing resources.

@@ -77,4 +77,4 @@ clean:
 # gtk2 zip file
 	rm -f swt.jar swt-pi.jar swtsrc.zip swt-pisrc.zip about.html cpl-v10.html lgpl-v21.txt libswt-gnome-gtk-2135.so libswt-gtk-2135.so libswt-pi-gtk-2135.so
 # motif zip file
-	rm -f libswt-gnome-motif-3009.so libswt-gnome-motif-3009.so  libswt-kde-motif-3009.so libswt-motif-3009.so libXm.so libXm.so.2 libXm.so.2.1 swt.jar
+	rm -f libswt-gnome-motif-2133.so libswt-gnome-motif-2133.so  libswt-kde-motif-2133.so libswt-motif-2133.so libXm.so libXm.so.2 libXm.so.2.1 swt.jar
