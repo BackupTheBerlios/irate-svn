@@ -21,7 +21,7 @@ $cfg["random_frequency"]=2;
 $cfg["dft_correlation"]="sylvinus1"; //hoping for a better one :)
 
 // can users register with irate.registerUser ?
-//$cfg["allow_registering"]=true;
+$cfg["allow_registering"]=true;
 
 
 

@@ -43,6 +43,12 @@ function irate_server($options="") {
 
  $this->db= DB::connect($this->cfg["dsn"],true);
 
+
+ if (DB::isError($this->db)) {
+  die ($this->db->getMessage());
+ }
+			 
+
  $this->db->setFetchMode(DB_FETCHMODE_ASSOC);
 
  $DispMap=array(
@@ -125,7 +131,7 @@ function getNew($number,$include_random=true,$min_old_weight=1) {
  */
 
  if ($this->cfg["prepare"]) {
-  $ids=$this->db->getCol("SELECT trackid FROM prepare WHERE userid=".$this->user["id"]." LIMIT 0,".$number);
+  $ids=$this->db->getCol("SELECT trackid FROM irate_prepare WHERE userid=".$this->user["id"]." LIMIT 0,".$number);
  }
  
  $number-=count($ids);
@@ -149,7 +155,7 @@ function getNew($number,$include_random=true,$min_old_weight=1) {
  * STEP 3 : we get the correlated results if needed
  */ 
  
- $old=$this->db->getOne("SELECT count(*) FROM ratings WHERE userid=".$this->user["id"]);
+ $old=$this->db->getOne("SELECT count(*) FROM irate_ratings WHERE userid=".$this->user["id"]);
 
  $c=array();
  
@@ -203,7 +209,7 @@ function requireAuth() {
   $this->error("MUST_LOGIN");
  }
  
- $user=$this->db->getRow("SELECT * FROM users WHERE user=?",array($u));
+ $user=$this->db->getRow("SELECT * FROM irate_users WHERE user=?",array($u));
 
  if (empty($user)) {
   $this->error("UNKNOWN_USER");
@@ -211,7 +217,7 @@ function requireAuth() {
 
  if (sha1("irate".sha1($user["pass"]))==$h) {
   $this->user=$user;
-  $this->db->query("UPDATE users SET datelastlogin=now() WHERE user=?",array($u));
+  $this->db->query("UPDATE irate_users SET datelastlogin=now() WHERE user=?",array($u));
  } else {
   $this->error("WRONG_PASSWORD");
  }
@@ -269,7 +275,7 @@ function findTrackID($params) {
  if (empty($params["id"])) {
 
   if (!empty($params["hash_sha1"])) {
-   $params["id"]=$this->db->getOne("SELECT distributions.trackid FROM distributions WHERE hash_sha1=!",array($params["hash_sha1"]));
+   $params["id"]=$this->db->getOne("SELECT trackid FROM irate_distributions WHERE hash_sha1=!",array($params["hash_sha1"]));
   }
 
 
@@ -290,7 +296,7 @@ function unrateOne($params) {
   $this->error("TRACK_NOT_FOUND");
  }
 
- $this->db->query("DELETE FROM ratings WHERE userid=? AND trackid=?",array($this->user["id"],$params["id"]));
+ $this->db->query("DELETE FROM irate_ratings WHERE userid=? AND trackid=?",array($this->user["id"],$params["id"]));
 
 }
 
@@ -316,7 +322,7 @@ function rateOne($params) {
 
 
  //step 2 : has the user already rated the track ?
- $row=$this->db->getRow("SELECT * FROM ratings WHERE userid=? AND trackid=?",array($this->user["id"],$params["id"]));
+ $row=$this->db->getRow("SELECT * FROM irate_ratings WHERE userid=? AND trackid=?",array($this->user["id"],$params["id"]));
  
  if (count($row)>0) {
 
@@ -324,20 +330,20 @@ function rateOne($params) {
    //todo : add, avg, and reduce to weight=1 ?
 
   if ($params["weight"]>=$row["weight"]) {
-    $this->db->query("UPDATE ratings SET weight=?,rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($params["weight"],$params["rating"],$row["id"]));
+    $this->db->query("UPDATE irate_ratings SET weight=?,rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($params["weight"],$params["rating"],$row["id"]));
   }
   
  } else  {
   
 
    //new rating
-  $rid=$this->db->nextId("ratings");
+  $rid=$this->db->nextId("irate_ratings");
  
-  $a=$this->db->query("INSERT INTO ratings(id,trackid,userid,rating,ratingdate,ratingnum,weight) VALUES(?,?,?,?,now(),0,?)",array($rid,$params["id"],$this->user["id"],$params["rating"],$params["weight"]));
+  $a=$this->db->query("INSERT INTO irate_ratings(id,trackid,userid,rating,ratingdate,ratingnum,weight) VALUES(?,?,?,?,now(),0,?)",array($rid,$params["id"],$this->user["id"],$params["rating"],$params["weight"]));
  }
 
  //step 3 : delete track from suggestion cache.
-$this->db->query("DELETE FROM prepare WHERE userid=! AND trackid=!",array($this->user["id"],$params["id"]));
+$this->db->query("DELETE FROM irate_prepare WHERE userid=! AND trackid=!",array($this->user["id"],$params["id"]));
 
 
 return true;
@@ -348,7 +354,7 @@ return true;
 
 function getratings() {
 
- $a=$this->db->getAll("SELECT trackid,rating,weight FROM ratings WHERE userid=?",array($this->user["id"]));
+ $a=$this->db->getAll("SELECT trackid,rating,weight FROM irate_ratings WHERE userid=?",array($this->user["id"]));
 
  return $a;
 
@@ -367,14 +373,14 @@ function addTrack($data) {
   //server-specific file
  } else {
 
-  $id=$this->db->nextID("tracks");
+  $id=$this->db->nextID("irate_tracks");
   $id=($id*1000)+1; // 001 for audio
   $id=($id*100)+($id%97); // modulo 97
   $id=($id*10)+1; //-1 for server-specific
 
  }
   
-  $q=$this->db->query("INSERT INTO tracks(id,artistname,duration,pubdate,albumname,license,trackname,adddate,crediturl) VALUES (?,?,?,?,?,?,?,now(),?)",array($id,$data["artistname"],$data["duration"],$data["pubdate"],$data["albumname"],$data["license"],$data["trackname"],$data["crediturl"]));
+  $q=$this->db->query("INSERT INTO irate_tracks(id,artistname,duration,pubdate,albumname,license,trackname,adddate,crediturl) VALUES (?,?,?,?,?,?,?,now(),?)",array($id,$data["artistname"],$data["duration"],$data["pubdate"],$data["albumname"],$data["license"],$data["trackname"],$data["crediturl"]));
 
   return $id;
  
@@ -384,9 +390,9 @@ function addTrack($data) {
 
  function addDistribution($data) {
   
-  $id=$this->db->nextID("distributions");
+  $id=$this->db->nextID("irate_distributions");
 
-  $this->db->query("INSERT INTO distributions(id,trackid,codec,crediturl,adddate,filesize,hash_sha1) VALUES(?,?,?,?,now(),?,?)",array($id,$data["trackid"],$data["codec"],$data["crediturl"],$data["filesize"],$data["hash_sha1"]));
+  $this->db->query("INSERT INTO irate_distributions(id,trackid,codec,crediturl,adddate,filesize,hash_sha1) VALUES(?,?,?,?,now(),?,?)",array($id,$data["trackid"],$data["codec"],$data["crediturl"],$data["filesize"],$data["hash_sha1"]));
  
   return $id;
  }
@@ -395,10 +401,10 @@ function addTrack($data) {
 
  function addSource($data) {
   
-  $i=$this->db->nextId("sources");
+  $i=$this->db->nextId("irate_sources");
  
  
-  $this->db->query("INSERT INTO sources(id,distribid,media,protocol,link,crediturl,adddate) VALUES(?,?,?,?,?,?,now())",array($i,$data["distribid"],$data["media"],$data["protocol"],$data["link"],$data["crediturl"]));
+  $this->db->query("INSERT INTO irate_sources(id,distribid,media,protocol,link,crediturl,adddate) VALUES(?,?,?,?,?,?,now())",array($i,$data["distribid"],$data["media"],$data["protocol"],$data["link"],$data["crediturl"]));
 
  }
 
@@ -424,15 +430,15 @@ function addTrack($data) {
  $oldid=$this->user["id"];
 
   if (rand(0,100)<3) {
-   $this->db->query("DELETE FROM prepare WHERE now() - INTERVAL ! day > date",array($this->cfg["prepare_expire"]));
+   $this->db->query("DELETE FROM irate_prepare WHERE now() - INTERVAL ! day > date",array($this->cfg["prepare_expire"]));
   }
 
 
   $this->initCorrelation();
 
   $users=$this->db->getAll("SELECT users.id as id
-  FROM users
-  LEFT  JOIN prepare ON users.id = prepare.userid
+  FROM irate_users as users
+  LEFT  JOIN irate_prepare ON users.id = irate_prepare.userid
   WHERE now() - INTERVAL ! day < users.datelastlogin
   GROUP BY users.id
   ORDER BY users.datelastprepare ASC
@@ -441,13 +447,13 @@ function addTrack($data) {
 
   for ($i=0;$i<count($users);$i++) {
    $this->user["id"]=$users[$i]["id"];
-    $this->db->query("DELETE FROM prepare WHERE userid=!",array($users[$i]["id"]));
-    $this->db->query("UPDATE users SET datelastprepare=now() WHERE id=!",array($users[$i]["id"]));
+    $this->db->query("DELETE FROM irate_prepare WHERE userid=!",array($users[$i]["id"]));
+    $this->db->query("UPDATE irate_users SET datelastprepare=now() WHERE id=!",array($users[$i]["id"]));
 
    $tracks=$this->getNew($this->cfg["prepare_tracks"],false);
 
    for ($y=0;$y<count($tracks);$y++) {
-    $this->db->query("INSERT INTO prepare(trackid,userid,date) VALUES (!,!,now())",array($tracks[$y],$users[$i]["id"]));
+    $this->db->query("INSERT INTO irate_prepare(trackid,userid,date) VALUES (!,!,now())",array($tracks[$y],$users[$i]["id"]));
    }
   }
   
@@ -489,13 +495,13 @@ function getTrackXMLRPCbyIDs($ids) {
 
 function getTrackArray($trackid) {
  
- $trackrow=$this->db->getRow("SELECT artistname,trackname,license,albumname,pubdate,id,duration,crediturl FROM tracks WHERE id=!",array($trackid));
+ $trackrow=$this->db->getRow("SELECT artistname,trackname,license,albumname,pubdate,id,duration,crediturl FROM irate_tracks WHERE id=!",array($trackid));
  
- $distribs=$this->db->getALL("SELECT codec,crediturl,filesize,hash_sha1,id FROM distributions WHERE trackid=!",array($trackid));
+ $distribs=$this->db->getALL("SELECT codec,crediturl,filesize,hash_sha1,id FROM irate_distributions WHERE trackid=!",array($trackid));
 
 
  for ($i=0;$i<count($distribs);$i++) {
-  $sources=$this->db->getAll("SELECT protocol,link,crediturl FROM sources WHERE distribid=!",array($distribs[$i]["id"]));
+  $sources=$this->db->getAll("SELECT protocol,link,crediturl FROM irate_sources WHERE distribid=!",array($distribs[$i]["id"]));
   
   unset($distribs[$i]["id"]);
   
@@ -548,6 +554,7 @@ function IRS_xmlrpc_registerUser($params) {
  
  global $IRS;
 
+if ($cfg["allow_registering"]) {
 
  $p=$params->getParam(0);
  $username=$p->structmem("username");
@@ -556,14 +563,18 @@ function IRS_xmlrpc_registerUser($params) {
  //todo preg on username/password
 
 
-if ($IRS->db->getOne("SELECT 1 FROM users WHERE user=?",array($username->scalarval()))) {
+if ($IRS->db->getOne("SELECT 1 FROM irate_users WHERE user=?",array($username->scalarval()))) {
  $IRS->error("USER_ALREADY_EXISTS");
 }
 
 
-$IRS->db->query("INSERT INTO users(id,user,pass,dateinscr,datelastlogin,ipinscr) VALUES(?,?,?,now(),now(),?)",array($IRS->db->nextID("users"),$username->scalarval(),$password->scalarval(),$_SERVER["REMOTE_ADDR"]));
+$IRS->db->query("INSERT INTO irate_users(id,user,pass,dateinscr,datelastlogin,ipinscr) VALUES(?,?,?,now(),now(),?)",array($IRS->db->nextID("users"),$username->scalarval(),$password->scalarval(),$_SERVER["REMOTE_ADDR"]));
 
 return new XML_RPC_Response(new XML_RPC_Value("OK", "string"));
+
+} else {
+$IRS->error("REGISTERING_NOT_ALLOWED");
+}
 
 
 }
@@ -650,7 +661,7 @@ function IRS_xmlrpc_getNew($params) {
 
  $num=$p->structmem("n");
 
- if (!preg_match("/^[0-9]+$/",$num->scalarval())) {
+ if (empty($num) OR !preg_match("/^[0-9]+$/",$num->scalarval())) {
   $IRS->error("BAD_INPUT");
  }
  

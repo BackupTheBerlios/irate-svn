@@ -17,7 +17,7 @@ Intro
 
 This is an iRATE server written in PHP.
 
-It implements a new HTTP protocol for iRATE, as well as new
+It implements a new HTTP/XMLRPC protocol for iRATE, as well as new
 SQL backend.
 
 
@@ -48,6 +48,8 @@ Then you'll need to install some PEAR PHP modules :
 # pear install -o XML_RPC DB
 
 
+Copy config.php.SAMPLE to config.php
+
 Then edit config.php, and fix the DSN with your database password.
 
 You need to put your irate-phpserver somewhere in your apache webroot.
@@ -72,12 +74,13 @@ few years, but for the moment, writting it in PHP makes sense,
 maybe more for Apache than for PHP. Performance issues will be
 mostly SQL related, and Apache will help with scalability. We also
 would like many people to test new correlation algorithms, and
-PHP is very easy to learn and use, and most of the hard stuff
+PHP is very easy to learn and use ; anyway most of the hard stuff
 will be SQL-related.
 
  - Why a new HTTP protocol ?
 
-To allow people behind a firewall to use iRATE.
+To allow people behind a firewall to use iRATE. XMLRPC will
+also allow third-party iRATE clients to be easily developed.
 
 
 
@@ -103,9 +106,27 @@ Here are the main things you can do with irate-phpserver :
 
 Just connect to the host where the irate-phpserver is installed.
 
-For instance : http://localhost/myprojects/irate-phpserver/
+For instance : 
+ server : localhost ; path : myprojects/irate-phpserver/
 
 The port is 80.
+
+
+* Registering
+-------------
+
+Of course, registering doesn't need auth. (so don't include ?u=...&h=.... in the address
+for this query, see "Logging in")
+
+XMLRPC function : irate.register
+XMLRPC params : 
+ * struct 
+    - username => .....  (irate username)
+    - password => .....  (clear password)
+
+
+The function will return "OK" or an error.
+
 
 
 * Logging in
@@ -119,25 +140,12 @@ The hash is : sha1( "irate" . sha1 ( $password ) );
 
 So to connect to irate server, just query the XMLRPC location :
 
-  http://localhost/myprojects/irate-phpserver/?u=[username]&h=[sha1_hash]
+  localhost/myprojects/irate-phpserver/?u=[username]&h=[sha1_hash]
 
 If the login failed, an XMLRPC error will be thrown.
 
-
-* Registering
--------------
-
-Registering doesn't need auth. (so don't include ?u=...&h=.... in the address
-for this query)
-
-XMLRPC function : irate.register
-XMLRPC params : 
- * struct 
-    - username => .....  (irate username)
-    - password => .....  (clear password)
-
-
-The function will return "OK" or an error.
+All of the XMLRPC queries have to include these credentials in
+the path of the XMLRPC interface.
 
 
 

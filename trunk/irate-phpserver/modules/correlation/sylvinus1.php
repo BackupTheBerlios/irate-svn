@@ -109,7 +109,7 @@ function getTracksLike($users,$minrating,$num) {
 
 $tracks=$this->irs->db->getAll("
 SELECT ratings.trackid, avg(ratings.rating) as avgrating, sum(ratings.weight) as c1
-FROM ratings LEFT JOIN ratings as ratings2                                
+FROM irate_ratings as ratings LEFT JOIN irate_ratings as ratings2                                
 ON ratings.trackid=ratings2.trackid   
 AND ratings2.userid=!
 WHERE (ratings.userid=".implode(" OR ratings.userid=",$users).") 
@@ -138,7 +138,7 @@ function getUsersLike($maxdiff,$num) {
 
 $users=$this->irs->db->getAll("
 SELECT ratings2.userid,sum(ratings.weight) as c1,sum(abs(ratings2.rating-ratings.rating))/count(*) as diff
-FROM ratings LEFT JOIN ratings as ratings2
+FROM irate_ratings as ratings LEFT JOIN irate_ratings as ratings2
 ON ratings.trackid=ratings2.trackid 
 WHERE ratings.userid=! AND ratings2.userid<>!
 GROUP BY ratings2.userid 

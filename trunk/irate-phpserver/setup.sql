@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 -- 
 -- Host: localhost
--- Generation Time: Jan 06, 2005 at 07:33 PM
+-- Generation Time: Jan 11, 2005 at 11:48 PM
 -- Server version: 4.0.22
 -- PHP Version: 4.3.9
 -- 
@@ -13,10 +13,10 @@
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `distributions`
+-- Table structure for table `irate_distributions`
 -- 
 
-CREATE TABLE `distributions` (
+CREATE TABLE `irate_distributions` (
   `trackid` bigint(16) NOT NULL default '0',
   `id` bigint(16) NOT NULL default '0',
   `codec` varchar(16) NOT NULL default '',
@@ -32,10 +32,10 @@ CREATE TABLE `distributions` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `distributions_seq`
+-- Table structure for table `irate_distributions_seq`
 -- 
 
-CREATE TABLE `distributions_seq` (
+CREATE TABLE `irate_distributions_seq` (
   `id` int(10) unsigned NOT NULL auto_increment,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM;
@@ -43,10 +43,10 @@ CREATE TABLE `distributions_seq` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `prepare`
+-- Table structure for table `irate_prepare`
 -- 
 
-CREATE TABLE `prepare` (
+CREATE TABLE `irate_prepare` (
   `userid` int(12) NOT NULL default '0',
   `trackid` bigint(16) NOT NULL default '0',
   `date` datetime NOT NULL default '0000-00-00 00:00:00',
@@ -57,17 +57,17 @@ CREATE TABLE `prepare` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `ratings`
+-- Table structure for table `irate_ratings`
 -- 
 
-CREATE TABLE `ratings` (
+CREATE TABLE `irate_ratings` (
   `id` int(12) NOT NULL default '0',
   `trackid` bigint(16) NOT NULL default '0',
   `userid` int(12) NOT NULL default '0',
   `rating` int(2) NOT NULL default '0',
   `ratingdate` datetime NOT NULL default '0000-00-00 00:00:00',
   `ratingnum` int(4) NOT NULL default '0',
-  `weight` tinyint(3) NOT NULL default '100',
+  `weight` float NOT NULL default '0',
   PRIMARY KEY  (`id`),
   KEY `trackid` (`trackid`),
   KEY `userid` (`userid`),
@@ -77,10 +77,10 @@ CREATE TABLE `ratings` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `ratings_seq`
+-- Table structure for table `irate_ratings_seq`
 -- 
 
-CREATE TABLE `ratings_seq` (
+CREATE TABLE `irate_ratings_seq` (
   `id` int(10) unsigned NOT NULL auto_increment,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM;
@@ -88,10 +88,10 @@ CREATE TABLE `ratings_seq` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `sources`
+-- Table structure for table `irate_sources`
 -- 
 
-CREATE TABLE `sources` (
+CREATE TABLE `irate_sources` (
   `id` int(12) NOT NULL default '0',
   `distribid` bigint(16) NOT NULL default '0',
   `media` tinyint(3) NOT NULL default '0',
@@ -106,10 +106,10 @@ CREATE TABLE `sources` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `sources_seq`
+-- Table structure for table `irate_sources_seq`
 -- 
 
-CREATE TABLE `sources_seq` (
+CREATE TABLE `irate_sources_seq` (
   `id` int(10) unsigned NOT NULL auto_increment,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM;
@@ -117,10 +117,10 @@ CREATE TABLE `sources_seq` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `tracks`
+-- Table structure for table `irate_tracks`
 -- 
 
-CREATE TABLE `tracks` (
+CREATE TABLE `irate_tracks` (
   `artistname` text NOT NULL,
   `trackname` text NOT NULL,
   `license` varchar(255) NOT NULL default '',
@@ -136,10 +136,10 @@ CREATE TABLE `tracks` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `tracks_seq`
+-- Table structure for table `irate_tracks_seq`
 -- 
 
-CREATE TABLE `tracks_seq` (
+CREATE TABLE `irate_tracks_seq` (
   `id` int(10) unsigned NOT NULL auto_increment,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM;
@@ -147,10 +147,10 @@ CREATE TABLE `tracks_seq` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `users`
+-- Table structure for table `irate_users`
 -- 
 
-CREATE TABLE `users` (
+CREATE TABLE `irate_users` (
   `id` int(12) NOT NULL default '0',
   `user` varchar(32) NOT NULL default '',
   `pass` varchar(32) NOT NULL default '',
@@ -167,11 +167,10 @@ CREATE TABLE `users` (
 -- --------------------------------------------------------
 
 -- 
--- Table structure for table `users_seq`
+-- Table structure for table `irate_users_seq`
 -- 
 
-CREATE TABLE `users_seq` (
+CREATE TABLE `irate_users_seq` (
   `id` int(10) unsigned NOT NULL auto_increment,
   PRIMARY KEY  (`id`)
 ) TYPE=MyISAM;
-        

@@ -28,7 +28,7 @@ Class IRS_Grabber_Libredb_Audio1 extends IRS_Grabber {
   $arr=$this->makeXMLTree($matches[$i][0]);
   $id=$arr["Track"][0]["ldbid"][0]."-0";
 
-  $exists=$this->irs->db->getOne("SELECT 1 FROM tracks WHERE id=?",array($this->irs->id2int($id))); 
+  $exists=$this->irs->db->getOne("SELECT 1 FROM irate_tracks WHERE id=?",array($this->irs->id2int($id))); 
 
  if (!$exists) {
    $trackid=$this->irs->addTrack(array(
