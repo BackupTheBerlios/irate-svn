@@ -17,16 +17,19 @@ public class Track {
   private XMLElement elt;
   private File dir;
   private TrackDatabase trackDatabase;
+  private LicensingScheme license;
 
   public Track(XMLElement elt, File dir) {
     this.elt = elt;
     this.dir = dir;
+    license = this.generateLicense();
   }
   
   public Track(Track track) {
     elt = new XMLElement(new Properties(), true, false);
     elt.setName("Track");
     copy(track);
+		license = this.generateLicense();
   }
 
   public Track(URL url) {
@@ -34,6 +37,7 @@ public class Track {
     elt.setName("Track");
     setURL(url);
     setInfoFromID3Tags(new File(url.getFile()));
+		license = this.generateLicense();
   }  
   
   private void copy(Track track) {
@@ -443,10 +447,54 @@ public class Track {
 
   /** Returns artist website */
   public String getArtistWebsite() {
-    return elt.getStringAttribute("www");
+  	
+  	String www = elt.getStringAttribute("www");
+	
+    return www;
   }
 	
   public int hashCode() {
     return getURL().hashCode();
   }
+
+  public String getAlbum() {
+		try {
+				MP3File mp3 = new MP3File(this.getFile());
+				return mp3.getAlbum();
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+				return "";
+			}		
+	}
+  
+  private LicensingScheme generateLicense() {
+		try {
+			if(this.getFile() != null) {
+				MP3File mp3 = new MP3File(this.getFile());
+				return new LicensingScheme(mp3.getCopyrightInfo());
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}		
+		return null;
+ }
+
+ public String getPlayingTimeString() {
+	 try {
+		 MP3File mp3 = new MP3File(this.getFile());
+		 return mp3.getPlayingTimeString();
+	 }
+	 catch (Exception e) {
+		 e.printStackTrace();
+		 return "";
+	 }		
+}
+
+  public LicensingScheme getLicense() {
+    return license;
+  }
+
 }
