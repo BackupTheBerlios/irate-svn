@@ -1,6 +1,6 @@
 /* DownloadConnection.java
  *
- * $Id: DownloadConnection.java,v 1.2 2004/02/12 22:08:09 enz Exp $
+ * $Id: DownloadConnection.java,v 1.3 2004/03/01 01:07:24 enz Exp $
  * $Source: /tmp/irate/irate/irate/download/DownloadConnection.java,v $
  */
 
@@ -17,10 +17,10 @@ import java.net.*;
  */
 public class DownloadConnection {
 
-  public class ResumeNotSupportedException extends IOException {
+  public static class ResumeNotSupportedException extends IOException {
   }
 
-  public class TimeoutException extends IOException {
+  public static class TimeoutException extends IOException {
   }
 
   public DownloadConnection(URL url) {
