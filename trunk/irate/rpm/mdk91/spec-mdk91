@@ -1,7 +1,7 @@
 Name: irate-client-gtk
 Summary: The iRATE music database client
 Version: snapshot1
-Release: 2
+Release: 20031006
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
@@ -56,7 +56,10 @@ rm -rf $RPM_BUILD_DIR/irate
 /usr/share/man
 
 %changelog
-* Mon Oct 06 2003 Todd Pytel <tppytel@sophrosune.org> snapshot2-1
+* Mon Oct 06 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031006
+- Changed versioning to be consistent with Mandrake specs
+
+* Mon Oct 06 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-2
 - Menu file is no longer a separate source since it is now in CVS
 
 * Sat Sep 20 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-1
