@@ -15,7 +15,9 @@ Class IRS_Correlation_sylvinus1 extends IRS_Correlation {
 
 
 
-function _get($num,$accept) {
+function _get($num,$min_old_weight) {
+
+ $this->min_old_weight=$min_old_weight;
 
  $ret=array();
 
@@ -87,7 +89,6 @@ if (count($tracks)<$num) {
 
 
 
-
 //print_r($users);
 //print_r($tracks);
 
@@ -101,6 +102,9 @@ if (count($tracks)<$num) {
 
 function getTracksLike($users,$minrating,$num) {
 
+ if (count($users)==0) {
+  return array();
+ }
 
 
 $tracks=$this->irs->db->getAll("
@@ -109,7 +113,7 @@ FROM ratings LEFT JOIN ratings as ratings2
 ON ratings.trackid=ratings2.trackid   
 AND ratings2.userid=!
 WHERE (ratings.userid=".implode(" OR ratings.userid=",$users).") 
-AND (ratings2.id IS NULL OR ratings2.weight<100)
+AND (ratings2.id IS NULL OR ratings2.weight<".$this->min_old_weight.")
 GROUP BY ratings.trackid
 HAVING avgrating>!
 ORDER BY c1 DESC , avgrating DESC 
@@ -127,6 +131,8 @@ return $tracks1;
 }
 
 
+
+//todo : fix diff !!
 
 function getUsersLike($maxdiff,$num) {
 

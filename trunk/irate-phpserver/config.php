@@ -18,6 +18,7 @@ $cfg["random_frequency"]=2;
 
  //Location of LibreDB_audio1 file
 $cfg["grabber_libredb_audio1_url"]="http://www.libredb.org/pub/audio1.xml.gz";
+$cfg["grabber_libredb_audio1_url"]="/home/sylvinus/cvsroot/libredb/site/libredb/pub/peermajor1.xml.gz";
 
  //Activate the prepare function (compute correlation in background, needs cron)
 $cfg["prepare"]=true;

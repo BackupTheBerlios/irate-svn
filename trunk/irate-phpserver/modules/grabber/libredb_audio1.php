@@ -19,9 +19,7 @@ Class IRS_Grabber_Libredb_Audio1 extends IRS_Grabber {
  set_time_limit(0);
 
  //$str=implode("",file("/home/sylvinus/cvsroot/libredb/site/libredb/pub/audio1.xml"));
- $str=implode("",gzfile($this->cfg["grabber_libredb_audio1_url"]));
-
-
+ $str=implode("",gzfile($this->irs->cfg["grabber_libredb_audio1_url"]));
  
   preg_match_all(
   "/<track>(.*?)<\/track>/is",$str,$matches,PREG_SET_ORDER);
@@ -46,13 +44,12 @@ Class IRS_Grabber_Libredb_Audio1 extends IRS_Grabber {
     "crediturl"=>$arr["track"][0]["crediturl"][0],
    ));
 
-
    
    $dists=&$arr["track"][0]["distributions"][0]["distribution"];
    for ($y=0;$y<count($dists);$y++) {
 
     $did=$this->irs->addDistribution(array(
-      "trackid"=>$id,
+      "trackid"=>$trackid,
       "crediturl"=>$dists[$y]["crediturl"][0],
       "averagebitrate"=>$dists[$y]["averagebitrate"][0],
       "crediturl"=>$dists[$y]["crediturl"][0],

@@ -125,7 +125,7 @@ function parse() {
 
 
 
-function getNew($number,$include_random=true) {
+function getNew($number,$include_random=true,$min_old_weight=100) {
 
  if (!$this->init["correlation"]) {
   $this->initCorrelation();
@@ -161,14 +161,16 @@ function getNew($number,$include_random=true) {
  /*
  * STEP 3 : we get the correlated results
  */ 
+ 
+ $old=$this->db->getOne("SELECT count(*) FROM ratings WHERE userid=".$this->user["id"]);
+
  $c=array();
- if ($number-$num_random>0) {
-  $c=$this->correlation->get($number-$num_random);
+ if ($number-$num_random>0 AND $old>0) {
+  $c=$this->correlation->get($number-$num_random,$min_old_weight);
   for ($i=0;$i<count($c);$i++) {
    $ids[]=$c[$i];
   }
  }
-
  /*
  * STEP 4 : we get the random results (wanted, or left)
  */
@@ -176,8 +178,7 @@ function getNew($number,$include_random=true) {
  $random=$number-count($c);
 
  if ($random>0 and $include_random) {
-  
-  $r=$this->correlation_random->get($random);
+  $r=$this->correlation_random->get($random,$min_old_weight);
  
   //put the random ones at the end (todo : put them random ?)
 
@@ -186,7 +187,6 @@ function getNew($number,$include_random=true) {
   }
 
  }
-
  return $ids;
 
 }
@@ -302,9 +302,13 @@ function rateOne($trackid,$note,$weight=100) {
  $row=$this->db->getRow("SELECT * FROM ratings WHERE userid=? AND trackid=?",array($this->user["id"],$trackid));
  if (count($row)>0) {
   if ($weight>=$row["weight"]) {
-   $this->db->query("UPDATE ratings SET weight=?,rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($weight,$note,$row["id"]));
+   if (empty($note)) { // set unrated.
+    $this->db->query("DELETE FROM ratings WHERE id=!",array($row["id"]));
+   } else { //update the rating.
+    $this->db->query("UPDATE ratings SET weight=?,rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($weight,$note,$row["id"]));
+   }
   }
- } else {
+ } elseif (!empty($note)) {
   
   $rid=$this->db->nextId("ratings");
  
@@ -375,7 +379,6 @@ function addTrack($data) {
  }
   
   $q=$this->db->query("INSERT INTO tracks(id,artistname,duration,pubdate,albumname,license,trackname,adddate,crediturl) VALUES (?,?,?,?,?,?,?,now(),?)",array($id,$data["artistname"],$data["duration"],$data["pubdate"],$data["albumname"],$data["license"],$data["trackname"],$data["crediturl"]));
-
 
   return $id;
  
@@ -450,7 +453,6 @@ function addTrack($data) {
   ORDER BY users.datelastprepare ASC
   LIMIT 0,".$this->cfg["prepare_users"],array($this->cfg["prepare_idle"]));
  
-print_r($users);
 
   for ($i=0;$i<count($users);$i++) {
    $this->user["id"]=$users[$i]["id"];

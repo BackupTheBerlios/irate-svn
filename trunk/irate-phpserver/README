@@ -202,6 +202,10 @@ The shown crediturl should be the first available from source, distribution and 
 
  Replace XX and YY by track IDs like 1043-001-34-0
 
+ Note that you can cancel a previous rating you've done by giving
+ an empty note. For instance : "..&rate=XX:,YY:" will cancel both
+ ratings.
+
 
 * Getting all the ratings back to the client
 --------------------------------------------

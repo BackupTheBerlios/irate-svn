@@ -13,9 +13,9 @@ function IRS_Correlation(&$irs) {
 
 }
 
-function get($num,$accept="http") {
+function get($num,$min_old_weight) {
 
- $trackids=$this->_get($num,explode(",",$accept));
+ $trackids=$this->_get($num,$min_old_weight);
 
  return $trackids;
 
