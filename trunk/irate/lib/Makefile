@@ -19,10 +19,10 @@ swt.jar: swt-2.1-win32.zip
 else
 
 ifeq ($(PLATFORM),linux-gtk2)
-#swt.jar: swt-2.1.1-linux-gtk.zip
-#	unzip swt-2.1.1-linux-gtk.zip
-swt.jar: swt-3.0M6-linux-gtk.zip
-	unzip swt-3.0M6-linux-gtk.zip
+swt.jar: swt-2.1.1-linux-gtk.zip
+	unzip swt-2.1.1-linux-gtk.zip
+#swt.jar: swt-3.0M6-linux-gtk.zip
+#	unzip swt-3.0M6-linux-gtk.zip
 else
 
 ifeq ($(PLATFORM),linux-libswt-gtk2)
