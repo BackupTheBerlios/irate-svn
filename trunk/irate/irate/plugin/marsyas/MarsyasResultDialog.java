@@ -11,6 +11,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
@@ -29,7 +30,7 @@ public class MarsyasResultDialog extends BaseDialog{
   private Table resultTable = null;
   Collection result;
   private MarsyasPlugin plugin;
-  
+  private Button btnPlay, btnDownload;
   /**
    * 
    * @param plugin
@@ -51,6 +52,18 @@ public class MarsyasResultDialog extends BaseDialog{
     Composite mainComposite = getMainComposite();
     createResultTable(mainComposite);
     Shell shell = getShell();
+    btnPlay = addButton(Resources.getString("play_track"));
+    btnPlay.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent arg0) {
+        int i = resultTable.getSelectionIndex();
+        if(i < 0)
+          return;
+        ((MarsyasSimilaritySearch.ServerTrack)resultTable.getItem(i).getData()).play();
+      }      
+    });
+    btnDownload = addButton(Resources.getString("download_track"));
+    btnPlay.setEnabled(false);
+    btnDownload.setEnabled(false);
     addButton(Resources.getString("close")).addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent arg0) {
         getShell().close();
@@ -74,30 +87,35 @@ public class MarsyasResultDialog extends BaseDialog{
     gridData.grabExcessVerticalSpace = true;
     resultTable.setLayoutData(gridData);
     
-    TableColumn colName = new TableColumn(resultTable, SWT.LEFT);
-    colName.setText(Resources.getString("track_name"));
-    
-    TableColumn  colD = new TableColumn(resultTable, SWT.LEFT);
-    colD.setText(Resources.getString("track_distance"));
-    
-    TableColumn  colS = new TableColumn(resultTable, SWT.LEFT);
-    colD.setText(Resources.getString("track_source"));
-    
-    resultTable.setHeaderVisible(true);
-    
+    TableColumn cols[] = null;
     for (Iterator iter = result.iterator(); iter.hasNext();) {
-      MarsyasSimilaritySearch.ComparableTrack ct = (MarsyasSimilaritySearch.ComparableTrack) iter.next();
+      MarsyasSimilaritySearch.ServerTrack t=(MarsyasSimilaritySearch.ServerTrack) iter.next();
+      //setup the headers
+      if(!resultTable.getHeaderVisible()) {
+        String s[] = t.getColumns();
+        cols = new TableColumn[s.length];
+        for (int i = 0; i < s.length; i++) {
+          cols[i] = new TableColumn(resultTable, SWT.LEFT);
+          cols[i].setText(s[i]);   
+        }        
+        resultTable.setHeaderVisible(true);
+      }
+      
       TableItem ti = new TableItem(resultTable, SWT.NONE);
-      ti.setText(new String[]{ct.track.toString(), ct.distance.toString(),""});
-      ti.setData(ct.track);
+      ti.setText(t.getData());
+      ti.setData(t);
     }
     
-    colD.pack();
-    colName.pack();
+    for (int i = 0; i < cols.length; i++) {
+      cols[i].pack();
+    }
+    
     resultTable.pack();
     resultTable.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent se) {
-        plugin.playTrack((Track)se.item.getData());       
+        MarsyasSimilaritySearch.ServerTrack st  = (MarsyasSimilaritySearch.ServerTrack)se.item.getData();       
+        btnDownload.setEnabled(!st.isLocal());
+        btnPlay.setEnabled(st.isLocal());
       }
     });
   }

@@ -75,7 +75,6 @@ implements TrackLifeCycleListener
    */
   public void addedToPlayList(Track track)
   {
-    // Start calculating how loud it is if we don't already know.
     check(track);
   }
   
@@ -91,9 +90,6 @@ implements TrackLifeCycleListener
    */
   public void startingToPlay(Track track)
   {
-    // Tell it to start calculating how loud it is if we don't already know.
-    // If robo-jock is running, it will be calculating during robo-jock's
-    // announcement.
     check(track);
     lazyInit();
   }
@@ -107,21 +103,21 @@ implements TrackLifeCycleListener
       return;
   	
     initialized = true;
-  	Track t[] = getApp().getTracks();
+  	/*Track t[] = getApp().getTracks();
   	for(int i=0;i<t.length;i++) {
   		check(t[i]); 			
-  	}
+  	}*/
   	
     getApp().addTrackAction(Resources.getString("find_similar"), (SelectionListener)new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         Track track = getApp().getSelectedTrack();
-        if(track.getProperty("marsyas") == null) {
+        /*if(track.getProperty("marsyas") == null) {
           	check(track);
             System.err.println("No features for "+track);
           	return;
-        }
+        }*/
         
-        new MarsyasSimilaritySearch(MarsyasPlugin.this, getApp().getTracks(), track);
+        new MarsyasSimilaritySearch(MarsyasPlugin.this, getApp().getUserName(), getApp().getTracks(), track);
       }
     });
 
@@ -140,6 +136,8 @@ implements TrackLifeCycleListener
   /** CHeck if the track needs to be processed by marsyas */
   private void check(Track track)
   {
+    if(0 == 0)
+      return;
     //System.err.println("Checking "+track);
     // If we don't know how loud it is, queue it to be processed.
     if (track.getFile() != null && track.isRated() && track.getProperty("marsyas") == null) {

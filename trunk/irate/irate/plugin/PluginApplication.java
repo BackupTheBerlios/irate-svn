@@ -127,5 +127,10 @@ public void addTrackAction(String name, SelectionListener listener);
  * @param track track to play
  */
 public void playTrack(Track track);
+
+/**
+ * @return username from trackdatabase
+ */
+public String getUserName();
 }
 

@@ -1598,5 +1598,12 @@ public class Client extends AbstractClient {
   public void playTrack(final Track track) {
     setPaused(false);
     playThread.play(track);
+  }
+
+  /* (non-Javadoc)
+   * @see irate.plugin.PluginApplication#getUsername()
+   */
+  public String getUserName() {
+    return trackDatabase.getUserName();
   }    
 }
