@@ -24,13 +24,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/12 20:46:45 $
+ * Date Updated: $Date: 2003/11/12 22:34:02 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.97 $
+ * @version $Revision: 1.98 $
  */
 public class Client extends AbstractClient {
 
@@ -53,7 +53,6 @@ public class Client extends AbstractClient {
   //  private SettingDialog settingDialog;
   private String strState = "";
   private TrackTable trackTable;
-	private TrackInfoDialog trackInfoDialog; 
 
   private SWTPluginUIFactory uiFactory;
   
@@ -68,8 +67,7 @@ public class Client extends AbstractClient {
   public Client() {
     initGUI();
     errorDialog = new ErrorDialog(display, shell);
-		trackInfoDialog = new TrackInfoDialog(display, shell);
-    uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
+		uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
 
     if (trackDatabase.getNoOfTracks() == 0)
       showAccountDialog();
@@ -670,6 +668,7 @@ public class Client extends AbstractClient {
         if (track == null)
           return;
         
+        TrackInfoDialog trackInfoDialog = new TrackInfoDialog(display, shell);
         trackInfoDialog.displayTrackInfo(track, clientToPass);
         
 //        String www = track.getArtistWebsite();
