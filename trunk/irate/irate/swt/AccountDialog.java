@@ -11,10 +11,10 @@ import irate.common.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/09/17 20:13:04 $
+ * Date Updated: $Date: 2003/09/20 09:08:32 $
  * @author Creator:	taras
- * @author Updated:	$Author: ebdalqui $
- * @version $Revision: 1.5 $
+ * @author Updated:	$Author: ajones $
+ * @version $Revision: 1.6 $
  */
 public class AccountDialog {
   boolean done = false;
@@ -65,7 +65,7 @@ public class AccountDialog {
     
     new Label(shell, SWT.NONE).setText
     (
-      "Please choose a User name & password. If\n" + 
+      "Please choose a User name and password. If\n" + 
       "the User does not exist it will be created."
     );
     

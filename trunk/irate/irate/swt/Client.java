@@ -24,10 +24,10 @@ import java.net.*;
 /**
  * 
  * Date Created: Sep 13, 2003
- * Date Updated: $Date: 2003/09/18 17:37:33 $
+ * Date Updated: $Date: 2003/09/20 09:08:32 $
  * @author Creator:	Eric Dalquist
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.74 $
+ * @version $Revision: 1.75 $
  */
 public class Client implements UpdateListener, PluginApplication {
   
@@ -485,9 +485,11 @@ public class Client implements UpdateListener, PluginApplication {
   }
 
   void showAccountDialog() {  
-    this.shell.setVisible(false); 
+    if (shell != null)
+      shell.setVisible(false); 
     new AccountDialog(display, trackDatabase);
-    this.shell.setVisible(true);
+    if (shell != null)
+      shell.setVisible(true);
   }
 
   void uncheckSiblingMenuItems(MenuItem self) {
