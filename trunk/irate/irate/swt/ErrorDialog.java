@@ -30,9 +30,9 @@ public class ErrorDialog {
       createDialog();
       createText(r);
       createCloseButton();
-      dialog.shell.pack();
+      dialog.getShell().pack();
       dialog.centerOn(parent);
-      dialog.shell.open();
+      dialog.getShell().open();
     }
   }
   
@@ -44,8 +44,8 @@ public class ErrorDialog {
   private void createDialog() {
     dialog = new BaseDialog(display, "");
     GridLayout layout = new GridLayout(1, false);
-    dialog.mainComposite.setLayout(layout);
-    dialog.shell.addShellListener(new ShellAdapter() {
+    dialog.getMainComposite().setLayout(layout);
+    dialog.getShell().addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e){
         actionClose();
       }
@@ -70,7 +70,7 @@ public class ErrorDialog {
   }
 
   private void createText(String s) {
-    Text text = new Text(dialog.mainComposite,
+    Text text = new Text(dialog.getMainComposite(),
                          SWT.MULTI | SWT.READ_ONLY | SWT.V_SCROLL);
     GridData data =
         new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
@@ -91,7 +91,7 @@ public class ErrorDialog {
   }
 
   private void actionClose() {
-    dialog.shell.dispose();
+    dialog.dispose();
     dialog = null;
   }
   

@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/01/10 23:20:57 $
+ * Date Updated: $Date: 2004/01/14 03:47:23 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.17 $
+ * @version $Revision: 1.18 $
  */
 public class SettingDialog
 {
@@ -50,7 +50,7 @@ public class SettingDialog
   /** Show prefs window 
   @param display swt display */
   public void open(Display display) {
-    dialog.shell.open();
+    dialog.getShell().open();
     while (!done) {
       if (!display.readAndDispatch()) display.sleep();
     }
@@ -62,7 +62,7 @@ public class SettingDialog
       e.printStackTrace();
     }
     //should do dispose in a finalyzer
-    dialog.shell.dispose();
+    dialog.dispose();
 
   }
 
@@ -70,15 +70,16 @@ public class SettingDialog
   private void createWidgets(Display display) {
     String title = getResourceString("SettingDialog.Title.Settings"); 
     dialog = new BaseDialog(display, title);
-    dialog.shell.addShellListener(new ShellAdapter() {
+    dialog.getShell().addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           done=true;
         }
       });
+    Composite mainComposite = dialog.getMainComposite();
     GridLayout layout = new GridLayout(1, false);
-    dialog.mainComposite.setLayout(layout);
+    mainComposite.setLayout(layout);
     
-    tabs = new TabFolder(dialog.mainComposite, SWT.NONE);
+    tabs = new TabFolder(mainComposite, SWT.NONE);
     //Pluginpage
     TabItem tabItem = new TabItem(tabs, SWT.NONE);
     tabItem.setText(getResourceString("SettingDialog.TabItem.Plugins")); 
@@ -96,13 +97,13 @@ public class SettingDialog
             Preferences.savePreferenceToFile("browser", browser); 
           } catch (IOException ioe) {
             ioe.printStackTrace();
-            dialog.shell.close();
+            dialog.getShell().close();
           }
-          dialog.shell.close();
+          dialog.getShell().close();
         }
       });
     
-    dialog.shell.pack();
+    dialog.getShell().pack();
   }
   
   private Composite createPluginPage(Composite parent) {
@@ -252,7 +253,7 @@ public class SettingDialog
     
     browseButton.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
-          FileDialog fd = new FileDialog(dialog.shell, SWT.OPEN);
+          FileDialog fd = new FileDialog(dialog.getShell(), SWT.OPEN);
           fd.setText(getResourceString("SettingDialog.FileDialog.Text")); 
           fd.open();
           if (!fd.getFileName().equals("")) { 

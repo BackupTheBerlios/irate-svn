@@ -30,17 +30,18 @@ public class AboutDialog {
     if (dialog == null) {
       createIcon();
       createDialog();
-      createHeaderGrid(dialog.mainComposite);
-      Text text = createText(dialog.mainComposite, reader);
+      Composite mainComposite = dialog.getMainComposite();
+      createHeaderGrid(mainComposite);
+      Text text = createText(mainComposite, reader);
       GridData data = new GridData(GridData.FILL_HORIZONTAL
                                    | GridData.FILL_VERTICAL);
       final int numberLinesShown = 10;
       data.heightHint = numberLinesShown * text.getLineHeight();;
       text.setLayoutData(data);
       createCloseButton();
-      dialog.shell.pack();
+      dialog.getShell().pack();
       dialog.centerOn(parent);
-      dialog.shell.open();
+      dialog.getShell().open();
     }
   }
 
@@ -60,8 +61,8 @@ public class AboutDialog {
       getResourceString("AboutDialog.Title") + " "
       + getResourceString("titlebar.program_name");
     dialog = new BaseDialog(display, title);
-    dialog.mainComposite.setLayout(new GridLayout(1, false));
-    dialog.shell.addShellListener(new ShellAdapter() {
+    dialog.getMainComposite().setLayout(new GridLayout(1, false));
+    dialog.getShell().addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           actionClose();
         }
@@ -128,7 +129,7 @@ public class AboutDialog {
   }
 
   private void actionClose() {
-    dialog.shell.dispose();
+    dialog.dispose();
     dialog = null;
   }
 

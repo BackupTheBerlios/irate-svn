@@ -112,7 +112,7 @@ public class TrackInfoDialog {
       licenseButton = new Button(infoGrid, SWT.FLAT);      
       try {
         Image licenseImage =
-          new Image(dialog.shell.getDisplay(),
+          new Image(dialog.getShell().getDisplay(),
                     BaseResources.getResourceAsStream(license.getIcon()));
         licenseButton.setImage(licenseImage);
       }
@@ -158,9 +158,10 @@ public class TrackInfoDialog {
       getResourceString("TrackInfoDialog.Title") + ": "
       + currentTrack.getTitle();
     dialog = new BaseDialog(display, title);
-    dialog.mainComposite.setLayout(new GridLayout(1, false));
+    Composite mainComposite = dialog.getMainComposite();
+    mainComposite.setLayout(new GridLayout(1, false));
     
-    trackTitle = new Label(dialog.mainComposite, SWT.CENTER);
+    trackTitle = new Label(mainComposite, SWT.CENTER);
     trackTitle.setFont(resizeFontTo(trackTitle.getFont(), 16));
     trackTitle.setText(currentTrack.getTitle());
     GridData data = new GridData();
@@ -168,14 +169,13 @@ public class TrackInfoDialog {
     data.grabExcessHorizontalSpace = true;
     trackTitle.setLayoutData(data);
     
-    Label horiDivider = new Label(dialog.mainComposite,
-                                  SWT.SEPARATOR|SWT.HORIZONTAL);
+    Label horiDivider = new Label(mainComposite, SWT.SEPARATOR|SWT.HORIZONTAL);
     data = new GridData();
     data.horizontalAlignment = GridData.FILL;
     data.grabExcessHorizontalSpace = true;
     horiDivider.setLayoutData(data);
 
-    Composite mainGrid = createMainGrid(dialog.mainComposite);
+    Composite mainGrid = createMainGrid(mainComposite);
 
     Composite infoGrid = createInfoGrid(mainGrid);
     data = new GridData();
@@ -199,9 +199,9 @@ public class TrackInfoDialog {
 
     addListeners();
 
-    dialog.shell.pack();
+    dialog.getShell().pack();
     dialog.centerOn(parent);
-    dialog.shell.open();    
+    dialog.getShell().open();    
   }
 
   /**
@@ -209,7 +209,7 @@ public class TrackInfoDialog {
    */
   private void addListeners() {
     // Add a listener on the shell so it will close properly
-    dialog.shell.addShellListener(new ShellAdapter() {
+    dialog.getShell().addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           actionClose();
         }
@@ -261,7 +261,7 @@ public class TrackInfoDialog {
    * Dispose of the shell when a user closes the dialogue box.
    */
   private void actionClose() {
-    dialog.shell.dispose();
+    dialog.dispose();
     dialog = null;
   }
 

@@ -15,10 +15,6 @@ import org.eclipse.swt.widgets.*;
 */
 public class BaseDialog {
 
-  public Composite mainComposite;
-
-  public Shell shell;
-
   public BaseDialog(Display display, String title) {
     shell = new Shell(display);
     shell.setLayout(new GridLayout(1, false));
@@ -33,12 +29,6 @@ public class BaseDialog {
     data = new GridData();
     data.horizontalAlignment = GridData.END;
     buttonsComposite.setLayoutData(data);
-    shell.addDisposeListener(new DisposeListener() {
-        public void widgetDisposed(DisposeEvent e) {
-          if (image != null)
-            image.dispose();
-        }
-      });
   }
 
   public Button addButton(String text) {
@@ -77,9 +67,30 @@ public class BaseDialog {
     shell.setLocation(x, y);
   }
 
+  public void dispose() {
+    shell.dispose();
+    shell = null;
+    if (image != null) {
+      image.dispose();
+      image = null;
+    }
+  }
+
+  public Shell getShell() {
+    return shell;
+  }
+
+  public Composite getMainComposite() {
+    return mainComposite;
+  }
+
   private Composite buttonsComposite;
 
+  private Composite mainComposite;
+
   private Image image;
+
+  private Shell shell;
 
   private void setImage(Display display) {
     try {
