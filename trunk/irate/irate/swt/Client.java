@@ -591,14 +591,24 @@ public class Client extends AbstractClient {
 
       String wholeCmd;
       Runtime r = Runtime.getRuntime();
-      // Check the browser preference. 
-      wholeCmd = Preferences.getUserPreference("browser");
 
-      // If it's blank then try the KDE default and if that fails then we
-      // try the Windows default.
-      if (wholeCmd == null || wholeCmd.length() == 0)
-        wholeCmd = "kfmclient exec " + url + "|" + "rundll32 url.dll,FileProtocolHandler";
-        // Go through the list of possible commands (separated by |)
+      // Windows and Mac OS X use standard commands:
+      String os = System.getProperty("os.name");
+      if (os.startsWith("Mac"))
+        wholeCmd = "open";
+      else if (os.startsWith("Windows"))
+        wholeCmd = "rundll32 url.dll,FileProtocolHandler";
+      else {
+        // Check the browser preference on Linux/Unix.
+        wholeCmd = Preferences.getUserPreference("browser");
+        
+        // If it's blank then try the GNOME and KDE defaults.
+        // Do GNOME first as kfmclient returns 1 on success?
+        if (wholeCmd == null || wholeCmd.length() == 0)
+          wholeCmd = "gnome-open|kfmclient exec";
+      }
+      
+      // Go through the list of possible commands (separated by |)
       StringTokenizer st = new StringTokenizer(wholeCmd, "|");
       while (st.hasMoreTokens()) {
         String cmd = st.nextToken();

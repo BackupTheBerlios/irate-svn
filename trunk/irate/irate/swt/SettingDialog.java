@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/09/07 11:31:12 $
+ * Date Updated: $Date: 2004/09/18 01:51:08 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.26 $
+ * @version $Revision: 1.27 $
  */
 public class SettingDialog
 {
@@ -92,10 +92,18 @@ public class SettingDialog
     TabItem tabItem = new TabItem(tabs, SWT.NONE);
     tabItem.setText(getResourceString("SettingDialog.TabItem.Plugins")); 
     tabItem.setControl(createPluginPage(tabs));
-    tabItem = new TabItem(tabs, SWT.NONE);
-    tabItem.setText(getResourceString("SettingDialog.TabItem.Browser")); 
-    tabItem.setControl(createBrowserPage(tabs));
-    tabs.pack();
+    
+    if (os.startsWith("Mac") || os.startsWith("Windows")) {
+      // Mac OS X and Windows have standard ways of launching the
+      // default browser. Just use that, and don't prompt.
+    } else {
+      // On Unix/Linux/misc, add a tab asking for how to start
+      // the browser. There are so many ways...
+      tabItem = new TabItem(tabs, SWT.NONE);
+      tabItem.setText(getResourceString("SettingDialog.TabItem.Browser")); 
+      tabItem.setControl(createBrowserPage(tabs));
+      tabs.pack();
+    }
 
     Button ok =
       dialog.addButton(getResourceString("SettingDialog.Button.Close"));
@@ -158,51 +166,27 @@ public class SettingDialog
 
   
   private Composite createBrowserPage(Composite parent) {
+	// assume Unix if no Mac or Windows
     //    final Composite comp = new Composite(parent, SWT.NONE);
     comp = new Composite(parent, SWT.NONE);
     GridLayout layout = new GridLayout(1, false);
     comp.setLayout(layout);
     new Label(comp, SWT.NONE).setText(getResourceString("SettingDialog.Label.Browser")); 
 
-    if (os.startsWith("Mac")) {
 	browsers = new BrowserButton[]{
-      		new BrowserButton("Mozilla (Linux/UNIX)", 
+      		new BrowserButton("Mozilla", 
                         "mozilla -remote openURL(%u,new-window)|mozilla", 
                         getResourceString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
-      		new BrowserButton("Mozilla-Firefox (Linux/UNIX)", 
+      		new BrowserButton("Mozilla-Firefox", 
                         "firefox -remote openURL(%u,new-window)|firefox", 
                         getResourceString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
-      		new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec",  //$NON-NLS-2$
+      		new BrowserButton("Konqueror","kfmclient exec",  //$NON-NLS-2$
                         getResourceString
-				("SettingDialog.Button.Browser.Tooltip.Konqueror")),  
-		new BrowserButton(getResourceString
-				("SettingDialog.Button.Browser.MacOSXDefault"), 
-                        "open", getResourceString
-				("SettingDialog.Button.Browser.Tooltip.MacOSXDefault")),
-    	}; 
-    } else if (os.startsWith("Windows")) {
-	// Show Windows default option
-	browsers = new BrowserButton[]{
- 		new BrowserButton(getResourceString
-			("SettingDialog.Button.Browser.WindowsDefault"), 
-                        "rundll32 url.dll,FileProtocolHandler", 
+                                ("SettingDialog.Button.Browser.Tooltip.Konqueror")),  
+      		new BrowserButton("GNOME default","gnome-open",  //$NON-NLS-2$
                         getResourceString
-			("SettingDialog.Button.Browser.Tooltip.WindowsDefault")),
+                                ("SettingDialog.Button.Browser.Tooltip.GNOME")),  
     	}; 
-    } else {
-	// assume Unix if no Mac or Windows
-	browsers = new BrowserButton[]{
-      		new BrowserButton("Mozilla (Linux/UNIX)", 
-                        "mozilla -remote openURL(%u,new-window)|mozilla", 
-                        getResourceString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
-      		new BrowserButton("Mozilla-Firefox (Linux/UNIX)", 
-                        "firefox -remote openURL(%u,new-window)|firefox", 
-                        getResourceString("SettingDialog.Button.Browser.Tooltip.Mozilla")),  
-      		new BrowserButton("Konqueror (Linux/UNIX)","kfmclient exec",  //$NON-NLS-2$
-                        getResourceString
-				("SettingDialog.Button.Browser.Tooltip.Konqueror")),  
-    	}; 
-    };
 
     browserSpecified = new Button(comp, SWT.RADIO);
     browserText = new Text(comp, SWT.NONE);
