@@ -52,7 +52,12 @@ public class ThreeModeButton extends AlphaLabel implements Skinable {
       }
 
       public void mouseUp(MouseEvent arg0) {
-        ThreeModeButton.this.setSelection(false);
+          if(ThreeModeButton.this.getClientArea().contains(arg0.x,arg0.y)) {
+              ThreeModeButton.this.setSelection(false);
+          }
+          else { 
+              ThreeModeButton.this.setSelection(ThreeModeButton.this.isPressed());
+          }
       }
     });
 

@@ -1150,19 +1150,26 @@ public class Client extends AbstractClient {
   
     new AlphaLabel(trackToolbar, SWT.CENTER).setText("  ");
 
-    ThreeModeButton info = new ThreeModeButton(trackToolbar, SWT.FLAT);
+    final ThreeModeButton info = new ThreeModeButton(trackToolbar, SWT.FLAT);
     info.setLayoutData(new GridData(GridData.FILL_VERTICAL));
     final Client clientToPass = this;
-    info.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        Track track = getSelectedTrack();
-        if (track == null)
-          return;
         
-        TrackInfoDialog trackInfoDialog = new TrackInfoDialog(display, shell);
-        trackInfoDialog.displayTrackInfo(track, clientToPass);   
-      }
-    });
+        info.addMouseListener(new MouseListener() {
+            public void mouseDoubleClick(MouseEvent arg0) {}
+            public void mouseDown(MouseEvent arg0) {}
+            public void mouseUp(MouseEvent arg0) {
+                if(info.getClientArea().contains(arg0.x,arg0.y))
+                {
+                    Track track = getSelectedTrack();
+                    if (track == null)
+                        return;
+                
+                    TrackInfoDialog trackInfoDialog = new TrackInfoDialog(display, shell);
+                    trackInfoDialog.displayTrackInfo(track, clientToPass);
+                }
+            }    
+          });
+
     info.setToolTipText(Resources.getString("button.info.tooltip"));
     skinManager.add(info, "button.info");
 
@@ -1178,9 +1185,12 @@ public class Client extends AbstractClient {
       public void mouseDoubleClick(MouseEvent arg0) {}
       public void mouseDown(MouseEvent arg0) {}
       public void mouseUp(MouseEvent arg0) {
-        if(previous.isEnabled()) {
-          skip(true);
-        }
+          if(previous.getClientArea().contains(arg0.x,arg0.y))
+          {
+              if(previous.isEnabled()) {
+                  skip(true);
+              }
+          }
       }    
     });
     
@@ -1199,7 +1209,10 @@ public class Client extends AbstractClient {
       public void mouseDoubleClick(MouseEvent arg0) {}
       public void mouseDown(MouseEvent arg0) {}
       public void mouseUp(MouseEvent arg0) {
-        setPaused(!isPaused());
+          if(play.getClientArea().contains(arg0.x,arg0.y))
+          {
+              setPaused(!isPaused());
+          }
       }    
     });
     
@@ -1212,7 +1225,10 @@ public class Client extends AbstractClient {
       public void mouseDoubleClick(MouseEvent arg0) {}
       public void mouseDown(MouseEvent arg0) {}
       public void mouseUp(MouseEvent arg0) {
-        skip(false);
+          if(next.getClientArea().contains(arg0.x,arg0.y))
+          {
+              skip(false);
+          }
       }    
     });
     
