@@ -75,12 +75,12 @@ public class PlayListManager {
     //
     
     Track selectedTrack;
-    do {
+//    do {
       if (++playListIndex >= size) {
         playListIndex = 0;
       }
       selectedTrack = (Track) playList.get(playListIndex);
-    }  while (selectedTrack == lastPlayedTrack);
+//    }  while (selectedTrack == lastPlayedTrack);
 
     lastPlayedTrack = selectedTrack;
     
