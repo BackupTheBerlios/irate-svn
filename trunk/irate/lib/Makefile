@@ -10,7 +10,6 @@ all: libswt.o libnanoxml-lite.o
 swt.jar:
 ifeq ($(PLATFORM),linux-motif)
 	unzip swt-2.1-motif-linux.zip
-	rm libXm.so*
 else
 
 ifeq ($(PLATFORM),win32)
