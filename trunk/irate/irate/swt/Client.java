@@ -1011,6 +1011,7 @@ public class Client extends AbstractClient {
         }
       });
       rf.setItem(button);
+      button.setToolTipText(Resources.getString(rf.getName()));
       skinManager.add(button, i == 0 ? rf.getName() : "button.star");
     }
   
@@ -1029,6 +1030,7 @@ public class Client extends AbstractClient {
         trackInfoDialog.displayTrackInfo(track, clientToPass);   
       }
     });
+    info.setToolTipText(Resources.getString("button.info.tooltip"));
     skinManager.add(info, "button.info");
 
 //    volumeScale = new Scale(trackGroup, SWT.HORIZONTAL | SWT.FLAT);
@@ -1066,6 +1068,7 @@ public class Client extends AbstractClient {
       }    
     });
     
+    previous.setToolTipText(Resources.getString("button.previous.tooltip"));
     skinManager.add(previous, "button.previous");
     
     /************ PLAY / PAUSE BUTTON  ****************/
@@ -1096,6 +1099,7 @@ public class Client extends AbstractClient {
       }    
     });
     
+    next.setToolTipText(Resources.getString("button.next.tooltip"));
     skinManager.add(next, "button.next");
     
     
