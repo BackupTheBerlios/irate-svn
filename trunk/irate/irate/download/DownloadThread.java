@@ -340,9 +340,11 @@ public class DownloadThread extends Thread {
               }
             }
           }
-          succeeded = true;
+          os.close();
+          os = null;
           if (downloadingFile.renameTo(finishedFile)) {
             track.setFile(finishedFile);
+            succeeded = true;
           } else {
             // I don't think this could occur, since we've already
             // checked to see if finishedFile exists, but...
@@ -351,7 +353,9 @@ public class DownloadThread extends Thread {
           exponentialBackoffManager.succeeded(track.getURL());
         }
         finally {
-          os.close();
+          if (os != null)
+            os.close();
+          
           try {
             connection.close(timeout);
           }
