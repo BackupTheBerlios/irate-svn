@@ -41,14 +41,16 @@ public class AlphaLabel extends Canvas implements Skinable {
 
   public void setTransparencyManager(TransparencyManager transparencyManager) {
     this.transparencyManager = transparencyManager;
-    imageMerger = new ImageMerger(transparencyManager, this);
+    imageMerger = new ImageMerger();
   }
 
   public void paint(GC gc) {
     Rectangle bounds = getBounds();
+    ImageData backgroundData = transparencyManager.getBackground(this);
+    
     if (imageData == null) {
       /* Get the background image. */
-      Image image = new Image(getDisplay(), transparencyManager.getBackground(this));
+      Image image = new Image(getDisplay(), backgroundData);
       
       /* Draw the text onto it. */
       GC imageGc = new GC(image);
@@ -65,13 +67,13 @@ public class AlphaLabel extends Canvas implements Skinable {
     else {
       int x = (bounds.width - imageData.width) / 2;
       int y = (bounds.height - imageData.height) / 2;
-      ImageData mergedImage = imageMerger.merge(x, y, imageData);
+      ImageData mergedImageData = imageMerger.merge(backgroundData, x, y, imageData);
 
       /* Look up our ImageData in our cache. */
-      ImageHandle imageHandle = (ImageHandle) cache.get(mergedImage);
+      ImageHandle imageHandle = (ImageHandle) cache.get(mergedImageData);
       if (imageHandle == null) {
-        imageHandle = new ImageHandle(new Image(this.getDisplay(), mergedImage));
-        cache.put(mergedImage, imageHandle);
+        imageHandle = new ImageHandle(new Image(this.getDisplay(), mergedImageData));
+        cache.put(mergedImageData, imageHandle);
       }
       gc.drawImage(imageHandle.getImage(), 0, 0);
     }

@@ -15,15 +15,18 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.*;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 
 /**
  * @author Anthony Jones
  */
-public class TrackTable extends BasicSkinable {
+public class TrackTable {
   
   /** The SWT display object associated with the Shell and Table. */
   private Display display;
@@ -48,10 +51,18 @@ public class TrackTable extends BasicSkinable {
   
   /** The currently selected track. */
   private Track selected;
-  
+
+  /** Used to reduce the number of instances of LicensingScheme. */
   private LicenseIndex licenseIndex = new LicenseIndex();
-  
+
+  /** Alpha blends images with the background color. */ 
+  private ImageMerger imageMerger = new ImageMerger();
+
+  /** Cache for caching generated images. */
   private Cache imageCache = new Cache();
+  
+  /** Stores skinable images automagically */
+  private BasicSkinable basicSkinable; 
   
   /** Constructor to create a table contained in the given Shell where the
    * tracks are updated from the given TrackDatabase. 
@@ -63,9 +74,9 @@ public class TrackTable extends BasicSkinable {
    *                      table headings. 
    */ 
   public TrackTable(Shell shell, TrackDatabase trackDatabase, SkinManager skinManager) {
-    super(shell.getDisplay());
-    this.display = shell.getDisplay();
+    display = shell.getDisplay();
     this.trackDatabase = trackDatabase;
+    basicSkinable = new BasicSkinable(this.display);
     table = new Table(shell, SWT.NONE);
     table.setEnabled(false);
 
@@ -88,7 +99,9 @@ public class TrackTable extends BasicSkinable {
     skinManager.addItem(col, "TrackTable.Heading.Track"); 
 
     col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(100);
+    col.setWidth(120);
+    // Setting the alighnment to left doesn't seem to make a difference for images on GTK
+    col.setAlignment(SWT.LEFT);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getState()).compareTo(new MagicString(track1.getState()));
@@ -97,6 +110,7 @@ public class TrackTable extends BasicSkinable {
     skinManager.addItem(col, "TrackTable.Heading.Rating");
 
     col = new TableColumn(table, SWT.LEFT);
+    col.setAlignment(SWT.LEFT);
     col.setWidth(50);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
@@ -116,14 +130,14 @@ public class TrackTable extends BasicSkinable {
     skinManager.addItem(col, "TrackTable.Heading.Last"); 
 
     col = new TableColumn(table, SWT.LEFT);
-    col.setWidth(55);
+    col.setWidth(60);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
           return licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.License");
-    skinManager.add(this, "TrackTable");
+    skinManager.add(basicSkinable, "TrackTable");
     
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
@@ -133,6 +147,28 @@ public class TrackTable extends BasicSkinable {
     gridData.horizontalSpan = 3;
     table.setLayoutData(gridData);
     table.pack();
+
+//    This code updates table items as they get selected and unselected. It would be good
+//    if the background colour for selected items could be predicted however there doesn't
+//    appear to be an easy way to find this colour.
+//    
+//    table.addSelectionListener(new SelectionAdapter() {
+//      private TableItem[] selection;
+//      private void update(TableItem[] tableItems) {
+//        if (tableItems != null)
+//          for (int i = 0 ; i < tableItems.length; i++) {
+//            TableItem tableItem = tableItems[i];
+//            Track track = (Track) hashByTableItem.get(tableItems[i]);
+//            if (track != null)
+//              updateTableItem(tableItem, track);
+//          }
+//      }
+//      public void widgetSelected(SelectionEvent e) {
+//        update(selection);
+//        selection = table.getSelection();
+//        update(selection);
+//      }
+//    });
     
     DragSource source = new DragSource(table, DND.DROP_COPY);
     source.setTransfer(new Transfer[] { FileTransfer.getInstance() });
@@ -235,25 +271,47 @@ public class TrackTable extends BasicSkinable {
   
   /** Loads the Track into the TableItem. */
   private void updateTableItem(TableItem tableItem, Track track) {
+    Color background = tableItem.getBackground();
+//    Can't get it to work out the current background color. COLOR_LIST_SELECTION
+//    is correct only when the TrackTable has focus (at least on GTK).
+//
+//    TableItem[] selection = table.getSelection();
+//    if (selection != null)
+//      for (int i = 0; i < selection.length; i++) 
+//        if (tableItem == selection[i])
+//          background = display.getSystemColor(SWT.COLOR_LIST_SELECTION);
     
     String state = track.getState();
     //System.out.println("WOOT: " + state);
-    ImageData stateImageData = getImageData(state);
+    ImageData stateImageData = basicSkinable.getImageData(state);
     if (stateImageData != null) {
-       state = "";
-       Image stateImage = (Image) imageCache.get(state);
-       if (stateImage == null)
-         imageCache.put(stateImageData, stateImage = new Image(display, stateImageData));
-       tableItem.setImage(2, stateImage);
+      ImageData mergedImageData = imageMerger.merge(background, stateImageData);
+//      mergedImageData.transparentPixel = mergedImageData.palette.getPixel(background.getRGB());
+      ImageHandle stateImage = (ImageHandle) imageCache.get(mergedImageData);
+      if (stateImage == null)
+        imageCache.put(mergedImageData, stateImage = new ImageHandle(new Image(display, mergedImageData)));
+      tableItem.setImage(2, stateImage.getImage());
     }
     else {
-      tableItem.setImage(2, null);
+      /* We need to generate an image for the text */
+      ImageHandle imageHandle = (ImageHandle) imageCache.get(state);
+      if (imageHandle == null) {
+        GC gc = new GC(table);      
+        Point size = gc.stringExtent(state);
+        gc.dispose();
+        Image image = new Image(display, size.x, size.y);
+        gc = new GC(image);
+        gc.drawText(state, 0, 0, true);
+        gc.dispose();
+        imageCache.put(state, imageHandle = new ImageHandle(image));
+      }
+      tableItem.setImage(2, imageHandle.getImage());
     }
     
     tableItem.setText(new String[] {
       track.getArtist(),
       track.getTitle(),
-      state,
+      "",
       String.valueOf(track.getNoOfTimesPlayed()),
       track.getLastPlayed().toString(),
       ""
@@ -263,18 +321,24 @@ public class TrackTable extends BasicSkinable {
      * Get the license image.
      */
     String icon = licenseIndex.get(track).getIcon();
-    ImageHandle imageHandle = (ImageHandle) imageCache.get(icon);
-    if (imageHandle == null && icon != null && icon.length() != 0) {
+    ImageHandle imageHandle = null;
+    if (icon != null && icon.length() != 0) {
+      ImageData scaledImageData = (ImageData) imageCache.get(icon);
       try {
-        System.out.println("Loading image: " + icon);
-        Image image = new Image(display, BaseResources.getResourceAsStream(icon));
-        ImageData imageData = image.getImageData();
-        image.dispose();
-        int scaledHeight = 20;
-        image = new Image(display, imageData.scaledTo(
-            imageData.width * scaledHeight / imageData.height, scaledHeight));
-        imageHandle = new ImageHandle(image);
-        imageCache.put(icon, imageHandle);
+        if (scaledImageData == null) {
+          System.out.println("Loading image: " + icon);
+          Image image = new Image(display, BaseResources.getResourceAsStream(icon));
+          ImageData imageData = image.getImageData();
+          image.dispose();
+          int scaledHeight = 20;
+          imageCache.put(icon, scaledImageData = imageData.scaledTo(
+              imageData.width * scaledHeight / imageData.height, scaledHeight));
+        }
+  
+        ImageData mergedImageData = imageMerger.merge(background, scaledImageData);
+        imageHandle = (ImageHandle) imageCache.get(mergedImageData);
+        if (imageHandle == null)      
+          imageCache.put(mergedImageData, imageHandle = new ImageHandle(new Image(display, scaledImageData)));
       }
       catch (IOException e) {
         e.printStackTrace();

@@ -290,13 +290,14 @@ public class ThreeModeButton extends Canvas implements Skinable {
     Rectangle bounds = getBounds();
     int x = (bounds.width - imageData.width) / 2;
     int y = (bounds.height - imageData.height) / 2;
-    ImageData mergedImage = imageMerger.merge(x, y, imageData);
+    ImageData backgroundData = transparencyManager.getBackground(this);
+    ImageData mergedImageData = imageMerger.merge(backgroundData, x, y, imageData);
     
     /* Look up our ImageData in our cache. */
-    ImageHandle imageHandle = (ImageHandle) cache.get(mergedImage);
+    ImageHandle imageHandle = (ImageHandle) cache.get(mergedImageData);
     if (imageHandle == null) {
-      imageHandle = new ImageHandle(new Image(this.getDisplay(), mergedImage));
-      cache.put(mergedImage, imageHandle);
+      imageHandle = new ImageHandle(new Image(this.getDisplay(), mergedImageData));
+      cache.put(mergedImageData, imageHandle);
     }
     
     return imageHandle.getImage();
@@ -308,7 +309,7 @@ public class ThreeModeButton extends Canvas implements Skinable {
 
   public void setTransparencyManager(TransparencyManager tm) {
     this.transparencyManager = tm;
-    this.imageMerger = new ImageMerger(this.transparencyManager, this);
+    this.imageMerger = new ImageMerger();
   }
 
   public void setText(String key, String text) {

@@ -11,6 +11,7 @@ import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.*;
@@ -91,8 +92,10 @@ public class SkinManager {
 
       public void setImage(String key, ImageData imageData) {
         if (key.equals("")) {
-          item.setImage(new Image(item.getDisplay(), imageData));
-//          item.setText("");
+          ImageMerger imageMerger = new ImageMerger();
+          Color background = item.getDisplay().getSystemColor(SWT.COLOR_WIDGET_BACKGROUND);
+          ImageData mergeImageData = imageMerger.merge(background, imageData);
+          item.setImage(new Image(item.getDisplay(), mergeImageData));
         }
       }
 

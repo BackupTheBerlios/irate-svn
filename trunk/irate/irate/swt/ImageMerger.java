@@ -3,41 +3,31 @@
  */
 package irate.swt;
 
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
-import org.eclipse.swt.widgets.Control;
 
 /**
  * @author Anthony Jones
  */
 public class ImageMerger {
   
-  private TransparencyManager transparencyManager;
-  private Control control;
   private Cache cache = new Cache();
   
-  public ImageMerger(TransparencyManager transparencyManager, Control control) {
-    this.transparencyManager = transparencyManager;
-    this.control = control;
+  public ImageMerger() {
   }
   
-  public ImageData merge(Point location, ImageData foregroundData) {
-    return merge(location.x, location.y, foregroundData);
+  public ImageData merge(ImageData backgroundData, Point location, ImageData foregroundData) {
+    return merge(backgroundData, location.x, location.y, foregroundData);
   }
   
-  public ImageData merge(int x, int y, ImageData foregroundData) {
-    // Get the background and create a new image which uses the foreground
-    // image's palette and depth from the background image. 
-    ImageData backgroundData = transparencyManager.getBackground(control);
-    if (backgroundData == null)
-      return foregroundData;
-    
+  public ImageData merge(ImageData backgroundData, int x, int y, ImageData foregroundData) {    
     Merge merge = new Merge();
+    merge.backgroundData = backgroundData;
     merge.x = x;
     merge.y = y;
     merge.foregroundData = foregroundData;
-    merge.backgroundData = backgroundData;
     
     ImageData imageData = (ImageData) cache.get(merge);        
     if (imageData == null)
@@ -45,6 +35,18 @@ public class ImageMerger {
     
     return imageData;
   }
+  
+  public ImageData merge(Color backgroundColour, ImageData foregroundData) {    
+    ColourMerge merge = new ColourMerge();
+    merge.backgroundColour = backgroundColour;
+    merge.foregroundData = foregroundData;
+    
+    ImageData imageData = (ImageData) cache.get(merge);        
+    if (imageData == null)
+      cache.put(merge, imageData = merge(merge));
+    
+    return imageData;
+  }  
   
   private ImageData merge(Merge merge) {        
     ImageData destData = new ImageData(merge.backgroundData.width, merge.backgroundData.height,
@@ -77,12 +79,38 @@ public class ImageMerger {
     }    
     return destData;
   }
-  
+
+  private ImageData merge(ColourMerge merge) {
+    ImageData destData = new ImageData(merge.foregroundData.width, merge.foregroundData.height,
+        merge.foregroundData.depth, merge.foregroundData.palette);
+    RGB brgb = merge.backgroundColour.getRGB();
+    int[] foregroundPixels = new int[merge.foregroundData.width];
+    int[] destPixels = new int[merge.foregroundData.width];
+    for (int i = 0; i < merge.foregroundData.height; i++) {
+      merge.foregroundData.getPixels(0, i, foregroundPixels.length, foregroundPixels, 0);
+      for (int j = 0; j < destPixels.length; j++) {
+        
+        // Grab the alpha value of the pixel we're deal with
+        int a = merge.foregroundData.getAlpha(j,i);
+       
+        // Calculate the merge value
+        RGB frgb = merge.foregroundData.palette.getRGB(foregroundPixels[j]);
+        int r = (frgb.red * a + brgb.red * (255 - a)) / 255;
+        int g = (frgb.green * a + brgb.green * (255 - a)) / 255;
+        int b = (frgb.blue * a + brgb.blue * (255 - a)) / 255;
+        RGB drgb = new RGB(r, g, b);
+        destPixels[j] = destData.palette.getPixel(drgb);
+      }
+      destData.setPixels(0, i, destPixels.length, destPixels, 0);
+    }
+    return destData;
+  }  
+
   private class Merge {
+    ImageData backgroundData;
     int x;
     int y;
     ImageData foregroundData;
-    ImageData backgroundData;
     
     public boolean equals(Object obj) {
       if (!(obj instanceof Merge))
@@ -92,6 +120,20 @@ public class ImageMerger {
       return x == merge.x && y == merge.y 
           && foregroundData == merge.foregroundData 
           && backgroundData == merge.backgroundData; 
+    }
+  }
+  
+  private class ColourMerge {
+    Color backgroundColour;
+    ImageData foregroundData;
+    
+    public boolean equals(Object obj) {
+      if (!(obj instanceof ColourMerge))
+        return false;
+      
+      ColourMerge merge = (ColourMerge) obj;
+      return foregroundData == merge.foregroundData 
+          && backgroundColour == merge.backgroundColour; 
     }
   }
 }

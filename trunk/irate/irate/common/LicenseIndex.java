@@ -7,6 +7,10 @@ import java.util.Hashtable;
 
 
 /**
+ * Hash table to reduce the number of instances of LicensingScheme required.
+ * This class means there only needs to be one instance for each unique license
+ * URL.
+ *   
  * @author Anthony Jones
  */
 public class LicenseIndex {
