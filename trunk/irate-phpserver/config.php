@@ -29,6 +29,9 @@ $cfg["prepare_users"]=10;
 $cfg["prepare_tracks"]=10;
 
  //After how long a prepared track is outdated (in days)
-$cfg["prepare_expire"]=10;
+$cfg["prepare_expire"]=20;
+
+ //How long after the user's last login tracks stop being prepared (days)
+$cfg["prepare_idle"]=6*30;
 
 ?>

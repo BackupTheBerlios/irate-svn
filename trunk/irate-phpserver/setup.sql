@@ -2,6 +2,7 @@
 # Table structure for table `distributions`
 #
 
+DROP TABLE IF EXISTS `distributions`;
 CREATE TABLE `distributions` (
   `trackid` bigint(16) NOT NULL default '0',
   `id` bigint(16) NOT NULL default '0',
@@ -12,7 +13,23 @@ CREATE TABLE `distributions` (
   `filesize` bigint(15) NOT NULL default '0',
   `hash_sha1` varchar(40) NOT NULL default '',
   PRIMARY KEY  (`id`),
-  KEY `trackid` (`trackid`)
+  KEY `trackid` (`trackid`),
+  KEY `hash_sha1` (`hash_sha1`)
+) TYPE=MyISAM;
+
+# --------------------------------------------------------
+
+#
+# Table structure for table `prepare`
+#
+
+DROP TABLE IF EXISTS `prepare`;
+CREATE TABLE `prepare` (
+  `userid` int(12) NOT NULL default '0',
+  `trackid` bigint(16) NOT NULL default '0',
+  `date` datetime NOT NULL default '0000-00-00 00:00:00',
+  KEY `userid` (`userid`),
+  KEY `date` (`date`)
 ) TYPE=MyISAM;
 
 # --------------------------------------------------------
@@ -21,6 +38,7 @@ CREATE TABLE `distributions` (
 # Table structure for table `ratings`
 #
 
+DROP TABLE IF EXISTS `ratings`;
 CREATE TABLE `ratings` (
   `id` int(12) NOT NULL default '0',
   `trackid` bigint(16) NOT NULL default '0',
@@ -41,6 +59,7 @@ CREATE TABLE `ratings` (
 # Table structure for table `sources`
 #
 
+DROP TABLE IF EXISTS `sources`;
 CREATE TABLE `sources` (
   `id` int(12) NOT NULL default '0',
   `distribid` bigint(16) NOT NULL default '0',
@@ -59,6 +78,7 @@ CREATE TABLE `sources` (
 # Table structure for table `tracks`
 #
 
+DROP TABLE IF EXISTS `tracks`;
 CREATE TABLE `tracks` (
   `artistname` varchar(64) NOT NULL default '',
   `trackname` varchar(128) NOT NULL default '',
@@ -78,13 +98,17 @@ CREATE TABLE `tracks` (
 # Table structure for table `users`
 #
 
+DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int(12) NOT NULL default '0',
   `user` varchar(32) NOT NULL default '',
   `pass` varchar(32) NOT NULL default '',
   `dateinscr` datetime NOT NULL default '0000-00-00 00:00:00',
   `datelastlogin` datetime NOT NULL default '0000-00-00 00:00:00',
+  `datelastprepare` datetime NOT NULL default '0000-00-00 00:00:00',
   `ipinscr` varchar(15) NOT NULL default '',
   PRIMARY KEY  (`id`),
-  KEY `user` (`user`)
+  KEY `user` (`user`),
+  KEY `datelastlogin` (`datelastlogin`),
+  KEY `datelastprepare` (`datelastprepare`)
 ) TYPE=MyISAM;

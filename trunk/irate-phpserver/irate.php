@@ -17,6 +17,7 @@ var $options;
 var $out_status;
 var $out_message;
 
+var $init;
 
 function irate_server($options="") {
 
@@ -124,7 +125,11 @@ function parse() {
 
 
 
-function getNew($number) {
+function getNew($number,$include_random=true) {
+
+ if (!$this->init["correlation"]) {
+  $this->initCorrelation();
+ }
 
  $ids=array();
 
@@ -142,11 +147,14 @@ function getNew($number) {
  * STEP 2 : we see how many random ones we can send to the user
  */
 
-
+ 
  $num_random=0;
- for ($i=0;$i<count($number);$i++) {
-  if (rand(0,99)<$this->cfg["random_frequency"]) {
-   $num_random++;
+
+ if ($include_random) {
+  for ($i=0;$i<count($number);$i++) {
+   if (rand(0,99)<$this->cfg["random_frequency"]) {
+    $num_random++;
+   }
   }
  }
 
@@ -156,7 +164,6 @@ function getNew($number) {
  $c=array();
  if ($number-$num_random>0) {
   $c=$this->correlation->get($number-$num_random);
-
   for ($i=0;$i<count($c);$i++) {
    $ids[]=$c[$i];
   }
@@ -168,7 +175,7 @@ function getNew($number) {
 
  $random=$number-count($c);
 
- if ($random>0) {
+ if ($random>0 and $include_random) {
   
   $r=$this->correlation_random->get($random);
  
@@ -180,7 +187,6 @@ function getNew($number) {
 
  }
 
- 
  return $ids;
 
 }
@@ -232,6 +238,8 @@ function initAuth($u,$p,$h) {
 
 
 function initCorrelation($corr="") {
+
+ $this->init["correlation"]=true;
 
  require_once($this->options["root"]."modules/correlation/common.php");
 
@@ -292,7 +300,6 @@ function rate($ratings) {
 function rateOne($trackid,$note,$weight=100) {
 
  $row=$this->db->getRow("SELECT * FROM ratings WHERE userid=? AND trackid=?",array($this->user["id"],$trackid));
-
  if (count($row)>0) {
   if ($weight>=$row["weight"]) {
    $this->db->query("UPDATE ratings SET weight=?,rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($weight,$note,$row["id"]));
@@ -301,7 +308,7 @@ function rateOne($trackid,$note,$weight=100) {
   
   $rid=$this->db->nextId("ratings");
  
-  $this->db->query("INSERT INTO ratings(id,trackid,userid,rating,ratingdate,ratingnum,weight) VALUES(?,?,?,?,now(),0,?)",array($rid,$trackid,$this->user["id"],$note,$weight));
+  $a=$this->db->query("INSERT INTO ratings(id,trackid,userid,rating,ratingdate,ratingnum,weight) VALUES(?,?,?,?,now(),0,?)",array($rid,$trackid,$this->user["id"],$note,$weight));
  }
 
   $this->db->query("DELETE FROM prepare WHERE userid=! AND trackid=!",array($this->user["id"],$trackid));
@@ -429,25 +436,28 @@ function addTrack($data) {
  $oldid=$this->user["id"];
 
   if (rand(0,100)<3) {
-   $this->db->query("DELETE FROM prepare WHERE now() - INTERVAL ! day > date",array($this->cfg["prepare_expire"]);
+   $this->db->query("DELETE FROM prepare WHERE now() - INTERVAL ! day > date",array($this->cfg["prepare_expire"]));
   }
 
 
   $this->initCorrelation();
 
-  $users=$this->db->getAll("SELECT count(*) as c1,users.id as id
+  $users=$this->db->getAll("SELECT users.id as id
   FROM users
   LEFT  JOIN prepare ON users.id = prepare.userid
+  WHERE now() - INTERVAL ! day < users.datelastlogin
   GROUP BY users.id
-  ORDER BY c1 ASC
-  LIMIT 0,".$this->cfg["prepare_users"]);
+  ORDER BY users.datelastprepare ASC
+  LIMIT 0,".$this->cfg["prepare_users"],array($this->cfg["prepare_idle"]));
  
-
+print_r($users);
 
   for ($i=0;$i<count($users);$i++) {
    $this->user["id"]=$users[$i]["id"];
     $this->db->query("DELETE FROM prepare WHERE userid=!",array($users[$i]["id"]));
-   $tracks=$this->getNew($this->cfg["prepare_tracks"]);
+    $this->db->query("UPDATE users SET datelastprepare=now() WHERE id=!",array($users[$i]["id"]));
+
+   $tracks=$this->getNew($this->cfg["prepare_tracks"],false);
 
    for ($y=0;$y<count($tracks);$y++) {
     $this->db->query("INSERT INTO prepare(trackid,userid,date) VALUES (!,!,now())",array($tracks[$y],$users[$i]["id"]));
@@ -455,9 +465,10 @@ function addTrack($data) {
   }
   
 
- }
 
  $this->user["id"]=$oldid;
+
+}
 
 
 }
