@@ -1,13 +1,12 @@
 Name: irate-client-gtk
 Summary: The iRATE music database client
 Version: snapshot1
-Release: 1
+Release: 2
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
 BuildRoot: /tmp/build-%{name}
-Source0: irate-src.tar.gz
-Source1: menu-mdk91
+Source: irate-src.tar.gz
 Requires: mad
 
 %description
@@ -33,7 +32,7 @@ make PLATFORM=linux-gtk2 DESTDIR=$RPM_BUILD_ROOT install
 mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
 
 mkdir -p $RPM_BUILD_ROOT/usr/lib/menu
-cp $RPM_SOURCE_DIR/menu-mdk91 $RPM_BUILD_ROOT/usr/lib/menu/irate-client-gtk
+cp rpm/mdk91/menu-mdk91 $RPM_BUILD_ROOT/usr/lib/menu/irate-client-gtk
 
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
 cp debian/irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1
@@ -57,6 +56,9 @@ rm -rf $RPM_BUILD_DIR/irate
 /usr/share/man
 
 %changelog
+* Mon Oct 06 2003 Todd Pytel <tppytel@sophrosune.org> snapshot2-1
+- Menu file is no longer a separate source since it is now in CVS
+
 * Sat Sep 20 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-1
 - Initial CVS commit
 

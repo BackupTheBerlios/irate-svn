@@ -23,17 +23,13 @@ substituting your choice of path appropriately.
 4) Copy the spec file from your distro's subdirectory to RPM/SPECS. You may
 want to rename it to something logical like irate.spec.
 
-5) Copy any other files from your distro's subdirectory to RPM/SOURCES. You
-cannot rename these files. (Well you *can*, of course, but then you'd have to
-change the spec file as well.)
-
-6) Create a source tarball called irate-src.tar.gz from the CVS pull and put
+5) Create a source tarball called irate-src.tar.gz from the CVS pull and put
 it in RPM/SOURCES. With my path choices, this looks like:
 
 cd ~/cvsirate
 tar czf ~/RPM/SOURCES/irate-src.tar.gz
 
-7) cd to the SPECS directory and do: 
+6) cd to the SPECS directory and do: 
 
 rpmbuild -bb irate.spec
 
@@ -41,6 +37,6 @@ using whatever name you chose for the spec. Note that SuSE (should I ever get
 specs in for it) uses an older RPM version - use "rpm -bb" instead of
 "rpmbuild -bb".
 
-8) You will find the new RPM in either the i386 or i586 subdirectory of 
+7) You will find the new RPM in either the i386 or i586 subdirectory of 
 RPM/RPMS - which one depends on the distro.
 
