@@ -1,0 +1,53 @@
+REQUIREMENT
+===========
+	
+	As this is a plugin for Noatun you'll need Noatun : It's located in KDEMultimedia package.
+	Depending on your distribution you will also need something like kdemultimedia-devel to compile this plugin.
+	
+	Actually tested with KDE 3.2.3
+
+INSTALLATION
+============
+You can install to your local dir by using your home kde dir as prefix for configure:
+if you don't know it execute in a shell: kde-config --localprefix
+then run
+./configure --prefix=/path/to/your/local/kde
+make
+make install
+
+then run Noatun and choose "Configure Noatun..." select Plugin and then Playlist tab. Choose "iRate Radio".
+That's all
+
+
+Of course you can also use normal install (need root access)
+
+The installation is really basic:
+./configure
+make
+su -c "make install"
+
+
+TROUBLESHOOTING
+===============
+If you have any trouble you can reach me at <matthias.studer@ezwww.ch>, feel free to ask
+Normally this won't happen
+
+First try to set $KDEDIR var: (you can find the value by running : kde-config --prefix)
+export KDEDIR=/path/kde/prefix
+then run configure && make && make install
+
+Else try
+If you enconter problems this is likely because prefix is not guessed correctly (normally this won't happen)
+
+if you tried with normal configure type : su -c "make uninstall" to be sure to remove all file previously installed
+
+check your $KDEDIR var (making echo $KDEDIR)
+if nothing print try
+kde-config --prefix
+and set $KDEDIR to the returned value
+
+then type
+
+./configure --prefix=$KDEDIR
+make 
+su -c "make install"
