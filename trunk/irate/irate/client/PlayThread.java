@@ -96,8 +96,10 @@ public class PlayThread extends Thread {
           }
 	  if (toKeepPlaying) {
 	    playFile(file);
-            if (toKeepPlaying) 
+            if (toKeepPlaying) {
               currentTrack.incNoOfTimesPlayed();
+              playListManager.getPlayList().incNoOfPlays();
+            }
           }
         }
 	else
@@ -121,6 +123,9 @@ public class PlayThread extends Thread {
   }
 
   public synchronized void reject() {
+      // It must not be paused if you want to reject a track.
+    setPaused(false);
+    
       // Clear the toKeepPlaying flag to instruct the play thread to co-operatively stop.
     toKeepPlaying = false;
     if (externalPlayer.length() != 0) {

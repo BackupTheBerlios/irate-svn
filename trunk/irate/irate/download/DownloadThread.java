@@ -26,11 +26,11 @@ public class DownloadThread extends Thread {
 
   public void run() {
     while (true) {
-      setState(" ");
+      checkAutoDownload();
       
       try {
         while (!ready) {
-          sleep(100);
+          sleep(250);
         }
         process();
         ready = false;
@@ -136,6 +136,7 @@ public class DownloadThread extends Thread {
     try {
       setState("Connecting to server");
       Socket socket = new Socket(trackDatabase.getHost(), trackDatabase.getPort());
+
       InputStream is = socket.getInputStream();
       setState("Sending server request");
       OutputStream os = socket.getOutputStream();
@@ -196,5 +197,23 @@ public class DownloadThread extends Thread {
       ActionListener actionListener = (ActionListener) actionListeners.elementAt(i);
       actionListener.actionPerformed(null);
     }
+  }
+
+  public void checkAutoDownload() {
+    String state = null;
+    synchronized (trackDatabase) {
+      int autoDownload = trackDatabase.getAutoDownload();
+      int autoDownloadCount = trackDatabase.getAutoDownloadCount();
+      if (autoDownload == 0) 
+        state = " ";
+      else if (autoDownloadCount < autoDownload) 
+        state = "Download in " + (autoDownload - autoDownloadCount) + " plays";
+      else
+        trackDatabase.setAutoDownloadCount(0);
+    }
+    if (state == null)
+      go();
+    else
+      setState(state);
   }
 }

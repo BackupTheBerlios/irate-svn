@@ -110,14 +110,12 @@ public class PlayPanel extends JPanel {
         setPaused(!playThread.isPaused());
       }
     });
-    setPaused(false);
     panel.add(pauseButton);
 
     JButton skipButton = new JButton(">>");
     skipButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         playThread.reject();
-        setPaused(false);
       }
     });
     panel.add(skipButton);
@@ -125,14 +123,8 @@ public class PlayPanel extends JPanel {
   }
 
   public void setPaused(boolean paused) {
-    if (paused) {
-      playThread.setPaused(true);
-      pauseButton.setText(">");
-    }
-    else {
-      playThread.setPaused(false);
-      pauseButton.setText("||");
-    }
+    playThread.setPaused(paused);
+    update();
   }
 
   public void setRating(int rating) {
@@ -150,5 +142,6 @@ public class PlayPanel extends JPanel {
     currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
     trackTable.notifyListeners();
     pauseButton.setEnabled(playThread.isPauseSupported());
+    pauseButton.setText(playThread.isPaused() ? ">" : "||");
   }
 }

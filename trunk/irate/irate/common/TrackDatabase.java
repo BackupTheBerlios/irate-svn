@@ -13,6 +13,7 @@ public class TrackDatabase {
   private final String docElementName = "TrackDatabase";
   private final String trackElementName = "Track";
   private final String userElementName = "User";
+  private final String autoDownloadElementName = "AutoDownload";
   private final String defaultHost = "takahe.blacksapphire.com";
   private final int defaultPort = 2278;
   private Vector tracks = new Vector();
@@ -168,6 +169,38 @@ public class TrackDatabase {
     setAttribute(userElementName, "port", Integer.toString(port));
   }
   
+  public int getAutoDownload() {
+    try {
+      return Integer.parseInt(getAttribute(autoDownloadElementName,"setting"));
+    }
+    catch (NumberFormatException e) {
+    }
+    return 0;
+  }
+
+  public void setAutoDownload(int setting) {
+    setAttribute(autoDownloadElementName, "setting", Integer.toString(setting));
+  }
+  
+  public int getAutoDownloadCount() {
+    try {
+      return Integer.parseInt(getAttribute(autoDownloadElementName,"count"));
+    }
+    catch (NumberFormatException e) {
+    }
+    return 0; 
+  }
+
+  public void setAutoDownloadCount(int count) {
+    setAttribute(autoDownloadElementName, "count", Integer.toString(count));
+  }
+
+  public void incNoOfPlays() {
+    synchronized (this) {
+      setAutoDownloadCount(getAutoDownloadCount() + 1);
+    }
+  }
+
   public boolean isRoboJockEnabled() {
     String s = getAttribute("RoboJock", "enabled").toLowerCase();
     if (s.equals("true") || s.equals("yes"))

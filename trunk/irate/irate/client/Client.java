@@ -94,6 +94,11 @@ public class Client extends JFrame {
         }
       }
     });
+    playThread.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        downloadThread.checkAutoDownload();
+      }
+    });
     downloadThread.start();
     getContentPane().add(downloadPanel, BorderLayout.SOUTH);
 
@@ -200,6 +205,29 @@ public class Client extends JFrame {
     
     return mi; 
   }
+
+  public JMenu createDownloadMenu() {
+    int autoDownload = trackDatabase.getAutoDownload(); 
+    
+    JMenu m = new JMenu("Auto download");
+    ButtonGroup bg = new ButtonGroup();
+    int counts[] = new int[] {0, 11, 17, 23, 29};
+    for (int i = 0; i < counts.length; i++) {
+      final int count = counts[i];
+      JCheckBoxMenuItem mi = new JCheckBoxMenuItem(count == 0 ? "Disabled" : "Every " + count + " plays");
+      mi.addActionListener(new ActionListener() {
+        public void actionPerformed(ActionEvent e) {
+          trackDatabase.setAutoDownload(count);
+          downloadThread.checkAutoDownload();
+        }
+      });
+      bg.add(mi);
+      mi.setState(count == autoDownload);
+      m.add(mi);
+    }
+    
+    return m;
+  }
     
   public JMenu createSettingsMenu() {
     JMenu m = new JMenu("Settings");
@@ -225,9 +253,18 @@ public class Client extends JFrame {
     playerButtonGroup = new ButtonGroup();
     JMenu player = new JMenu("Player");
     player.add(createPlayer(null, "javalayer"));
-    player.add(createPlayer(new String[] { "/usr/bin/mpg123" }, "mpg123"));
-    player.add(createPlayer(new String[] { "/usr/bin/madplay", "madplay.exe" }, "madplay"));
+    player.add(createPlayer(new String[] { 
+        "/usr/bin/mpg123", 
+        "/usr/local/bin/mpg123" 
+        }, "mpg123"));
+    player.add(createPlayer(new String[] { 
+        "/usr/bin/madplay", 
+        "/usr/local/bin/madplay", 
+        "madplay.exe" 
+        }, "madplay"));
     m.add(player);
+
+    m.add(createDownloadMenu());
 
     return m;
   }

@@ -17,7 +17,6 @@
       <fileset dir="." includes="irate/client/help/*.html"/>
       <fileset dir="." includes="irate/common/*.class"/>
       <fileset dir="." includes="irate/download/*.class"/>
-      <fileset dir="." includes="MAD/*.class"/>
     </jar>
     
     <jar jarfile="irate-server.jar" manifest="META-INF/manifest.irate-server" compress="false">
