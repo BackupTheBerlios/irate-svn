@@ -45,6 +45,8 @@
   
     <!-- Windoze installer -->
   <target name="nsis" depends="jar" unless="nsis.notrequired">
+    <mkdir dir="lib/swt-win32"/>
+    <unzip src="lib/swt-2.1-win32.zip" dest="lib/swt-win32/"/>
     <exec executable="makensis.exe">
       <arg line="irate-client.nsi"/>
     </exec>
