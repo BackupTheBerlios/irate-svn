@@ -3,18 +3,19 @@
  */
 package irate.swt;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.events.PaintListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Item;
-import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.*;
 
 /**
  * @author Anthony Jones
@@ -22,9 +23,16 @@ import org.eclipse.swt.widgets.ToolItem;
 public class SkinManager {
   
   private Vector items = new Vector();
+  private Vector controls = new Vector();
   private ZipFile zip;
   
   public SkinManager() {
+  }
+  
+  public SkinControl add(Control control, String name) {
+    SkinControl skinControl = new SkinControl(control, name);
+    add(skinControl);
+    return skinControl;
   }
   
   public SkinItem add(Item item, String name) {
@@ -37,6 +45,10 @@ public class SkinManager {
     items.add(skinItem);
     skinItem.getItem().setText(Resources.getString(skinItem.getName()));
   }
+  
+  public void add(SkinControl skinControl) {
+    controls.add(skinControl);
+  }
 
   
   public void applySkin(ZipFile zip) {
@@ -44,6 +56,10 @@ public class SkinManager {
     for (Iterator itr = items.iterator(); itr.hasNext(); ) {
       SkinItem skinItem = (SkinItem) itr.next();
       skinItem.update();
+    }
+    for (Iterator itr = controls.iterator(); itr.hasNext(); ) {
+      SkinControl skinControl = (SkinControl) itr.next();
+      skinControl.update();
     }
   }
   
@@ -101,4 +117,49 @@ public class SkinManager {
       System.out.println(name);
     }
   }
+  
+  
+  public class SkinControl {
+    
+    private Control control;
+    private String name;
+
+    public SkinControl(Control control, String name) {
+      this.control = control;
+      this.name = name;
+    }
+  
+    public String getName() {
+      return name;
+    }
+    
+    public void setName(String name) {
+      this.name = name;
+      update();
+    }
+
+    private Image getImage(Display display, String name) throws IOException {
+      ZipEntry zipEntry = zip.getEntry(name + ".gif"); // Returns null if not found
+      InputStream is = zip.getInputStream(zipEntry);
+      ImageData data = new ImageData(is);
+      return new Image(display, data);
+    }
+
+    public void update() {  
+        control.addPaintListener(new PaintListener(){
+          public void paintControl(PaintEvent e){
+            try {
+            Rectangle clientArea = control.getBounds();
+            Image img = getImage(control.getDisplay(), name);
+            ImageData data = img.getImageData();
+            data = data.scaledTo(clientArea.width, clientArea.height);
+            img = new Image(control.getDisplay(), data);
+            e.gc.drawImage(img, 0, 0);
+            }
+            catch (IOException f) {}
+          }
+        });
+        control.redraw();
+  } 
+}
 }

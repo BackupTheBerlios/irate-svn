@@ -345,7 +345,10 @@ public class Client extends AbstractClient {
   public void createShell() {
     shell = new Shell(display);
     shell.setText(Resources.getString("titlebar.program_name"));
-
+    
+    // Add the shell control so that it can contain a background.
+    skinManager.add(shell, "shell-background");
+    
     try {
       shell.setImage(Resources.getIconImage(display));
     } 
@@ -361,6 +364,7 @@ public class Client extends AbstractClient {
     //gridlayout is overkill for this
     GridLayout layout = new GridLayout(3, false);
     layout.horizontalSpacing = 0;
+    layout.marginWidth = 0;
     // Set the layout into the composite.
     shell.setLayout(layout);
   }
@@ -691,54 +695,22 @@ public class Client extends AbstractClient {
   }
 
   public void createToolBar() {
-    Composite composite = new Composite(shell, SWT.FLAT);
-    GridData gridData = new GridData();
-    gridData.horizontalAlignment = GridData.FILL;
-    gridData.grabExcessHorizontalSpace = true;
-    gridData.horizontalSpan = 3;
-    composite.setLayoutData(gridData);
-    composite.setLayout(new GridLayout(2, false));
+//    Composite composite = new Composite(shell, SWT.FLAT);
+      GridData gridData = new GridData();
+//    gridData.horizontalAlignment = GridData.FILL;
+//    gridData.grabExcessHorizontalSpace = true;
+//    gridData.horizontalSpan = 3;
+//    composite.setLayoutData(gridData);
+//    composite.setLayout(new GridLayout(2, false));
     
-    ToolBar toolbar = new ToolBar(composite, SWT.FLAT);
-    gridData = new GridData();
-    gridData.horizontalAlignment = GridData.CENTER;
-    gridData.grabExcessHorizontalSpace = true;
-    gridData.horizontalSpan = 1;
-    toolbar.setLayoutData(gridData);
+    
 
-    previous = new ToolItem(toolbar, SWT.PUSH);
-    previous.setToolTipText(Resources.getString("button.previous.tooltip"));
-    previous.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        skip(true);
-      }
-    });
-    previous.setEnabled(false);
-    skinManager.add(previous, "button.previous");
-
-    pause = new ToolItem(toolbar, SWT.PUSH);
-    setPaused(false);
-    pause.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setPaused(!isPaused());
-      }
-    });
-    pauseSkin = skinManager.add(pause, "button.pause");
-
-    ToolItem next = new ToolItem(toolbar, SWT.PUSH);
-    next.setToolTipText(Resources.getString("button.next.tooltip"));
-    next.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        skip();
-      }
-    });
-    skinManager.add(next, "button.next");
-
-    Composite trackGroup = new Composite(composite, SWT.BORDER);
+    Composite trackGroup = new Composite(shell, SWT.BORDER);
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
     gridData.horizontalSpan = 1;
+    gridData.horizontalIndent = 10;
     trackGroup.setLayoutData(gridData);    
     trackGroup.setLayout(new GridLayout(2, false));
     
@@ -796,6 +768,43 @@ public class Client extends AbstractClient {
     gridData.horizontalAlignment = GridData.END;
     gridData.grabExcessHorizontalSpace = true;
     volumeScale.setLayoutData(gridData);
+    
+    
+    ToolBar toolbar = new ToolBar(shell, SWT.FLAT);
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.CENTER;
+    gridData.grabExcessHorizontalSpace = true;
+    gridData.horizontalSpan = 1;
+    toolbar.setLayoutData(gridData);
+
+    previous = new ToolItem(toolbar, SWT.PUSH);
+    previous.setToolTipText(Resources.getString("button.previous.tooltip"));
+    previous.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        skip(true);
+      }
+    });
+    previous.setEnabled(false);
+    skinManager.add(previous, "button.previous");
+
+    pause = new ToolItem(toolbar, SWT.PUSH);
+    setPaused(false);
+    pause.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        setPaused(!isPaused());
+      }
+    });
+    pauseSkin = skinManager.add(pause, "button.pause");
+
+    ToolItem next = new ToolItem(toolbar, SWT.PUSH);
+    next.setToolTipText(Resources.getString("button.next.tooltip"));
+    next.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        skip();
+      }
+    });
+    skinManager.add(next, "button.next");
+    
     
 //    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
   }
@@ -936,7 +945,6 @@ public class Client extends AbstractClient {
    * updates the progress bar.
    */
   public void positionUpdated(int position, int length) {
-    System.out.println("positionUpdated()");
     final int currentTime = position;
     int checkedTime;
     if(length == 0) {
