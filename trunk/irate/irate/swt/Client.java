@@ -4,6 +4,7 @@ package irate.swt;
 
 import irate.common.Track;
 import irate.client.*;
+import irate.resources.Resources;
 import irate.swt.plugin.SWTPluginUIFactory;
 import irate.plugin.PluginApplication;
 import irate.plugin.PluginUIFactory;
@@ -24,13 +25,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/12 22:34:02 $
+ * Date Updated: $Date: 2003/11/13 01:21:30 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.98 $
+ * @version $Revision: 1.99 $
  */
 public class Client extends AbstractClient {
 
@@ -295,7 +296,7 @@ public class Client extends AbstractClient {
 
     try {
       ImageData icon =
-        new ImageData(getClass().getResourceAsStream("irate.gif"));
+        new ImageData(Resources.getResourceAsStream("irate.gif"));
       int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
       icon.transparentPixel = whitePixel;
       shell.setImage(new Image(display, icon));
@@ -659,8 +660,8 @@ public class Client extends AbstractClient {
     new ToolItem(toolbar, SWT.SEPARATOR);
 
     item = new ToolItem(toolbar, SWT.PUSH);
-    item.setText("Track Info");
-    item.setToolTipText("Display Track Info");
+    item.setText("Info");
+    item.setToolTipText("Display information about the track.");
     final Client clientToPass = this;
     item.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {

@@ -29,7 +29,8 @@
   <target name="jar" depends="compile,irate-client-swing">
     <jar jarfile="irate-client-swt.jar" manifest="META-INF/manifest.irate-swt-client" compress="true">
       <fileset dir="." includes="irate/swt/*.class"/>
-      <fileset dir="." includes="irate/swt/*.gif"/>
+      <fileset dir="." includes="irate/resources/*.class"/>
+      <fileset dir="." includes="irate/resources/*.gif"/>
       <fileset dir="." includes="irate/client/*.class"/>
       <fileset dir="." includes="irate/client/help/*.txt"/>
       <fileset dir="." includes="irate/common/*.class"/>
