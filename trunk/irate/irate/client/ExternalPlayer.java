@@ -164,6 +164,20 @@ public class ExternalPlayer extends AbstractPlayer {
     return r;
   } 
 
+  /** Function that sleeps in spite of interruptions. */
+  private void deepSleep(long msec) {
+    long start = System.currentTimeMillis();
+    long end = -1, elapsed = -1;
+    do {
+      try { 
+        Thread.sleep(msec - elapsed);
+      } catch (InterruptedException e) { }
+
+      end = System.currentTimeMillis();
+      elapsed = end - start;
+    } while (elapsed < msec);
+  }
+
   public void play(File file) throws PlayerException {
 
     playTime = 0;
@@ -214,6 +228,7 @@ public class ExternalPlayer extends AbstractPlayer {
           }
         }
         catch (IOException e) {
+          // Couldn't grab stdin/stdout of the player process! 
           e.printStackTrace();
           setPlayingThread(null);
           throw new PlayerException(e.toString());
@@ -233,6 +248,18 @@ public class ExternalPlayer extends AbstractPlayer {
         } catch (InterruptedException e) {
           // We should arrive here when someone changes the internal state of
           // this ExternalPlayer object.
+          // Bring the state of the player in sync with this object's state.
+          // To do this, we stop the player.
+          // First we delay for a brief amount of time (currently 1/10 sec) to
+          // prevent respawning the player too quickly.  Starting and stopping
+          // the external player too fast can cause crashes with older sound 
+          // drivers.
+          deepSleep(100);
+          try {
+          process.destroy();
+          process.waitFor();
+          } catch (InterruptedException foo) {}
+
           synchronized(this) {
             if (!stateDirty) {
               setPlayingThread(null);
@@ -240,13 +267,6 @@ public class ExternalPlayer extends AbstractPlayer {
                 "player thread interrupted without a state change");
             }
           }
-
-          // Bring the state of the player in sync with this object's state.
-          // To do this, we stop the player.
-          try {
-          process.destroy();
-          process.waitFor();
-          } catch (InterruptedException foo) {}
 
           long timePlayed = System.currentTimeMillis() - start;
           playTime += timePlayed;
