@@ -9,7 +9,7 @@ public class MadplayPlayer extends ExternalPlayer {
   public MadplayPlayer()
     throws FileNotFoundException
   {
-    super("madplay", new String[] { "madplay", "/usr/bin/madplay", "/usr/local/bin/madplay", "madplay.exe" });
+    super("madplay", new String[] { "madplay", "madplay.exe" });
   }
 
   private String format00(int number)
