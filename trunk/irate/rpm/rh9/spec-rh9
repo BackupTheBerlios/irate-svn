@@ -1,13 +1,12 @@
 Name: irate-client-gtk
 Summary: The iRATE music database client
 Version: snapshot1
-Release: 20030923
+Release: 20031006
 Group: Applications/Multimedia
 Copyright: GPL
 Packager: Todd Pytel <tppytel@sophrosune.org>
 BuildRoot: /tmp/build-%{name}
-Source0: irate-src.tar.gz
-Source1: desktop-rh9
+Source: irate-src.tar.gz
 Requires: madplay
 
 %description
@@ -30,7 +29,7 @@ make PLATFORM=linux-gtk2 DESTDIR=$RPM_BUILD_ROOT install
 mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
 
 mkdir -p $RPM_BUILD_ROOT/usr/share/applications/
-cp $RPM_SOURCE_DIR/desktop-rh9 $RPM_BUILD_ROOT/usr/share/applications/irate-client-gtk.desktop
+cp rpm/rh9/desktop-rh9 $RPM_BUILD_ROOT/usr/share/applications/irate-client-gtk.desktop
 mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
 cp debian/irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1
 ln -s irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1/irate-client-gtk.1
@@ -48,6 +47,9 @@ rm -rf $RPM_BUILD_DIR/irate
 /usr/share/man
 
 %changelog
+* Mon Oct 06 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20031006
+- Removed desktop entry as a separate source, since it is now in CVS
+
 * Tue Sep 23 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-20030923
 - Initial CVS commit
 - Renamed desktop file for consistency
