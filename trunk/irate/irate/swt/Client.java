@@ -26,13 +26,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/22 23:51:15 $
+ * Date Updated: $Date: 2003/11/26 05:48:31 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.106 $
+ * @version $Revision: 1.107 $
  */
 public class Client extends AbstractClient {
 
@@ -346,24 +346,30 @@ public class Client extends AbstractClient {
     }
 
     String cmd;
+    String urlString = URLEncoder.encode(url.toString());
     Runtime r = Runtime.getRuntime();
     try {
-      cmd = "kfmclient exec " + url + "";
+      // Check the browser preference. 
+      cmd = Preferences.getUserPreference("browser");
+
+      // If it's blank then try the KDE default and if that fails then we
+      // try the Windows default.
+      if (cmd == null || cmd.length() == 0) {
+        try {
+          cmd = "kfmclient exec " + urlString;
+          System.out.println(cmd);
+          r.exec(cmd);
+          return;
+        }
+        catch (Exception ex) {
+        }
+        cmd = "rundll32 url.dll,FileProtocolHandler";
+      }
+      cmd += " " + urlString;
       System.out.println(cmd);
       r.exec(cmd);
     }
-    catch (Exception ex) {
-      try {
-        //win32 way
-        cmd = Preferences.getUserPreference("browser");
-        if(cmd != null) {
-          cmd = cmd + " " + url;
-        }
-        r.exec(cmd);
-      }
-      catch (Exception eee) {
-
-      }
+    catch (Exception e) {
     }
   }
 
