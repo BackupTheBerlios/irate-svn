@@ -25,6 +25,7 @@ public class FastTrack extends Track {
     super(track);
     key = super.getKey();
     rating = super.getRawRating();
+    noOfTimesPlayed = super.getNoOfTimesPlayed();
   }
   
   public String key() {
@@ -75,7 +76,7 @@ public class FastTrack extends Track {
 
   public void setTitle(String title) {
     cacheTitle = new SoftReference(title);
-    super.setArtist(title);
+    super.setTitle(title);
   }
   
   public String getTitle() {
