@@ -1,3 +1,9 @@
+irate (0.3-0pre12) unstable; urgency=low
+
+  * Fixed problem with rating via IR remote.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Wed, 28 Jan 2004 22:18:57 +0800
+
 irate (0.3-0pre11) unstable; urgency=low
 
   * Fixed ThreadStateException on woody build.
