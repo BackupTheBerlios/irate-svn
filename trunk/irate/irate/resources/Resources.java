@@ -19,7 +19,10 @@ public class Resources {
   }
   
   public static InputStream getResourceAsStream(String name) throws IOException {
-    return getResource(name).openStream();
+    if(getResource(name) != null)
+      return getResource(name).openStream();
+    else
+      throw new IOException();
   }
   
 }
