@@ -105,7 +105,17 @@ public class Track {
   public void incNoOfTimesPlayed() {
     synchronized (this) {
       elt.setAttribute("played", Integer.toString(getNoOfTimesPlayed() + 1));
-      elt.setAttribute("last", new SimpleDateFormat().format(new Date()));
+      String strDate;
+      Date d = new Date();
+      try
+      {
+        strDate = new SimpleDateFormat().format(d);
+      }catch(Exception e){
+        System.err.println("Date formatting failed");
+        e.printStackTrace();
+        strDate = d.toString();
+      } 
+      elt.setAttribute("last", strDate);
     }
   }
 
