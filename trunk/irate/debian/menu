@@ -1,2 +1,0 @@
-?package(irate-client-motif):needs=X11 section=Apps/Sound\
-  title="iRATE radio" command="/usr/bin/irate-client"
