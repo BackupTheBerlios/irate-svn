@@ -1,3 +1,10 @@
+irate (0.3-0pre5) unstable; urgency=low
+
+  * Added drag and drop.
+  * Added a bunch of other features.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Sat,  8 Nov 2003 11:13:44 +0800
+
 irate (0.3-0pre4) unstable; urgency=low
 
   * Made it work more smoothly for the new user.
