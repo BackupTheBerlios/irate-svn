@@ -315,19 +315,17 @@ public class TrackTable
           "  widths " + colZeroWidth + "," + colOneWidth + "," + colTwoWidth +
           "  colTwoX " + colTwoX);
         if (e.x >= colTwoX && e.x < (colTwoX+colTwoWidth) && e.x < (colTwoX+80)) {
-          if (popupMenu != null && clickedTrack != null) {
+          if (popupMenu != null && clickedTrack != null && !clickedTrack.isNotDownloaded()) {
             menuSelectedTrack = clickedTrack;
               // Select and scroll to the selected track.
             select(selected, true);
               // Put the menu 10 pixels below the mouse position so there is less risk of
               // choosing "THIS SUX" accidentally.
-            if(!menuSelectedTrack.isNotDownloaded()) {
-                popupMenu.popUp(menuSelectedTrack, table.toDisplay(e.x, e.y+10));
-            }
-              // Note: We will now receive a 'widgetSelected' event.  This will call
-              // select(selected, false) - this will ensure the correct track is
-              // highlighted, because menuSelectedTrack overrides the 'selected' track.
+            popupMenu.popUp(menuSelectedTrack, table.toDisplay(e.x, e.y+10));
           }
+            // Note: We will now receive a 'widgetSelected' event.  This will call
+            // select(selected, false) - this will ensure the correct track is
+            // highlighted, because menuSelectedTrack overrides the 'selected' track.
         }
       }
     });
