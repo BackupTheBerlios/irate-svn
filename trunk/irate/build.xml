@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+
+<project name="Survey View" default="release">
+  <target name="compile">
+    <javac srcdir="." debug="true" debuglevel="lines,vars,source">
+      <classpath>
+        <pathelement path="xercesImpl.jar"/>
+        <pathelement path="xmlParserAPIs.jar"/>
+        <pathelement path="jl020.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="jar" depends="compile">
+    <jar jarfile="irate-client.jar" manifest="META-INF/manifest.irate-client" compress="false">
+      <fileset dir="." includes="irate/client/*.class"/>
+      <fileset dir="." includes="irate/common/*.class"/>
+      <fileset dir="." includes="irate/download/*.class"/>
+    </jar>
+    
+    <jar jarfile="irate-server.jar" manifest="META-INF/manifest.irate-server" compress="false">
+      <fileset dir="." includes="irate/server/*.class"/>
+      <fileset dir="." includes="irate/common/*.class"/>
+    </jar>
+    
+    <uptodate property="release.notrequired" targetfile="irate-installer.exe">
+      <srcfiles dir="." includes="*.jar"/>
+    </uptodate>
+  </target>
+
+  <target name="release" depends="jar" unless="release.notrequired">
+    <exec executable="makensis.exe">
+      <arg line="irate-client.nsi"/>
+    </exec>
+  </target>
+  
+  <target name="clean">
+    <delete file="**/*.class"/>
+    <delete file="irate-server.jar"/>
+    <delete file="irate-client.jar"/>
+    <delete file="irate-client-installer.exe"/>
+  </target>
+</project>
