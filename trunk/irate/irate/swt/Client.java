@@ -74,6 +74,9 @@ public class Client extends AbstractClient {
   private SWTPluginUIFactory uiFactory;
   private SkinManager skinManager;
   
+  private final int UNRATED_ON_PLAYLIST_VALUE = 13;
+  private final int UNRATED_NOT_ON_PLAYLIST_VALUE = 0;
+  
   private RatingFunction[] ratingFunctions = new RatingFunction[] {
     new RatingFunction(0, "button.this_sux"),
     new RatingFunction(2, "button.yawn"),
@@ -766,11 +769,25 @@ public class Client extends AbstractClient {
      *
      * Allows the user to select the number of unrated tracks to add to each playlist generation
      */
-    MenuItem mNewUnrated = new MenuItem(mSettings, SWT.CASCADE);
+    MenuItem mNewUnrated = new MenuItem(mSettings, SWT.CHECK);
     skinManager.addItem(mNewUnrated, "toolbar.menu_item.unrated");
     mNewUnrated.addArmListener(new ToolTipArmListener(this, Resources.getString("toolbar.menu_item.tooltip.unrated")));
-
-    Menu menuNewUnrated = new Menu(mNewUnrated);
+    if (trackDatabase.getUnratedPlayListRatio() > 0) {
+        mNewUnrated.setSelection(true);
+    }
+    mNewUnrated.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          MenuItem self = (MenuItem) e.getSource();        
+          if (self.getSelection()) {
+              trackDatabase.setUnratedPlayListRatio(UNRATED_ON_PLAYLIST_VALUE);
+          }
+          else {
+              trackDatabase.setUnratedPlayListRatio(UNRATED_NOT_ON_PLAYLIST_VALUE);
+          }
+        }
+      });
+    
+    /*Menu menuNewUnrated = new Menu(mNewUnrated);
     mNewUnrated.setMenu(menuNewUnrated);
 
     int unratedPlayListRatio = trackDatabase.getUnratedPlayListRatio();
