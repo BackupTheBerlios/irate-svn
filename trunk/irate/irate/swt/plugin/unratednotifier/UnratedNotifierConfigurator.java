@@ -9,10 +9,10 @@ import irate.plugin.unratednotifier.*;
 
 /**
  * Date Created: Feb 13, 2004
- * Date Updated: $Date: 2004/02/17 21:11:08 $
+ * Date Updated: $Date: 2004/02/22 19:45:22 $
  * @author Creator: Mathieu Mallet
  * @author Updated: $Author: emh_mark3 $
- * @version $Revision: 1.1 $ */
+ * @version $Revision: 1.2 $ */
 
 public class UnratedNotifierConfigurator {
   private Display display;
@@ -29,7 +29,7 @@ public class UnratedNotifierConfigurator {
     this.plugin = (UnratedNotifierPlugin) plugin_;
 
     final Shell shell = new Shell(display);
-    shell.setText("Unrated Notifier configuration");
+    shell.setText(Resources.getString("configurator.title"));
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e){
         done=true;
@@ -38,7 +38,7 @@ public class UnratedNotifierConfigurator {
     GridLayout layout = new GridLayout(1, false);
     shell.setLayout(layout);
 
-    new Label(shell, SWT.NONE).setText("When an unrated track is playing, play a notification sound...");
+    new Label(shell, SWT.NONE).setText(Resources.getString("configurator.firstlabel"));
 
     notificationMode = plugin.getNotificationMode();
 
@@ -64,17 +64,17 @@ public class UnratedNotifierConfigurator {
     if (notificationMode >= 0 && notificationMode < notificationModes.length)
       notificationModes[notificationMode].setSelection(true);
     
-    notificationModes[0].setText("nowhere");
-    notificationModes[0].setToolTipText("Select this option to turn off unrated tracks notification."); 
-    notificationModes[1].setText("at beginning of track");
-    notificationModes[1].setToolTipText("Select this option to play a sound when an unrated track starts playing."); 
-    notificationModes[2].setText("at end of track");
-    notificationModes[2].setToolTipText("Select this option to play a sound when an unrated track has finished playing."); 
-    notificationModes[3].setText("30 seconds before end of track");
-    notificationModes[3].setToolTipText("Select this option to play a sound when an unrated track is almost finished playing."); 
+    notificationModes[0].setText(Resources.getString("configurator.modes.nowhere"));
+    notificationModes[1].setText(Resources.getString("configurator.modes.beginning"));
+    notificationModes[2].setText(Resources.getString("configurator.modes.end"));
+    notificationModes[3].setText(Resources.getString("configurator.modes.beforeend"));
+    notificationModes[0].setToolTipText(Resources.getString("configurator.modes.tooltips.nowhere"));
+    notificationModes[1].setToolTipText(Resources.getString("configurator.modes.tooltips.beginning"));
+    notificationModes[2].setToolTipText(Resources.getString("configurator.modes.tooltips.end"));
+    notificationModes[3].setToolTipText(Resources.getString("configurator.modes.tooltips.beforeend"));
     
     org.eclipse.swt.widgets.Button ok = new org.eclipse.swt.widgets.Button(shell, SWT.NONE);
-    ok.setText("OK");
+    ok.setText(Resources.getString("configurator.buttons.ok"));
     GridData gd = new GridData(GridData.HORIZONTAL_ALIGN_CENTER);
     gd.horizontalSpan = 2;
     ok.setLayoutData(gd);

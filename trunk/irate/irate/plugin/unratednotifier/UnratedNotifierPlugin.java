@@ -8,10 +8,10 @@ import irate.common.Track;
 
 /**
  * Date Created: Feb 13, 2004
- * Date Updated: $Date: 2004/02/21 06:20:33 $
+ * Date Updated: $Date: 2004/02/22 19:46:51 $
  * @author Creator: Mathieu Mallet
  * @author Updated: $Author: emh_mark3 $
- * @version $Revision: 1.3 $ */
+ * @version $Revision: 1.4 $ */
 
 public class UnratedNotifierPlugin extends Plugin {
   private PluginApplication app;
@@ -54,14 +54,14 @@ public class UnratedNotifierPlugin extends Plugin {
    * Gets a short description of this plugin.
    */
   public String getDescription() {
-    return "Unrated Tracks Notifier";
+    return Resources.getString("plugin.description");
   }
 
   /**
    * Gets a long description of this plugin, for tooltips.
    */
   public String getLongDescription() {
-    return "This plugin allows iRATE to play a sound event whenever an unrated track is playing.";
+    return Resources.getString("plugin.longdescription");
   }
 
   /**
@@ -115,7 +115,7 @@ public class UnratedNotifierPlugin extends Plugin {
   
   private void playNotificationSound() {
     try {
-      app.playSoundEvent(BaseResources.getResourceAsFile("notify_sound.mp3"), "Unrated track playing.");
+      app.playSoundEvent(BaseResources.getResourceAsFile("notify_sound.mp3"), Resources.getString("plugin.events.unratedtrackplaying"));
     }
     catch (IOException e) {
       e.printStackTrace();
