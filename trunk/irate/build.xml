@@ -202,6 +202,7 @@
       <fileset file="irate/resources/skin.zip"/>
       <fileset file="irate-client-macosx.zip"/>
       <fileset file="irate-client-macosx.dmg"/>
+      <fileset file="irate-mac-launcher.jar"/>
       
       <!-- Old files no longer used -->
       <fileset file="irate-client.jar"/>
