@@ -24,13 +24,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/10 08:51:56 $
+ * Date Updated: $Date: 2003/11/10 10:30:53 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.95 $
+ * @version $Revision: 1.96 $
  */
 public class Client extends AbstractClient {
 
@@ -55,7 +55,15 @@ public class Client extends AbstractClient {
   private TrackTable trackTable;
 
   private SWTPluginUIFactory uiFactory;
-
+  
+  private RatingFunction[] ratingFunctions = new RatingFunction[] {
+    new RatingFunction(0, "This sux", "Stop playing the current track and never play it again."),
+    new RatingFunction(2, "Yawn", "Rate the current track as 2 out of 10."),
+    new RatingFunction(5, "Not bad", "Rate the current track as 5 out of 10."),
+    new RatingFunction(7, "Cool", "Rate the current track as 7 out of 10."),
+    new RatingFunction(10, "Love it", "Rate the current track as 10 out of 10.")
+  };
+  
   public Client() {
     initGUI();
     errorDialog = new ErrorDialog(display, shell);
@@ -73,6 +81,7 @@ public class Client extends AbstractClient {
         playThread.play(trackTable.getSelectedTrack());
       }
     });
+    playThread.start();
   }
 
   public void handleError(String code, String urlString) {
@@ -175,7 +184,8 @@ public class Client extends AbstractClient {
    * this may be the same as the track that is playing.
    */
   public Track getSelectedTrack() {
-    return trackTable.getSelectedTrack();
+    // Return the track that is playing - ignoring the currently selected track.
+    return playThread.getCurrentTrack();
   }
 
   /**
@@ -185,6 +195,9 @@ public class Client extends AbstractClient {
    * has been changed.
    */
   public void setRating(final Track track, int rating) {
+    // Return if there's no track to rate.
+    if (track == null)
+      return;
 
     // Call the super method to deal with updating the track and DB.    
     super.setRating(track, rating);
@@ -262,6 +275,7 @@ public class Client extends AbstractClient {
     //    createTitle();
     trackTable = new TrackTable(shell, trackDatabase);
     createToolBar();
+    createTableMenu();
     createState();
     createProgressBar();
 
@@ -592,58 +606,24 @@ public class Client extends AbstractClient {
 
   public void createToolBar() {
     ToolBar toolbar = new ToolBar(shell, SWT.FLAT);
-    ToolItem item;
-    item = new ToolItem(toolbar, SWT.PUSH);
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = false;
     gridData.horizontalSpan = 1;
     toolbar.setLayoutData(gridData);
 
-    item.setText("This sux");
-    item.setToolTipText(
-      "Stop playing the current track and never play it again.");
-    item.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setRating(getSelectedTrack(), 0);
-      }
-    });
-
-    item = new ToolItem(toolbar, SWT.PUSH);
-    item.setText("Yawn");
-    item.setToolTipText("Rate the current track as 2 out of 10.");
-    item.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setRating(getSelectedTrack(), 2);
-      }
-    });
-
-    item = new ToolItem(toolbar, SWT.PUSH);
-    item.setText("Not bad");
-    item.setToolTipText("Rate the current track as 5 out of 10.");
-    item.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setRating(getSelectedTrack(), 5);
-      }
-    });
-
-    item = new ToolItem(toolbar, SWT.PUSH);
-    item.setText("Cool");
-    item.setToolTipText("Rate the current track as 7 out of 10.");
-    item.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setRating(getSelectedTrack(), 7);
-      }
-    });
-
-    item = new ToolItem(toolbar, SWT.PUSH);
-    item.setText("Love it");
-    item.setToolTipText("Rate the current track as 10 out of 10.");
-    item.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setRating(getSelectedTrack(), 10);
-      }
-    });
+    for (int i = 0; i < ratingFunctions.length; i++) {
+      RatingFunction rf = ratingFunctions[i];
+      ToolItem item = new ToolItem(toolbar, SWT.PUSH);
+      item.setText(rf.getName());
+      item.setToolTipText(rf.getToolTip());
+      final int value = rf.getValue();
+      item.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          setRating(getSelectedTrack(), value);
+        }
+      });
+    }
 
     new ToolItem(toolbar, SWT.SEPARATOR);
 
@@ -655,6 +635,7 @@ public class Client extends AbstractClient {
       }
     });
 
+    ToolItem item;
     item = new ToolItem(toolbar, SWT.PUSH);
     item.setText("<<");
     item.setToolTipText("Return to previous track");
@@ -683,6 +664,9 @@ public class Client extends AbstractClient {
     item.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         Track track = getSelectedTrack();
+        if (track == null)
+          return;
+          
         String www = track.getArtistWebsite();
 
         if (www == null) {
@@ -719,6 +703,23 @@ public class Client extends AbstractClient {
     gridData.grabExcessHorizontalSpace = false;
     gridData.horizontalSpan = 1;
     volumeScale.setLayoutData(gridData);
+  }
+  
+  public void createTableMenu() {
+    Menu menu = new Menu(shell, SWT.POP_UP);
+    trackTable.setMenu(menu);
+    for (int i = 0; i < ratingFunctions.length; i++) {
+      RatingFunction rf = ratingFunctions[i];
+      MenuItem item = new MenuItem(menu, SWT.NONE);
+      item.setText(rf.getName());
+      item.addArmListener(new ToolTipArmListener(rf.getToolTip()));
+      final int value = rf.getValue();
+      item.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          setRating(trackTable.getSelectedTrack(), value);
+        }
+      });
+    }
   }
 
   public void createState() {
@@ -825,6 +826,24 @@ public class Client extends AbstractClient {
 
   public static void main(String[] args) throws Exception {
     new Client().run();
+  }
+  
+  private class RatingFunction {
+    
+    private int value;
+    private String name;
+    private String toolTip;
+    
+    public RatingFunction(int value, String name, String toolTip) {
+      this.value = value;
+      this.name = name;
+      this.toolTip = toolTip;
+    }
+    
+    public int getValue() { return value; }
+    public String getName() { return name; }
+    public String getToolTip() { return toolTip; }
+    
   }
 
 }

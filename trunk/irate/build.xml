@@ -7,7 +7,6 @@
         <pathelement path="lib/HTTPClient.jar"/>
         <pathelement path="lib/nanoxml-lite-2.2.3.jar"/>
         <pathelement path="lib/jl030.jar"/>
-        <pathelement path="lib/jlGui2.2.jar"/>
         <pathelement path="lib/swt.jar"/>
         <pathelement path="lib/swt-pi.jar"/>
         <pathelement path="lib/skinlf.jar"/>

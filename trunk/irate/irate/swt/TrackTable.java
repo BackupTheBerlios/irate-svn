@@ -25,6 +25,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -312,6 +313,11 @@ public class TrackTable {
     }
   
     public abstract int compareTrack(Track track0, Track track1);  
+  }
+  
+  /** Set the a pop-up menu for the table. */
+  public void setMenu(Menu menu) {
+    table.setMenu(menu);
   }
 
 }

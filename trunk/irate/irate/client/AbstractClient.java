@@ -60,7 +60,6 @@ public abstract class AbstractClient implements UpdateListener, PluginApplicatio
       handleError(null, "help/missingplayer.html");
 
     playThread.addUpdateListener(this);
-    playThread.start();
 
     downloadThread = new DownloadThread(trackDatabase) {
       public void process() throws IOException {
