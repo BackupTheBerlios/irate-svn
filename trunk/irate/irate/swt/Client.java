@@ -19,7 +19,7 @@ import java.net.*;
 
 public class Client implements UpdateListener {
   
-  static Label lblTitle;
+//  static Label lblTitle;
   static Label lblState;
   static Table tblSongs;
   static Display display = new Display();
@@ -140,7 +140,9 @@ public class Client implements UpdateListener {
   public void update(){    
     //synchronizePlaylist(playListManager, tblSongs);
     Track track = playThread.getCurrentTrack();
-    lblTitle.setText(""+track);
+    String s = track.toString();
+//    lblTitle.setText(s);
+    shell.setText("iRATE radio - " + s);
     TableItem item = (TableItem)hashSongs.get(track);
     tblSongs.select(tblSongs.indexOf(item));
     tblSongs.showItem(item);    
@@ -299,7 +301,7 @@ public class Client implements UpdateListener {
   void initGUI(){
     createShell();
     createMenu();
-    createTitle();
+//    createTitle();
     createSongTable();
     createToolBar();
     createState();
@@ -342,14 +344,13 @@ public class Client implements UpdateListener {
     });
   }
     
-  public void createTitle() {
-    lblTitle = new Label(shell, SWT.NONE);
-//    lblTitle.setText("Current song goes here");
-    GridData gridData = new GridData();
-    gridData.horizontalAlignment = GridData.FILL;
-    gridData.horizontalSpan = 2;
-    lblTitle.setLayoutData(gridData);
-  }
+//  public void createTitle() {
+//    lblTitle = new Label(shell, SWT.NONE);
+//    GridData gridData = new GridData();
+//    gridData.horizontalAlignment = GridData.FILL;
+//    gridData.horizontalSpan = 2;
+//    lblTitle.setLayoutData(gridData);
+//  }
     
   public void createSongTable() {  
     tblSongs = new Table(shell, SWT.NONE);
