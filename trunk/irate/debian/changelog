@@ -1,0 +1,7 @@
+irate (0.2-1) unstable; urgency=low
+
+  * Initial Debian Release.
+  * This is my first Debian package.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Sun, 20 Jul 2003 19:14:00 +0800
+

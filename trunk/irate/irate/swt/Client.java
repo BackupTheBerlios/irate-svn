@@ -94,7 +94,7 @@ public class Client implements UpdateListener {
         //actionSetContinuousDownload(false);
         URL url;
         if (urlString.indexOf(':') < 0)
-          url = getClass().getResource("help/" + urlString);
+          url = getResource("help/" + urlString);
         else 
           try {
             url = new URL(urlString);
@@ -229,7 +229,7 @@ public class Client implements UpdateListener {
  
   public void setPaused(boolean paused) {
     playThread.setPaused(paused);
-    pause.setText(paused ? ">" : "||");
+    pause.setText(paused ? "|>" : "||");
   }
   
   void sortTable(Table table, Comparator c)

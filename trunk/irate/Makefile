@@ -1,3 +1,7 @@
+BIN=$(DESTDIR)/usr/bin
+LIB=$(DESTDIR)/usr/lib
+DOC=$(DESTDIR)/usr/doc/irate
+
 PWD=$(shell pwd)
 export CLASSPATH=.:$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
 
@@ -25,6 +29,15 @@ SERVER_LIBS = lib/libnanoxml-lite.a
 GCJ_WIN32 = thisiscool-gcc/gcc-3.3/bin/gcj.exe  
 
 all: lib irate-client irate-server
+
+install: irate-client
+	install -d $(BIN) $(LIB) $(DOC)
+	install irate-client $(BIN)
+	install lib/libswt-gnome-motif-3009.so $(LIB)
+	install lib/libswt-kde-motif-3009.so $(LIB)
+	install lib/libswt-motif-3009.so $(LIB)
+	install README $(DOC)
+	install COPYING $(DOC)
 
 lib:
 	$(MAKE) -C lib/
@@ -73,3 +86,4 @@ win32:
 
 clean:
 	rm -f $(DEPS) irate-client irate-server *.a *.o
+	$(MAKE) -C lib clean
