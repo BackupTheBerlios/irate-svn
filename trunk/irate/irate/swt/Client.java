@@ -33,7 +33,7 @@ public class Client implements UpdateListener, PluginApplication {
   private Display display = new Display();
   private Shell shell;
   private ProgressBar progressBar;
-  private Slider volumeSlider;
+  private Scale volumeScale;
 
   private Hashtable hashSongs = new Hashtable();
   private TrackDatabase trackDatabase;
@@ -192,7 +192,7 @@ public class Client implements UpdateListener, PluginApplication {
         String s = track.toString();
     //    lblTitle.setText(s);
         shell.setText("iRATE radio - " + s);
-        volumeSlider.setSelection(track.getVolume() + VOLUME_OFFSET);
+        volumeScale.setSelection(track.getVolume() + VOLUME_OFFSET);
         TableItem item = (TableItem)hashSongs.get(track);
         tblSongs.select(tblSongs.indexOf(item));
         tblSongs.showItem(item);    
@@ -783,21 +783,21 @@ public class Client implements UpdateListener, PluginApplication {
       }
     });
     
-    volumeSlider = new Slider(shell, SWT.HORIZONTAL | SWT.FLAT);
-    volumeSlider.setIncrement(VOLUME_RESOLUTION);
-    volumeSlider.setPageIncrement(VOLUME_RESOLUTION * 2);
-    volumeSlider.setMaximum(VOLUME_SPAN);
-    volumeSlider.setThumb(1);
-    volumeSlider.addSelectionListener(new SelectionAdapter(){
+    volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
+    volumeScale.setIncrement(VOLUME_RESOLUTION);
+    volumeScale.setPageIncrement(VOLUME_RESOLUTION * 2);
+    volumeScale.setMaximum(VOLUME_SPAN);
+    //volumeScale.setThumb(1);
+    volumeScale.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        setVolume(volumeSlider.getSelection() - VOLUME_OFFSET);
+        setVolume(volumeScale.getSelection() - VOLUME_OFFSET);
       }
     });
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = false;
     gridData.horizontalSpan = 1;
-    volumeSlider.setLayoutData(gridData);
+    volumeScale.setLayoutData(gridData);
   }
 
   public void createState() {
