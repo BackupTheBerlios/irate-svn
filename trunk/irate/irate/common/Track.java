@@ -382,6 +382,8 @@ public class Track {
 
   public void setFile(File file) {
     elt.setAttribute("file", file.getPath());
+    // Generate a license once we have a file.
+    license = this.generateLicense();
   }
 
   public void unSetFile() {
