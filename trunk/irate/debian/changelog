@@ -1,3 +1,9 @@
+irate (0.3-99post1) unstable; urgency=low
+
+  * Updates to Spanish and German translations.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Wed, 11 Feb 2004 22:02:58 +0800
+
 irate (0.3-1) unstable; urgency=low
 
   * Created new stable release.
