@@ -27,10 +27,10 @@ import org.eclipse.swt.widgets.Text;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/11/29 05:56:45 $
+ * Date Updated: $Date: 2003/11/29 06:15:33 $
  * @author Creator:	taras
  * @author Updated:	$Author: eythian $
- * @version $Revision: 1.11 $
+ * @version $Revision: 1.12 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -81,6 +81,9 @@ public class AccountDialog {
     if (password.length() == 0)
       password = randomString(10);
     txtPassword.setText(password);
+    txtPassword.setToolTipText("This is the password to authenticate you. "+
+                               "You may want to set it to something you can "+
+                               "remember.");
 
     new Label(shell, SWT.NONE).setText("Server");
     txtServer = new Text(shell, SWT.SINGLE | SWT.BORDER);
@@ -88,6 +91,8 @@ public class AccountDialog {
     data.horizontalSpan = 2;
     txtServer.setLayoutData(data);
     txtServer.setText(trackDatabase.getHost());
+    txtServer.setToolTipText("The server to use. The standard server is "+
+                             "server.irateradio.org.");
 
     new Label(shell, SWT.NONE).setText("Port");
     txtPort = new Text(shell, SWT.SINGLE | SWT.BORDER);
@@ -95,6 +100,8 @@ public class AccountDialog {
     data.horizontalSpan = 2;
     txtPort.setLayoutData(data);
     txtPort.setText(Integer.toString(trackDatabase.getPort()));
+    txtPort.setToolTipText("The port to comunicate with the server on. The "+
+                           "standard port is 2278.");
     
     new Label(shell, SWT.NONE).setText("Directory");
     txtDirectory = new Text(shell, SWT.SINGLE | SWT.BORDER);
@@ -104,13 +111,19 @@ public class AccountDialog {
     txtDirectory.setEnabled(false);
     txtDirectory.setLayoutData(data);
     txtDirectory.setText(System.getProperties().getProperty("user.home"));
+    txtDirectory.setToolTipText("The location for iRATE downloads. The "+
+                                "directory 'irate' will be created in this "+
+                                "location");
 
     Button btnDirectory = new Button(shell, SWT.NONE);
     btnDirectory.setText("Browse...");
     btnDirectory.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         DirectoryDialog dialog = new DirectoryDialog (shell);
-        dialog.setMessage("Choose the location for iRATE downloads -- The directory 'irate' will be created in this location");
+        dialog.setMessage("Choose the location for iRATE downloads -- The "+
+                          "directory 'irate' will be created in this "+
+                          "location");
+        dialog.setText("iRATE Downloads Directory");
         String result = dialog.open();
         if(result != null) {
           txtDirectory.setText(result);
@@ -159,8 +172,10 @@ public class AccountDialog {
     data.horizontalSpan = 2;
     txtUser.setLayoutData(data);String userName = trackDatabase.getUserName();
     if (userName.length() == 0) 
-      userName = System.getProperty("user.name") + " " + randomString(3); 
+      userName = System.getProperty("user.name");// + " " + randomString(3); 
     txtUser.setText(userName);
+    txtUser.setToolTipText("This is the username use to store your rating "+
+                           "information. It will need to be unique.");
   }
  
   /** Create the OK button. */
