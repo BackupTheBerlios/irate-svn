@@ -1,13 +1,18 @@
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
 DOC=$(DESTDIR)/usr/doc/irate
-GCJ=gcj
-
+GCJ=gcj -g
+IRATE_CLIENT=irate-client
 PWD=$(shell pwd)
 export CLASSPATH=.:$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
 
-CLIENT_DEPS = irate-swt.o irate-common.a irate-client.o irate-download.o
-CLIENT_LIBS = lib/libswt.a lib/libnanoxml-lite.a
+
+CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
+CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o
+ifdef WITH_GTK2
+CLIENT_LIBS += lib/libswt-pi.o
+endif
+
 CLIENT_FILES = \
 	irate/client/PlayThread.java \
 	irate/client/PlayerException.java \
@@ -22,15 +27,10 @@ CLIENT_FILES = \
 #	irate/client/JavaSoundAudioDevice.java 
 #	irate/client/JavaLayerPlayer.java 
 
-SERVER_DEPS = irate-server.o irate-common.a
-SERVER_LIBS = lib/libnanoxml-lite.a
+SERVER_DEPS = irate-server.o irate-common.o
+SERVER_LIBS = lib/libnanoxml-lite.o
 
-# You need to set this as executable by going:
-# chmod a+x `find thisiscool-gcc/ -name \*.exe`
-
-GCJ_WIN32 = thisiscool-gcc/gcc-3.3/bin/$(GCJ).exe  
-
-all: lib irate-client irate-server
+all: lib $(IRATE_CLIENT) irate-server
 
 install: irate-client
 	install -d $(BIN) $(LIB) $(DOC)
@@ -44,16 +44,24 @@ install: irate-client
 lib:
 	$(MAKE) -C lib/
 
-lib/libswt.a:
-	$(MAKE) -C lib/ libswt.a
+lib/libswt.o:
+	$(MAKE) -C lib/ libswt.o
 
-lib/libnanoxml-lite.a:
-	$(MAKE) -C lib/ libnanoxml-lite.a
+lib/libswt-pi.o:
+	$(MAKE) -C lib/ libswt-pi.o
+
+lib/libnanoxml-lite.o:
+
+lib/libnanoxml-lite.o:
+	$(MAKE) -C lib/ libnanoxml-lite.o
 	
 irate-client: $(CLIENT_DEPS) $(CLIENT_LIBS)
 	$(GCJ)  $(CLIENT_DEPS) $(CLIENT_LIBS) -o irate-client --main=irate.swt.Client
 
-irate-server: $(SERVER_DEPS)
+irate-client.exe: lib/libnanoxml-lite.o $(CLIENT_DEPS) lib/libswt-win32.a
+	$(GCJ) lib/libnanoxml-lite.o $(CLIENT_DEPS) lib/libswt-win32.a  --main=irate.swt.Client -o irate-client.exe
+
+irate-server: $(SERVER_DEPS) $(SERVER_LIBS)
 	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o irate-server --main=irate.server.Server
 	
 irate-swt.o: irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
@@ -65,9 +73,6 @@ irate-client.o: $(CLIENT_FILES)
 irate-download.o: irate/download/*.java
 	$(GCJ) -c irate/download/*.java -o irate-download.o
 	
-irate-common.a:irate-common.o
-	ar rcs irate-common.a irate-common.o
-	 
 irate-common.o:irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java
 	$(GCJ) -c irate/common/*.java irate/plugin/*.java irate/plugin/*/*.java -o irate-common.o
 

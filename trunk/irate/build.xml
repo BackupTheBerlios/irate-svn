@@ -7,6 +7,7 @@
         <pathelement path="lib/nanoxml-lite-2.2.3.jar"/>
         <pathelement path="lib/jl020.jar"/>
         <pathelement path="lib/swt.jar"/>
+        <pathelement path="lib/swt-pi.jar"/>
       </classpath>
     </javac>
   </target>
