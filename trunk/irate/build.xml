@@ -32,7 +32,7 @@
     </jar>
   </target>
     
-  <target name="jar" depends="compile,irate-client-swing">
+  <target name="jar" depends="compile,irate-client-swing,timestamp">
     <jar jarfile="irate-client-swt.jar" manifest="META-INF/manifest.irate-swt-client" compress="true">
       <fileset dir="." includes="irate/swt/*.class"/>
       <fileset dir="." includes="irate/swt/locale.properties"/>
@@ -53,6 +53,8 @@
       <fileset dir="." includes="irate/swt/plugin/locale.properties"/>
       <fileset dir="." includes="irate/swt/plugin/*/*.class"/>
       <fileset dir="." includes="irate/swt/plugin/*/locale.properties"/>
+      <fileset dir="." includes="irate/version/*.class"/>
+      <fileset dir="." includes="irate/version/*.txt"/>
       <fileset dir="." includes="javazoom/jlGui/*.class"/>
     </jar>
 
@@ -111,6 +113,14 @@
   </target>
 
   <target name="all" depends="gzip,nsis">
+  </target>
+
+  <target name="timestamp">
+    <tstamp/>
+    <copy file="irate/version/timestamp.txt.in"
+     tofile="irate/version/timestamp.txt" overwrite="true"/>
+    <replace file="irate/version/timestamp.txt" token="@TIMESTAMP@"
+     value="${DSTAMP}${TSTAMP}"/>
   </target>
 
   <target name="clean">

@@ -3,6 +3,7 @@
 package irate.swt;
 
 import irate.resources.BaseResources;
+import irate.version.Version;
 import java.io.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
@@ -76,7 +77,11 @@ public class AboutDialog {
     if (icon != null)
       labelImage.setImage(icon);
     Label labelText = new Label(header, SWT.HORIZONTAL);
-    labelText.setText(getResourceString("titlebar.program_name"));
+    String text = getResourceString("titlebar.program_name");
+    String version = Version.getVersionString();
+    if (! version.equals(""))
+      text = text + " " + version;
+    labelText.setText(text);
     labelText.setFont(createBoldFont(labelText.getFont()));
     return header;
 
