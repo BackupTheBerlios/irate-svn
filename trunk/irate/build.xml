@@ -43,6 +43,7 @@
       <fileset dir="." includes="irate/client/help/*.txt"/>
       <fileset dir="." includes="irate/common/*.class"/>
       <fileset dir="." includes="irate/common/locale.properties"/>
+      <fileset dir="." includes="irate/common/*.txt"/>
       <fileset dir="." includes="irate/download/*.class"/>
       <fileset dir="." includes="irate/download/locale.properties"/>
       <fileset dir="." includes="irate/plugin/*.class"/>
@@ -53,8 +54,6 @@
       <fileset dir="." includes="irate/swt/plugin/locale.properties"/>
       <fileset dir="." includes="irate/swt/plugin/*/*.class"/>
       <fileset dir="." includes="irate/swt/plugin/*/locale.properties"/>
-      <fileset dir="." includes="irate/version/*.class"/>
-      <fileset dir="." includes="irate/version/*.txt"/>
       <fileset dir="." includes="javazoom/jlGui/*.class"/>
     </jar>
 
@@ -117,9 +116,9 @@
 
   <target name="timestamp">
     <tstamp/>
-    <copy file="irate/version/timestamp.txt.in"
-     tofile="irate/version/timestamp.txt" overwrite="true"/>
-    <replace file="irate/version/timestamp.txt" token="@TIMESTAMP@"
+    <copy file="irate/common/timestamp.txt.in"
+     tofile="irate/common/timestamp.txt" overwrite="true"/>
+    <replace file="irate/common/timestamp.txt" token="@TIMESTAMP@"
      value="${DSTAMP}${TSTAMP}"/>
   </target>
 

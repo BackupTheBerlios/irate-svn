@@ -1,4 +1,4 @@
-package irate.version;
+package irate.common;
 
 import java.io.*;
 import java.net.URL;
@@ -17,9 +17,9 @@ public class Version {
       Returns an empty string if no information is available.
   */
   public static String getVersionString() {
-    String version = parseResourceFile("irate/version/version.txt");
+    String version = parseResourceFile("irate/common/version.txt");
     if (version.equals("")) {
-      String timeStamp = parseResourceFile("irate/version/timestamp.txt");
+      String timeStamp = parseResourceFile("irate/common/timestamp.txt");
       if (! timeStamp.equals(""))
         version = "[Build " + timeStamp + "]";
     }

@@ -2,8 +2,8 @@
 
 package irate.swt;
 
+import irate.common.Version;
 import irate.resources.BaseResources;
-import irate.version.Version;
 import java.io.*;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
