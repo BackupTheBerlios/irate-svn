@@ -903,7 +903,7 @@ public class Client extends AbstractClient {
       public void mouseDoubleClick(MouseEvent arg0) {}
       public void mouseDown(MouseEvent arg0) {}
       public void mouseUp(MouseEvent arg0) {
-        skip();
+        skip(false);
       }    
     });
     

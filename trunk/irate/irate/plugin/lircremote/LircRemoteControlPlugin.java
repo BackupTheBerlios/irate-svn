@@ -30,7 +30,7 @@ public class LircRemoteControlPlugin
     functions.add(new Function() {
       public String getID() {return "this-sux";}
       public String getName() {return "Rate as 'This sux'";}
-      public void perform() {getApp().setRating(getApp().getSelectedTrack(), 0); getApp().skip();}
+      public void perform() {getApp().setRating(getApp().getSelectedTrack(), 0); getApp().skip(false);}
     });
     functions.add(new Function() {
       public String getID() {return "yawn";}
@@ -59,8 +59,13 @@ public class LircRemoteControlPlugin
     });
     functions.add(new Function() {
       public String getID() {return "skip";}
-      public String getName() {return "Skip";}
-      public void perform() {getApp().skip();}
+      public String getName() {return "Forward";}
+      public void perform() {getApp().skip(false);}
+    });
+    functions.add(new Function() {
+      public String getID() {return "back";}
+      public String getName() {return "Back";}
+      public void perform() {getApp().skip(true);}
     });
   }
 

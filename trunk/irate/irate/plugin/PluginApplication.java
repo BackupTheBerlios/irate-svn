@@ -31,9 +31,9 @@ public interface PluginApplication
   public void setPaused(boolean paused);
 
   /**
-   * Skip to the next song.
+   * Skip to the next or previous song.
    */
-  public void skip();
+  public void skip(boolean reverse);
 
   /**
    * Get the track that is currently being played.

@@ -263,12 +263,8 @@ public abstract class AbstractClient
 
   /**
    * PluginApplication interface:
-   * Skip to the next song.
+   * Skip to the next or previous song.
    */
-  public void skip() {
-    skip(false);
-  }
-
   public void skip(boolean reverse) {
     setPaused(false);
     if (!reverse) {

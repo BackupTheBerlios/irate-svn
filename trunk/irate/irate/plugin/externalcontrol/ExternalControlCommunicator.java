@@ -15,10 +15,10 @@ import nanoxml.*;
  *  connections can be handled by different instances.
  *
  * Date Created: 20/9/2003
- * Date Updated: $$Date: 2004/05/31 04:38:44 $$
+ * Date Updated: $$Date: 2004/06/10 03:18:05 $$
  * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
- * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.4 $$
+ * @author Updated:	$$Author: blackh $$
+ * @version $$Revision: 1.5 $$
  */
 
 public class ExternalControlCommunicator
@@ -146,7 +146,7 @@ public class ExternalControlCommunicator
             app.setPaused(false);
 
           } else if (cmdType.equals("skip")) {
-            app.skip();
+            app.skip(false);
             trackResponseXML(response, app.getPlayingTrack());
             response.setAttribute("source","playing");
             replyNeeded = true;          
