@@ -10,6 +10,7 @@ import java.util.List;
 import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
+import irate.download.DownloadListener;
 import irate.download.DownloadThread;
 import irate.plugin.Plugin;
 import irate.plugin.PluginApplication;
@@ -105,14 +106,10 @@ public abstract class AbstractClient
       }
     };
 
-    downloadThread.addUpdateListener(new UpdateListener() {
-      boolean newState = false;
-      public void actionPerformed() {
-        setState(downloadThread.getState());
-        if (downloadThread.getPercentComplete() == 100)
-          updateTrackTable();
+    downloadThread.addDownloadListener(new DownloadListener() {
+      public void downloadProgressed(Track track, int percentComplete, String state) {
+        updateDownloadInfo(track, state, percentComplete);
       }
-      public void newTrackStarted(Track track) { }
     });
 
     System.out.println("Number of tracks "+trackDatabase.getNoOfTracks() );
@@ -261,7 +258,7 @@ public abstract class AbstractClient
   protected abstract void createNewAccount();
   public abstract Track getSelectedTrack();
   public abstract void handleError(String code, String urlString);
-  public abstract void setState(String state);
+  public abstract void updateDownloadInfo(Track track, String state, int percentageDone);
 
   /** Update the display of all tracks. */
   public abstract void updateTrackTable();

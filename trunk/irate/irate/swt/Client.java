@@ -57,7 +57,7 @@ public class Client extends AbstractClient {
   private Help help = new Help();
   private ErrorDialog errorDialog;
   private AboutDialog aboutDialog;
-  
+  private Composite trackGroup = null;  
 
   //  private SettingDialog settingDialog;
   private String strState = "";
@@ -163,18 +163,15 @@ public class Client extends AbstractClient {
   }
 
   /** This sets the statusbar */
-  public void setState(String state) {
+  public void updateDownloadInfo(final Track track,final String state,final int percentageDone) {
     strState = state;
-    if(shell == null) {
-      System.out.println("setState("+state+")");
-      return;
-    }
+  
     display.asyncExec(new Runnable() {
       public void run() {
-        int n = downloadThread.getPercentComplete();
-        boolean barVisible = progressBar.getVisible();
-        String status;
-        
+        //int n = percentageDone;
+        //boolean barVisible = progressBar.getVisible();
+        //String status;
+        /*
         if (n > 0 && n < 100) {
           status = strState + " " + n + "%";
           progressBar.setSelection(n);
@@ -186,11 +183,10 @@ public class Client extends AbstractClient {
           if (barVisible)
             progressBar.setVisible(false);
         }
-        //dont call pack so often
-        boolean pack = status.length() >= lblState.getText().length();
-        lblState.setText(status);
-        if(pack)
-          lblState.pack();
+        */
+        trackTable.updateTrack(track);
+        lblState.setText(strState);
+        lblState.pack();
       }
     });
   }
@@ -217,7 +213,11 @@ public class Client extends AbstractClient {
   }
 
   public void update() {
-    System.out.println("update()");
+    if(trackGroup != null && trackGroup.isEnabled()==false) {
+      trackGroup.setEnabled(true);
+      trackTable.enable();
+    }
+    
     //synchronizePlaylist(playListManager, tblSongs);
     Track track = playThread.getCurrentTrack();
     if (track == null)
@@ -358,7 +358,7 @@ public class Client extends AbstractClient {
 
   public void createShell() {
     shell = new Shell(display);
-
+    shell.setText("iRATE Radio - Initializing");
     try {
       shell.setImage(Resources.getIconImage(display));
     } 
@@ -695,11 +695,8 @@ public class Client extends AbstractClient {
   }
 
   public void createToolBar() {
-    
-    
-    
-
-    Composite trackGroup = new Composite(topPanel, SWT.BORDER);
+    trackGroup = new Composite(topPanel, SWT.BORDER);
+    trackGroup.setEnabled(false);
     skinManager.add(trackGroup, "topPanel-background!");
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;

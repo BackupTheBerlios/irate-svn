@@ -5,6 +5,7 @@ package irate.swing;
 import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
+import irate.download.DownloadListener;
 import irate.download.DownloadThread;
 import irate.client.PlayListManager;
 import irate.client.PlayThread;
@@ -138,16 +139,15 @@ public class Client extends JFrame {
         }
       };
      downloadPanel = new DownloadPanel(downloadThread);
-     downloadThread.addUpdateListener(new UpdateListener() {
+     downloadThread.addDownloadListener(new DownloadListener() {
        private String state = "";
-       public void actionPerformed() {
-         String state = downloadThread.getState();
+     
+       public void downloadProgressed(Track track, int percentComplete, String state) {
          if (!state.equals(this.state)) {
            this.state = state;
            playPanel.update();
          }
        }
-       public void newTrackStarted(Track track) { }
      });
        playThread.addUpdateListener(new UpdateListener() {
        public void actionPerformed() {

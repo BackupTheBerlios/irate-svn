@@ -57,7 +57,8 @@ public class TrackTable {
     this.display = shell.getDisplay();
     this.trackDatabase = trackDatabase;
     table = new Table(shell, SWT.NONE);
-
+    table.setEnabled(false);
+    
     TableColumn col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
     addColumnListener(col, comparator = new TrackComparator() {
@@ -171,6 +172,10 @@ public class TrackTable {
     sort();
   }
   
+  /** Enables the table widget */
+  public void enable() {
+    table.setEnabled(true);
+  }
   /** Sorts the table and loads it into the Table (displays it). */
   private void sort() {
     System.out.println("TrackTable: Sorting"); //$NON-NLS-1$

@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.*;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Iterator;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -26,6 +27,7 @@ public class DownloadThread extends Thread {
   private boolean ready;
   private boolean continuous;
   private int contactCount = 0;
+  private Vector downloadListeners = new Vector();
     
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
@@ -114,37 +116,39 @@ public class DownloadThread extends Thread {
     }
     Enumeration keys = downloadTracks.keys();
     Thread downloadThreads[] = new Thread[5];
-    int threads = 0;
-    while(keys.hasMoreElements() && threads < downloadThreads.length) {
-      String host = (String)keys.nextElement();
-      //final Track track = (Track)keys.nextElement();
-      final Track track = (Track) downloadTracks.get(host);
-      System.out.println("Simultaniously downloading url "+track.getURL() + " hidden="+track.isHidden());
-      Thread th = new Thread(){
-        public void run() {
-          try {
-            download(track);
-          } catch(IOException ioe) {
-            ioe.printStackTrace();
+    
+    //as long as there are urls in the queue
+    //keep waiting for a free slot to download them
+    boolean stillDownloading = true;
+    while(downloadTracks.size() > 0 || stillDownloading) {
+      stillDownloading = false;
+      
+      for (int i = 0; i < downloadThreads.length; i++) {
+        if(downloadThreads[i]==null || !downloadThreads[i].isAlive()) {
+          if(keys.hasMoreElements()) {
+            String host = (String)keys.nextElement();
+            
+            final Track track = (Track) downloadTracks.get(host);
+            downloadTracks.remove(host);
+            keys = downloadTracks.keys();
+            
+            System.out.println("Simultaniously downloading url "+track.getURL() + " hidden="+track.isHidden());
+            //place a new download in the slot
+            downloadThreads[i] = new TrackDownloader(this, track);
+            //silly gcj craps out if we call start fromt the TrackDownloader constructor
+            downloadThreads[i].start();
+            stillDownloading = true;
           }
-        }
-      };
-      th.start();
-      downloadThreads[threads++] = th;
-    }
-    boolean downloadsRunning = false;
-    do {
+        } else // if there are running threads
+          stillDownloading = true;
+      }//for
+      
       try {
         Thread.sleep(1000);
       } catch (InterruptedException e) {
         e.printStackTrace();
       }
-      for (int i = 0; i < threads; i++) {
-        Thread th = downloadThreads[i];
-        if(th.isAlive())
-          downloadsRunning = true;
-      }
-    } while (downloadsRunning); 
+    }//while
     
     success = true;
     return success;
@@ -270,7 +274,11 @@ public class DownloadThread extends Thread {
               if (percent != percentComplete) {
                 percentComplete = percent;
                 track.setPercentComplete(percent);
-                notifyUpdateListeners();
+                notifyUpdateListeners(track);
+                for (Iterator iter = downloadListeners.iterator(); iter.hasNext();) {
+                  DownloadListener d = (DownloadListener) iter.next();
+                  d.downloadProgressed(track, percent, "downloading songs");
+                }
               }
             }
           }
@@ -394,11 +402,15 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
   //Can we have more reasons here?
   public void setState(String state) {
     this.state = state;
-    notifyUpdateListeners();
+    notifyUpdateListeners(null);
   }
 
-  public void addUpdateListener(UpdateListener updateListener) {
-    updateListeners.add(updateListener);
+  public void addUpdateListener(UpdateListener downloadListener) {
+    updateListeners.add(downloadListener);
+  }
+
+  public void addDownloadListener(DownloadListener downloadListener) {
+    downloadListeners.add(downloadListener);
   }
 
   public void removeUpdateListener(UpdateListener updateListener) {
@@ -409,7 +421,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
       }
   }
 
-  private void notifyUpdateListeners() {
+  private void notifyUpdateListeners(Track track) {
     for (int i = 0; i < updateListeners.size(); i++) {
       UpdateListener updateListener = (UpdateListener) updateListeners.elementAt(i);
       updateListener.actionPerformed();
@@ -441,6 +453,24 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
   private String getResourceString(String key) {
     return BaseResources.getString(LOCALE_RESOURCE_LOCATION, key); 
   }
+
+  private class TrackDownloader extends Thread{
+    private Track track;
+    private DownloadThread dt;
+    
+    public TrackDownloader(DownloadThread dthread, Track t) {
+      track = t;
+      dt = dthread;
+    }
+    
+    public void run() {
+      try {
+        dt.download(track);
+      } catch(IOException ioe) {
+        ioe.printStackTrace();
+      }
+    }
+  };
 }
 
 // Local Variables:
