@@ -833,6 +833,7 @@ public class Client extends AbstractClient {
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.BEGINNING;
     gridData.grabExcessHorizontalSpace = true;
+    gridData.horizontalIndent = 5;
     lblState.setLayoutData(gridData);
   }
 
@@ -841,6 +842,7 @@ public class Client extends AbstractClient {
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.END;
     gridData.horizontalSpan = 2;
+    gridData.horizontalIndent = 10;
     progressBar.setLayoutData(gridData);
     progressBar.setMinimum(0);
     progressBar.setMaximum(100);
