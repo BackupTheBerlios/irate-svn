@@ -1,17 +1,19 @@
 CXXFLAGS = -pipe -Wall -W -g3 -O0 -D_IR_DEBUG
 CXX      = g++
-INCPATH  = -I.. -I.
+INCPATH  = -I.
 MOC      = $(QTDIR)/bin/moc
 LINKFLAG= -lgcj -L. -lirate --shared
 QT_LINKFLAG=
-GCJ=gcj
-GCJFLAGS=-g3 -pipe -O0
+export GCJ=gcj -g -pipe -O2
+#GCJFLAGS=-g3 -pipe -O0
 GCJLINKFLAG=
 ifdef USE_WCHAR
 CXXFLAGS+= -D_CPPIR_USE_WCHAR_T
 else
 CXXFLAGS+= -D_CPPIR_USE_CHAR
 endif
+#Path
+IRATE_PATH=../irate
 #library defs
 LIBCPP_IRATE_O=baseiratetrack.o util_irate.o stdiratetrack.o
 LIBC_IRATE_O=c_irate.o util_irate.o
@@ -22,17 +24,17 @@ LIBQT_IRATE_SO=libqt_irate.so
 LIB_IRATE_SO=libirate.so
 LIB_IRATE_A=libirate.a
 LIB_IRATE_H=jiratelib/LibIRateNative.h
-LIB_IRATE_DEPS = ../irate-common.o ../irate-download.o irate-lib.o libiratenative.o
-LIB_IRATE_LIBS = ../lib/libnanoxml-lite.o ../lib/libjd3.o
+LIB_IRATE_DEPS = $(IRATE_PATH)/irate-common.o $(IRATE_PATH)/irate-download.o irate-lib.o libiratenative.o
+LIB_IRATE_LIBS = $(IRATE_PATH)/lib/libnanoxml-lite.o $(IRATE_PATH)/lib/libjd3.o
 #QT
 CXXQTFLAGS=
 QTINCPATH=-I$(QTDIR)/mkspecs/linux-g++ -I$(QTDIR)/include
 
 
 #Starting with java stuff
-export CLASSPATH=$(PWD):$(PWD)/..:$(PWD)/../lib/nanoxml-lite-2.2.3.jar:$(PWD)/../lib/jd3lib.jar
+export CLASSPATH=$(PWD):$(PWD)/$(IRATE_PATH):$(PWD)/$(IRATE_PATH)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/$(IRATE_PATH)/lib/jd3lib.jar
 
-JPATH=.:..:../lib/nanoxml-lite-2.2.3.jar:../lib/jd3lib.jar
+JPATH=.:$(IRATE_PATH):$(IRATE_PATH)/lib/nanoxml-lite-2.2.3.jar:$(IRATE_PATH)/lib/jd3lib.jar
 JAVAC=javac -classpath $(JPATH)
 
 all:$(LIB_IRATE_SO) $(LIB_IRATE_A) $(LIBCPP_IRATE_SO) $(LIBC_IRATE_SO)
@@ -58,22 +60,22 @@ $(LIBQT_IRATE_SO):$(LIBQT_IRATE_O)
 irate-lib.o: jiratelib/LibIRateNative.java jiratelib/PlayListManager.java
 	$(GCJ) -c jiratelib/*.java -o irate-lib.o
 jiratelib/LibIRateNative.h: jiratelib/LibIRateNative.java
-	$(JAVAC) ../irate/common/Track.java
-	$(JAVAC) ../irate/common/Date.java
+	$(JAVAC) $(IRATE_PATH)/irate/common/Track.java
+	$(JAVAC) $(IRATE_PATH)/irate/common/Date.java
 	$(JAVAC) jiratelib/LibIRateNative.java
 	mkdir -p irate/common
 	gcjh -d ./ irate.common.Track
 	gcjh -d ./ irate.common.Date
 	gcjh -d ./ jiratelib.LibIRateNative
 
-../irate-common.o:
-	$(MAKE) -C .. irate-common.o
-../irate-download.o:
-	$(MAKE) -C .. irate-download.o
-../lib/libnanoxml-lite.o:
-	$(MAKE) -C ../lib libnanoxml-lite.o
-../lib/libjd3.o:
-	$(MAKE) -C ../lib libjd3.o
+$(IRATE_PATH)/irate-common.o:
+	$(MAKE) -C $(IRATE_PATH) irate-common.o
+$(IRATE_PATH)/irate-download.o:
+	$(MAKE) -C $(IRATE_PATH) irate-download.o
+$(IRATE_PATH)/lib/libnanoxml-lite.o:
+	$(MAKE) -C $(IRATE_PATH)/lib libnanoxml-lite.o
+$(IRATE_PATH)/lib/libjd3.o:
+	$(MAKE) -C $(IRATE_PATH)/lib libjd3.o
 
 c_irate.o: c_irate.cpp c_irate.h
 util_irate.o: util_irate.cpp util_irate.h
