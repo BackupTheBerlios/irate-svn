@@ -238,13 +238,31 @@ public class TrackTable
       {
         // Carbon tables have some extra column margin width.
         // Table.EXTRA_WIDTH is hardcoded to 24, and of course not public.
-        // There seems to be one extra pixel in there too.
-        final int margin = Client.isMac() ? 25 : 0;
+        // There are also about 4 pixels on the right due for the focus ring.
+        final int margin = Client.isMac() ? 24 : 0;
+        final int gutter = Client.isMac() ? 4 : 0;
+        
+        // On Mac OS X, column header selection is broken. We need to check
+        // here for a column header hit to provide sort-on-click:
+        if (Client.isMac() && e.y < 20) {
+          final int sizeHandle = 4; // Resizing columns
+          int colStart = gutter;
+          for(int i = 0; i < table.getColumnCount(); i++ ) {
+            int colWidth = table.getColumn(i).getWidth() + margin;
+            if( e.x >= colStart && e.x - colStart < colWidth - sizeHandle ) {
+              System.out.println("mouseDown column hit on " + i);
+              setSortColumn(i);
+              return;
+            }
+            colStart += colWidth;
+          }
+          System.out.println("mouseDown couldn't find a column");
+        }
         int colZeroWidth = table.getColumn(0).getWidth() + margin;
         int colOneWidth = table.getColumn(1).getWidth() + margin;
         int colTwoWidth = table.getColumn(2).getWidth() + margin;
         
-        int colTwoX = (margin / 2) + colZeroWidth + colOneWidth;
+        int colTwoX = gutter + (margin / 2) + colZeroWidth + colOneWidth;
         
         TableItem item = table.getItem(new Point(margin, e.y));
         if (item == null)
