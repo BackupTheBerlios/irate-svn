@@ -17,6 +17,7 @@ public class PlayThread extends Thread {
   private String externalPlayer;
   private String[] possiblePlayers = new String[] { "/usr/bin/mpg123", "madplay.exe" };
   private Speech speech = new Speech();
+  private boolean playing;
   
   public PlayThread(PlayListManager playListManager) {
     this.playListManager = playListManager;
@@ -53,7 +54,7 @@ public class PlayThread extends Thread {
     }
   }
 
-  public void play(Track track)
+  public synchronized void play(Track track)
   {
     nextTrack = track;
     reject();
@@ -61,10 +62,13 @@ public class PlayThread extends Thread {
   
   private void playTrack() {
     try {
-        // If a next track has been chosen by the user, use that, otherwise
-	// pick one intelligently.
-      currentTrack = nextTrack != null ? nextTrack : playListManager.chooseTrack();
-      nextTrack = null;
+      synchronized (this) {
+	  // If a next track has been chosen by the user, use that, otherwise
+	  // pick one intelligently.
+	currentTrack = nextTrack != null ? nextTrack : playListManager.chooseTrack();
+	playing = true;
+	nextTrack = null;
+      }
 
       if (currentTrack != null) {
         notifyActionListeners();
@@ -78,8 +82,10 @@ public class PlayThread extends Thread {
               e.printStackTrace();
             }
           }
-          playFile(file);
-          currentTrack.incNoOfTimesPlayed();
+	  if (playing) {
+	    playFile(file);
+	    currentTrack.incNoOfTimesPlayed();
+          }
         }
       }
     }
@@ -99,7 +105,9 @@ public class PlayThread extends Thread {
     return currentTrack;
   }
 
-  public void reject() {
+  public synchronized void reject() {
+      // Clear the playing flag to instruct the play thread to co-operatively stop.
+    playing = false;
     if (externalPlayer.length() != 0) {
       if (playerProcess != null)
         playerProcess.destroy();
@@ -108,6 +116,8 @@ public class PlayThread extends Thread {
       if (player != null)
         player.stop();
     }
+    if (speech != null)
+      speech.abort();
   }
 
   public void setRating(int rating) {
