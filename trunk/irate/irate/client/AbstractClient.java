@@ -61,6 +61,13 @@ public abstract class AbstractClient
     // Check to see if the iRATE directory exists in the user's home.
     // This needs to be there.
     dir = new File(home, "/irate");
+    if (isMac()) {
+      // If the user doesn't already have an irate dir and hasn't removed ~/Music,
+      // let's put our stuff there alongside iTunes etc.
+      if (!dir.exists() && new File(home, "/Music").exists()) {
+        dir = new File(home, "/Music/iRATE");
+      }
+    }
     if (!dir.exists()) {
       dir.mkdir();
     }
@@ -78,7 +85,6 @@ public abstract class AbstractClient
       // If they don't have one set, fall back on the home directory.
       // If it doesn't exist in either location, then the user will need to fill in the
       // registration information.
-      dir = new File(home, "irate");
       downloadDir = new File(dir, "download/");
       file = new File(dir, "trackdatabase.xml");
     }
@@ -467,4 +473,11 @@ public abstract class AbstractClient
    * It should call 'getHighestPriorityStatusMessage'.
    */
   protected abstract void updateStatusMessage();
+
+  /**
+   * For controlling some platform-specific behavior
+   */
+  public static boolean isMac() {
+    return System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+  }
 }

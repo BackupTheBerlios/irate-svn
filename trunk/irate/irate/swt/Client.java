@@ -549,7 +549,7 @@ public class Client extends AbstractClient {
     });
     item_undo.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.undo")));
     skinManager.addItem(item_undo, "toolbar.menu_item.undo");
-
+    
     if (!isMac()) {
       // Mac OS X already has Quit in the app menu
       MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
@@ -1186,8 +1186,4 @@ public class Client extends AbstractClient {
       
     client.run();
   }    
-  
-  public static boolean isMac() {
-    return System.getProperty("os.name").toLowerCase().startsWith("mac os x");
-  }
 }
