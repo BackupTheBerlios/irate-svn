@@ -26,13 +26,14 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/27 04:32:56 $
+ * Date Updated: $Date: 2003/11/27 04:36:58 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.112 $
+ * @author Updated: Robin Sheat
+ * @version $Revision: 1.113 $
  */
 public class Client extends AbstractClient {
 
@@ -324,7 +325,6 @@ public class Client extends AbstractClient {
       System.out.println("JNLP:" + e);
 
       String cmd;
-      String urlString = URLEncoder.encode(url.toString());
       Runtime r = Runtime.getRuntime();
       try {
         // Check the browser preference. 
@@ -334,10 +334,6 @@ public class Client extends AbstractClient {
         // try the Windows default.
         if (cmd == null || cmd.length() == 0) {
           try {
-            // kfmclient doesn't like the first part of the protocol
-            // being encoded, and the search terms part have already
-            // been encoded, so we just use the straight URL given to
-            // us.
             cmd = "kfmclient exec " + url;
             System.out.println(cmd);
             r.exec(cmd);
@@ -347,7 +343,7 @@ public class Client extends AbstractClient {
           }
           cmd = "rundll32 url.dll,FileProtocolHandler";
         }
-        cmd += " " + urlString;
+        cmd += " " + url;
         System.out.println(cmd);
         r.exec(cmd);
       }
