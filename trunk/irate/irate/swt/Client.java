@@ -206,6 +206,8 @@ public class Client implements UpdateListener, PluginApplication {
           previousTrack = track;
         }
         downloadThread.checkAutoDownload();
+				previous.setEnabled(playThread.hasHistory());
+
       }
     });
   }
@@ -390,7 +392,6 @@ public class Client implements UpdateListener, PluginApplication {
 		else {
 				playThread.goBack();
 		}
-		previous.setEnabled(playThread.hasHistory());
   }
 
   void sortTable(Table table, Comparator c) {
