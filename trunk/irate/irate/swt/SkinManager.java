@@ -25,6 +25,7 @@ public class SkinManager {
   private Vector items = new Vector();
   private Vector controls = new Vector();
   private ZipFile zip;
+  private TransparencyManager transparencyManager = new TransparencyManager();
   
   public SkinManager() {
   }
@@ -127,6 +128,18 @@ public class SkinManager {
     public SkinControl(Control control, String name) {
       this.control = control;
       this.name = name;
+
+      control.addPaintListener(new PaintListener() {
+        public void paintControl(PaintEvent e) {
+          ImageData imageData = transparencyManager.getBackground(SkinControl.this.control);
+          if (imageData == null)
+            return;
+  
+          Image img = new Image(SkinControl.this.control.getDisplay(), imageData);
+          e.gc.drawImage(img, 0, 0);
+          img.dispose();
+        }
+      });
     }
   
     public String getName() {
@@ -138,39 +151,23 @@ public class SkinManager {
       update();
     }
 
-    private Image getImage(Display display, String name) throws IOException {
+    private ImageData getImageData(String name) throws IOException {
       ZipEntry zipEntry = zip.getEntry(name + ".gif"); // Returns null if not found
       if(zipEntry != null) {
         InputStream is = zip.getInputStream(zipEntry);
-        ImageData data = new ImageData(is);
-        return new Image(display, data);
+        return new ImageData(is);
       }
       return null;
     }
 
-    public void update() {  
-        control.addPaintListener(new PaintListener(){
-          public void paintControl(PaintEvent e){
-            try {
-            Rectangle clientArea = control.getBounds();
-            Image img = getImage(control.getDisplay(), name);
-            
-            if (img == null)
-            {
-              return;
-            }
-            
-            ImageData data = img.getImageData();
-            img.dispose();
-            data = data.scaledTo(clientArea.width, clientArea.height);
-            img = new Image(control.getDisplay(), data);
-            e.gc.drawImage(img, 0, 0);
-            img.dispose();
-            }
-            catch (IOException f) {}
-          }
-        });
+    public void update() {
+      try {
+        transparencyManager.associate(control, getImageData(name));
         control.redraw();
-  } 
-}
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    } 
+  }
 }

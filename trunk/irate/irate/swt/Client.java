@@ -710,6 +710,7 @@ public class Client extends AbstractClient {
     
 
     Composite trackGroup = new Composite(topPanel, SWT.BORDER);
+    skinManager.add(trackGroup, "topPanel-background!");
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
     gridData.grabExcessHorizontalSpace = true;
