@@ -24,13 +24,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/07 23:44:42 $
+ * Date Updated: $Date: 2003/11/09 02:09:37 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.93 $
+ * @version $Revision: 1.94 $
  */
 public class Client extends AbstractClient {
 
@@ -171,14 +171,6 @@ public class Client extends AbstractClient {
 
   /**
    * PluginApplication interface:
-   * Get the track that is currently being played.
-   */
-  public Track getPlayingTrack() {
-    return playThread.getCurrentTrack();
-  }
-
-  /**
-   * PluginApplication interface:
    * Get the track that is currently selected.  In some implementations
    * this may be the same as the track that is playing.
    */  
@@ -189,63 +181,32 @@ public class Client extends AbstractClient {
   /**
    * PluginApplication interface:
    * Set rating for the specified track.
+   * Override the base class so that we can update the GUI after the rating
+   * has been changed.
    */
   public void setRating(final Track track, int rating) {
-    // We have to delegate to the SWT event thread, because we might be
-    // called from a thread other than it, such as the remote control thread.
-    final Integer ratingInt = new Integer(rating);
+
+		// Call the super method to deal with updating the track and DB.    
+		super.setRating(track, rating);
+
+	  // Update the SWT GUI
     display.asyncExec(new Runnable() {
       public void run() {
-        track.setRating(ratingInt.intValue());
-        if (ratingInt.intValue() == 0 && track == getSelectedTrack())
-          playThread.reject();
         trackTable.updateTrack(track);
-        
-        //save the precious ratings :)
-        try {
-          trackDatabase.save();
-        }
-        catch (Exception e) {
-          e.printStackTrace();
-        }
       }
     });
   }
 
-  public void setVolume(final int volume) {
-    // We have to delegate to the SWT event thread, because we might be
-    // called from a thread other than it, such as the remote control thread.
-    final Integer volumeInt = new Integer(volume);
-    display.asyncExec(new Runnable() {
-      public void run() {
-        playThread.setVolume(volumeInt.intValue());
 
-        //save the updated volume
-        try {
-          trackDatabase.save();
-        }
-        catch (Exception e) {
-          e.printStackTrace();
-        }
-      }
-    });
-  }
-
-  /**
-   * PluginApplication interface:
-   * Return true if music play is paused.
-   */
-  public boolean isPaused() {
-    return playThread.isPaused();
-  }
 
   /**
    * PluginApplication interface:
    * Pause or unpause music play.
    */
   public void setPaused(boolean paused) {
-    playThread.setPaused(paused);
+    super.setPaused(paused);
     final Boolean pausedFinal = new Boolean(paused);
+    
     // We have to delegate to the SWT event thread, because we might be
     // called from a thread other than it, such as the remote control thread.
     display.asyncExec(new Runnable() {
@@ -262,27 +223,16 @@ public class Client extends AbstractClient {
     });
   }
 
-  /**
-   * PluginApplication interface:
-   * Skip to the next song.
-   */
-  public void skip() {
-    skip(false);
-  }
+	public void skip(boolean reverse) {
+		super.skip(reverse);
+		if(reverse && !playThread.goBack()) {
+			previous.setEnabled(false);
+		}
+	}
+  
 
-  public void skip(boolean reverse) {
-    setPaused(false);
-    if (!reverse) {
-      playThread.reject();
-      downloadThread.checkAutoDownload();
-    }
-    else {
-      if(!playThread.goBack())
-        previous.setEnabled(false);
-    }
-  }
-
-  void quit() {
+  public void quit() {
+    super.quit();
     try {
       shell.setVisible(false);
     }
@@ -295,9 +245,7 @@ public class Client extends AbstractClient {
     catch (IOException ee) {
       ee.printStackTrace();
     }
-    trackDatabase.purge();
-    playThread.reject();
-    System.exit(0);
+		System.exit(0);
   }
 
   void showAccountDialog() {
