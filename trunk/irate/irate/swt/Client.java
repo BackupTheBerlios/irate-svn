@@ -83,8 +83,6 @@ public class Client extends AbstractClient {
     new RatingFunction(10, "button.love_it")
   };
   
-  private static long lastStatusUpdate = 0;
-  
   public Client() {
     
     initGUI();
@@ -202,13 +200,7 @@ public class Client extends AbstractClient {
   /** This sets the statusbar */
   public void updateDownloadInfo(final Track track,final String state,final int percentageDone) {
       // Note: Track description says what percentage download, so we don't need to add it here.
-    long thisUpdate = new Date().getTime();
-    // Don't bother changing the status bar if we've already updated
-    // in the last second.
-    if(thisUpdate - lastStatusUpdate >= 1000) {
-      showDownloadStatus(state+" "+track);
-      lastStatusUpdate = thisUpdate;
-    }
+    showDownloadStatus(state + " " + track.getName() + " " + percentageDone + "%");
     display.asyncExec(new Runnable() {
       public void run() {
         //int n = percentageDone;
