@@ -49,7 +49,7 @@ public class Client extends AbstractClient {
   private Composite bottomPanel;
   private AlphaLabel lblState;
   private String lastStatusMessage = null;
-  private Display display;;
+  private Display display;
   private Shell shell;
   private AlphaLabel trackLabel;
   private ProgressBar progressBar;
@@ -125,8 +125,11 @@ public class Client extends AbstractClient {
         // Play track if the user double-clicks on it (or whatever the equivalent
         // is on the target platform).
       public void widgetDefaultSelected(SelectionEvent e) {
-        setPaused(false);
-        playThread.play(trackTable.getClickedTrack());
+        Track track = trackTable.getClickedTrack();
+        if (track.exists()) {
+          setPaused(false);
+          playThread.play(track);
+        }
       }
     });
     setPaused(false);
