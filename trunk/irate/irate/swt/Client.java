@@ -20,13 +20,13 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/13 03:59:19 $
+ * Date Updated: $Date: 2003/10/23 08:35:56 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.86 $
+ * @version $Revision: 1.87 $
  */
 public class Client extends AbstractClient {
 
@@ -449,7 +449,7 @@ public class Client extends AbstractClient {
     shell = new Shell(display);
     shell.setText("iRATE radio");
 		try{
-			ImageData icon = new ImageData( getClass().getResourceAsStream("irate.png"));
+			ImageData icon = new ImageData( getClass().getResourceAsStream("irate.gif"));
 			int whitePixel = icon.palette.getPixel(new RGB(255,255,255));
 			icon.transparentPixel = whitePixel;
 			shell.setImage(new Image(display, icon));

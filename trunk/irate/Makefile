@@ -133,8 +133,8 @@ irate-common.o:	$(JAVA_COMMONSRC)
 irate-server.o:irate/server/*.java
 	$(GCJ) -c irate/server/*.java -o irate-server.o
 
-irate-icon.o: irate/swt/irate.png
-	$(GCJ) -c --resource irate/swt/irate.png $^ -o $@
+irate-icon.o: irate/swt/irate.gif
+	$(GCJ) -c --resource $^ $^ -o $@
 
 deb:
 	dpkg-buildpackage -b -rfakeroot
