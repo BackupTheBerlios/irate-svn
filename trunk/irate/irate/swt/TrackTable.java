@@ -123,7 +123,7 @@ public class TrackTable
     col.setWidth(200);
     addColumnListener(col, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-          return magicStringCompare(track0.getArtist(), track1.getArtist());
+        return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.Artist"); 
@@ -143,7 +143,14 @@ public class TrackTable
     col.setAlignment(SWT.LEFT);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-        return magicStringCompare(track0.getState(), track1.getState());
+        String state0 = track0.getState();
+        String state1 = track1.getState();
+        if (!state0.startsWith("%") || !state1.startsWith("%")) {
+          int compare = magicStringCompare(state0, state1);
+          if (compare != 0)
+            return compare;
+        }
+        return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.Rating");
@@ -157,7 +164,7 @@ public class TrackTable
         int plays1 = track1.getNoOfTimesPlayed();
         if (plays0 < plays1) return -1;
         if (plays0 > plays1) return 1;
-        return 0;
+        return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.Plays");
@@ -176,7 +183,10 @@ public class TrackTable
     col.setWidth(60);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-        return licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
+        int compare = licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
+        if (compare != 0)
+          return compare;
+        return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.License");
