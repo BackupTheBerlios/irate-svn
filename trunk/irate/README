@@ -1,0 +1,10 @@
+This directory contains iRATE radio client and server code. iRATE radio client
+and server are free software. See the file COPYING for copying permission.
+
+To compile iRATE to run under the java VM you will need the Java SDK v1.4 or 
+equivalent and Apache Ant 1.5.2.
+
+http://java.sun.com/j2se/downloads.html
+http://ant.apache.org/
+
+Just run ant and it will automatically build it for you.
