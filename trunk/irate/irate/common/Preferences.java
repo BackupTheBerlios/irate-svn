@@ -18,11 +18,27 @@ public class Preferences {
   private static File temp;
 
   public Preferences() {
-    home = new File(System.getProperties().getProperty("user.home"));
-    config = new File(home, "/irate/irate.xml");
-    temp = new File(home, "/irate/irate.xml~");
+    File dir = getPrefsDirectory();
+    config = new File(dir, "irate.xml");
+    temp = new File(dir, "irate.xml~");
   }
-      
+  
+  public static File getPrefsDirectory() {
+    home = new File(System.getProperties().getProperty("user.home"));
+    File dir = new File(home, "/irate");
+    if (System.getProperty("os.name").toLowerCase().startsWith("mac os x")) {
+      // If the user doesn't already have an irate dir and hasn't removed ~/Music,
+      // let's put our stuff there alongside iTunes etc.
+      if (!dir.exists() && new File(home, "/Music").exists()) {
+        dir = new File(home, "/Music/iRATE");
+      }
+    }
+    if (!dir.exists()) {
+      dir.mkdir();
+    }
+    return dir;
+  }
+  
   /** 
    * This method accesses the irate.xml configuration file and returns a 
    * string representation of the user's preferred download directory.  That is,

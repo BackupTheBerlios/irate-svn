@@ -60,14 +60,7 @@ public abstract class AbstractClient
 
     // Check to see if the iRATE directory exists in the user's home.
     // This needs to be there.
-    dir = new File(home, "/irate");
-    if (isMac()) {
-      // If the user doesn't already have an irate dir and hasn't removed ~/Music,
-      // let's put our stuff there alongside iTunes etc.
-      if (!dir.exists() && new File(home, "/Music").exists()) {
-        dir = new File(home, "/Music/iRATE");
-      }
-    }
+    dir = Preferences.getPrefsDirectory();
     if (!dir.exists()) {
       dir.mkdir();
     }
