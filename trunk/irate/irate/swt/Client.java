@@ -102,7 +102,7 @@ public class Client implements UpdateListener, PluginApplication {
 
     playThread.addUpdateListener(this);
     playThread.start();
-        
+    playThread.setPaused(playerList.getPlayers().length > 0);   
     
     downloadThread = new DownloadThread(trackDatabase) {
       public void process() throws IOException {
