@@ -103,13 +103,12 @@ public class Track implements TrackDetails {
   }
   
   public String toString() {
-    String ratingStr = getState();
-    if (ratingStr.equals("10")) ratingStr = "****"; else
-    if (ratingStr.equals("7")) ratingStr = "***"; else
-    if (ratingStr.equals("5")) ratingStr = "**"; else
-    if (ratingStr.equals("2")) ratingStr = "*";
-    String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ")";
-    String s = getName() + rating;
+    String ratingStr = getState() + ":";
+    if (ratingStr.equals("10:")) ratingStr = "****"; else
+    if (ratingStr.equals("7:")) ratingStr = "***"; else
+    if (ratingStr.equals("5:")) ratingStr = "**"; else
+    if (ratingStr.equals("2:")) ratingStr = "*";
+    String s = ratingStr + " " + getName();
     if (getFile() == null)
       return "[" + s + "]";
     return s;
@@ -397,7 +396,7 @@ public class Track implements TrackDetails {
       return getId3Artist();
     if (artist.endsWith("...")) {
       String id3Artist = getId3Artist();
-      if (id3Artist.length() != 0)
+      if (id3Artist.length() > artist.length())
         return id3Artist;
     }
     return artist;
@@ -432,7 +431,7 @@ public class Track implements TrackDetails {
       return getId3Title();
     if (title.endsWith("...")) {
       String id3Title = getId3Title();
-      if (id3Title.length() != 0)
+      if (id3Title.length() > title.length())
         return id3Title;
     }
     return title;
