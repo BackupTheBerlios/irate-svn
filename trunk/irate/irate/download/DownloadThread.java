@@ -164,7 +164,7 @@ public class DownloadThread extends Thread {
         Thread.sleep(step);
         timeout -= step;
         if (exception != null)
-          throw exception;
+          throw new Exception(exception.toString());
         if (done)
           return;
       }

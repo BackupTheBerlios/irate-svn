@@ -15,6 +15,7 @@ import java.io.*;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.zip.ZipFile;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.*;
@@ -25,14 +26,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/07 00:33:44 $
+ * Date Updated: $Date: 2003/12/08 03:18:19 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.124 $
+ * @version $Revision: 1.125 $
  */
 public class Client extends AbstractClient {
 
@@ -47,11 +48,9 @@ public class Client extends AbstractClient {
   private Scale volumeScale;
   private TrackProgressBar songProgressBar;
 
-  private ToolItem[] rateButtons;
   private ToolItem pause;
+  private SkinManager.SkinItem pauseSkin;
   private ToolItem previous;
-  private ToolItem next;
-  private ToolItem info;
   private Track previousTrack;
   private Help help = new Help();
   private ErrorDialog errorDialog;
@@ -61,6 +60,7 @@ public class Client extends AbstractClient {
   private TrackTable trackTable;
 
   private SWTPluginUIFactory uiFactory;
+  private SkinManager skinManager = new SkinManager();
   
   private RatingFunction[] ratingFunctions = new RatingFunction[] {
     new RatingFunction(0, "button.this_sux"),
@@ -69,6 +69,15 @@ public class Client extends AbstractClient {
     new RatingFunction(7, "button.cool"),
     new RatingFunction(10, "button.love_it")
   };
+  
+  public static void main(String[] args) throws Exception {
+    Client client = new Client();
+    if (args.length == 2) {
+      if (args[0].equals("--skin"))
+        client.skinManager.applySkin(new ZipFile(new File(args[1])));
+    }
+    client.run();
+  }
   
   public Client() {
     
@@ -79,8 +88,10 @@ public class Client extends AbstractClient {
     initGUI();
     errorDialog = new ErrorDialog(display, shell);
 		uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
-
     createDropTarget();
+  }
+  
+  public void run() {
     shell.open();
     downloadThread.start();
     trackTable.addSelectionListener(new SelectionAdapter() {
@@ -90,7 +101,13 @@ public class Client extends AbstractClient {
       }
     });
     playThread.start();
+    
+    while (true) {
+      if (!display.readAndDispatch())
+        display.sleep();
+    }
   }
+
 
   public void handleError(String code, String urlString) {
     //actionSetContinuousDownload(false);
@@ -227,11 +244,11 @@ public class Client extends AbstractClient {
     display.asyncExec(new Runnable() {
       public void run() {
         if (pausedFinal.booleanValue()) {
-          setToolItemSkin(pause, "button.resume");
+          pauseSkin.setName("button.resume");
           pause.setToolTipText(Resources.getString("button.resume.tooltip"));
         }
         else {
-          setToolItemSkin(pause, "button.pause");
+          pauseSkin.setName("button.pause");
           pause.setToolTipText(Resources.getString("button.pause.tooltip"));
         }
       }
@@ -280,7 +297,7 @@ public class Client extends AbstractClient {
     createMenu();
     createToolBar();
     //    createTitle();
-    trackTable = new TrackTable(shell, trackDatabase);
+    trackTable = new TrackTable(shell, trackDatabase, skinManager);
     createTableMenu();
     createState();
     createProgressBar();
@@ -409,7 +426,7 @@ public class Client extends AbstractClient {
     shell.setMenuBar(menubar);
 
     MenuItem item1 = new MenuItem(menubar, SWT.CASCADE);
-    item1.setText(Resources.getString("toolbar.menu_title.action"));
+    skinManager.add(item1, "toolbar.menu_title.action");
 
     Menu menu1 = new Menu(item1);
     //Added for a nicer UI by Allen Tipper 14.9.03
@@ -423,7 +440,6 @@ public class Client extends AbstractClient {
     item1.setMenu(menu1);
 
     MenuItem item1_1 = new MenuItem(menu1, SWT.PUSH);
-    item1_1.setText(Resources.getString("toolbar.menu_item.download"));
     item1_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         downloadThread.go();
@@ -432,30 +448,32 @@ public class Client extends AbstractClient {
     //Added for a nicer UI by Allen Tipper 16.9.03
     item1_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.download")));
     //end add
+    skinManager.add(item1_1, "toolbar.menu_item.download");
+    
 
     MenuItem item_undo = new MenuItem(menu1, SWT.PUSH);
-    item_undo.setText(Resources.getString("toolbar.menu_item.undo"));
     item_undo.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         undoLastRating();
       }
     });
     item_undo.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.undo")));
+    skinManager.add(item_undo, "toolbar.menu_item.undo");
 
     MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
-    item1_4.setText(Resources.getString("toolbar.menu_item.quit"));
     item1_4.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         quit();
       }
     });
+    skinManager.add(item1_4, "toolbar.menu_item.quit");
 
     //Added for a nicer UI by Allen Tipper 14.9.03
     item1_4.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.quit")));
     //end add
 
     MenuItem item2 = new MenuItem(menubar, SWT.CASCADE);
-    item2.setText(Resources.getString("toolbar.menu_title.settings"));
+    skinManager.add(item2, "toolbar.menu_title.settings");
 
     Menu mSettings = new Menu(item2);
     //Added for a nicer UI by Allen Tipper 14.9.03
@@ -468,7 +486,7 @@ public class Client extends AbstractClient {
     item2.setMenu(mSettings);
 
     MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
-    mDownload.setText(Resources.getString("toolbar.menu_item.auto_download"));
+    skinManager.add(mDownload, "toolbar.menu_item.auto_download");
 
     //Added for a nicer UI by Allen Tipper 14.9.03
     mDownload.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.auto_download")));
@@ -506,7 +524,7 @@ public class Client extends AbstractClient {
     }
 
     MenuItem mPlayList = new MenuItem(mSettings, SWT.CASCADE);
-    mPlayList.setText(Resources.getString("toolbar.menu_item.play_list"));
+    skinManager.add(mPlayList, "toolbar.menu_item.play_list");
 
     //Added for a nicer UI by Allen Tipper 14.9.03
     mPlayList.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.play_list")));
@@ -545,7 +563,7 @@ public class Client extends AbstractClient {
      * Allows the user to select the number of unrated tracks to add to each playlist generation
      */
     MenuItem mNewUnrated = new MenuItem(mSettings, SWT.CASCADE);
-    mNewUnrated.setText(Resources.getString("toolbar.menu_item.unrated"));
+    skinManager.add(mNewUnrated, "toolbar.menu_item.unrated");
     Menu menuNewUnrated = new Menu(mNewUnrated);
     mNewUnrated.setMenu(menuNewUnrated);
 
@@ -577,7 +595,7 @@ public class Client extends AbstractClient {
     /****/
 
     MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
-    mPlayers.setText(Resources.getString("toolbar.menu_item.player"));
+    skinManager.add(mPlayers, "toolbar.menu_item.player");
     menu2 = new Menu(mPlayers);
     mPlayers.setMenu(menu2);
 
@@ -609,7 +627,7 @@ public class Client extends AbstractClient {
     }
 
     MenuItem item2_1 = new MenuItem(mSettings, SWT.PUSH);
-    item2_1.setText(Resources.getString("toolbar.menu_item.advanced"));
+    skinManager.add(item2_1, "toolbar.menu_item.advanced");
     item2_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         showSettingDialog(SettingDialog.PLUGIN_PAGE);
@@ -621,7 +639,7 @@ public class Client extends AbstractClient {
     //end add
 
     MenuItem item3 = new MenuItem(menubar, SWT.CASCADE);
-    item3.setText(Resources.getString("toolbar.menu_title.info"));
+    skinManager.add(item3, "toolbar.menu_title.info");
 
     Menu menu3 = new Menu(item3);
 
@@ -634,7 +652,7 @@ public class Client extends AbstractClient {
     item3.setMenu(menu3);
 
     MenuItem item3_1 = new MenuItem(menu3, SWT.PUSH);
-    item3_1.setText(Resources.getString("toolbar.menu_item.credits"));
+    skinManager.add(item3_1, "toolbar.menu_item.credits");
     item3_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         actionAbout();
@@ -651,7 +669,6 @@ public class Client extends AbstractClient {
     gridData.horizontalSpan = 1;
     toolbar.setLayoutData(gridData);
 
-    rateButtons = new ToolItem[ratingFunctions.length]; 
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       ToolItem item = new ToolItem(toolbar, SWT.PUSH);
@@ -662,7 +679,7 @@ public class Client extends AbstractClient {
           setRating(getSelectedTrack(), value);
         }
       });
-      rateButtons[i] = item;
+      skinManager.add(item, rf.getName());
     }
 
     new ToolItem(toolbar, SWT.SEPARATOR);
@@ -674,6 +691,7 @@ public class Client extends AbstractClient {
         setPaused(!isPaused());
       }
     });
+    pauseSkin = skinManager.add(pause, "button.pause");
 
     previous = new ToolItem(toolbar, SWT.PUSH);
     previous.setToolTipText(Resources.getString("button.previous.tooltip"));
@@ -683,18 +701,20 @@ public class Client extends AbstractClient {
       }
     });
     previous.setEnabled(false);
+    skinManager.add(previous, "button.previous");
 
-    next = new ToolItem(toolbar, SWT.PUSH);
+    ToolItem next = new ToolItem(toolbar, SWT.PUSH);
     next.setToolTipText(Resources.getString("button.next.tooltip"));
     next.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         skip();
       }
     });
+    skinManager.add(next, "button.next");
 
     new ToolItem(toolbar, SWT.SEPARATOR);
 
-    info = new ToolItem(toolbar, SWT.PUSH);
+    ToolItem info = new ToolItem(toolbar, SWT.PUSH);
     info.setToolTipText(Resources.getString("button.info.tooltip"));
     final Client clientToPass = this;
     info.addSelectionListener(new SelectionAdapter() {
@@ -707,6 +727,7 @@ public class Client extends AbstractClient {
         trackInfoDialog.displayTrackInfo(track, clientToPass);   
       }
     });
+    skinManager.add(info, "button.info");
 
     volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
     volumeScale.setIncrement(1);
@@ -725,7 +746,6 @@ public class Client extends AbstractClient {
     volumeScale.setLayoutData(gridData);
     
     songProgressBar = new TrackProgressBar(shell, SWT.NONE);
-    applySkin();
   }
   
   public void createTableMenu() {
@@ -734,7 +754,6 @@ public class Client extends AbstractClient {
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       MenuItem item = new MenuItem(menu, SWT.NONE);
-      item.setText(Resources.getString(rf.getName()));
       item.addArmListener(new ToolTipArmListener(Resources.getString(rf.getName() + ".tooltip")));
       final int value = rf.getValue();
       item.addSelectionListener(new SelectionAdapter() {
@@ -742,33 +761,8 @@ public class Client extends AbstractClient {
           setRating(trackTable.getSelectedTrack(), value);
         }
       });
+      skinManager.add(item, rf.getName());
     }
-  }
-
-  public Image getSkinImage(String name) throws IOException {
-    ImageData icon = new ImageData(irate.resources.BaseResources.getResourceAsStream(name));
-//    int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
-//    icon.transparentPixel = whitePixel;
-    return new Image(display, icon);
-  }
-  
-  public void setToolItemSkin(ToolItem item, String name) {
-    try {
-      item.setImage(getSkinImage(name + ".gif"));
-      item.setText("");
-    }
-    catch (IOException e) {
-      item.setText(Resources.getString(name));
-    }
-  }
-
-  public void applySkin() {
-    for (int i = 0; i < rateButtons.length; i++)
-      setToolItemSkin(rateButtons[i], ratingFunctions[i].getName());
-    setPaused(super.isPaused());
-    setToolItemSkin(previous, "button.previous");
-    setToolItemSkin(next, "button.next");
-    setToolItemSkin(info, "button.info");
   }
 
   public void createState() {
@@ -789,13 +783,6 @@ public class Client extends AbstractClient {
     progressBar.setLayoutData(gridData);
     progressBar.setMinimum(0);
     progressBar.setMaximum(100);
-  }
-
-  public void run() {
-    while (true) {
-      if (!display.readAndDispatch())
-        display.sleep();
-    }
   }
 
   /**
@@ -874,10 +861,6 @@ public class Client extends AbstractClient {
     });
   }
 
-  public static void main(String[] args) throws Exception {
-    new Client().run();
-  }
-  
   private class RatingFunction {
     
     private int value;

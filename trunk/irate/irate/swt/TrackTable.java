@@ -50,57 +50,59 @@ public class TrackTable {
    * @param trackDatabase The database containing the list of tracks. Track
    *                      listings are automatically updated from this
    *                      database.
+   * @param skinManager   The skin manager used to display graphics for the
+   *                      table headings. 
    */ 
-  public TrackTable(Shell shell, TrackDatabase trackDatabase) {
+  public TrackTable(Shell shell, TrackDatabase trackDatabase, SkinManager skinManager) {
     this.display = shell.getDisplay();
     this.trackDatabase = trackDatabase;
     table = new Table(shell, SWT.NONE);
 
     TableColumn col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
-    col.setText(getResourceString("TrackTable.Heading.Artist")); 
     addColumnListener(col, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
           return new MagicString(track0.getArtist()).compareTo(new MagicString(track1.getArtist()));
       }        
     });
+    skinManager.add(col, "TrackTable.Heading.Artist"); 
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
-    col.setText(getResourceString("TrackTable.Heading.Track")); 
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getTitle()).compareTo(new MagicString(track1.getTitle()));
       }        
     });
+    skinManager.add(col, "TrackTable.Heading.Track"); 
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(100);
-    col.setText(getResourceString("TrackTable.Heading.Rating"));
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new MagicString(track0.getState()).compareTo(new MagicString(track1.getState()));
       }        
     });
+    skinManager.add(col, "TrackTable.Heading.Rating");
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(50);
-    col.setText(getResourceString("TrackTable.Heading.Plays"));
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return new Integer(track0.getNoOfTimesPlayed()).compareTo(new Integer(track1.getNoOfTimesPlayed()));
       }        
     });
+    skinManager.add(col, "TrackTable.Heading.Plays");
 
     col = new TableColumn(table, SWT.LEFT);
     col.setWidth(180);
-    col.setText(getResourceString("TrackTable.Heading.Last")); 
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
         return track0.getLastPlayed().compareTo(track1.getLastPlayed());
       }        
     });
     table.setHeaderVisible(true);
+    skinManager.add(col, "TrackTable.Heading.Last"); 
 
     updateTable();    
 
