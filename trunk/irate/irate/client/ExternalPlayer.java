@@ -2,11 +2,15 @@
 
 package irate.client;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 
 public abstract class ExternalPlayer extends AbstractPlayer {
 
@@ -291,28 +295,66 @@ public abstract class ExternalPlayer extends AbstractPlayer {
   public void route(final InputStream is, final OutputStream os, String title) {
     new Thread(title) {
       public void run() {
+        String currentLine;
+        
         try {
-          byte[] buf = new byte[128];
-          while (true) {
-            int avail = is.available();
-            if (avail == 0)
-              avail = 1;
-            else 
-              if (avail > buf.length)
-                avail = buf.length;
-            int nbytes = is.read(buf, 0, avail);
-            if (nbytes < 0)
-              break;
-            if (nbytes != 0) {
-              os.write(buf, 0, nbytes);
-              os.flush();
+          BufferedReader in = new BufferedReader(new InputStreamReader(is));
+          BufferedWriter out = new BufferedWriter(new OutputStreamWriter(os));
+          
+          while ((currentLine=in.readLine()) != null) {
+            if (!currentLine.startsWith("A:")) {
+              out.flush();
+            }
+            else {
+              if (!processPlayerTrackOutput(currentLine))
+                out.write(currentLine + '\n');                
+              out.flush();
             }
           } 
+            // We mustn't close os here, because it is System.out.  The
+            // caller takes care of closing the streams.
         } 
         catch (IOException ioe) {
-          ioe.printStackTrace();
+          //ioe.printStackTrace();
         }
       }
     }.start();
   }
+  
+  public abstract boolean processPlayerTrackOutput(String line);
+  
+  /**
+   * Splits a string in multiple substrings. Implemented here instead of using String.split() in order
+   * to remain compatible with JDK 1.3. Maximum of 4 string divisions.
+   */
+  public static String[] split(String data, char divisor) {
+    String[] temp = new String[4];
+    int currentSubString = 0;
+    int lastpos = 0;
+
+    while (data.indexOf(divisor, lastpos) != -1 && currentSubString != temp.length - 1) {
+      temp[currentSubString] = data.substring(lastpos, data.indexOf(divisor, lastpos));
+      lastpos = data.indexOf(divisor, lastpos) + 1;
+      currentSubString++;
+    }
+    
+    temp[currentSubString] = data.substring(lastpos);
+
+    return temp;
+  }
+  
+  public static String format00(int number) {
+    if (number < 10)
+      return "0"+Integer.toString(number);
+    else
+      return Integer.toString(number);
+  }
+
+  public static String formatTime(long time) {
+    int seconds = (int) ((time / 1000L) % 60L);
+    int minutes = (int) ((time / 60000L) % 60L);
+    int hours = (int) (time / 3600000L);
+    return Integer.toString(hours)+":"+format00(minutes)+":"+format00(seconds);
+  }
+
 }

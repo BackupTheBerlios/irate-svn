@@ -4,10 +4,6 @@ package irate.client;
 
 import java.io.FileNotFoundException;
 import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.IOException;
-import java.io.*;
 
 public class MadplayPlayer extends ExternalPlayer {
 
@@ -19,25 +15,9 @@ public class MadplayPlayer extends ExternalPlayer {
   {
     super(new String[] { "madplay", "madplay.exe" });
   }
-
   
-  private String format00(int number)
-  {
-    if (number < 10)
-      return "0"+Integer.toString(number);
-    else
-      return Integer.toString(number);
-  }
-
-  public String[] formatResumeArgument()
-  {
-    long playTime = getPlayTime();
-    int seconds = (int) ((playTime / 1000L) % 60L);
-    int minutes = (int) ((playTime / 60000L) % 60L);
-    int hours = (int) (playTime / 3600000L);
-    return new String[] {
-      "--start="+Integer.toString(hours)+":"+format00(minutes)+":"+format00(seconds)
-    };
+  public String[] formatResumeArgument() {
+    return new String[] { "--start="+formatTime(getPlayTime()) };
   }
   
   public String[] formatVolumeArgument()
@@ -64,43 +44,14 @@ public class MadplayPlayer extends ExternalPlayer {
     super.play(file);
   }
   
-  /*
-   * Hacked route() routine used to grab player output from stdout
-   */
-   public void route(final InputStream is, final OutputStream os, String title) {
-    new Thread(title) {
-      public void run() {
-        String currentLine;
-        
-        try {
-          BufferedReader in = new BufferedReader(new InputStreamReader(is));
-          BufferedWriter out = new BufferedWriter(new OutputStreamWriter(os));
-          
-          while ((currentLine=in.readLine()) != null) {
-            if (currentLine.charAt(0) != '-') {
-              out.write(currentLine + '\n');
-              out.flush();
-            }
-            else {
-              processPlayerTrackOutput(currentLine);
-              out.flush();
-            }
-          } 
-            // We mustn't close os here, because it is System.out.  The
-            // caller takes care of closing the streams.
-        } 
-        catch (IOException ioe) {
-          //ioe.printStackTrace();
-        }
-      }
-    }.start();
-  }
-   
    /**
     * Analyses the player's output to obtain the current position in track. Sends
     * notify to listeners when done.
     */
-  public void processPlayerTrackOutput(String line) {
+  public boolean processPlayerTrackOutput(String line) {
+    if (!line.startsWith("-"))
+      return false;
+    
     String[] splits;
     String data;
     int seconds, minutes, hours, time;
@@ -130,36 +81,9 @@ public class MadplayPlayer extends ExternalPlayer {
     catch (Exception e) {
       e.printStackTrace();
     }
+    return true;
   }
-  
-  /**
-   * Splits a string in multiple substrings. Implemented here instead of using String.split() in order
-   * to remain compatible with JDK 1.3. Maximum of 4 string divisions.
-   */
-  private String[] split(String data, char divisor) {
-    String[] temp = new String[4];
-    int currentSubString = 0;
-    int lastpos = 0;
-
-    while (firstIndexOf(data, divisor, lastpos) != -1 && currentSubString != temp.length - 1) {
-      temp[currentSubString] = data.substring(lastpos, firstIndexOf(data, divisor, lastpos));
-      lastpos = firstIndexOf(data, divisor, lastpos) + 1;
-      currentSubString++;
-    }
-    
-    temp[currentSubString] = data.substring(lastpos);
-
-    return temp;
-  }
-  
-  private int firstIndexOf(String data, char c, int pos) {
-    for (int i = pos; i < data.length(); i++)
-      if (data.charAt(i) == c)
-        return i;
-    
-    return -1;
-  }
-   
+     
   public String getName() {
     return "madplay";
   }

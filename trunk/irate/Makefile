@@ -75,7 +75,7 @@ JAVA_CLIENT = \
 	irate/client/PlayerList.java \
 	irate/client/ExternalPlayer.java \
 	irate/client/MadplayPlayer.java \
-	irate/client/MadplayEsdPlayer.java \
+	irate/client/MplayerPlayer.java \
 	irate/client/Speech.java \
 	irate/client/Help.java \
 	irate/client/AbstractPlayer.java \

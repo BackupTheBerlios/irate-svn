@@ -20,6 +20,13 @@ public class PlayerList {
     }
     
     try {
+      players.add(Class.forName("irate.client.MplayerPlayer").newInstance());
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    try {
       players.add(Class.forName("irate.client.MadplayPlayer").newInstance());
       //players.add(new MadplayPlayer());
     }
@@ -27,14 +34,6 @@ public class PlayerList {
       e.printStackTrace();
     }
     
-    try {
-      players.add(Class.forName("irate.client.MadplayEsdPlayer").newInstance());
-      //players.add(new MadplayPlayer());
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-
 // I've removed this because it doesn't really work as well as it should do.
 //    try {
 //      players.add(Class.forName("irate.client.StreamPlayer").newInstance());
