@@ -35,7 +35,7 @@ public class Track implements TrackDetails {
     elt = new XMLElement(new Properties(), true, false);
     elt.setName("Track");
     setURL(url);
-    setInfoFromID3Tags(new File(url.getFile()));
+//    setInfoFromID3Tags(new File(url.getFile()));
   }  
   
   private void copy(Track track) {
@@ -50,31 +50,31 @@ public class Track implements TrackDetails {
     // copy other attributes
   }
   
-  private void setInfoFromID3Tags(File file) {
-
-    try {
-      MP3File mp3 = new MP3File(file);
-
-      this.setArtist(mp3.getArtist());
-      this.setTitle(mp3.getTitle());
-    }
-    catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-    catch (NoMPEGFramesException e) {
-      e.printStackTrace();
-    }
-    catch (IOException e) {
-      e.printStackTrace();
-    }
-    catch (ID3v2FormatException e) {
-      e.printStackTrace();
-    }
-    catch (CorruptHeaderException e) {
-      e.printStackTrace();
-    }
-
-  }
+//  private void setInfoFromID3Tags(File file) {
+//
+//    try {
+//      MP3File mp3 = new MP3File(file);
+//
+//      this.setArtist(mp3.getArtist());
+//      this.setTitle(mp3.getTitle());
+//    }
+//    catch (FileNotFoundException e) {
+//      e.printStackTrace();
+//    }
+//    catch (NoMPEGFramesException e) {
+//      e.printStackTrace();
+//    }
+//    catch (IOException e) {
+//      e.printStackTrace();
+//    }
+//    catch (ID3v2FormatException e) {
+//      e.printStackTrace();
+//    }
+//    catch (CorruptHeaderException e) {
+//      e.printStackTrace();
+//    }
+//
+//  }
   
   public void setTrackDatabase(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
@@ -372,10 +372,34 @@ public class Track implements TrackDetails {
     elt.setAttribute("artist", artist);
   }
 
+  private String getId3Artist() {
+    String artist = elt.getStringAttribute("id3Artist");
+    if (artist == null) {
+      artist = "";
+      File file = getFile();
+      if (file != null && file.exists()) {
+        try {
+          MP3File mp3 = new MP3File(getFile());
+          artist = mp3.getArtist();
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
+        elt.setAttribute("id3Artist", artist);
+      }
+    }
+    return artist;
+  }
+
   public synchronized String getArtist() {
     String artist = elt.getStringAttribute("artist");
-    if (artist == null)
-      return "";
+    if (artist == null || artist.length() == 0)
+      return getId3Artist();
+    if (artist.endsWith("...")) {
+      String id3Artist = getId3Artist();
+      if (id3Artist.length() != 0)
+        return id3Artist;
+    }
     return artist;
   }
   
@@ -383,10 +407,34 @@ public class Track implements TrackDetails {
     elt.setAttribute("title", title);
   }
   
+  private String getId3Title() {
+    String title = elt.getStringAttribute("id3Title");
+    if (title == null) {
+      title = "";
+      File file = getFile();
+      if (file != null && file.exists()) {
+        try {
+          MP3File mp3 = new MP3File(getFile());
+          title = mp3.getTitle();
+        }
+        catch (Exception e) {
+          e.printStackTrace();
+        }
+        elt.setAttribute("id3Title", title);
+      }
+    }
+    return title;
+  }
+  
   public synchronized String getTitle() {
     String title = elt.getStringAttribute("title");
-    if (title == null)
-      return "";
+    if (title == null || title.length() == 0)
+      return getId3Title();
+    if (title.endsWith("...")) {
+      String id3Title = getId3Title();
+      if (id3Title.length() != 0)
+        return id3Title;
+    }
     return title;
   }
 
