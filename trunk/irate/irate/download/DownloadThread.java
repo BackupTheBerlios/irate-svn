@@ -497,7 +497,7 @@ System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
     int noOfRated = trackDatabase.getNoOfRated();
     int noOfUnrated = trackDatabase.getNoOfUnrated();
     int noOfUnratedOnPlaylist = trackDatabase.getNoOfUnratedOnPlaylist();
-    if (noOfRated > noOfUnrated / 2 && noOfUnrated < noOfUnratedOnPlaylist)
+    if (noOfRated >= noOfUnrated / 2 && noOfUnrated < noOfUnratedOnPlaylist)
       go();
   }
   

@@ -274,7 +274,7 @@ public class TrackDatabase {
     int playListLength = getPlayListLength();
     int unratedPlayListRatio = getUnratedPlayListRatio();
     
-    return (int)Math.round(((double)playListLength) * (((double)unratedPlayListRatio) / 100.0));
+    return (int)Math.ceil(((double)playListLength) * (((double)unratedPlayListRatio) / 100.0));
   }
   
   public boolean isRoboJockEnabled() {
