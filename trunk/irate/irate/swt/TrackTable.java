@@ -189,6 +189,7 @@ public class TrackTable {
     // Sort first
     Collections.sort(listOfTracks, comparator);
     
+    System.out.println("TrackTable: Resizing");
     // Update the list of tracks
     int size = listOfTracks.size();
     while (table.getItemCount() > size)
@@ -196,6 +197,7 @@ public class TrackTable {
     while (table.getItemCount() < size)
       new TableItem(table, SWT.NONE);
       
+    System.out.println("TrackTable: Updating");
     // Update the table    
     int i = 0;
     hashByTrack = new Hashtable();
@@ -208,6 +210,7 @@ public class TrackTable {
       hashByTableItem.put(tableItem, track);
     }
     
+    System.out.println("TrackTable: Done");
     // Make sure the correct track is selected
     if (selected != null)
       select(selected);
@@ -309,9 +312,16 @@ public class TrackTable {
    * without too much casting. */
   private abstract class TrackComparator implements Comparator {
     public int compare(Object o0, Object o1) {
-      return compareTrack((Track) o0, (Track) o1);
+      int comp = compareTrack((Track) o0, (Track) o1);
+      if (comp != 0)
+        return comp;
+      return compareURL((Track) o0, (Track) o1);
     }
-  
+
+    public int compareURL(Track track0, Track track1) {
+      return track0.getURL().toString().compareTo(track1.getURL().toString());
+    }
+          
     public abstract int compareTrack(Track track0, Track track1);  
   }
   
