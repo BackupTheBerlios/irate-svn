@@ -2,13 +2,13 @@ package irate.swt;
 
 import java.util.Hashtable;
 
-import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
-public class ThreeModeButton extends CLabel implements Skinable {
+public class ThreeModeButton extends Canvas implements Skinable {
 
   private TransparencyManager transparencyManager;
 
