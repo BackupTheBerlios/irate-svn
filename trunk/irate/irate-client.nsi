@@ -31,7 +31,11 @@ Section "iRATE radio"
   File "jl020.jar"  
   File "xercesImpl.jar"  
   File "xmlParserAPIs.jar"
-
+  CreateDirectory "$INSTDIR\MAD"
+  CreateDirectory "$INSTDIR\MAD\libs"
+  CreateDirectory "$INSTDIR\MAD\libs\Win32"
+  File /oname="MAD\libs\Win32\madplay.dll" "MAD\libs\Win32\madplay.dll"
+  
   CreateDirectory "$SMPROGRAMS\iRATE radio"
   CreateShortCut "$SMPROGRAMS\iRate radio\iRATE radio.lnk" "$INSTDIR\irate-client.jar" ""
 
@@ -49,6 +53,7 @@ Section "Uninstall"
   Delete "$INSTDIR\xercesImpl.jar"
   Delete "$INSTDIR\xmlParserAPIs.jar"
   Delete "$INSTDIR\uninstall.exe"
+  RMDir /r "$INSTDIR\MAD"
   RMDir "$INSTDIR\download"
   RMDir "$INSTDIR"
 SectionEnd ;

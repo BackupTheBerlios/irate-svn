@@ -1,0 +1,122 @@
+
+   distribution terms
+
+The JNI compatibility (MadPlayer.java and mad-0.14.2b-jni.20020808.diff) is
+
+Copyright (C) 2002 by Mark Stier, Germany.
+
+It is distributed under the GPL license because the mad player's source is 
+distributed the same way.
+
+
+   What is it?
+
+JNI means "Java Native Interface" which allows to access natively compiled code 
+(eg. C/C++ code) from within the JVM. Currently only Windows x86, Linux i386 and 
+SunOS SPARC platforms are supported. If You have experience in compiling DLL/SO 
+files on other platforms, please try to do so and send me the result for 
+inclusion into this package. See 'How to compile the player's native code on 
+other platforms' section at the end of this document for further reference.
+
+
+   Why?
+
+Implementing MP3 playback in Java is not an efficient task. Basically it is 
+always a good idea to implement non-GUI operations (eg. time-intensive 
+calculations) in Java for portability and in C for speed. That way it is 
+possible to support common platforms very efficiently and the rest not-so-
+efficiently.
+
+
+   Performance
+
+Basically, I have not done any more than compiling madplay.exe as a DLL/SO with 
+JNI-Support and added support for the redirection of status messages to the 
+'fireMadEvent(MadEvent)' callback function in 'MadPlayer.java'. Additionally TTY 
+console input is faked by MadPlayer.java's readkey method, which is a replacement 
+for the player's direct console input readkey method. It is absolutely no 
+problem to run it on a Pentium 133.
+
+
+   Use
+
+For testing, You can use the JNI 'port' simply by compiling MadPlayer.java and 
+by running the command "java MAD.MadPlayer <mp3-file>". The options will all be 
+given to the DLL/SO. This is just for testing and not the intended use and 
+therefore no console input works here. Of course, it would be easy to redirect 
+it.
+
+
+   Implementation problems
+
+The getopt methods are not intended to be run more than twice during each 
+program execution. I changed this behaviour by resetting two variables each time 
+the 'nativeMain' method is being called. The nativeMain method replaces the 
+'main' method.
+
+Getopt also changes the order of the pointers of the command line parameter 
+strings. I had to add a second array in order to be able to correctly call the 
+JNI's release methods in order to prevent memory leaks.
+
+
+   How to add MP3 playback support to Your application 
+
+The easiest way to do that is:
+
+    ...
+    import MAD.*;
+    ...
+    MadPlayer player = new MadPlayer();
+    player.start("my-mp3-file.mp3");
+    ...
+    ... do something ...
+    ...
+    player.stop();
+
+It is not required to stop the player before doing another call to 'start(...)'. 
+You can add MadListeners to the player instance by doing the call 
+'player.addListener(madListener)'. A MadListener is an instance which has 
+defined the 'public void actionPerformed(MadEvent)' method. The MadEvent object
+is used as a relacement for the verbose console output of the Win32 console player
+'madplay.exe'. For example, MadEvent.getTime() returns a HH:MM:SS-formatted string
+representing the current playtime. If the event does NOT represent a playtime
+update, MadEvent.getTime() returns 'null'. The same applies for methods like
+'getArtist()', 'getTitle()', 'getGenre()' etc.
+
+
+   Still missing
+
+The 'MadEvent' class does not yet support the identification of errors.
+
+
+   How to compile the player's native code on other platforms 
+
+Thiese instructions refer onyl to UNIX platforms with GNU utilities installed.
+
+Get the corresponding madplay source package. For 'mad-0.14.2b-
+jni.20020811.diff' it is 'mad-0.14.2b.tar.gz'. Extract it and apply the .diff 
+file using 'patch'. Then run './configure --disable-debugging' in './mad-
+0.14.2b'. After that step edit the top-level makefile 'Makefile':
+
+ 1. add '-DJNI' to the 'DEFS' option
+ 2. add '-I<JAVAHOME>/include -I<JAVAHOME>/include/<PLATFORM>
+    to the 'INCLUDES' option
+
+'<JAVAHOME>' represents Your installation directory of the JDK. I recommend 
+using JDK 1.4.0 because I used the same. '<PLATFORM>' represents Your platform. 
+It is 'linux' for Linux systems and 'win32' for Windows systems. As far as I can 
+remember it is 'solaris' for Sun's SPARC systems.
+
+After that run 'make'. It will abort on linking 'madplay' or 'madplay.exe' (the 
+execution file name depends on the platform/OS). Use the failed command to 
+produce a shared object file by adding '-shared' to the list of commands. This 
+worked for Linux (Mandrake 8.2).
+
+
+   Contact
+
+If required, You may contact me via email:
+
+      kalium at gmx dot de.
+
+      

@@ -17,6 +17,7 @@
       <fileset dir="." includes="irate/client/help/*.html"/>
       <fileset dir="." includes="irate/common/*.class"/>
       <fileset dir="." includes="irate/download/*.class"/>
+      <fileset dir="." includes="MAD/*.class"/>
     </jar>
     
     <jar jarfile="irate-server.jar" manifest="META-INF/manifest.irate-server" compress="false">
@@ -31,7 +32,7 @@
   </target>
 
   <target name="tar" depends="jar">
-    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/xercesImpl.jar,irate/xmlParserAPIs.jar"/>
+    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/xercesImpl.jar,irate/xmlParserAPIs.jar,irate/MAD/libs/linux-i386/madplay.so,irate/MAD/libs/sunos-sparc/madplay.so"/>
   </target>
 
   <target name="gzip" depends="tar">
