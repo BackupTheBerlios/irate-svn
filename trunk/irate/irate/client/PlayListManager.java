@@ -33,8 +33,8 @@ public class PlayListManager {
   }
 
   public synchronized Track chooseTrack() {
-    int playListLength = trackDatabase.getPlayListLength();
-    int unratedPlayListCount = trackDatabase.getNoOfUnratedOnPlaylist();
+     int playListLength = trackDatabase.getPlayListLength();
+      int unratedPlayListCount = trackDatabase.getNoOfUnratedOnPlaylist();
     
       // Remove the track we've just played if necessary.
     if (playListIndex < playList.size()) {
@@ -135,7 +135,7 @@ public class PlayListManager {
         if (++playListIndex >= size)
           playListIndex = 0;
         selectedTrack = (Track) playList.get(playListIndex);
-        if (selectedTrack != lastPlayedTrack)
+        if (!selectedTrack.isHidden() && selectedTrack != lastPlayedTrack)
           break;
       } while (playListIndex != currentIndex);
     }
