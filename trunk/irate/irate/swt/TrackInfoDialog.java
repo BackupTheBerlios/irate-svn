@@ -3,9 +3,6 @@
 package irate.swt;
 
 import irate.common.Track;
-
-import java.util.regex.*;
-import java.io.*;
 import java.net.URLEncoder;
 
 import org.eclipse.swt.widgets.*;
