@@ -1005,7 +1005,7 @@ public class Client extends AbstractClient {
     for (int i = 0; i < ratingFunctions.length; i++) {
       RatingFunction rf = ratingFunctions[i];
       ThreeModeButton button = ratingButtons[i] = new ThreeModeButton(trackToolbar, SWT.FLAT);
-      button.setLayoutData(new GridData(GridData.FILL_VERTICAL));
+      button.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_CENTER));
       final int value = rf.getValue();
       button.addSelectionListener(new SelectionAdapter() {
         public void widgetSelected(SelectionEvent e) {
