@@ -23,12 +23,17 @@ import java.net.*;
 
 public class Client implements UpdateListener, PluginApplication {
   
+  private static final int VOLUME_RESOLUTION = 3;
+  private static final int VOLUME_SPAN = 30; 
+  private static final int VOLUME_OFFSET = VOLUME_SPAN / 2;
+  
 //  static Label lblTitle;
-  static Label lblState;
-  static Table tblSongs;
-  static Display display = new Display();
-  static Shell shell;
-  static ProgressBar progressBar;
+  private Label lblState;
+  private Table tblSongs;
+  private Display display = new Display();
+  private Shell shell;
+  private ProgressBar progressBar;
+  private Slider volumeSlider;
 
   private Hashtable hashSongs = new Hashtable();
   private TrackDatabase trackDatabase;
@@ -187,6 +192,7 @@ public class Client implements UpdateListener, PluginApplication {
         String s = track.toString();
     //    lblTitle.setText(s);
         shell.setText("iRATE radio - " + s);
+        volumeSlider.setSelection(track.getVolume() + VOLUME_OFFSET);
         TableItem item = (TableItem)hashSongs.get(track);
         tblSongs.select(tblSongs.indexOf(item));
         tblSongs.showItem(item);    
@@ -717,8 +723,8 @@ public class Client implements UpdateListener, PluginApplication {
     item = new ToolItem(toolbar,SWT.PUSH);
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.FILL;
-    gridData.grabExcessHorizontalSpace = true;
-    gridData.horizontalSpan = 2;
+    gridData.grabExcessHorizontalSpace = false;
+    gridData.horizontalSpan = 1;
     toolbar.setLayoutData(gridData);
 
     item.setText("This sux");
@@ -778,19 +784,21 @@ public class Client implements UpdateListener, PluginApplication {
       }
     });
     
-    new ToolItem(toolbar,SWT.SEPARATOR);
-    
-    for (int i = -12; i <= 12; i += 6) {
-      final int volume = i;
-      
-      item = new ToolItem(toolbar,SWT.PUSH);
-      item.setText((volume > 0 ? "+" : "") + volume + "db");
-      item.addSelectionListener(new SelectionAdapter(){
-        public void widgetSelected(SelectionEvent e){
-          setVolume(volume);
-        }
-      });
-    }    
+    volumeSlider = new Slider(shell, SWT.HORIZONTAL | SWT.FLAT);
+    volumeSlider.setIncrement(VOLUME_RESOLUTION);
+    volumeSlider.setPageIncrement(VOLUME_RESOLUTION * 2);
+    volumeSlider.setMaximum(VOLUME_SPAN);
+    volumeSlider.setThumb(1);
+    volumeSlider.addSelectionListener(new SelectionAdapter(){
+      public void widgetSelected(SelectionEvent e){
+        setVolume(volumeSlider.getSelection() - VOLUME_OFFSET);
+      }
+    });
+    gridData = new GridData();
+    gridData.horizontalAlignment = GridData.FILL;
+    gridData.grabExcessHorizontalSpace = false;
+    gridData.horizontalSpan = 1;
+    volumeSlider.setLayoutData(gridData);
   }
 
   public void createState() {
