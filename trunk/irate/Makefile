@@ -38,6 +38,10 @@ LOCALES = \
   $(wildcard irate/download/locale*.properties) \
   $(wildcard irate/swt/locale*.properties)
 CLIENT_DEPS += $(LOCALES:.properties=.properties.o)  
+TXT_RESOURCES = \
+  irate/common/timestamp.txt \
+  irate/common/version.txt
+CLIENT_DEPS += $(TXT_RESOURCES:.txt=.txt.o)  
 endif
 
 ifeq ($(PLATFORM),win32)
@@ -168,10 +172,19 @@ irate-server.o:irate/server/*.java
 %.properties.o: %.properties	
 	$(GCJ) -c --resource $^ $^ -o $@
 
+%.txt.o: %.txt
+	$(GCJ) -c --resource $^ $^ -o $@
+
 libmadplayer.o: irate/client/AbstractPlayer.java irate/client/LibMadPlayer.java irate/client/LibMadPlayer.cc
 	gcjh -o irate/client/AbstractPlayer.h irate.client.AbstractPlayer
 	gcjh -o irate/client/LibMadPlayer.h irate.client.LibMadPlayer
 	$(GCJ) -c -I. -o libmadplayer.o irate/client/LibMadPlayer.cc
+
+.PHONY: irate/common/timestamp.txt
+irate/common/timestamp.txt:
+	sed "s/@TIMESTAMP@/`date +'%Y%m%d%H%M'`/" \
+        < irate/common/timestamp.txt.in \
+        > irate/common/timestamp.txt
 
 deb:
 	dpkg-buildpackage -b -rfakeroot
