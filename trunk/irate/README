@@ -56,12 +56,13 @@ To run the Swing version on any platform you need to do:
 $ java -Djava.library.path=lib -jar irate-client-swing.jar
 
 
-The SWT build on Mac OS X needs to be run from an application bundle:
+Due to threading oddities with Apple's Java runtime,the SWT build on Mac OS X
+needs to be run from an application bundle:
 
 $ ant mac
 
-This will create an application bundle iRATE.app under dist/mac, and a
-distributable disk image irate-client-macosx.dmg.
+This will create an application bundle iRATE.app, which can be launched from
+Finder or by "open iRATE.app".
 
 
 BUILDING WITH GCJ
