@@ -37,7 +37,7 @@ public class PlayListManager {
       int unratedPlayListCount = trackDatabase.getNoOfUnratedOnPlaylist();
     
       // Remove the track we've just played if necessary.
-    if (playListIndex < playList.size()) {
+    if (playListIndex >= 0 && playListIndex < playList.size()) {
       Track track = (Track) playList.get(playListIndex);
       if (!track.isOnPlayList()) {
         notifyRemovedFromPlayList((Track)playList.get(playListIndex));
