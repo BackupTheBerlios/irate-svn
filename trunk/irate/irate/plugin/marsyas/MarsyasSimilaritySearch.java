@@ -82,6 +82,7 @@ public class MarsyasSimilaritySearch extends Thread  {
     String str_data[];
     Track track = null;
     final int URL_ID = 1;
+    final int FEATURES_ID = 2;
     
     public ServerTrack(String line) {
       StringTokenizer st = new StringTokenizer(line,",",true);
@@ -97,15 +98,27 @@ public class MarsyasSimilaritySearch extends Thread  {
         else
           str_data[i] = URLDecoder.decode(t);
       }
+      integrate();
+    }
+    
+    /** this tries to find a matching track in the db
+     * if it does the servertrack is local
+     * if it does and the local track doesnt have
+     * features, they are merged into the local track
+     */
+    private void integrate() {
       String url = str_data[URL_ID];
       //should do a binary search here
       for (Iterator iter = tracks.iterator(); iter.hasNext();) {
         Track t = (Track) iter.next();
-        if(t.getURL().toString().equals(url))
+        if(t.getURL().toString().equals(url)){
           this.track = t;
-        
+          //merge missing features
+          if(track.getProperty("marsyas")==null)
+            track.setProperty("marsyas",str_data[FEATURES_ID]);
+          break;
+        }
       }
-      System.err.println("Found a match in db: "+(track != null));
     }
     
     public String[] getColumns() {
@@ -208,7 +221,7 @@ public class MarsyasSimilaritySearch extends Thread  {
             Shell fake = new Shell(display);
             MessageBox m = new MessageBox(fake);
             m.setText("Similarity search failed");
-            m.setMessage("Error on the server:\r\n"+tmpString);
+            m.setMessage("Server said:\r\n"+tmpString);
             m.open();
           }
         });        
