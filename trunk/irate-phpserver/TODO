@@ -4,4 +4,4 @@ Ok. So here is what we would like to add :
 - Support for other medias (video, ...)
 - Preprocessing of correlation, and caching the results 
 for future use
-
+- Always think of possible biaising of the system by evil users

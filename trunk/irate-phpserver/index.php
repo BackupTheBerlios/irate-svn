@@ -16,11 +16,19 @@ var $out_status;
 var $out_message;
 
 
-function irate_server() {
+function irate_server($options="") {
+
+ if (is_array($options)) {
+  $this->options=$options;
+ } else {
+  $this->options=array();
+ }
 
  $this->VARS=array_merge($argv,$_SESSION,$GLOBALS["HTTP_COOKIE_VARS"],$GLOBALS["HTTP_GET_VARS"],$GLOBALS["HTTP_POST_VARS"]);
  
- require_once("config.php");
+
+ 
+ require_once($this->options["root"]."config.php");
 
  $this->cfg=$cfg;
 
@@ -88,7 +96,7 @@ function parse() {
    }
 
   } else {
-   $this->error("WRONG_ADMIN_PASSWORD");
+   $this->error("WRONG_ADMIN_USER");
   }
  }
 
@@ -125,8 +133,12 @@ function initAuth($u,$p,$h) {
     $this->error("WRONG_PASSWORD");
    }
   } elseif (!empty($p)) {
-   $this->registerUser($u,$p);
-  $user=$this->db->getRow("SELECT * FROM users WHERE user=?",array($u));
+   if ($this->cfg["allow_registering"]) {
+    $this->registerUser($u,$p);
+   } else {
+    $this->error("REGISTERING_NOT_ALLOWED");
+   }
+   $user=$this->db->getRow("SELECT * FROM users WHERE user=?",array($u));
    $this->user=$user;
   } else {
    $this->error("REGISTERING_NEEDS_PASSWORD");
@@ -137,20 +149,21 @@ function initAuth($u,$p,$h) {
 }
 
 
-function initCorrelation() {
+function initCorrelation($corr="") {
 
+ require_once($this->options["root"]."modules/correlation/common.php");
 
- require_once("modules/correlation/common.php");
+ if (empty($corr)) {
+  $corr=$this->cfg["dft_correlation"];
+ }
 
-  // hoping for better one :)
- $corr="sylvinus1";
-
- require_once("modules/correlation/".$corr.".php");
-
+ require_once($this->options["root"]."modules/correlation/".$corr.".php");
  $classname="IRS_Correlation_".$corr;
-
  $this->correlation = new $classname(&$this);
 
+ require_once($this->options["root"]."modules/correlation/random.php");
+ $classname="IRS_Correlation_random";
+ $this->correlation_random = new $classname(&$this);
 
 }
 
@@ -193,17 +206,19 @@ function rate($ratings) {
 
 
 
-function _rate($trackid,$note) {
+function _rate($trackid,$note,$weight=100) {
 
  $row=$this->db->getRow("SELECT * FROM ratings WHERE userid=? AND trackid=?",array($this->user["id"],$trackid));
 
  if (count($row)>0) {
-  $this->db->query("UPDATE ratings SET rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($note,$row["id"]));
+  if ($weight>=$row["weight"]) {
+   $this->db->query("UPDATE ratings SET weight=?,rating=?,ratingdate=now(),ratingnum=ratingnum+1 WHERE id=?",array($weight,$note,$row["id"]));
+  }
  } else {
   
   $rid=$this->db->nextId("ratings");
  
-  $this->db->query("INSERT INTO ratings(id,trackid,userid,rating,ratingdate,ratingnum) VALUES(?,?,?,?,now(),0)",array($rid,$trackid,$this->user["id"],$note));
+  $this->db->query("INSERT INTO ratings(id,trackid,userid,rating,ratingdate,ratingnum,weight) VALUES(?,?,?,?,now(),0,?)",array($rid,$trackid,$this->user["id"],$note,$weight));
  }
 
 
@@ -301,8 +316,8 @@ function addTrack($data) {
   
   $name="IRS_Grabber_".$grabber;
 
-  require_once("modules/grabber/common.php");
-  require_once("modules/grabber/".$grabber.".php");
+  require_once($this->options["root"]."modules/grabber/common.php");
+  require_once($this->options["root"]."modules/grabber/".$grabber.".php");
 
   $this->grabber=new $name(&$this);
 

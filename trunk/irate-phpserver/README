@@ -45,6 +45,11 @@ password:
 
 Then edit config.php, and fix the DSN with your database password.
 
+You need to put your irate-phpserver somewhere in your apache webroot.
+Additionally, you should have an apache vhost linked to the
+irate-phpserver directory, so that the URL of the server is simple.
+
+
 Then log in as admin to create the admin account.
 
 
@@ -62,7 +67,8 @@ few years, but for the moment, writting it in PHP makes sense,
 maybe more for Apache than for PHP. Performance issues will be
 mostly SQL related, and Apache will help with scalability. We also
 would like many people to test new correlation algorithms, and
-PHP is very easy to learn and use.
+PHP is very easy to learn and use, and most of the hard stuff
+will be SQL-related.
 
  - Why a new HTTP protocol ?
 
