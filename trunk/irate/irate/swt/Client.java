@@ -26,13 +26,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/26 05:48:31 $
+ * Date Updated: $Date: 2003/11/26 14:32:04 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.107 $
+ * @version $Revision: 1.108 $
  */
 public class Client extends AbstractClient {
 
@@ -145,37 +145,32 @@ public class Client extends AbstractClient {
     display.asyncExec(new Runnable() {
       public void run() {
         trackTable.updateTable();
+        update();
       }
     });
   }
 
   public void update() {
-    display.asyncExec(new Runnable() {
-      public void run() {
-        //synchronizePlaylist(playListManager, tblSongs);
-        Track track = playThread.getCurrentTrack();
-        if (track == null)
-          return;
-        shell.setText(
-          "iRATE radio" + (track == null ? "" : " - " + track.toString()));
-        volumeScale.setSelection(
-          (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
-        trackTable.select(track);
-        if (track != previousTrack) {
-          if (previousTrack != null)
-            trackTable.updateTrack(previousTrack);
-          previousTrack = track;
-        }
-        downloadThread.checkAutoDownload();
-        previous.setEnabled(playThread.hasHistory());
-      }
-    });
+    //synchronizePlaylist(playListManager, tblSongs);
+    Track track = playThread.getCurrentTrack();
+    if (track == null)
+      return;
+    shell.setText(
+      (track == null ? "" : track.toString() + " - ") + "iRATE radio");
+    volumeScale.setSelection(
+      (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
+    trackTable.select(track);
+    if (track != previousTrack) {
+      if (previousTrack != null)
+        trackTable.updateTrack(previousTrack);
+      previousTrack = track;
+    }
+    downloadThread.checkAutoDownload();
+    previous.setEnabled(playThread.hasHistory());
   }
 
   //called from playThread.addUpdateListener(this);
   public void actionPerformed() {
-    // now update the UI. We don't depend on the result,
-    // so use async.
     display.asyncExec(new Runnable() {
       public void run() {
         update();
@@ -208,11 +203,8 @@ public class Client extends AbstractClient {
     super.setRating(track, rating);
 
     // Update the SWT GUI
-    display.asyncExec(new Runnable() {
-      public void run() {
-        trackTable.updateTrack(track);
-      }
-    });
+    trackTable.updateTrack(track);
+    update();
   }
 
   /**
