@@ -10,7 +10,7 @@ import nanoxml.XMLElement;
 
 public class Track {
 
-  private static final TimeZone UTC = new SimpleTimeZone(SimpleTimeZone.UTC_TIME, "UTC");
+  private static final TimeZone UTC = new SimpleTimeZone(/*SimpleTimeZone.UTC_TIME*/ 2, "UTC");
   private final int DEFAULT_RATING = 6;
   
   private XMLElement elt;
