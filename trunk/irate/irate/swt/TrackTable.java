@@ -264,7 +264,7 @@ public class TrackTable extends BasicSkinable {
      */
     String icon = licenseIndex.get(track).getIcon();
     ImageHandle imageHandle = (ImageHandle) imageCache.get(icon);
-    if (imageHandle == null && icon.length() != 0) {
+    if (imageHandle == null && icon != null && icon.length() != 0) {
       try {
         System.out.println("Loading image: " + icon);
         Image image = new Image(display, BaseResources.getResourceAsStream(icon));
