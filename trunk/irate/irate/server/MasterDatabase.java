@@ -13,8 +13,11 @@ public class MasterDatabase extends ServerDatabase {
     /** Add a random track one time in n. */
   private final int randomChance = 10;
 
-    /** The number of initial tracks to start with. */
-  private final int initialTracks = 6;
+    /** The number of peer tracks to start with. */
+  private final int initialPeerTracks = 7;
+
+    /** The number of peer tracks to download before switching to random. */
+  private final int peerThreshhold = 14;
   
   private UserList userList;
   private Random random = new Random();
@@ -73,21 +76,8 @@ public class MasterDatabase extends ServerDatabase {
       }
     }
 
-    if (user.getNoOfTracks() == 0) {
-      for (int i = 0; i < initialTracks; i++) {
-        ServerDatabase peer = userList.randomUser(random, user);
-        if (peer != null) {
-          System.out.println("Peer: " + peer.getUserName());
-          Track track = peer.chooseTrack(random);
-          if (track != null) {
-            System.out.println("Initial: " + track.getName() + " " + track.getRating());
-            reply.add(track);
-          }
-        }
-      }
-    }
-    else {
-        // See if we can correlate a track
+      // See if we can correlate a track
+    if (user.getNoOfTracks() >= initialPeerTracks) {
       ServerDatabase corel = getBest(user);
       Track track = corel.chooseTrack(random);
       if (track != null) {
@@ -96,6 +86,19 @@ public class MasterDatabase extends ServerDatabase {
       }
     }
 
+      // Correlate tracks for new users
+    if (reply.getNoOfTracks() == 0 && user.getNoOfTracks() < peerThreshhold) {
+      ServerDatabase peer = userList.randomUser(random, user);
+      if (peer != null) {
+        System.out.println("Peer: " + peer.getUserName());
+        Track track = peer.chooseTrack(random);
+        if (track != null) {
+          System.out.println("Initial: " + track.getName() + " " + track.getRating());
+          reply.add(track);
+        }
+      }
+    }
+        
       // Do this randomly or if we couldn't correlate
     if (reply.getNoOfTracks() == 0 || (random.nextInt() % randomChance) == 0) {
         // Just pick any random track that we don't already have

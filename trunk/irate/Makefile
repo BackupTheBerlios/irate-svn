@@ -6,9 +6,11 @@ CLIBS = lib/libswt.a lib/libnanoxml-lite.a
 SDEPS = irate-server.o irate-common.a
 SLIBS = lib/libnanoxml-lite.a
 
+all: irate-client irate-server
+
 irate-client: $(CDEPS) 
 	gcj  $(CDEPS) $(CLIBS) -o irate-client --main=irate.client.SWTClient
-	
+
 irate-server: $(SDEPS)
 	gcj  $(SDEPS) $(SLIBS) -o irate-server --main=irate.server.Server
 	

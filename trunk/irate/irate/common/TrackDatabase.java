@@ -132,7 +132,7 @@ public class TrackDatabase {
   }
   
   public String getUserName() {
-    return getAttribute(userElementName, "name");
+    return getAttribute(userElementName, "name").replace('/', '.').replace('\\', '.');
   }
 
   public void setUserName(String name) {
