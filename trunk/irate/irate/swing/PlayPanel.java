@@ -9,7 +9,7 @@ import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
 
-public class PlayPanel extends JPanel {
+public class PlayPanel extends JPanel implements MouseListener {
 
   private PlayListManager playListManager;
   private PlayThread playThread;
@@ -19,6 +19,7 @@ public class PlayPanel extends JPanel {
   private TrackTable trackTable;
   private JTable table;
   private JButton pauseButton;
+  private TableSorter sorter;
   
   public PlayPanel(PlayListManager playListManager, PlayThread playThread) {
     super(new BorderLayout());
@@ -37,28 +38,49 @@ public class PlayPanel extends JPanel {
     add(currentSongLabel, BorderLayout.NORTH);
 
     trackTable = new TrackTable(playListManager);
-    table = new JTable(trackTable); 
+    
+    sorter = new TableSorter(trackTable); //ADDED THIS
+    //table = new JTable(trackTable);           //OLD
+    table = new JTable(sorter);             //NEW
+    sorter.addMouseListenerToHeaderInTable(table); //ADDED THIS
 
+
+/*
       // If you click on the current song label, it clears the list selection.
     currentSongLabel.addMouseListener(new MouseAdapter() {
       public void mouseClicked(MouseEvent e) {
         table.clearSelection();
       }
     });
-
+*/
       // Double click to play a specified track.
-    table.addMouseListener(new MouseAdapter() {
-      public void mouseClicked(MouseEvent e) {
-	if (e.getClickCount() == 2) {
-	  int index = table.getSelectedRow();
-	  if (index >= 0)
-	    PlayPanel.this.playThread.play(trackTable.getTrack(index));
-	}
-      }
-    });
+    table.addMouseListener(this);
     
     add(new JScrollPane(table), BorderLayout.CENTER);
     add(createButtonPanel(), BorderLayout.SOUTH);
+  }
+
+  public void mouseClicked(MouseEvent e) {
+    if (e.getClickCount() == 2) {
+      int index = table.getSelectedRow();
+      if (index >= 0) {
+        Integer temp = (Integer) sorter.getValueAt(index, 0);
+        this.playThread.play(trackTable.getTrack(temp.intValue()));
+      }
+
+    }
+  }
+
+  public void mousePressed(MouseEvent e) {
+  }
+
+  public void mouseReleased(MouseEvent e) {
+  }
+
+  public void mouseEntered(MouseEvent e) {
+  }
+
+  public void mouseExited(MouseEvent e) {
   }
 
   private JPanel createButtonPanel() {
@@ -153,5 +175,18 @@ public class PlayPanel extends JPanel {
     currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
     trackTable.notifyListeners();
     pauseButton.setText(playThread.isPaused() ? "|>" : "||");
+    
+    if (null != currentTrack) {
+      for (int i = 0; i < sorter.getRowCount(); i++) {
+        if (currentTrack.getTitle().equals(sorter.getValueAt(i, 2))) {
+          table.clearSelection();
+          table.setRowSelectionInterval(i, i);
+          break;
+        }
+      }
+    }   
+    
+    this.validate();
+    this.repaint();
   }
 }
