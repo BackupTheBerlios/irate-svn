@@ -4,7 +4,6 @@ import irate.common.UpdateListener;
 import irate.download.DownloadThread;
 
 import java.awt.*;
-import java.awt.event.*;
 import javax.swing.*;
 
 public class DownloadPanel extends JPanel {

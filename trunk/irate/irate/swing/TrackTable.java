@@ -4,10 +4,7 @@ import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.client.PlayListManager;
 
-import java.awt.event.*;
-import java.io.*;
 import java.util.*;
-import javax.swing.*;
 import javax.swing.event.*;
 import javax.swing.table.*;
 

@@ -2,7 +2,6 @@
 
 package irate.server;
 
-import irate.common.*;
 import java.io.*;
 import java.net.*;
 

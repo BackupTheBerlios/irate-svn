@@ -303,6 +303,25 @@ public class Client implements UpdateListener {
     MenuItem item2_1 = new MenuItem(menu2,SWT.PUSH);
     item2_1.setText("Account");
     
+    MenuItem mDownload = new MenuItem(menu2, SWT.CASCADE);
+	mDownload.setText("Auto Download");
+	menu2 = new Menu(mDownload);
+	mDownload.setMenu(menu2);
+	
+	int counts[] = new int[] {0, 5, 11, 17, 23, 29};
+	for(int i=0;i< counts.length;i++){
+        MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
+		final int count = counts[i];
+		mTimes.setText(i==0?"Disabled":"Every " + count + " times" );
+		mTimes.addSelectionListener(new SelectionAdapter(){
+		public void widgetSelected(SelectionEvent e){
+			trackDatabase.setAutoDownload(count);
+			downloadThread.checkAutoDownload();
+			}
+		});
+	}
+    
+    
     
     lblTitle = new Label(shell, SWT.NONE);
     lblTitle.setText("Current song goes here");
@@ -418,6 +437,7 @@ public class Client implements UpdateListener {
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         playThread.reject();
+		downloadThread.checkAutoDownload();
       }
     });
 
@@ -445,7 +465,7 @@ public class Client implements UpdateListener {
     shell.pack();
     progressBar.setMinimum(0);
     progressBar.setMaximum(100);
-    progressBar.setSelection(100);
+    //progressBar.setSelection(100);
     
     
     Rectangle rec = shell.getBounds();

@@ -3,13 +3,10 @@
 package irate.client;
 
 import irate.common.Track;
-import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
 
-import java.lang.reflect.*;
 import java.io.*;
 import java.util.*;
-import javax.sound.sampled.*;
 
 public class PlayThread extends Thread {
  

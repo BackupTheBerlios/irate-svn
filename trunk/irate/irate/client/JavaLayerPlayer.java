@@ -3,7 +3,6 @@
 package irate.client;
 
 import java.io.*;
-import javazoom.jl.decoder.JavaLayerException;
 
 public class JavaLayerPlayer implements Player {
 

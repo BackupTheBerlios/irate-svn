@@ -6,7 +6,6 @@ import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
 
-import java.awt.event.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
