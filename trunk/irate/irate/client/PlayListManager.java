@@ -11,45 +11,49 @@ public class PlayListManager {
 
   private Random random = new Random();
   private int playListMaximumSize;
-  
+
   private TrackDatabase trackDatabase;
   private List playList;
   private int playListIndex;
-  
+
   private Track lastPlayedTrack;
-  
+
   public PlayListManager(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
     this.playList = new Vector();
     playListIndex = 0;
   }
-  
+
   public TrackDatabase getTrackDatabase() {
     return trackDatabase;
   }
-  
+
   public synchronized Track[] getPlayList() {
     return (Track[]) playList.toArray(new Track[playList.size()]);
   }
-  
+
   public synchronized Track chooseTrack() {
     int playListLength = trackDatabase.getPlayListLength();
+    int unratedPlayListRatio = trackDatabase.getUnratedPlayListRatio();
+//Added by EBD - 11.09.2003
+//Maybe use ceiling instead of round?
+    int unratedPlayListCount = (int)Math.round(((double)playListLength) * (((double)unratedPlayListRatio) / 100.0));
 
       // Remove the track we've just played if necessary.
     if (playListIndex < playList.size()) {
       Track track = (Track) playList.get(playListIndex);
       if (!track.isOnPlayList()) {
         playList.remove(playListIndex);
-        
+
           // Subtract one from the index because it'll get incremented later.
         playListIndex--;
       }
     }
-         
+
       // Remove extra unwanted items.
-    while (playList.size() > playListLength) 
-      playList.remove(playList.size() - 1);  
-    
+    while (playList.size() > playListLength)
+      playList.remove(playList.size() - 1);
+
       // Maintain a 'toOmit' hash table, which is used to make the choosing
       // of tracks not choose ones we have already got on the list.
     Hashtable toOmit = new Hashtable();
@@ -64,49 +68,56 @@ public class PlayListManager {
         }
       }
       else {
-	toOmit.put(track, track);
+    toOmit.put(track, track);
         if (!track.isRated())
           noOfUnrated++;
       }
     }
-    
-      // Loop around one time for each track which needs to be added to the 
+
+      // Loop around one time for each track which needs to be added to the
       // play list. Don't worry too much if we don't exactly that number of
       // tracks because it will likely get one next time around.
     for (int i = playListLength - playList.size(); i > 0; i--) {
       synchronized (trackDatabase) {
         Track track = null;
-        if (noOfUnrated == 0 && playList.size() != 0)
+
+/**
+ * Modified by Eric Dalquist - 11.09.2003
+ *
+ * Now multiple unrated tracks can be selected.
+ */
+        if (noOfUnrated <= unratedPlayListCount && playList.size() != 0)
           track = trackDatabase.chooseUnratedTrack(random, toOmit);
 
         if (track == null)
           track = trackDatabase.chooseTrack(random, toOmit);
-        
+
         if (track != null) {
           if (!track.isRated())
             noOfUnrated++;
-	  toOmit.put(track, track);
-	  playList.add(track);
+
+      toOmit.put(track, track);
+      playList.add(track);
         }
       }
     }
-    
+
     int size = playList.size();
     if (size < 1)
       return null;
-    
+
     if (playListIndex >= size)
-      playListIndex = 0;   
+      playListIndex = 0;
 
     //
     // Make sure the track you select isn't the same as the track
     // that was previously played
     //
-  
+
     Track selectedTrack;
     if (size == 1) {
       selectedTrack = (Track) playList.get(0);
-    } else {        
+    } else {
       int currentIndex = playListIndex;
       do {
         if (++playListIndex >= size)
@@ -116,9 +127,9 @@ public class PlayListManager {
           break;
       } while (playListIndex != currentIndex);
     }
-        
+
     lastPlayedTrack = selectedTrack;
-    
+
     System.out.println("---Play list---");
     for (int i = 0; i < playList.size(); i++) {
       Track track = (Track) playList.get(i);
@@ -126,10 +137,10 @@ public class PlayListManager {
         System.out.print("* ");
       System.out.println(track.toString());
     }
-    
+
     return selectedTrack;
   }
-  
+
   private void randomise(List playList) {
     for (int i = 0; i < playList.size(); i++) {
       int swap = (Math.abs(random.nextInt()) % playList.size());

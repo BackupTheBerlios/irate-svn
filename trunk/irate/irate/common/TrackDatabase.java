@@ -22,6 +22,7 @@ public class TrackDatabase {
   private final String trackElementName = "Track";
   private final String userElementName = "User";
   private final String autoDownloadElementName = "AutoDownload";
+  private final String playListElementName = "PlayList";
   private final String defaultHost = "server.irateradio.org";
   private final int defaultPort = 2278;
   private TreeSet tracks;
@@ -29,7 +30,7 @@ public class TrackDatabase {
   private File file;
   private File downloadDir;
   private XMLElement docElt;
-    
+
   public TrackDatabase() {
     create();
   }
@@ -101,7 +102,7 @@ public class TrackDatabase {
     }
     return true;
   }
-  
+
   public Track[] getTracks() {
     synchronized (this) {
       Track[] tracks = new Track[this.tracks.size()];
@@ -122,13 +123,13 @@ public class TrackDatabase {
       if(elt.getName().equals(eltName))
         return elt;
       }
-    
+
     return null;
     /*NodeList nodeList = docElt.getElementsByTagName(eltName);
-	  
+
     if (nodeList.getLength() != 0) {
       Node node = nodeList.item(0);
-      if (node instanceof Element) 
+      if (node instanceof Element)
         return (Element) node;
     }
     return null;*/
@@ -155,9 +156,9 @@ public class TrackDatabase {
       docElt.addChild(elt);
     }
     elt.setAttribute(attName, attValue);
-  //  System.out.println("name="+name + " '" +attName+"="+attValue+" "+elt); 
+  //  System.out.println("name="+name + " '" +attName+"="+attValue+" "+elt);
   }
-  
+
   public String getUserName() {
     return getAttribute(userElementName, "name").replace('/', '.').replace('\\', '.');
   }
@@ -201,7 +202,7 @@ public class TrackDatabase {
   public void setPort(int port) {
     setAttribute(userElementName, "port", Integer.toString(port));
   }
-  
+
   public int getAutoDownload() {
     try {
       return Integer.parseInt(getAttribute(autoDownloadElementName,"setting"));
@@ -214,28 +215,47 @@ public class TrackDatabase {
   public void setAutoDownload(int setting) {
     setAttribute(autoDownloadElementName, "setting", Integer.toString(setting));
   }
-  
+
   public int getAutoDownloadCount() {
     try {
       return Integer.parseInt(getAttribute(autoDownloadElementName,"count"));
     }
     catch (NumberFormatException e) {
     }
-    return 0; 
+    return 0;
   }
-  
+
   public void setPlayListLength(int length) {
-    setAttribute("PlayList", "length", Integer.toString(length));
+    setAttribute(playListElementName, "length", Integer.toString(length));
   }
-  
+
   public int getPlayListLength() {
     try {
-      return Integer.parseInt(getAttribute("PlayList", "length"));
+      return Integer.parseInt(getAttribute(playListElementName, "length"));
     }
     catch (NumberFormatException e) {
     }
     return 5;
   }
+
+/**
+ * Added By Eric Dalquist - 11.09.2003
+ *
+ * Allows the ratio of unrated tracks per playlist generation to be stored.
+ */
+  public void setUnratedPlayListRatio(int length) {
+    setAttribute(playListElementName, "UnratedRatio", Integer.toString(length));
+  }
+
+  public int getUnratedPlayListRatio() {
+    try {
+      return Integer.parseInt(getAttribute(playListElementName, "UnratedRatio"));
+    }
+    catch (NumberFormatException e) {
+    }
+    return 10;
+  }
+/****/
 
   public void setAutoDownloadCount(int count) {
     setAttribute(autoDownloadElementName, "count", Integer.toString(count));
@@ -261,7 +281,7 @@ public class TrackDatabase {
   public void setFile(File file) {
     this.file = file;
   }
-  
+
   public File getDownloadDirectory() {
     return downloadDir;
   }
@@ -273,12 +293,12 @@ public class TrackDatabase {
     load(is);
     is.close();
   }
-      
-  public void load(InputStream is) throws IOException {    
+
+  public void load(InputStream is) throws IOException {
     if(docElt == null)
       create();
     docElt.parseFromReader(new InputStreamReader(is));
-    
+
     if (docElt.getName().equals(docElementName)) {
       Enumeration enum = docElt.enumerateChildren();
       while(enum.hasMoreElements()) {
@@ -347,14 +367,14 @@ public class TrackDatabase {
 
   public void add(TrackDatabase trackDatabase) {
     Track[] tracks = trackDatabase.getTracks();
-    for (int i = 0; i < tracks.length; i++) 
+    for (int i = 0; i < tracks.length; i++)
       add(tracks[i]);
   }
 
   public boolean remove(TrackDatabase trackDatabase) {
     boolean removed = false;
     Track[] tracks = trackDatabase.getTracks();
-    for (int i = 0; i < tracks.length; i++) 
+    for (int i = 0; i < tracks.length; i++)
       removed |= remove(tracks[i]);
     return false;
   }
@@ -366,7 +386,7 @@ public class TrackDatabase {
   public String getPlayer() {
     return getAttribute("Player", "path");
   }
-  
+
   public void setError(String code, String url) {
     setAttribute("Error", "code", code);
     setAttribute("Error", "url", url);
@@ -379,7 +399,7 @@ public class TrackDatabase {
   public String getErrorURLString() {
     return getAttribute("Error", "url");
   }
-  
+
   public float getProbability(Track track) {
     if (track.getFile() == null)
       return 0;
@@ -398,17 +418,17 @@ public class TrackDatabase {
   public Track chooseTrack(Random random, Hashtable toOmit) {
     Track[] tracks = getTracks();
     while (true) {
-      float[] probs = new float[tracks.length]; 
+      float[] probs = new float[tracks.length];
 
         // Choose a minimum probability
       float minRating = (MAX_RATING - 2) * Math.abs(random.nextFloat());
-    
+
       float totalProb = 0;
       for (int i = 0; i < tracks.length; i++) {
         Track track = tracks[i];
           float rating = track.getRating();
 
-        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track))) 
+        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track)) && track.getFile() != null)
           totalProb += getProbability(track);
 
         probs[i] = totalProb;
@@ -422,7 +442,7 @@ public class TrackDatabase {
         while (true) {
           float rand = Math.abs(random.nextFloat()) * totalProb;
           for (int i = 0; i < tracks.length; i++) {
-	        if (toOmit != null && toOmit.containsKey(tracks[i]))
+            if (toOmit != null && toOmit.containsKey(tracks[i]))
               continue;
             if (rand <= probs[i])
               return tracks[i];
@@ -444,15 +464,18 @@ public class TrackDatabase {
       if (!track.isRated() && (toOmit == null || !toOmit.containsKey(track)) && track.getFile() != null)
         list.add(track);
     }
-    
+
       // If there are no unrated tracks then return null.
     if (list.size() == 0)
       return null;
-    
-    int rand = Math.round(Math.abs(random.nextFloat()) * list.size());
+
+//Commented out by EBD in favor of a true random int method
+//    int rand = Math.round(Math.abs(random.nextFloat()) * list.size());
+    int rand = random.nextInt(list.size());
+
     return (Track) list.get(rand);
   }
-  
+
   public int getNoOfUnrated() {
     Track[] tracks = getTracks();
     int noOfUnrated = 0;
@@ -461,7 +484,7 @@ public class TrackDatabase {
         noOfUnrated++;  
     return noOfUnrated;  
   }
-  
+
   private int compare(Track track0, Track track1) {
     return track0.getName().compareToIgnoreCase(track1.getName());
   }
@@ -469,7 +492,7 @@ public class TrackDatabase {
   public void purge() {
     for (Iterator itr = tracks.iterator(); itr.hasNext(); ) {
       Track track = (Track) itr.next();
-      if (track.isHidden()) 
+      if (track.isHidden())
         track.erase();
     }
   }
