@@ -501,6 +501,20 @@ public class Track {
   }
   
   /**
+   * Gets the playing time of a track in seconds
+   */
+  public long getPlayingTime() {
+    try {
+      MP3File mp3 = new MP3File(this.getFile());
+      return mp3.getPlayingTime();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+      return 0;
+    }
+  }
+  
+  /**
    * Gets the comment associated with this track
    * @return A string representing the comment in the track's ID3 tag
    */

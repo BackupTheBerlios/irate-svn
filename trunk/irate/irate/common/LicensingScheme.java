@@ -1,5 +1,7 @@
 package irate.common;
 
+import irate.resources.BaseResources;
+
 import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -23,7 +25,7 @@ public class LicensingScheme {
   public LicensingScheme(String copyrightData) {
     buildImageTable();
     if(copyrightData == null || copyrightData.equals("")) { //$NON-NLS-1$
-      initializeLicensingScheme(null, "", Resources.getString("LicensingScheme.No_Copyright_Information_Available"), "");
+      initializeLicensingScheme(null, "", "No copyright available", "");
     }
     else {	
       String urlFound = findURLInText(copyrightData);

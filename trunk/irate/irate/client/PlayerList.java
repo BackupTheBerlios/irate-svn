@@ -2,7 +2,6 @@
 package irate.client;
 
 import java.util.Vector;
-import java.io.FileNotFoundException;
 
 public class PlayerList {
 
@@ -21,9 +20,17 @@ public class PlayerList {
     }
     
     try {
-      players.add(new MadplayPlayer());
+      players.add(Class.forName("irate.client.LibMadPlayer").newInstance());
     }
-    catch (FileNotFoundException e) {
+    catch (Exception e) {
+      e.printStackTrace();
+    }
+    
+    try {
+      players.add(Class.forName("irate.client.MadplayPlayer").newInstance());
+      //players.add(new MadplayPlayer());
+    }
+    catch (Exception e) {
       e.printStackTrace();
     }
 

@@ -13,4 +13,5 @@ public interface PlayerListener {
   
   /** Called when the track starts playing. */
   public void bitRateUpdated(int bitRate);
+  
 }

@@ -25,14 +25,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/05 07:15:58 $
+ * Date Updated: $Date: 2003/12/07 00:33:44 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.123 $
+ * @version $Revision: 1.124 $
  */
 public class Client extends AbstractClient {
 
@@ -898,7 +898,16 @@ public class Client extends AbstractClient {
    */
   public void positionUpdated(int position, int length) {
     final int currentTime = position;
-    final int finalTime = length;
+    int checkedTime;
+    if(length == 0) {
+      checkedTime = (int)playThread.getCurrentTrack().getPlayingTime();
+    }
+    else {
+      checkedTime = length;
+    }
+    
+    final int finalTime = checkedTime;
+    
     display.asyncExec(new Runnable() {
       public void run() {
         songProgressBar.setCurrentTime(currentTime);
