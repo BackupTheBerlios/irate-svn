@@ -482,18 +482,6 @@ public class Client extends AbstractClient {
 
     item1.setMenu(menu1);
 
-    MenuItem item1_1 = new MenuItem(menu1, SWT.PUSH);
-    item1_1.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        downloadThread.go();
-      }
-    });
-    //Added for a nicer UI by Allen Tipper 16.9.03
-    item1_1.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.download")));
-    //end add
-    skinManager.add(item1_1, "toolbar.menu_item.download");
-    
-
     MenuItem item_undo = new MenuItem(menu1, SWT.PUSH);
     item_undo.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
