@@ -63,9 +63,10 @@ need to do is run make like this:
 
 $ make
 
-There's a handy scrip to run it:
+To run it you need to do this:
 
-$ ./irate-client.sh
+$ export LD_LIBRARY_PATH=lib
+$ ./irate-client
 
 Building iRATE using GCJ on Windows is not recommended. If you wish to develop
 iRATE on the Windows platform then use the Java SDK (above).

@@ -11,6 +11,7 @@ public class UserList {
 
   private File userDir;
   private Vector users = new Vector();
+  private int rollingUserIndex;
   
   public UserList() {
     userDir = new File("users");
@@ -87,13 +88,17 @@ public class UserList {
       users[i].discard();
   }
   
-  public Set getRandomUserSet(Random random, ServerDatabase user, int noOfUsers) {
+  public Set getRollingUserSet(Random random, ServerDatabase user, int noOfUsers) {
+    rollingUserIndex = (rollingUserIndex + noOfUsers / 5) % users.size();
+    int index = rollingUserIndex; 
     Set randomUsers = new HashSet();
     for (int i = 0; i < noOfUsers; i++) {
-      DatabaseReference ref = randomUser(random, user);
-      if (ref == null)
-        break; 
-      randomUsers.add(ref);
+      DatabaseReference ref = (DatabaseReference) users.get(index);
+      if (++index == users.size())
+        index = 0;
+      
+      if (!ref.refersTo(user))
+        randomUsers.add(ref);
     }
  
     return randomUsers;

@@ -5,7 +5,6 @@ package irate.client;
 import java.io.File;
 
 import javazoom.jlGui.BasicPlayer;
-import javazoom.jlGui.BasicPlayerListener;
 
 public class JavaLayerPlayer implements Player {
 
@@ -55,29 +54,13 @@ public class JavaLayerPlayer implements Player {
   public void play(File file) throws PlayerException {
     try {
       if (player == null)
-        player = new BasicPlayer(new BasicPlayerListener() {
-          public void updateCursor(int cursor, int total) {
-          }
-          public void updateMediaData(byte[] data) {
-          }
-          public void updateMediaState(String state) {
-            if (state.equals("EOM")) {
-              System.out.println("Done");
-              synchronized (JavaLayerPlayer.this) { 
-                JavaLayerPlayer.this.notify();
-              }
-            }
-          }          
-        });
+        player = new BasicPlayer();
       player.setDataSource(file);
       player.startPlayback();
       setPlayerVolume(volume);
       if (paused)
         player.pausePlayback();
-        
-      synchronized (this) {
-        wait();
-      }
+      player.waitFor();
     }
     catch (Exception e) {
       e.printStackTrace();
@@ -89,9 +72,6 @@ public class JavaLayerPlayer implements Player {
     synchronized (this) {
       if (player != null) {
         player.stopPlayback();
-        synchronized (this) {
-          notify();
-        }
         paused = false;
       }
     }

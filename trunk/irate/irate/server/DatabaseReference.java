@@ -5,6 +5,7 @@ package irate.server;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.ref.SoftReference;
 import java.util.Properties;
 
 import nanoxml.XMLElement;
@@ -18,6 +19,7 @@ public class DatabaseReference {
   private File file;
   private ServerDatabase serverDatabase;
   private XMLElement elt;
+  private SoftReference softRef;
   
   public DatabaseReference(UserList userList, File file) throws IOException {
     this.userList = userList;
@@ -54,8 +56,16 @@ public class DatabaseReference {
   
   public ServerDatabase getServerDatabase() throws IOException {
     if (serverDatabase == null) {
-      serverDatabase = new ServerDatabase(userList, file);
-      load(serverDatabase);
+        // Try to rescue the information through the soft pointer.
+      ServerDatabase soft = softRef == null ? null : (ServerDatabase) softRef.get();
+      if (soft == null) {
+        serverDatabase = new ServerDatabase(userList, file);
+        load(serverDatabase);
+        softRef = new SoftReference(serverDatabase);
+      }
+      else {
+        serverDatabase = soft;
+      }
     }
     return serverDatabase;
   }

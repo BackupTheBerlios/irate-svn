@@ -250,7 +250,7 @@ public class MasterDatabase extends ServerDatabase {
     Set users = new HashSet();
     users.addAll(user.getFriendSet());
     System.out.println("No. of friends: " + users.size());
-    users.addAll(userList.getRandomUserSet(random, user, noOfUsersToCompare - users.size()));
+    users.addAll(userList.getRollingUserSet(random, user, noOfUsersToCompare - users.size()));
     
     TrackAverageRating tar = new TrackAverageRating();
     TreeMap treeMap = new TreeMap(new Comparator() {
