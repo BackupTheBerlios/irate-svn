@@ -395,9 +395,7 @@ public class Client implements UpdateListener {
     col.setText("Last");
     col.setWidth(150);
     tblSongs.setHeaderVisible(true);
-    System.out.println("Sychronising playlist");
     synchronizePlaylist(playListManager, tblSongs);
-    System.out.println("Done");
     tblSongs.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
         playThread.play(getTrackByTableItem(tblSongs.getSelection()[0]));
