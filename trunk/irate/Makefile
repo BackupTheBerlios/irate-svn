@@ -1,6 +1,5 @@
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
-DOC=$(DESTDIR)/usr/doc/irate-client-motif
 export GCJ=gcj -g -pipe -O0
 IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
@@ -44,13 +43,11 @@ SERVER_LIBS = lib/libnanoxml-lite.o
 all: lib $(IRATE_CLIENT) $(IRATE_SERVER)
 
 install: $(IRATE_CLIENT)
-	install -d $(BIN) $(LIB) $(DOC)
+	install -d $(BIN) $(LIB)
 	install $(IRATE_CLIENT) $(BIN)
 	install lib/libswt-gnome-motif-3009.so $(LIB)
 	install lib/libswt-kde-motif-3009.so $(LIB)
 	install lib/libswt-motif-3009.so $(LIB)
-	install README $(DOC)
-	install COPYING $(DOC)
 
 lib:
 	$(MAKE) -C lib/
