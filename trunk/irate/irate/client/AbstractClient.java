@@ -39,6 +39,13 @@ public abstract class AbstractClient
 
   private Vector trackLifeCycleListeners = new Vector();
 
+  private static class StatusMessage {
+    public StatusMessage(int priority, String text) {this.priority = priority; this.text = text;}
+    public int priority;
+    public String text;
+  };
+  private Vector statusMessages = new Vector();
+
   public AbstractClient() {
 		init();
     userPreferences = new Preferences();
@@ -398,4 +405,66 @@ public abstract class AbstractClient
   {
     playThread.getVolumeMeister().removeVolumePolicy(policy);
   }
+
+  /**
+   * PluginApplication interface:
+   * Add a status message.  The highest priority message will be the one that is
+   * displayed.
+   */
+  public void addStatusMessage(int priority, String text)
+  {
+    if (text != null) {
+      synchronized (statusMessages) {
+        statusMessages.add(new StatusMessage(priority, text));
+      }
+      updateStatusMessage();
+    }
+  }
+
+  /**
+   * PluginApplication interface:
+   * Remove a status message added by addStatusMessage.  The passed string value must
+   * be the same instance.
+   */
+  public void removeStatusMessage(String text)
+  {
+    if (text != null) {
+      synchronized (statusMessages) {
+        for (int i = 0; i < statusMessages.size(); i++) {
+          StatusMessage sm = (StatusMessage) statusMessages.get(i);
+          if (text == sm.text) {
+            statusMessages.remove(i);
+            break;
+          }
+        }
+      }
+      updateStatusMessage();
+    }
+  }
+
+  /**
+   * Out of all the status messages that are competing to be displayed (added through
+   * addStatusMessage/removeStatusMessage), get the highest priority one.
+   */
+  protected String getHighestPriorityStatusMessage()
+  {
+    synchronized (statusMessages) {
+      int highestPriority = 0;
+      String text = null;
+      for (int i = 0; i < statusMessages.size(); i++) {
+        StatusMessage sm = (StatusMessage) statusMessages.get(i);
+        if (i ==0 || sm.priority > highestPriority) {
+          highestPriority = sm.priority;
+          text = sm.text;
+        }
+      }
+      return text;
+    }
+  }
+
+  /**
+   * Instance must supply a method here to update the display of the status message.
+   * It should call 'getHighestPriorityStatusMessage'.
+   */
+  protected abstract void updateStatusMessage();
 }

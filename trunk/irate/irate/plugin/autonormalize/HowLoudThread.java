@@ -15,6 +15,7 @@ public class HowLoudThread
   implements Runnable
 {
   private PluginApplication app;
+  private String identifier;
   private Vector queue = new Vector();
   private Object mutex = new Object();
   private boolean toTerminate;
@@ -23,9 +24,10 @@ public class HowLoudThread
    */
   private Track beingProcessed;
 
-  public HowLoudThread(PluginApplication app)
+  public HowLoudThread(PluginApplication app, String identifier)
   {
     this.app = app;
+    this.identifier = identifier;
     toTerminate = false;
     Thread t = new Thread(this);
     t.start();
@@ -91,8 +93,7 @@ public class HowLoudThread
 
           double ratio = trackLevel / averageLevel;
           double decibels = log10(ratio) * 20.0;
-          System.out.println("auto-normalize: calculated track "+beingProcessed+" loudness of "+(decibels < 0.0 ? "" : "+") + format.format(decibels)+" dB");
-          loudness = Integer.toString((int) Math.floor(decibels));
+          loudness = (decibels < 0.0 ? "" : "+") + format.format(decibels);
           app.saveTrack(beingProcessed, false);
         }
         catch (RuntimeException ex)
@@ -110,6 +111,7 @@ public class HowLoudThread
       }
       finally {
         beingProcessed.setProperty("loudness", loudness);
+        System.out.println("auto-normalize: "+identifier+" track "+beingProcessed+" loudness of "+loudness+" dB");
         try {is.close();} catch (IOException e) {}
       }
     }

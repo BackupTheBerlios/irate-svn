@@ -61,7 +61,8 @@ public class Client extends AbstractClient {
   private Composite trackGroup = null;  
 
   //  private SettingDialog settingDialog;
-  private String strState = "";
+  private Object strStateLock = new Object();
+  private String strState = null;
   private TrackTable trackTable;
 
   private SWTPluginUIFactory uiFactory;
@@ -83,8 +84,16 @@ public class Client extends AbstractClient {
     errorDialog.setParent(shell);
 		uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
     createDropTarget();
+
+    UpdateListener ul = new UpdateListener() {
+      public void actionPerformed() {
+        showDownloadStatus(downloadThread.getState());
+      }//method
+      public void newTrackStarted(Track track) { }
+    };//ul
+    downloadThread.addUpdateListener(ul);
   }
-  
+
   /** Init gui. Called from constructor */
   public void init() {
     try {
@@ -167,10 +176,19 @@ public class Client extends AbstractClient {
     }
   }
 
+  private void showDownloadStatus(String statusText)
+  {
+    synchronized(strStateLock) {
+      removeStatusMessage(strState);
+      strState = statusText;
+      addStatusMessage(10, strState);
+    }
+  }
+
   /** This sets the statusbar */
   public void updateDownloadInfo(final Track track,final String state,final int percentageDone) {
-    strState = state;
-  
+      // Note: Track description says what percentage download, so we don't need to add it here.
+    showDownloadStatus(state+" "+track);
     display.asyncExec(new Runnable() {
       public void run() {
         //int n = percentageDone;
@@ -190,7 +208,22 @@ public class Client extends AbstractClient {
         }
         */
         trackTable.updateTrack(track);
-        lblState.setText(strState);
+      }
+    });
+  }
+
+  /**
+   * Instance must supply a method here to update the display of the status message.
+   * It should call 'getHighestPriorityStatusMessage'.
+   */
+  protected void updateStatusMessage()
+  {
+    display.asyncExec(new Runnable() {
+      public void run() {
+        String text = getHighestPriorityStatusMessage();
+        if (text == null)
+          text = "";
+        lblState.setText(text);
         lblState.pack();
       }
     });
@@ -307,7 +340,6 @@ public class Client extends AbstractClient {
   }
 
   void showAccountDialog() {
-    strState = "";
     new AccountDialog(display, trackDatabase, downloadThread);
   }
 
@@ -925,7 +957,6 @@ public class Client extends AbstractClient {
   public void createState() {
     lblState = new AlphaLabel(bottomPanel, SWT.NONE);
     skinManager.add(lblState, "label.status");
-    lblState.setText(strState);
 
     GridData gridData = new GridData();
     gridData.horizontalAlignment = GridData.BEGINNING;
@@ -976,7 +1007,7 @@ public class Client extends AbstractClient {
       this.str = str;
     }
     public void widgetArmed(ArmEvent e) {
-      lblState.setText(strState = str);
+      lblState.setText(str);
       lblState.pack();
     }
   }

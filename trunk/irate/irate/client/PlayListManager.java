@@ -4,12 +4,12 @@ package irate.client;
 
 import irate.common.Track;
 import irate.common.TrackDatabase;
+import irate.common.Utils;
 
 import java.util.*;
 
 public class PlayListManager {
 
-  private Random random = new Random();
   private int playListMaximumSize;
 
   private TrackDatabase trackDatabase;
@@ -95,10 +95,10 @@ public class PlayListManager {
  * Now multiple unrated tracks can be selected.
  */
         if (noOfUnrated <= unratedPlayListCount && playList.size() != 0)
-          track = trackDatabase.chooseUnratedTrack(random, toOmit);
+          track = trackDatabase.chooseUnratedTrack(Utils.getRandom(), toOmit);
           
         if (track == null)
-          track = trackDatabase.chooseTrack(random, toOmit);
+          track = trackDatabase.chooseTrack(Utils.getRandom(), toOmit);
 
           // We couldn't find a track so give up looking.
         if (track == null)
@@ -111,7 +111,7 @@ public class PlayListManager {
 
         // We want "0% unrated on playlist" to be an absolute.
         if (unratedPlayListRatio != 0 || track.isRated()) {
-          int insertIndex = random.nextInt(playList.size() + 1);
+          int insertIndex = Utils.getRandom().nextInt(playList.size() + 1);
           playList.add(insertIndex, track);
           notifyAddedToPlayList(track);
           if (insertIndex <= playListIndex)
@@ -159,17 +159,6 @@ public class PlayListManager {
     }
 
     return selectedTrack;
-  }
-
-  private void randomise(List playList) {
-    for (int i = 0; i < playList.size(); i++) {
-      int swap = (Math.abs(random.nextInt()) % playList.size());
-      if (swap != i) {
-        Object o = playList.get(i);
-        playList.set(i, playList.get(swap));
-        playList.set(swap, o);
-      }
-    }
   }
 
   /**

@@ -6,6 +6,7 @@ import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
 import irate.resources.BaseResources;
+import irate.common.Utils;
 
 import java.io.*;
 import java.net.*;
@@ -90,6 +91,9 @@ public class DownloadThread extends Thread {
     Vector downloadTracks = new Vector();
     //download threads keyed by host
     Hashtable downloadThreads = new Hashtable();
+    boolean toSave = false;
+      // The maximum number of files that can be downloaded simultaneously
+    final int MAX_SIMULTANEOUS_DOWNLOADS = 4;
     
     for (int i = 0; i < tracks.length; i++) {
       Track currentTrack = tracks[i];
@@ -99,12 +103,9 @@ public class DownloadThread extends Thread {
           try {
             if (file != null) {
               currentTrack.unSetFile();
-              trackDatabase.save();
+              toSave = true;
             }
             downloadTracks.add(currentTrack);
-            //gcj doesnt like nulls in hashtables..so we later will replace the value with a thread
-            downloadThreads.put(currentTrack.getURL().getHost(), currentTrack.getURL().getHost());
-            
           }
           catch (IOException e) {
             e.printStackTrace();
@@ -112,13 +113,25 @@ public class DownloadThread extends Thread {
         }
       }
     }
-    
+    if (toSave)
+      trackDatabase.save();
+
     //can't download anything..should contact server
     if(downloadTracks.size() == 0) 
       return false;
-    
-    
-    
+
+      // Scramble the list of download candidates into a random order
+    Utils.scramble(downloadTracks);
+      // Limit the number of simultaneous downloads to a reasonable maximum
+    while (downloadTracks.size() > MAX_SIMULTANEOUS_DOWNLOADS)
+      downloadTracks.remove(downloadTracks.size()-1);
+
+    for (int i = 0; i < downloadTracks.size(); i++) {
+      Track currentTrack = (Track) downloadTracks.get(i);
+      //gcj doesnt like nulls in hashtables..so we later will replace the value with a thread
+      downloadThreads.put(currentTrack.getURL().getHost(), currentTrack.getURL().getHost());
+    }
+
     while(downloadTracks.size() > 0 || downloadThreads.size() > 0) {
       //loop through current threads &queued downloads
       Enumeration keyThreads = downloadThreads.keys();
@@ -133,7 +146,7 @@ public class DownloadThread extends Thread {
             if(!host.equals(track.getURL().getHost()))
               continue;
             iter.remove();
-            System.out.println("Simultaniously downloading url "+track.getURL() + " hidden="+track.isHidden());
+            System.out.println("Simultaneously downloading url "+track.getURL() + " hidden="+track.isHidden());
             td = new TrackDownloader(this, track);
             //place a new download in the slot
             //silly gcj craps out if we call start fromt the TrackDownloader constructor
@@ -241,12 +254,13 @@ public class DownloadThread extends Thread {
           try {
             resumeConnection = new DownloadConnection(url);
             resumeConnection.connect(continueOffset, timeout);
-            System.out.println("Resuming download (offset="
+            System.out.println("Resuming download of "+track+" (offset="
                                + continueOffset + ")");
           }
           catch (DownloadConnection.ResumeNotSupportedException exception) {
             System.out.println("Server does not support resuming downloads");
             resume = false;
+            continueOffset = 0;
           }
           if (resume) {
             try {
@@ -259,16 +273,35 @@ public class DownloadThread extends Thread {
         }
         setState(getResourceString("DownloadThread.Downloading")
                  + track.getName());
+        for (int i = 0; i < downloadListeners.size(); i++)
+          ((DownloadListener)downloadListeners.get(i)).downloadStarted(track);
+        final byte buf[] = new byte[128000];
+
+          // If we are resuming a download, then we must feed the already-downloaded
+          // part of the file to the download listeners.  They are only expected
+          // to deal with whole files.
+        if (resume && downloadListeners.size() != 0) {
+          FileInputStream is = new FileInputStream(file.toString());
+          try {
+            while (true) {
+              int nbytes = is.read(buf, 0, buf.length);
+              if (nbytes <= 0)
+                break;
+              for (int i = 0; i < downloadListeners.size(); i++)
+                ((DownloadListener)downloadListeners.get(i)).downloadData(track, buf, 0, nbytes);
+            }
+          }
+          finally {
+            is.close();
+          }
+        }
+
         // If the continue offset is non-zero then we open the file in
         // append mode. If the file on the server is shorter than the one 
         // we have on disk then we just start again.
         OutputStream os = new FileOutputStream(file.toString(), resume);
         boolean succeeded = false;
         try {
-          for (int i = 0; i < downloadListeners.size(); i++)
-            ((DownloadListener)downloadListeners.get(i)).downloadStarted(track);
-
-          final byte buf[] = new byte[128000];
           int totalBytes = (int)continueOffset;          
           while (true) {
             int nbytes = connection.read(buf, timeout);

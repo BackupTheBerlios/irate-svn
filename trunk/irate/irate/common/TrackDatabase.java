@@ -533,7 +533,9 @@ public class TrackDatabase {
     Track[] tracks = getTracks();
     int noOfUnrated = 0;
     for (int i = 0; i < tracks.length; i++)
-      if (!tracks[i].isHidden() && !tracks[i].isRated() && tracks[i].exists())
+      if (tracks[i].isHidden() || tracks[i].isMissing() || tracks[i].isNotDownloaded() || tracks[i].isRated())
+        ;
+      else
         noOfUnrated++;  
     return noOfUnrated;  
   }
@@ -571,12 +573,15 @@ public class TrackDatabase {
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
       if (track.getFile() != null) {
-        noOfValidTracks++;
-        if (tracks[i].isRated())
-          noOfRated++;  
-        else 
-          if (!tracks[i].isHidden())
+        if (tracks[i].isHidden() || tracks[i].isMissing() || tracks[i].isNotDownloaded())
+          ;
+        else {
+          noOfValidTracks++;
+          if (tracks[i].isRated())
+            noOfRated++;  
+          else 
             noOfUnrated++;
+        }
       }
     }
 

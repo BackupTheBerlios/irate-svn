@@ -62,7 +62,7 @@ public class AutoNormalizePlugin
 
   protected void doAttach()
   {
-    hlThread = new HowLoudThread(getApp());
+    hlThread = new HowLoudThread(getApp(), "calculated");
     downloadHash = new Hashtable();
     getApp().addTrackLifeCycleListener(this);
     getApp().addDownloadListener(this);
@@ -136,7 +136,7 @@ public class AutoNormalizePlugin
     try {
       PipedInputStream pis = new PipedInputStream();
       PipedOutputStream pos = new PipedOutputStream(pis);
-      HowLoudThread hlThread = new HowLoudThread(getApp());
+      HowLoudThread hlThread = new HowLoudThread(getApp(), "downloaded");
       hlThread.queue(track, pis);
         // Request this hlThread to terminate once it has empties its queue.
       hlThread.requestTerminate();
@@ -147,7 +147,7 @@ public class AutoNormalizePlugin
     }
     catch (IOException e) {
         // This should not happen: PipedInputStream and PipedOutputStream exist entirely
-        // in memory, so there is nothing that can go wrong with them.
+        // in memory, so there is nothing that can go wrong with their creation.
       throw new RuntimeException(e.toString());
     }
   }
@@ -158,53 +158,56 @@ public class AutoNormalizePlugin
 
   public void downloadData(Track track, byte[] buffer, int offset, int length)
   {
-    try {
-      Object[] objs = (Object[]) downloadHash.get(track);
+    Object[] objs = (Object[]) downloadHash.get(track);
+    if (objs != null) {
       PipedOutputStream pos = (PipedOutputStream) objs[0];
-      pos.write(buffer, offset, length);
-    }
-    catch (IOException e) {
-        // Can't happen, because this is a PipedOutputStream, which exists only
-        // in memory.
-      throw new RuntimeException(e.toString());
+      try {
+        pos.write(buffer, offset, length);
+      }
+      catch (IOException e) {
+        System.err.println("auto-normalize: "+e.toString());
+        downloadHash.remove(track);
+        try {pos.close();} catch (IOException e2) {}
+      }
     }
   }
 
   public void downloadFinished(Track track, boolean succeeded)
   {
     Object[] objs = (Object[]) downloadHash.get(track);
-    PipedOutputStream pos = (PipedOutputStream) objs[0];
-    HowLoudThread hlThread = (HowLoudThread) objs[1];
-    downloadHash.remove(track);
+    if (objs != null) {
+      PipedOutputStream pos = (PipedOutputStream) objs[0];
+      HowLoudThread hlThread = (HowLoudThread) objs[1];
+      downloadHash.remove(track);
 
-    try {
-      pos.close();
-    }
-    catch (IOException e) {
-        // Can't happen, because this is a PipedOutputStream, which exists only
-        // in memory.
-      throw new RuntimeException(e.toString());
-    }
+      try {
+        pos.close();
+      }
+      catch (IOException e) {
+        System.err.println("auto-normalize: "+e.toString());
+      }
 
-    String loudness;
+      String loudness;
 
-      /* Block until the loudness has been determined. */
-    synchronized (hlThread.getMutex()) {
-      while ((loudness = track.getProperty("loudness")) == null) {
-        try {
-          hlThread.getMutex().wait();
-        }
-        catch (InterruptedException e) {
+        // Block until the loudness has been determined.
+      synchronized (hlThread.getMutex()) {
+        while ((loudness = track.getProperty("loudness")) == null) {
+          try {
+            hlThread.getMutex().wait();
+          }
+          catch (InterruptedException e) {
+          }
         }
       }
     }
+    else
+      track.setProperty("loudness", "unknown");
 
+      // If the download didn't succeed, then we blank the track's loudness.
     if (!succeeded) {
       track.setProperty("loudness", null);
       getApp().saveTrack(track, false);
     }
-    else
-      System.out.println("auto-normalize: downloaded track "+track+" loudness="+loudness);
   }
 
   /**
@@ -215,24 +218,25 @@ public class AutoNormalizePlugin
    */
   public int determineVolume(Track track, int suggestedVolume)
   {
-      // Note: We ignore (override) the suggestedVolume.
+      // Note: The suggestedVolume is only used when we don't know what the volume is.
 
-    String loudness;
+    String loudness = track.getProperty("loudness");
       // If we don't know how loud it is...
-    if ((loudness = track.getProperty("loudness")) == null) {
+    if (loudness == null) {
         // Then queue it for processing - top priority.
       try {
         hlThread.queue(track);
           // Wait until we have determined how loud it is.
         synchronized (hlThread.getMutex()) {
-          System.out.println("auto-normalize: Please wait... Need to determine track loudness for "+track);
+          final String message = "Please wait... Need to determine track loudness";
+          getApp().addStatusMessage(100, message);
           try {
             while ((loudness = track.getProperty("loudness")) == null)
               hlThread.getMutex().wait();
           }
           catch (InterruptedException e) {
           }
-          System.out.println("auto-normalize: Track loudness determined! I can now play it...");
+          getApp().removeStatusMessage(message);
         }
       }
       catch (FileNotFoundException e) {
@@ -241,14 +245,14 @@ public class AutoNormalizePlugin
       }
     }
     try {
-      int loudnessDb = Integer.parseInt(loudness);
+      int loudnessDb = (int) Math.floor(Float.parseFloat(loudness));
         // Negate the loudness to make it a volume adjustment.
       int adj = -loudnessDb;
       System.out.println("auto-normalize: playing "+track+" with volume adjustment of "+(adj<0?"":"+")+adj+" dB");
       return -loudnessDb;
     }
     catch (NumberFormatException e) {
-      return 0;
+      return suggestedVolume;
     }
   }
 }

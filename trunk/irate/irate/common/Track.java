@@ -140,7 +140,7 @@ public class Track implements TrackDetails {
   }
 
   public boolean isRated() {
-    return !Float.isNaN(getRawRating()) && (getRawRating() > 0);
+    return !Float.isNaN(getRawRating()) && (getRawRating() >= 0);
   }
 
   public float getRating() {
@@ -319,6 +319,27 @@ public class Track implements TrackDetails {
     return s != null && (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true"));
   }
 
+  /**
+   * True if the file is supposed to have been downloaded, but doesn't actually exist
+   * on the disk.
+   */
+  public boolean isMissing() {
+    File file = getFile();
+    return file != null && !file.exists();
+  }
+
+  /**
+   * True if the file has not been downloaded.
+   */
+  public boolean isNotDownloaded()
+  {
+    return getFile() == null;
+  }
+
+  /**
+   * True if the file is broken or rated 0, and therefore should not appear to
+   * the user.
+   */
   public boolean isHidden() {
     return isBroken() || getRating() == 0;
   }
@@ -443,12 +464,12 @@ public class Track implements TrackDetails {
     if (isBroken()) 
       return Resources.getString("track.rating.broken");
     File file = getFile();
-    if (file == null) {
+    if (isNotDownloaded()) {
       if(percent_complete != -1)
         return Resources.getString("track.rating.downloading") + " " + percent_complete + "%";
       return Resources.getString("track.rating.notdownloaded");
     }
-    if (!file.exists())
+    if (isMissing())
       return Resources.getString("track.rating.missing");
     if (isRated())
       return Integer.toString((int) getRating());

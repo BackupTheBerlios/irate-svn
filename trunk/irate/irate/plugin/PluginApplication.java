@@ -96,5 +96,17 @@ public interface PluginApplication
    * See VolumeMeister class for more details.
    */
   public void removeVolumePolicy(VolumePolicy policy);
+
+  /**
+   * Add a status message.  The highest priority message will be the one that is
+   * displayed.
+   */
+  public void addStatusMessage(int priority, String text);
+
+  /**
+   * Remove a status message added by addStatusMessage.  The passed string value must
+   * be the same instance.
+   */
+  public void removeStatusMessage(String text);
 }
 

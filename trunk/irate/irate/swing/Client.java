@@ -608,4 +608,14 @@ public class Client extends JFrame {
     mb.add(createInfoMenu());
     return mb;
   }
+
+  /**
+   * Instance must supply a method here to update the display of the status message.
+   * It should call 'getHighestPriorityStatusMessage'.
+   */
+  protected void updateStatusMessage()
+  {
+    // \todo This method ought to be implemented.
+    // It will allow plugins to display status messages.
+  }
 }
