@@ -85,7 +85,7 @@ public class Track {
       }
     }
   }
-
+  
   public boolean isErased() {
     return getFileState().equals("erased");
   }
@@ -105,17 +105,13 @@ public class Track {
   public void incNoOfTimesPlayed() {
     synchronized (this) {
       elt.setAttribute("played", Integer.toString(getNoOfTimesPlayed() + 1));
-      String strDate;
       Date d = new Date();
-      try
-      {
-        strDate = new SimpleDateFormat().format(d);
-      }catch(Exception e){
-        System.err.println("Date formatting failed");
-        e.printStackTrace();
-        strDate = d.toString();
+      try {
+        elt.setAttribute("last", new SimpleDateFormat().format(d));
       } 
-      elt.setAttribute("last", strDate);
+      catch(Exception e) {
+        e.printStackTrace();
+      } 
     }
   }
 
@@ -151,16 +147,30 @@ public class Track {
 
   public float getWeight() {
     try {
-      String s = elt.getStringAttribute("weight");
-      if (s == null)
-        s = "";
-      return Integer.parseInt(s);
+      return Integer.parseInt(elt.getStringAttribute("weight"));
     }
-    catch (NumberFormatException e) {
+    catch (Exception e) {
     }
     return Float.NaN;
   }
 
+  public void setVolume(int volume) {
+    elt.setAttribute("volume", Integer.toString(volume));
+  }
+
+  public int getVolume() {
+    try {
+      return Integer.parseInt(elt.getStringAttribute("volume"));
+    }
+    catch (Exception e) {
+    }
+    return 0;
+  }
+  
+  public void unsetVolume() {
+    elt.setAttribute("volume", "");
+  }
+  
   public void setBroken() {
     setFileState("broken");
   }
