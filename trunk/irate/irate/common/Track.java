@@ -402,7 +402,13 @@ public class Track {
     if(www == null) {
       www = "\"" +getArtist()+ "\" ";
       www += "\"" +getTitle()+ "\"";
-      www = "http://www.google.com/search?q="+URLEncoder.encode(www);
+      try {
+        //stupid sun and deprecating every method under the sun!
+        www = "http://www.google.com/search?q="+URLEncoder.encode(www,"UTF-8");
+      }
+      catch(Exception e){
+        System.out.println(e.toString());
+      }
       //www = replace(www, " ", "%20");
     }
     return www;
