@@ -183,10 +183,10 @@ public class Client implements UpdateListener {
     synchronizePlaylist(playListManager, tblSongs);
     update();
   } 
-  
+ 
   public void setPaused(boolean paused) {
-	playThread.setPaused(paused);
-	pause.setText(paused ? ">" : "||");
+    playThread.setPaused(paused);
+    pause.setText(paused ? ">" : "||");
   }
   
   void SortTableByStringColumn(int column_index, Table table)
@@ -514,6 +514,7 @@ public class Client implements UpdateListener {
     item.setText(">>");
     item.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
+        setPaused(false);
         playThread.reject();
 		downloadThread.checkAutoDownload();
       }
