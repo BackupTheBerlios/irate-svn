@@ -113,7 +113,7 @@ public class Speech {
 
   public void setVolume(int volume)
   {
-      Speech.volumeOffset = volume;
+      volumeOffset = volume;
       toSetVolume = true;
   }
 }
