@@ -19,12 +19,12 @@ public class PlayerList {
     	e.printStackTrace();
     }
     
-    try {
-      players.add(Class.forName("irate.client.LibMadPlayer").newInstance());
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
+//    try {
+//      players.add(Class.forName("irate.client.LibMadPlayer").newInstance());
+//    }
+//    catch (Exception e) {
+//      e.printStackTrace();
+//    }
     
     try {
       players.add(Class.forName("irate.client.MadplayPlayer").newInstance());

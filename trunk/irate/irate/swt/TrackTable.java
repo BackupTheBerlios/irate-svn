@@ -217,7 +217,7 @@ public class TrackTable {
   }
   
   /** Remove the specified track from the table. */
-  private void removeTrack(Track track) {
+  private void removeTrack(Track track, int index) {
     updateTable();
   }
   
@@ -227,12 +227,12 @@ public class TrackTable {
   }
   
   /** Move a track further down the list. */
-  private void moveTrackDown(Track track) {
+  private void moveTrackDown(Track track, int index) {
     sort();
   }
   
   /** Move the track further up the list. */
-  private void moveTrackUp(Track track) {
+  private void moveTrackUp(Track track, int index) {
     sort();
   }  
   
@@ -242,7 +242,7 @@ public class TrackTable {
     if (tableItem != null) {
       if (track.isHidden()) {
         // The track has become hidden so we remove it from the table.
-        removeTrack(track);
+        removeTrack(track, table.indexOf(tableItem));
       }
       else {
         updateTableItem(tableItem, track);
@@ -252,14 +252,14 @@ public class TrackTable {
         if (index != 0) {
           Track prevTrack = (Track) hashByTableItem.get(table.getItem(index - 1));
           if (comparator.compare(prevTrack, track) > 0) {
-            moveTrackDown(track);
+            moveTrackDown(track, index);
             return;          
           }
         }
         if (index + 1 < table.getItemCount()) {
           Track nextTrack = (Track) hashByTableItem.get(table.getItem(index + 1));
           if (comparator.compare(track, nextTrack) > 0) {
-            moveTrackUp(track);
+            moveTrackUp(track, index);
           }
         }
       }
