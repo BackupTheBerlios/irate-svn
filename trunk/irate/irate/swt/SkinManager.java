@@ -5,6 +5,7 @@ package irate.swt;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 import java.util.zip.ZipEntry;
@@ -12,12 +13,8 @@ import java.util.zip.ZipFile;
 
 import org.eclipse.swt.events.PaintEvent;
 import org.eclipse.swt.events.PaintListener;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.ImageData;
-import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Item;
-import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.graphics.*;
+import org.eclipse.swt.widgets.*;
 
 /**
  * @author Anthony Jones
@@ -26,6 +23,7 @@ public class SkinManager {
   
   private Vector items = new Vector();
   private Vector controls = new Vector();
+  private Vector buttons = new Vector();
   private ZipFile zip;
   private TransparencyManager transparencyManager = new TransparencyManager();
   
@@ -52,6 +50,11 @@ public class SkinManager {
   public void add(SkinControl skinControl) {
     controls.add(skinControl);
   }
+  
+  public void add(ThreeModeButton button, String name) {
+   SkinButton skinButton = new SkinButton(button, name);
+   buttons.add(skinButton);
+  }
 
   
   public void applySkin(ZipFile zip) {
@@ -63,6 +66,10 @@ public class SkinManager {
     for (Iterator itr = controls.iterator(); itr.hasNext(); ) {
       SkinControl skinControl = (SkinControl) itr.next();
       skinControl.update();
+    }
+    for (Iterator itr = buttons.iterator(); itr.hasNext(); ) {
+      SkinButton skinButton = (SkinButton) itr.next();
+      skinButton.update();
     }
   }
   
@@ -126,6 +133,7 @@ public class SkinManager {
     
     private Control control;
     private String name;
+    private boolean associated = false;
 
     public SkinControl(Control control, String name) {
       this.control = control;
@@ -154,7 +162,7 @@ public class SkinManager {
     }
 
     private ImageData getImageData(String name) throws IOException {
-      ZipEntry zipEntry = zip.getEntry(name + ".gif"); // Returns null if not found
+      ZipEntry zipEntry = zip.getEntry(name + ".png"); // Returns null if not found
       if(zipEntry != null) {
         InputStream is = zip.getInputStream(zipEntry);
         return new ImageData(is);
@@ -164,12 +172,56 @@ public class SkinManager {
 
     public void update() {
       try {
-        transparencyManager.associate(control, getImageData(name));
-        control.redraw();
+         transparencyManager.associate(control, getImageData(name));
+         control.redraw();
       }
       catch (IOException e) {
         e.printStackTrace();
       }
     } 
   }
+  
+  public class SkinButton {
+    
+    private ISkinableButton button;
+    private String name;
+
+    public SkinButton(ISkinableButton button, String name) {
+
+      button.setTransparencyManager(transparencyManager);
+      this.button = button;
+      this.name = name;
+    }
+    
+    public String getName() {
+      return name;
+    }
+    
+    public void setName(String name) {
+      this.name = name;
+      update();
+    }
+
+    private ImageData getImageData(String name) throws IOException {
+      ZipEntry zipEntry = zip.getEntry(name + ".png"); // Returns null if not found
+      if(zipEntry != null) {
+        InputStream is = zip.getInputStream(zipEntry);
+        return new ImageData(is);
+      }
+      return null;
+    }
+
+    public void update() {
+      try {
+        button.setNormalText(Resources.getString(name + ".normalText"));
+        button.setPressedText(Resources.getString(name + ".pressedText"));
+        ImageData normalImg = getImageData(name + ".normal");
+        ImageData pressedImg = getImageData(name + ".pressed");
+        //button.setNormalImage(normalImg);
+        //button.setPressedImage(pressedImg);
+        button.redraw();
+      } catch (IOException e) { }
+  }
+  }
 }
+  
