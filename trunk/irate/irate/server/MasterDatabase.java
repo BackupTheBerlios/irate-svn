@@ -69,6 +69,12 @@ public class MasterDatabase extends ServerDatabase {
     ServerDatabase reply = new ServerDatabase();
 
     System.out.println("User " + request.getUserName() + " " + request.getNoOfTracks());
+
+    if (request.getUserName().length() == 0) {
+      reply.setError("user", "http://www.irateradio.org/irate/client/help/nouser.html");
+      return reply;
+    }
+    
     DatabaseReference userRef = userList.getUser(request.getUserName());
     ServerDatabase user = null;
     try {
