@@ -26,13 +26,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/27 00:32:55 $
+ * Date Updated: $Date: 2003/11/27 03:34:06 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.110 $
+ * @version $Revision: 1.111 $
  */
 public class Client extends AbstractClient {
 
@@ -335,37 +335,38 @@ public class Client extends AbstractClient {
     }
     catch (Exception e) {
       System.out.println("JNLP:" + e);
-    }
 
-    String cmd;
-    String urlString = URLEncoder.encode(url.toString());
-    Runtime r = Runtime.getRuntime();
-    try {
-      // Check the browser preference. 
-      cmd = Preferences.getUserPreference("browser");
-
-      // If it's blank then try the KDE default and if that fails then we
-      // try the Windows default.
-      if (cmd == null || cmd.length() == 0) {
-        try {
-          // kfmclient doesn't like the first part of the protocol
-          // being encoded, and the search terms part have already
-          // been encoded, so we just use the straight URL given to
-          // us.
-          cmd = "kfmclient exec " + url;
-          System.out.println(cmd);
-          r.exec(cmd);
-          return;
+      String cmd;
+      String urlString = URLEncoder.encode(url.toString());
+      Runtime r = Runtime.getRuntime();
+      try {
+        // Check the browser preference. 
+        cmd = Preferences.getUserPreference("browser");
+  
+        // If it's blank then try the KDE default and if that fails then we
+        // try the Windows default.
+        if (cmd == null || cmd.length() == 0) {
+          try {
+            // kfmclient doesn't like the first part of the protocol
+            // being encoded, and the search terms part have already
+            // been encoded, so we just use the straight URL given to
+            // us.
+            cmd = "kfmclient exec " + url;
+            System.out.println(cmd);
+            r.exec(cmd);
+            return;
+          }
+          catch (Exception ex) {
+          }
+          cmd = "rundll32 url.dll,FileProtocolHandler";
         }
-        catch (Exception ex) {
-        }
-        cmd = "rundll32 url.dll,FileProtocolHandler";
+        cmd += " " + urlString;
+        System.out.println(cmd);
+        r.exec(cmd);
       }
-      cmd += " " + urlString;
-      System.out.println(cmd);
-      r.exec(cmd);
-    }
-    catch (Exception e) {
+      catch (Exception ee) {
+        System.err.println(ee.toString());
+      }
     }
   }
 
@@ -379,7 +380,7 @@ public class Client extends AbstractClient {
     Object basicServiceObject =
       lookupMethod.invoke(null, new Object[] { "javax.jnlp.BasicService" });
     Method method =
-      serviceManagerClass.getMethod("showDocument", new Class[] { URL.class });
+      basicServiceObject.getClass().getMethod("showDocument", new Class[] { URL.class });
 
     Boolean resultBoolean =
       (Boolean) method.invoke(basicServiceObject, new Object[] { url });
