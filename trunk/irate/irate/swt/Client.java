@@ -326,17 +326,7 @@ public class Client extends AbstractClient {
     shell = new Shell(display);
     shell.setText(Resources.getString("titlebar.program_name"));
 
-    try {
-      ImageData icon =
-        new ImageData(irate.resources.BaseResources.getResourceAsStream("icon.gif"));
-      int whitePixel = icon.palette.getPixel(new RGB(255, 255, 255));
-      icon.transparentPixel = whitePixel;
-      shell.setImage(new Image(display, icon));
-    }
-    catch (Exception e) {
-      e.printStackTrace();
-    }
-
+    shell.setImage(Resources.getIconImage(display));
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
         quit();

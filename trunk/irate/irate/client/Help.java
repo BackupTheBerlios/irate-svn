@@ -62,7 +62,7 @@ public class Help {
     add("help/malformedurl.txt", "The server has responded with a malformed URL.");
     add("help/errorerror.txt", "The requested page could not be displayed.");
     add("help/missingplayer.txt", "Can't find a suitable mp3 player such as madplay.");
-    add("help/password.txt", "The password you have entered is incorrect.");
+    add("help/password.txt", "The password you have entered is incorrect. If this is a new account, try using a different account name.");
     add("help/user.txt", "You have tried to create a user account with an invalid user name or password.\n" 
         + "Perhaps either the user name or password is blank.");
     add("help/notenoughratings.txt", "You have not rated enough tracks for the server to recognise your tastes.");

@@ -22,10 +22,10 @@ import org.eclipse.swt.graphics.*;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2004/01/16 05:02:35 $
+ * Date Updated: $Date: 2004/01/16 22:15:41 $
  * @author Creator:	taras
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.19 $
+ * @version $Revision: 1.20 $
  */
 public class AccountDialog {
   private boolean done = false;
@@ -56,6 +56,8 @@ public class AccountDialog {
     this.trackDatabase = trackDatabase;
     this.downloadThread = downloadThread;
     this.display = display;
+
+    shell.setImage(Resources.getIconImage(display));
     shell.setText(getResourceString( "AccountDialog.Title.Account_Settings"));
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
@@ -69,9 +71,11 @@ public class AccountDialog {
     tabItem.setText("Introduction");
     Composite composite = new Composite(tabs, SWT.NONE);
     tabItem.setControl(composite);
-    composite.setLayout(new GridLayout());
+    composite.setLayout(new GridLayout(2, false));
+    Label lblIcon = new Label(composite, SWT.NONE);
+    lblIcon.setImage(Resources.getIconImage(display));
     Text txt = new Text(composite, SWT.MULTI | SWT.READ_ONLY | SWT.WRAP);
-    txt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL));
+//    txt.setLayoutData(new GridData(GridData.FILL_HORIZONTAL| GridData.FILL_VERTICAL));
     txt.setText(getResourceString("AccountDialog.Intro"));
     
     tabItem = new TabItem(tabs, SWT.NONE);
@@ -188,19 +192,10 @@ public class AccountDialog {
     
   private void createStatus(Composite composite) {
     composite.setLayout(new GridLayout(2, false));
-    try {
-      InputStream stream = BaseResources.getResourceAsStream("icon.gif");
-      ImageData imageData = new ImageData(stream); 
-      int whitePixel = imageData.palette.getPixel(new RGB(255, 255, 255));
-      imageData.transparentPixel = whitePixel;
-      Image icon = new Image(display, imageData);
-      Label lblIcon = new Label(composite, SWT.NONE);
-      lblIcon.setImage(icon);
-      lblStatus = new Label(composite, SWT.NONE);
-      lblStatus.setText("status goes here");
-    }
-    catch (IOException e) {
-    }
+    Label lblIcon = new Label(composite, SWT.NONE);
+    lblIcon.setImage(Resources.getIconImage(display));
+    lblStatus = new Label(composite, SWT.NONE);
+    lblStatus.setText("status goes here");
   }
   /** Create the user input field. */
   private void createUserInfo(Composite parent) {
