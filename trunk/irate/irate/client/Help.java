@@ -14,6 +14,7 @@ public class Help {
     help.put(key, data);
   }
   
+	public Help()
   {
     add("help/about.txt", "iRATE radio 0.2 http://irate.sourceforge.net\n"
         + "\n"

@@ -86,7 +86,7 @@ public abstract class AbstractClient
     pluginManager = new PluginManager(this, dir);
 
     if (playerList.getPlayers().length == 0)
-      handleError(null, "help/missingplayer.html");
+      handleError(null, "missingplayer.html");
 
     playThread.addUpdateListener(this);
 

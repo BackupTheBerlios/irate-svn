@@ -26,14 +26,14 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/27 05:23:14 $
+ * Date Updated: $Date: 2003/11/27 08:00:55 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.114 $
+ * @version $Revision: 1.115 $
  */
 public class Client extends AbstractClient {
 
@@ -92,12 +92,15 @@ public class Client extends AbstractClient {
 
   public void handleError(String code, String urlString) {
     //actionSetContinuousDownload(false);
+    System.out.println("Error code:"+code);
+    System.out.println("Error url:"+urlString);
     Reader r;
     try {
       if (urlString.indexOf(':') < 0) {
-        r = getResource("help/" + urlString);
+        urlString = "help/" + urlString;
+        r = getResource(urlString);
         if (r == null)
-          throw new NullPointerException();
+          r = new StringReader("Could not load error msg from " + urlString);
       }
       else
         try {
@@ -111,12 +114,26 @@ public class Client extends AbstractClient {
     catch (IOException e) {
       r = getResource("help/errorerror.txt");
     }
-    final Reader finalReader = r;
-    display.asyncExec(new Runnable() {
-      public void run() {
-        errorDialog.show(finalReader);
+    if(display != null) {
+      final Reader finalReader = r;
+      display.asyncExec(new Runnable() {
+        public void run() {
+          errorDialog.show(finalReader);
+        }
+      });
+    }
+    else {
+      System.err.println("#######Error######");
+      BufferedReader bf = new BufferedReader(r);
+      String s;
+      try {
+      while((s = bf.readLine())!=null)
+        System.err.println(s);
+      } catch(IOException ioee) {
+        //ignore ioee
       }
-    });
+      System.err.println("##################");
+    }
   }
 
   public void setState(String state) {
@@ -307,7 +324,12 @@ public class Client extends AbstractClient {
   public Reader getResource(String s) {
     if (s.endsWith(".html"))
       s = s.substring(0, s.length() - 5) + ".txt";
-    return new StringReader(help.get(s));
+    if(help == null)
+      help = new Help();
+    String str = help.get(s);
+    if(str == null)
+      return null;
+    return new StringReader(str);
   }
 
   public void actionAbout() {
