@@ -13,6 +13,7 @@ public class FastTrack extends Track {
   private SoftReference cacheDate;
   private SoftReference cacheArtist;
   private SoftReference cacheTitle;
+  private SoftReference cacheCopyrightInfo;
   
   public FastTrack(XMLElement elt, File dir) {
     super(elt, dir);
@@ -26,6 +27,11 @@ public class FastTrack extends Track {
     key = super.getKey();
     rating = super.getRawRating();
     noOfTimesPlayed = super.getNoOfTimesPlayed();
+  }
+  
+  public void setFile(File file) {
+    cacheCopyrightInfo = null;
+    super.setFile(file);
   }
   
   public String key() {
@@ -101,4 +107,14 @@ public class FastTrack extends Track {
     }
     return date;
   }
+  
+  public String getCopyrightInfo() {
+    String copyrightInfo = cacheCopyrightInfo == null ? null : (String) cacheCopyrightInfo.get();
+    if (copyrightInfo == null) {
+      copyrightInfo = super.getCopyrightInfo();
+      cacheCopyrightInfo = new SoftReference(copyrightInfo);
+    }
+    return copyrightInfo;
+  }
+  
 }

@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.Hashtable;
 
-public class LicensingScheme {
+public class LicensingScheme implements Comparable {
 
   private URL url;
   private String name;
@@ -91,5 +91,12 @@ Resources.getString("LicensingScheme.No_Copyright_Information_Available"), "");
 
   public String getFullText() {
     return fullText;
+  }
+  
+  public int compareTo(Object o) {
+    if (!(o instanceof LicensingScheme))
+      return -1;
+    LicensingScheme license = (LicensingScheme) o;
+    return getName().compareTo(license.getName());
   }
 }

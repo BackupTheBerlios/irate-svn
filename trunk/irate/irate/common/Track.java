@@ -560,14 +560,29 @@ public class Track implements TrackDetails {
    * @return A string representing the copyright info in the track's ID3 tag
    */
   public String getCopyrightInfo() {
+    /* First check if there is a copyright attribute, which is faster than reading the ID3 tag. */
+    String copyrightInfo = elt.getStringAttribute("copyright");
+    if (copyrightInfo != null)
+      return copyrightInfo;
+
+    /* If we don't have the track yet then we just return an empty copyright string. */
+    if (!exists())
+      return "";
+    
+    /* If no copyright attribute then we read the ID3 tag. */
     try {
       MP3File mp3 = new MP3File(this.getFile());
-      return mp3.getCopyrightInfo();
+      copyrightInfo = mp3.getCopyrightInfo();
     }
     catch (Exception e) {
       e.printStackTrace();
-    }		
-    return null;
+    }	
+    
+    /* We've either got a vlue or not got a value so let's continue. */
+    if (copyrightInfo == null)
+      copyrightInfo = "";
+    elt.setAttribute("copyright", copyrightInfo);
+    return copyrightInfo;
   }
 
   /**

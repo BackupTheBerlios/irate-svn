@@ -74,7 +74,7 @@ public class TrackInfoDialog {
     GridData gridData = new GridData();
     labelTag.setLayoutData(gridData);
     labelTag.setFont(font);
-    Label labelData = new Label(grid, SWT.HORIZONTAL);
+    Label labelData = new Label(grid, SWT.HORIZONTAL | SWT.WRAP);
     gridData = new GridData();
     labelData.setLayoutData(gridData);
     labelData.setFont(font);

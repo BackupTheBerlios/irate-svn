@@ -3,15 +3,20 @@
  */
 package irate.swt;
 
+import irate.common.LicenseIndex;
 import irate.common.Track;
 import irate.common.TrackDatabase;
+import irate.resources.BaseResources;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.*;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.*;
 
@@ -44,6 +49,10 @@ public class TrackTable {
   /** The currently selected track. */
   private Track selected;
   
+  private LicenseIndex licenseIndex = new LicenseIndex();
+  
+  private Cache imageCache = new Cache();
+  
   /** Constructor to create a table contained in the given Shell where the
    * tracks are updated from the given TrackDatabase. 
    * @param shell         The Shell to add the Table to.
@@ -58,8 +67,17 @@ public class TrackTable {
     this.trackDatabase = trackDatabase;
     table = new Table(shell, SWT.NONE);
     table.setEnabled(false);
-    
+
     TableColumn col = new TableColumn(table, SWT.LEFT);
+    col.setWidth(70);
+    addColumnListener(col, comparator = new TrackComparator() {
+      public int compareTrack(Track track0, Track track1) {
+          return licenseIndex.get(track0).compareTo(licenseIndex.get(track1));
+      }        
+    });
+    skinManager.addItem(col, "TrackTable.Heading.License"); 
+
+    col = new TableColumn(table, SWT.LEFT);
     col.setWidth(200);
     addColumnListener(col, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
@@ -150,10 +168,13 @@ public class TrackTable {
     //final Integer colNo = new Integer(columnNumber);
     column.addListener(SWT.Selection, new Listener() {
       public void handleEvent(Event e) {
-        if (TrackTable.this.comparator == comparator)
+        if (TrackTable.this.comparator == comparator) {
           comparator.setDirection(!comparator.direction);
-        else
+        }
+        else {
           TrackTable.this.comparator = comparator;
+          comparator.setDirection(true);
+        }
         updateTable();
       } 
     });
@@ -215,12 +236,35 @@ public class TrackTable {
   /** Loads the Track into the TableItem. */
   private void updateTableItem(TableItem tableItem, Track track) {
     tableItem.setText(new String[] {
+      "",
       track.getArtist(),
       track.getTitle(),
       track.getState(),
       String.valueOf(track.getNoOfTimesPlayed()),
       track.getLastPlayed().toString()
     });
+    String icon = licenseIndex.get(track).getIcon();
+    ImageHandle imageHandle = (ImageHandle) imageCache.get(icon);
+    if (imageHandle == null && icon.length() != 0) {
+      try {
+        System.out.println("Loading image: " + icon);
+        Image image = new Image(display, BaseResources.getResourceAsStream(icon));
+        ImageData imageData = image.getImageData();
+        image.dispose();
+        int scaledHeight = 20;
+        image = new Image(display, imageData.scaledTo(
+            imageData.width * scaledHeight / imageData.height, scaledHeight));
+        imageHandle = new ImageHandle(image);
+        imageCache.put(icon, imageHandle);
+      }
+      catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    if (imageHandle != null)
+      tableItem.setImage(0, imageHandle.getImage());
+    else
+      tableItem.setImage(0, null);
   }
   
   /** Remove the specified track from the table. */
@@ -342,7 +386,7 @@ public class TrackTable {
    * without too much casting. */
   private abstract class TrackComparator implements Comparator {
     
-    private boolean direction = false;
+    private boolean direction = true;
     
     public void setDirection(boolean direction) {
       this.direction = direction; 
