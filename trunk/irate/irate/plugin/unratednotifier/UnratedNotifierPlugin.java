@@ -2,23 +2,26 @@ package irate.plugin.unratednotifier;
 
 import java.io.*;
 import irate.plugin.*;
+import irate.resources.BaseResources;
 import nanoxml.*;
 import irate.common.Track;
+import java.util.Vector;
 
 /**
  * Date Created: Feb 13, 2004
- * Date Updated: $Date: 2004/02/17 21:11:06 $
+ * Date Updated: $Date: 2004/02/21 04:44:29 $
  * @author Creator: Mathieu Mallet
  * @author Updated: $Author: emh_mark3 $
- * @version $Revision: 1.1 $ */
+ * @version $Revision: 1.2 $ */
 
 public class UnratedNotifierPlugin extends Plugin {
   private PluginApplication app;
   private int unratedNotificationMode = 0;
   private boolean bPlayedNotificationSoundAlready = false;
+  private Vector temporaryFiles;
 
   public UnratedNotifierPlugin() {
-  
+    temporaryFiles = new Vector();
   }
 
   /**
@@ -113,7 +116,14 @@ public class UnratedNotifierPlugin extends Plugin {
   }
   
   private void playNotificationSound() {
-    app.playSoundEvent(new File("irate/resources/notify_sound.mp3"), "Unrated track playing.");
+    //app.playSoundEvent(new File("irate/resources/notify_sound.mp3"), "Unrated track playing.");
+    try {
+      app.playSoundEvent(BaseResources.getResourceAsFile("notify_sound.mp3", temporaryFiles),
+        "Unrated track playing.");
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }    
   }
  
 }
