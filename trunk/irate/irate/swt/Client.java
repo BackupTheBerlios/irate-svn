@@ -259,7 +259,7 @@ public class Client implements UpdateListener, PluginApplication {
         }
       }
     };
-    if (display.isValidThread())
+    if (display.getThread().equals(Thread.currentThread()))
       r.run();
     else {
         // If this isn't the SWT event thread, then we must delegate to it,

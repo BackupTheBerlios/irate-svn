@@ -288,6 +288,8 @@ public class LircRemoteControlPlugin
                   notifyConnectStatusChanged(true);
                   while (true) {
                       String buttonText = r.readLine();
+                      if (buttonText == null)
+                          break;
                       int space1 = buttonText.indexOf(' ');
                       if (space1 >= 0) {
                           int space2 = buttonText.indexOf(' ', space1+1);
