@@ -24,13 +24,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/10 10:30:53 $
+ * Date Updated: $Date: 2003/11/12 20:46:45 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.96 $
+ * @version $Revision: 1.97 $
  */
 public class Client extends AbstractClient {
 
@@ -53,6 +53,7 @@ public class Client extends AbstractClient {
   //  private SettingDialog settingDialog;
   private String strState = "";
   private TrackTable trackTable;
+	private TrackInfoDialog trackInfoDialog; 
 
   private SWTPluginUIFactory uiFactory;
   
@@ -67,6 +68,7 @@ public class Client extends AbstractClient {
   public Client() {
     initGUI();
     errorDialog = new ErrorDialog(display, shell);
+		trackInfoDialog = new TrackInfoDialog(display, shell);
     uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
 
     if (trackDatabase.getNoOfTracks() == 0)
@@ -659,31 +661,34 @@ public class Client extends AbstractClient {
     new ToolItem(toolbar, SWT.SEPARATOR);
 
     item = new ToolItem(toolbar, SWT.PUSH);
-    item.setText("www");
-    item.setToolTipText("Visit artist website");
+    item.setText("Track Info");
+    item.setToolTipText("Display Track Info");
+    final Client clientToPass = this;
     item.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         Track track = getSelectedTrack();
         if (track == null)
           return;
-          
-        String www = track.getArtistWebsite();
-
-        if (www == null) {
-          www = "\"" + track.getArtist() + "\" ";
-          www += "\"" + track.getTitle() + "\"";
-          try {
-            // We need to use the deprecated version of this method because the
-            // un-deprecated version isn't implemented in GCJ 3.0.4. We can change
-            // this when we drop support for Debian Woody (when Sarge becomes 
-            // stable).
-            www = "http://www.google.com/search?q=" + URLEncoder.encode(www);
-          }
-          catch (Exception eee) {
-            System.out.println(e.toString());
-          }
-        }
-        showURL(www);
+        
+        trackInfoDialog.displayTrackInfo(track, clientToPass);
+        
+//        String www = track.getArtistWebsite();
+//
+//        if (www == null) {
+//          www = "\"" + track.getArtist() + "\" ";
+//          www += "\"" + track.getTitle() + "\"";
+//          try {
+//            // We need to use the deprecated version of this method because the
+//            // un-deprecated version isn't implemented in GCJ 3.0.4. We can change
+//            // this when we drop support for Debian Woody (when Sarge becomes 
+//            // stable).
+//            www = "http://www.google.com/search?q=" + URLEncoder.encode(www);
+//          }
+//          catch (Exception eee) {
+//            System.out.println(e.toString());
+//          }
+//        }
+//        showURL(www);
       }
     });
 
