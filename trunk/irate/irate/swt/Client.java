@@ -57,6 +57,18 @@ public class Client implements UpdateListener, PluginApplication {
   private SWTPluginUIFactory uiFactory;
 
   public Client() {
+      //Added by Allen Tipper 16.9.03, code by Anthony
+  class TooltipArmListener {
+    private String str;
+    public TooltipArmListener(String str) {
+      this.str = str;
+    }
+    public void widgetArmed(ArmEvent e){
+      lblState.setText(strState = str);
+      lblState.pack();
+    }
+  }
+  //end add
 
     File home = new File(System.getProperties().getProperty("user.home"));
 
@@ -616,14 +628,8 @@ public class Client implements UpdateListener, PluginApplication {
       }
     });
 
-    //Added for a nicer UI by Allen Tipper 14.9.03
-    item1_1.addArmListener(new ArmListener(){
-            public void widgetArmed(ArmEvent e){
-                strState = "Download a new track";
-                lblState.setText(strState);
-                lblState.pack();
-            }
-        });
+    //Added for a nicer UI by Allen Tipper 16.9.03
+    item1_1.addArmListener(new ToolTipArmListener("Download a new track"));
     //end add
 
 /*    MenuItem item1_2 = new MenuItem(menu1,SWT.PUSH);
@@ -646,13 +652,7 @@ public class Client implements UpdateListener, PluginApplication {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item1_4.addArmListener(new ArmListener(){
-            public void widgetArmed(ArmEvent e){
-                strState = "Quit iRate Radio";
-                lblState.setText(strState);
-                lblState.pack();
-            }
-        });
+    item1_4.addArmListener(new ToolTipArmListener("Quit iRate Radio"));
     //end add
 
 
@@ -676,13 +676,7 @@ public class Client implements UpdateListener, PluginApplication {
     mDownload.setText("Auto download");
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mDownload.addArmListener(new ArmListener(){
-	    public void widgetArmed(ArmEvent e){
-      strState = "Set number of unrated songs on list to stop automatically downloading at";
-      lblState.setText(strState);
-      lblState.pack();
-            }
-        });
+    mDownload.addArmListener(new ToolTipArmListener("Set number of unrated songs on list to stop automatically downloading at"));
     //end add
 
     Menu menu2 = new Menu(mDownload);
@@ -707,13 +701,7 @@ public class Client implements UpdateListener, PluginApplication {
       });
 
       //Added for a nicer UI by Allen Tipper 14.9.03
-      mTimes.addArmListener(new ArmListener(){
-              public void widgetArmed(ArmEvent e){
-                  strState = "Automatically download when the number of unrated tracks is less than " + count;
-                  lblState.setText(strState);
-                  lblState.pack();
-              }
-          });
+      mTimes.addArmListener(new ToolTipArmListener("Automatically download when the number of unrated tracks is less than " + count));
       //end add
 
     }
@@ -722,13 +710,7 @@ public class Client implements UpdateListener, PluginApplication {
     mPlayList.setText("Play list");
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mPlayList.addArmListener(new ArmListener(){
-            public void widgetArmed(ArmEvent e){
-                strState = "Set playlist length";
-                lblState.setText(strState);
-                lblState.pack();
-            }
-        });
+    mPlayList.addArmListener(new ToolTipArmListener("Set playlist length"));
     //end add
 
 
@@ -752,13 +734,7 @@ public class Client implements UpdateListener, PluginApplication {
       });
 
       //Added for a nicer UI by Allen Tipper 14.9.03
-      mTimes.addArmListener(new ArmListener(){
-              public void widgetArmed(ArmEvent e){
-                  strState = "Set songs in playlist to " + count;
-                  lblState.setText(strState);
-                  lblState.pack();
-              }
-          });
+      mTimes.addArmListener(new ToolTipArmListener("Set songs in playlist to " + count));
       //end add
 
     }
@@ -791,13 +767,7 @@ public class Client implements UpdateListener, PluginApplication {
       });
 
       //Added for a nicer UI by Allen Tipper 14.9.03
-      mRatio.addArmListener(new ArmListener(){
-              public void widgetArmed(ArmEvent e){
-                  strState = "Set percentage of unrated songs in playlist to " + ratio + "%.";
-                  lblState.setText(strState);
-                  lblState.pack();
-              }
-          });
+      mRatio.addArmListener(new ToolTipArmListener("Set percentage of unrated songs in playlist to " + ratio + "%."));
       //end add
 
     }
@@ -809,13 +779,7 @@ public class Client implements UpdateListener, PluginApplication {
     mPlayers.setMenu(menu2);
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    mPlayers.addArmListener(new ArmListener(){
-            public void widgetArmed(ArmEvent e){
-                strState = "Set mp3 player";
-                lblState.setText(strState);
-                lblState.pack();
-            }
-        });
+    mPlayers.addArmListener(new ToolTipArmListener("Set mp3 player"));
     //end add
 
     Player players[] = playerList.getPlayers();
@@ -840,13 +804,7 @@ public class Client implements UpdateListener, PluginApplication {
       });
 
 	//Added for a nicer UI by Allen Tipper 14.9.03
-        mPlayer.addArmListener(new ArmListener(){
-                public void widgetArmed(ArmEvent e){
-		    strState = "Set mp3 player to " + player;
-		    lblState.setText(strState);
-		    lblState.pack();
-                }
-            });
+        mPlayer.addArmListener(new ToolTipArmListener("Set mp3 player to " + player));
         //end add
 
     }
@@ -860,13 +818,7 @@ public class Client implements UpdateListener, PluginApplication {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item2_1.addArmListener(new ArmListener(){
-	    public void widgetArmed(ArmEvent e){
-		strState = "Select Plugins";
-		lblState.setText(strState);
-		lblState.pack();
-	    }
-	});
+    item2_1.addArmListener(new ToolTipArmListener("Select Plugins"));
     //end add
 
     MenuItem item3 = new MenuItem(menubar,SWT.CASCADE);
@@ -893,13 +845,7 @@ public class Client implements UpdateListener, PluginApplication {
     });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
-    item3_1.addArmListener(new ArmListener(){
-	    public void widgetArmed(ArmEvent e){
-		strState = "Show the Credits";
-		lblState.setText(strState);
-		lblState.pack();
-	    }
-	});
+item3_1.addArmListener(new ToolTipArmListener("Show the Credits"));
     //end add
 
 
@@ -1043,9 +989,22 @@ public class Client implements UpdateListener, PluginApplication {
     return uiFactory;
   }
 
-  public static void main(String[] args) throws Exception{
-			new Client().run();
-  }
+//added 16.9.03 by Allen Tipper, code by Anthony
+class ToolTipArmListener implements ArmListener{
+    private String str;
+    public ToolTipArmListener(String str) {
+	this.str = str;
+    }
+    public void widgetArmed(ArmEvent e){
+	lblState.setText(strState = str);
+	lblState.pack();
+    }
 }
+    //end add
+
+    public static void main(String[] args) throws Exception{
+	new Client().run();
+    }
 
 
+}
