@@ -119,7 +119,7 @@ public class DownloadThread extends Thread {
   	return null;
   }
   
-  private abstract class TimeoutWorker implements Runnable{
+private abstract class TimeoutWorker implements Runnable{
 	protected Object input;
   	private Object output;
 	private Thread timeoutThread;
@@ -132,12 +132,12 @@ public class DownloadThread extends Thread {
 	
 	protected void setOutput(Object output) {
 		this.output = output;
-		timeoutThread.interrupt();
+		//timeoutThread.interrupt();
 	}
 		
 	protected void setException(Exception exception) {
 		this.exception = exception;
-		timeoutThread.interrupt();
+		//timeoutThread.interrupt();
 	}
 		
 	public abstract void run();
@@ -148,19 +148,34 @@ public class DownloadThread extends Thread {
 		//start thread with a task that might timeout
     Thread th = new Thread(this);
     th.start();
-		try {
+    final int delay = 10;
+		/*try {
 			Thread.sleep(timeout);
 		} catch(InterruptedException ie) {
 			if(exception != null)
 				throw exception;
 			else
 				return output;
-		}
+		}*/
+    while(timeout > 0){
+      timeout -= delay;
+      try{
+        Thread.sleep(delay);
+      }catch(Exception e){
+        e.printStackTrace();
+        break;
+      }
+      
+      if(output != null)
+        return output;
+      else if(exception != null)
+        throw exception;
+    }
     //th.stop();
     //th.destroy();
 		throw new IOException("Timeout exceeded");
 	}
-  }
+}
  
   
   public void download(Track track) throws IOException {
@@ -222,7 +237,7 @@ public class DownloadThread extends Thread {
         setState("Downloading " + track.getName());
         final InputStream is = conn.getInputStream();
         OutputStream os = new FileOutputStream(file);
-        final byte buf[] = new byte[128000];
+        final byte buf[] = new byte[256000];
         int totalBytes = 0;
         worker = new TimeoutWorker((Object) is){
           public void run() {
