@@ -49,6 +49,9 @@ endif
 libnanoxml-lite.o: nanoxml-lite-2.2.3.jar
 	$(GCJ) -o libnanoxml-lite.o -c nanoxml-lite-2.2.3.jar
 
+libjd3.o: jd3lib.jar
+	$(GCJ) -o libjd3.o -c jd3lib.jar
+
 #libnanoxml-lite.a: libnanoxml-lite.o
 #	ar rcs libnanoxml-lite.a libnanoxml-lite.o
 

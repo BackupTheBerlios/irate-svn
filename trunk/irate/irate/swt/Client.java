@@ -24,13 +24,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/10/29 06:15:42 $
+ * Date Updated: $Date: 2003/11/07 23:44:42 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.92 $
+ * @version $Revision: 1.93 $
  */
 public class Client extends AbstractClient {
 
@@ -838,7 +838,7 @@ public class Client extends AbstractClient {
   
   /** Create a DND DropTarger for the Shell. */
   public void createDropTarget() {
-    DropTarget target = new DropTarget(shell, DND.DROP_LINK);
+    DropTarget target = new DropTarget(shell, DND.DROP_LINK | DND.DROP_MOVE);
     target.setTransfer(new Transfer[] { FileTransfer.getInstance() } );
     target.addDropListener(new DropTargetListener() {
       public void dragEnter(DropTargetEvent e) {};

@@ -4,7 +4,7 @@ include make.configure
 
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
-JPATH=.:lib/nanoxml-lite-2.2.3.jar:lib/skinlf.jar:lib/jl030.jar:lib/jlGui2.2.jar
+JPATH=.:lib/nanoxml-lite-2.2.3.jar:lib/skinlf.jar:lib/jl030.jar:lib/jlGui2.2.jar:lib/jd3lib.jar
 JAVAC=javac -classpath $(JPATH)
 export GCJ=gcj -g -pipe -O0
 IRATE_CLIENT=irate-client
@@ -14,10 +14,10 @@ export PLATFORM=linux-motif
 #export PLATFORM=linux-libswt-gtk2
 #export PLATFORM=win32
 PWD=$(shell pwd)
-export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar
+export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:lib/jd3lib.jar
 
 CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o #libmadplayer.o
-CLIENT_LIBS = lib/libnanoxml-lite.o 
+CLIENT_LIBS = lib/libnanoxml-lite.o lib/libjd3.o
 
 JAVA_SWTSRC=irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
 JAVA_SWINGSRC=irate/swing/*.java
@@ -72,7 +72,7 @@ CLIENT_FILES = \
 #	irate/client/JavaLayerPlayer.java 
 
 SERVER_DEPS = irate-server.o irate-common.o
-SERVER_LIBS = lib/libnanoxml-lite.o
+SERVER_LIBS = lib/libnanoxml-lite.o lib/libjd3.o
 
 all: make.configure lib $(IRATE_CLIENT) $(IRATE_SERVER)
 
@@ -111,6 +111,9 @@ lib/swt.jar:
 
 lib/libnanoxml-lite.o:
 	$(MAKE) -C lib/ libnanoxml-lite.o
+
+lib/libjd3.o:
+	$(MAKE) -C lib/ libjd3.o
 
 lib/libhttpclient.o:
 	$(MAKE) -C lib/ libhttpclient.o

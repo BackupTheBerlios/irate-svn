@@ -2,6 +2,7 @@
 
 package irate.common;
 
+import helliker.id3.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -32,7 +33,7 @@ public class Track {
     elt = new XMLElement(new Properties(), true, false);
     elt.setName("Track");
     setURL(url);
-    setTitle(url.getFile());
+    setInfoFromID3Tags(new File(url.getFile()));
   }  
   
   private void copy(Track track) {
@@ -46,6 +47,33 @@ public class Track {
 //    setWebURL(track.getWebURL());
     // copy other attributes
   }
+  
+  private void setInfoFromID3Tags(File file) {
+
+    try {
+      MP3File mp3 = new MP3File(file);
+
+      this.setArtist(mp3.getArtist());
+      this.setTitle(mp3.getTitle());
+    }
+    catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    catch (NoMPEGFramesException e) {
+      e.printStackTrace();
+    }
+    catch (IOException e) {
+      e.printStackTrace();
+    }
+    catch (ID3v2FormatException e) {
+      e.printStackTrace();
+    }
+    catch (CorruptHeaderException e) {
+      e.printStackTrace();
+    }
+
+  }
+  
 
   public void setTrackDatabase(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
