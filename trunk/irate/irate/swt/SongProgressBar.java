@@ -42,6 +42,7 @@ public class SongProgressBar extends Composite {
   public void setCurrentTime(int currentTimeInSeconds) {
     progressBar.setSelection(currentTimeInSeconds);
     currentTimeText.setText(formatTimeToString(currentTimeInSeconds));
+    currentTimeText.pack();
   }
   
   /**
@@ -54,6 +55,7 @@ public class SongProgressBar extends Composite {
     if(currentTotalTime != totalTimeInSeconds) {
       progressBar.setMaximum(totalTimeInSeconds); 
       totalTimeText.setText(formatTimeToString(totalTimeInSeconds));
+      totalTimeText.pack();
     }
   }
   
