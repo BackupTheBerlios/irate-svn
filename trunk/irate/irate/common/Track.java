@@ -17,6 +17,7 @@ public class Track {
   private XMLElement elt;
   private File dir;
   private TrackDatabase trackDatabase;
+  private int downloadAttempts = 0;
 
   public Track(XMLElement elt, File dir) {
     this.elt = elt;
@@ -532,4 +533,21 @@ public class Track {
       return "";
     }
   }
+  
+  /**
+   * Get the number of times this download has been attempted this session.
+   * @return the number of times the program has attempted to download the track
+   * during the current session.
+   */
+  public int getDownloadAttempts() {
+    return downloadAttempts;
+  }
+  
+  /**
+   * Increase the number of download attempts this session by one.
+   */
+  public void increaseDownloadAttempts() {
+      downloadAttempts++;
+  }
+
 }
