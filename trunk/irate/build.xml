@@ -140,6 +140,8 @@
       <!-- Make sure we copy all the exec bits etc -->
       <arg line="iRATE.app mac/dist/iRATE.app"/>
     </exec>
+    <copy file="COPYING" tofile="mac/dist/COPYING.txt"/>
+    <copy file="lib/about.html" tofile="mac/dist/about.html"/>
     <exec executable="hdiutil">
       <arg line="create -srcfolder mac/dist -ov -volname 'iRATE radio' -nouuid -gid 99 -format UDZO -imagekey zlib-level=9 irate-client-macosx.dmg"/>
     </exec>
