@@ -26,14 +26,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/10 03:47:48 $
+ * Date Updated: $Date: 2003/12/24 21:48:36 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.126 $
+ * @version $Revision: 1.127 $
  */
 public class Client extends AbstractClient {
 
@@ -142,6 +142,7 @@ public class Client extends AbstractClient {
       });
     }
     else {
+      //ideally we chould also cache the error and pop it up later if/once display != null
       System.err.println("#######Error######");
       BufferedReader bf = new BufferedReader(r);
       String s;
@@ -155,30 +156,39 @@ public class Client extends AbstractClient {
     }
   }
 
+  /** This sets the statusbar */
   public void setState(String state) {
-    final boolean newState = !strState.equals(state);
+    if(strState.equals(state))
+      return;
     strState = state;
     display.asyncExec(new Runnable() {
       public void run() {
         int n = downloadThread.getPercentComplete();
         boolean barVisible = progressBar.getVisible();
+        String status;
+        
         if (n > 0 && n < 100) {
-          lblState.setText(strState + " " + n + "%");
+          status = strState + " " + n + "%";
           progressBar.setSelection(n);
           if (!barVisible)
             progressBar.setVisible(true);
         }
         else {
-          lblState.setText(strState);
+          status = strState;
           if (barVisible)
             progressBar.setVisible(false);
         }
-        lblState.pack();
+        //dont call pack so often
+        boolean pack = status.length() >= lblState.getText().length();
+        lblState.setText(status);
+        if(pack)
+          lblState.pack();
       }
     });
   }
 
   public void updateTrackTable() {
+    System.out.println("updateTrackTable()");
     display.asyncExec(new Runnable() {
       public void run() {
         trackTable.updateTable();
@@ -194,6 +204,7 @@ public class Client extends AbstractClient {
   }
 
   public void update() {
+    System.out.println("update()");
     //synchronizePlaylist(playListManager, tblSongs);
     Track track = playThread.getCurrentTrack();
     if (track == null)
@@ -212,8 +223,9 @@ public class Client extends AbstractClient {
     previous.setEnabled(playThread.hasHistory());
   }
   
-  //called from playThread.addUpdateListener(this);
+  /** called from playThread.addUpdateListener(this); */
   public void actionPerformed() {
+    System.out.println("actionPerformed()");
     display.asyncExec(new Runnable() {
       public void run() {
         update();
@@ -880,6 +892,7 @@ public class Client extends AbstractClient {
    * updates the progress bar.
    */
   public void positionUpdated(int position, int length) {
+    System.out.println("positionUpdated()");
     final int currentTime = position;
     int checkedTime;
     if(length == 0) {
@@ -889,7 +902,7 @@ public class Client extends AbstractClient {
       checkedTime = length;
     }
     
-    final int finalTime = checkedTime;
+//    final int finalTime = checkedTime;
     
 //    display.asyncExec(new Runnable() {
 //      public void run() {

@@ -5,7 +5,7 @@
 
 [Setup]
 AppName=iRATE radio
-AppVerName=iRATE radio 0.2
+AppVerName=iRATE radio 0.3
 DefaultDirName={pf}\iRATE radio
 DefaultGroupName=iRATE radio
 UninstallDisplayIcon={app}\irate-client.exe
