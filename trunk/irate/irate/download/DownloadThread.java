@@ -118,13 +118,13 @@ public class DownloadThread extends Thread {
     int threads = 0;
     while(keys.hasMoreElements() && threads < downloadThreads.length) {
       //String host = (String)keys.nextElement();
-      final Track t = (Track)keys.nextElement();
+      final Track track = (Track)keys.nextElement();
       //Track t = (Track) downloadTracks.get(host);
-      System.out.println("Simultaniously downloading url "+t.getURL() + " hidden="+t.isHidden());
+      System.out.println("Simultaniously downloading url "+track.getURL() + " hidden="+track.isHidden());
       Thread th = new Thread(){
         public void run() {
           try {
-            download(currentTrack);
+            download(track);
           } catch(IOException ioe) {
             ioe.printStackTrace();
           }
