@@ -7,6 +7,7 @@ import irate.client.Help;
 import irate.client.Player;
 import irate.common.Preferences;
 import irate.common.Track;
+import irate.common.UpdateListener;
 import irate.plugin.Plugin;
 import irate.plugin.PluginApplication;
 import irate.plugin.PluginUIFactory;

@@ -100,16 +100,11 @@ public class DownloadThread extends Thread {
       if (!currentTrack.isHidden()) {
         File file = currentTrack.getFile();
         if ((file == null || !file.exists()) && currentTrack.getDownloadAttempts() < 10) {
-          try {
-            if (file != null) {
-              currentTrack.unSetFile();
-              toSave = true;
-            }
-            downloadTracks.add(currentTrack);
+          if (file != null) {
+            currentTrack.unSetFile();
+            toSave = true;
           }
-          catch (IOException e) {
-            e.printStackTrace();
-          }
+          downloadTracks.add(currentTrack);
         }
       }
     }
