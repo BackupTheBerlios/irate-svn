@@ -23,6 +23,9 @@ public class ExternalPlayer implements Player {
     this(name, new String[] { path });
   }
 
+  /**
+  @param name of the mp3 player. Used for display purposes
+  @param paths list of possible locations/names of the player. paths[0] should be the executable name */
   public ExternalPlayer(String name, String[] paths) throws FileNotFoundException {
     this.name = name;
     for (int i = 0; i < paths.length; i++) {
@@ -31,6 +34,18 @@ public class ExternalPlayer implements Player {
         return;
       }
     }
+    //couldnt find player by probing
+    //try using the first item in array
+    try {
+      Runtime.getRuntime().exec(paths[0]);
+      path = paths[0];
+      //if the above worked, we've located the mp3 player
+      return;
+    }
+    catch (IOException ioe) {
+      //too bad, couldn't find the player
+    }
+    
     StringBuffer msg = new StringBuffer();
     for (int i = 0; i < paths.length; i++) {
       if (i != 0)

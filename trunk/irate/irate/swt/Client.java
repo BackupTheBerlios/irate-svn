@@ -19,13 +19,13 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/07 06:22:13 $
+ * Date Updated: $Date: 2003/10/09 22:43:17 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.82 $
+ * @version $Revision: 1.83 $
  */
 public class Client extends AbstractClient {
 
@@ -61,6 +61,12 @@ public class Client extends AbstractClient {
     
     shell.open();    
     downloadThread.start();
+    tblSongs.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent e) {
+        setPaused(false);
+        playThread.play(getTrackByTableItem(tblSongs.getSelection()[0]));
+      }
+    });
   }
 
   public void handleError(String code, String urlString) {
@@ -494,12 +500,7 @@ public class Client extends AbstractClient {
     col.setText("Last");
     tblSongs.setHeaderVisible(true);
     synchronizePlaylist(playListManager, tblSongs);
-    tblSongs.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        setPaused(false);
-        playThread.play(getTrackByTableItem(tblSongs.getSelection()[0]));
-      }
-    });
+    
 
     //    for(int i = 0;i< tblSongs.getColumns().length;i++)
     //      tblSongs.getColumns()[i].pack();
