@@ -174,6 +174,9 @@ public class DownloadThread extends Thread {
       // Get rid of the problem where tracks are downloaded but in reality
       // they are 404 messages or some other html crud.
       String contentType = connection.getContentType();
+      if (contentType == null)
+        throw new ProtocolException("Something went wrong talking to the "+
+                                    "download site");
       if (contentType.indexOf("text") != -1)
         throw new FileNotFoundException("Content type is Text");
       int contentLength = connection.getContentLength();
