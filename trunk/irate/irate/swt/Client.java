@@ -75,7 +75,7 @@ public class Client implements UpdateListener, PluginApplication {
     playerList = new PlayerList();
       //try to do a nice initial experience for theuser
       //do as much handholding as possible
-    if(!file.exists())
+    if(trackDatabase.getNoOfTracks() == 0)
     {
       new AccountDialog(display, trackDatabase);
       Player players[] = playerList.getPlayers();

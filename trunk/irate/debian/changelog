@@ -1,3 +1,11 @@
+irate (0.2-8) unstable; urgency=low
+
+  * Made it so that the account dialog opens if you haven't downloaded any
+  * tracks.
+  * 
+
+ -- Anthony Jones <ajones@clear.net.nz>  Thu, 28 Aug 2003 21:30:10 +0800
+
 irate (0.2-7) unstable; urgency=low
 
   * Nothing much different.
