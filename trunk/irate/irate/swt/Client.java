@@ -343,7 +343,7 @@ public class Client extends AbstractClient {
         }
         // If the play/pause button is pressed, meaning it is paused, then
         // 'press' the button.  
-        if(play.isPressed()) {
+        if(!play.isPressed()) {
           play.setSelection(false);
         }
       }
