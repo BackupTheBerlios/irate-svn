@@ -21,8 +21,8 @@ else
 ifeq ($(PLATFORM),linux-gtk2)
 swt.jar: swt-2.1.1-linux-gtk.zip
 	unzip -o swt-2.1.1-linux-gtk.zip
-#swt.jar: swt-3.0M6-linux-gtk.zip
-#	unzip -o swt-3.0M6-linux-gtk.zip
+#swt.jar: swt-3.0RC3-linux-gtk.zip
+#	unzip -o swt-3.0RC3-linux-gtk.zip
 else
 
 ifeq ($(PLATFORM),linux-libswt-gtk2)
@@ -48,8 +48,9 @@ swt-2.1-win32.zip:
 swt-2.1.1-linux-gtk.zip:
 	wget http://download2.eclipse.org/downloads/drops/R-2.1.1-200306271545/swt-2.1.1-linux-gtk.zip
 
-swt-3.0M6-linux-gtk.zip:
-	wget http://download.eclipse.org/downloads/drops/S-3.0M6-200312182000/swt-3.0M6-linux-gtk.zip
+swt-3.0RC3-linux-gtk.zip:
+	wget http://download.eclipse.org/downloads/drops/S-3.0RC3-200406192000/swt-3.0RC3-linux-gtk.zip
+
 
 libswt.o: swt.jar
 ifeq ($(PLATFORM),win32)
