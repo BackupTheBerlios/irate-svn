@@ -24,13 +24,13 @@ import java.net.*;
 import java.lang.reflect.*;
 
 /**
- * Date Updated: $Date: 2003/11/09 02:09:37 $
+ * Date Updated: $Date: 2003/11/10 08:51:56 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.94 $
+ * @version $Revision: 1.95 $
  */
 public class Client extends AbstractClient {
 
@@ -50,32 +50,31 @@ public class Client extends AbstractClient {
   private Help help = new Help();
   private ErrorDialog errorDialog;
 
-//  private SettingDialog settingDialog;
+  //  private SettingDialog settingDialog;
   private String strState = "";
   private TrackTable trackTable;
-	
+
   private SWTPluginUIFactory uiFactory;
 
   public Client() {
     initGUI();
     errorDialog = new ErrorDialog(display, shell);
     uiFactory = new SWTPluginUIFactory(display, (PluginApplication) this);
-    
+
     if (trackDatabase.getNoOfTracks() == 0)
-      showAccountDialog();      
-    
+      showAccountDialog();
+
     createDropTarget();
-    shell.open();    
+    shell.open();
     downloadThread.start();
     trackTable.addSelectionListener(new SelectionAdapter() {
       public void widgetDefaultSelected(SelectionEvent e) {
         setPaused(false);
         playThread.play(trackTable.getSelectedTrack());
       }
-    });    
+    });
   }
 
-	
   public void handleError(String code, String urlString) {
     //actionSetContinuousDownload(false);
     Reader r;
@@ -104,7 +103,7 @@ public class Client extends AbstractClient {
       }
     });
   }
-  
+
   public void setState(String state) {
     final boolean newState = !strState.equals(state);
     strState = state;
@@ -127,7 +126,7 @@ public class Client extends AbstractClient {
       }
     });
   }
-  
+
   public void updateTrackTable() {
     display.asyncExec(new Runnable() {
       public void run() {
@@ -143,7 +142,8 @@ public class Client extends AbstractClient {
         Track track = playThread.getCurrentTrack();
         if (track == null)
           return;
-        shell.setText("iRATE radio" + (track == null ? "" : " - " + track.toString()));
+        shell.setText(
+          "iRATE radio" + (track == null ? "" : " - " + track.toString()));
         volumeScale.setSelection(
           (track.getVolume() + VOLUME_OFFSET) / VOLUME_RESOLUTION);
         trackTable.select(track);
@@ -173,7 +173,7 @@ public class Client extends AbstractClient {
    * PluginApplication interface:
    * Get the track that is currently selected.  In some implementations
    * this may be the same as the track that is playing.
-   */  
+   */
   public Track getSelectedTrack() {
     return trackTable.getSelectedTrack();
   }
@@ -186,18 +186,16 @@ public class Client extends AbstractClient {
    */
   public void setRating(final Track track, int rating) {
 
-		// Call the super method to deal with updating the track and DB.    
-		super.setRating(track, rating);
+    // Call the super method to deal with updating the track and DB.    
+    super.setRating(track, rating);
 
-	  // Update the SWT GUI
+    // Update the SWT GUI
     display.asyncExec(new Runnable() {
       public void run() {
         trackTable.updateTrack(track);
       }
     });
   }
-
-
 
   /**
    * PluginApplication interface:
@@ -206,7 +204,7 @@ public class Client extends AbstractClient {
   public void setPaused(boolean paused) {
     super.setPaused(paused);
     final Boolean pausedFinal = new Boolean(paused);
-    
+
     // We have to delegate to the SWT event thread, because we might be
     // called from a thread other than it, such as the remote control thread.
     display.asyncExec(new Runnable() {
@@ -223,13 +221,12 @@ public class Client extends AbstractClient {
     });
   }
 
-	public void skip(boolean reverse) {
-		super.skip(reverse);
-		if(reverse && !playThread.goBack()) {
-			previous.setEnabled(false);
-		}
-	}
-  
+  public void skip(boolean reverse) {
+    super.skip(reverse);
+    if (reverse && !playThread.goBack()) {
+      previous.setEnabled(false);
+    }
+  }
 
   public void quit() {
     super.quit();
@@ -245,7 +242,7 @@ public class Client extends AbstractClient {
     catch (IOException ee) {
       ee.printStackTrace();
     }
-		System.exit(0);
+    System.exit(0);
   }
 
   void showAccountDialog() {
@@ -281,7 +278,7 @@ public class Client extends AbstractClient {
   public void createShell() {
     shell = new Shell(display);
     shell.setText("iRATE radio");
-    
+
     try {
       ImageData icon =
         new ImageData(getClass().getResourceAsStream("irate.gif"));
@@ -292,7 +289,7 @@ public class Client extends AbstractClient {
     catch (Exception e) {
       e.printStackTrace();
     }
-    
+
     shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e) {
         quit();
@@ -324,9 +321,9 @@ public class Client extends AbstractClient {
       showURLwithJNLP(new URL(url));
     }
     catch (Exception e) {
-      System.out.println("JNLP:"+e);
+      System.out.println("JNLP:" + e);
     }
-    
+
     String cmd;
     Runtime r = Runtime.getRuntime();
     try {
@@ -337,7 +334,7 @@ public class Client extends AbstractClient {
     catch (Exception ex) {
       try {
         //win32 way
-        cmd = "rundll32 url.dll,FileProtocolHandler '" + url+"'";
+        cmd = "rundll32 url.dll,FileProtocolHandler '" + url + "'";
         System.out.println(cmd);
         r.exec(cmd);
       }
@@ -346,24 +343,25 @@ public class Client extends AbstractClient {
       }
     }
   }
-  
+
   /** use webstart to launch a browser */
-  private boolean  showURLwithJNLP ( URL  url ) throws Exception {    
-    Class  serviceManagerClass = Class.forName ( "javax.jnlp.ServiceManager" );
+  private boolean showURLwithJNLP(URL url) throws Exception {
+    Class serviceManagerClass = Class.forName("javax.jnlp.ServiceManager");
 
-    Method  lookupMethod = serviceManagerClass.getMethod ( "lookup", new Class [ ] { String.class } );
+    Method lookupMethod =
+      serviceManagerClass.getMethod("lookup", new Class[] { String.class });
 
-    Object basicServiceObject = lookupMethod.invoke (
-    null, new Object [ ] { "javax.jnlp.BasicService" } );
-    Method  method = serviceManagerClass.getMethod (
-    "showDocument", new Class [ ] { URL.class } );
-    
-    Boolean  resultBoolean = ( Boolean ) method.invoke (
-    basicServiceObject, new Object [ ] { url } );
-    
-    return resultBoolean.booleanValue ( );
+    Object basicServiceObject =
+      lookupMethod.invoke(null, new Object[] { "javax.jnlp.BasicService" });
+    Method method =
+      serviceManagerClass.getMethod("showDocument", new Class[] { URL.class });
+
+    Boolean resultBoolean =
+      (Boolean) method.invoke(basicServiceObject, new Object[] { url });
+
+    return resultBoolean.booleanValue();
   }
-  
+
   public void createMenu() {
     Menu menubar = new Menu(shell, SWT.BAR);
     shell.setMenuBar(menubar);
@@ -562,8 +560,8 @@ public class Client extends AbstractClient {
     item2_1.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         showSettingDialog(SettingDialog.PLUGIN_PAGE);
-			}
-		});
+      }
+    });
 
     //Added for a nicer UI by Allen Tipper 14.9.03
     item2_1.addArmListener(new ToolTipArmListener("Select Plugins"));
@@ -678,33 +676,33 @@ public class Client extends AbstractClient {
     });
 
     new ToolItem(toolbar, SWT.SEPARATOR);
-		
-		item = new ToolItem(toolbar, SWT.PUSH);
-		item.setText("www");
-		item.setToolTipText("Visit artist website");
-		item.addSelectionListener(new SelectionAdapter() {
+
+    item = new ToolItem(toolbar, SWT.PUSH);
+    item.setText("www");
+    item.setToolTipText("Visit artist website");
+    item.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         Track track = getSelectedTrack();
         String www = track.getArtistWebsite();
 
-        if(www == null) {
-          www = "\"" + track.getArtist()+ "\" ";
-          www += "\"" + track.getTitle()+ "\"";
+        if (www == null) {
+          www = "\"" + track.getArtist() + "\" ";
+          www += "\"" + track.getTitle() + "\"";
           try {
             // We need to use the deprecated version of this method because the
             // un-deprecated version isn't implemented in GCJ 3.0.4. We can change
             // this when we drop support for Debian Woody (when Sarge becomes 
             // stable).
-            www = "http://www.google.com/search?q="+URLEncoder.encode(www);
+            www = "http://www.google.com/search?q=" + URLEncoder.encode(www);
           }
-          catch(Exception eee){
+          catch (Exception eee) {
             System.out.println(e.toString());
           }
         }
         showURL(www);
       }
-		});
-    		
+    });
+
     volumeScale = new Scale(shell, SWT.HORIZONTAL | SWT.FLAT);
     volumeScale.setIncrement(1);
     volumeScale.setPageIncrement(1);
@@ -761,18 +759,19 @@ public class Client extends AbstractClient {
   /** Display a preference
   @page SettingDialog.*_PAGE value.wish java had enums
   */
-	public void showSettingDialog(int page) {
-  //  if(settingDialog == null) {
-    SettingDialog settingDialog = new SettingDialog(
+  public void showSettingDialog(int page) {
+    //  if(settingDialog == null) {
+    SettingDialog settingDialog =
+      new SettingDialog(
         display,
         pluginManager,
         (PluginApplication) Client.this);
-		//}
+    //}
     settingDialog.setPage(page);
     settingDialog.open(display);
-	}
-	
-	/** Class to show tooltips in the statusbar */
+  }
+
+  /** Class to show tooltips in the statusbar */
   class ToolTipArmListener implements ArmListener {
     private String str;
     public ToolTipArmListener(String str) {
@@ -783,17 +782,22 @@ public class Client extends AbstractClient {
       lblState.pack();
     }
   }
-  
+
   /** Create a DND DropTarger for the Shell. */
   public void createDropTarget() {
     DropTarget target = new DropTarget(shell, DND.DROP_LINK | DND.DROP_MOVE);
-    target.setTransfer(new Transfer[] { FileTransfer.getInstance() } );
+    target.setTransfer(new Transfer[] { FileTransfer.getInstance()});
     target.addDropListener(new DropTargetListener() {
-      public void dragEnter(DropTargetEvent e) {};
-      public void dragOver(DropTargetEvent e) {};
-      public void dragLeave(DropTargetEvent e) {};
-      public void dragOperationChanged(DropTargetEvent e) {};
-      public void dropAccept(DropTargetEvent e) {};
+      public void dragEnter(DropTargetEvent e) {
+      };
+      public void dragOver(DropTargetEvent e) {
+      };
+      public void dragLeave(DropTargetEvent e) {
+      };
+      public void dragOperationChanged(DropTargetEvent e) {
+      };
+      public void dropAccept(DropTargetEvent e) {
+      };
       public void drop(DropTargetEvent e) {
         if (e.data == null)
           e.detail = DND.DROP_NONE;
@@ -801,7 +805,7 @@ public class Client extends AbstractClient {
           String[] filenames = (String[]) e.data;
           for (int i = 0; i < filenames.length; i++) {
             File file = new File(filenames[i]);
-            if (file.exists()) { 
+            if (file.exists()) {
               System.out.println("Import: " + file);
               try {
                 Track track = new Track(file.toURL());
@@ -816,7 +820,7 @@ public class Client extends AbstractClient {
           }
         }
       }
-    }); 
+    });
   }
 
   public static void main(String[] args) throws Exception {
