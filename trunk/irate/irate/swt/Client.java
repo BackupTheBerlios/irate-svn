@@ -36,21 +36,29 @@ public class Client implements UpdateListener {
   // private PlayThread playThread;
   
   
-  public Client() throws Exception {
+  public Client() {
    
     File file = new File("trackdatabase.xml");
+    boolean needToSetupAccount = false;
+
     try {
       trackDatabase = new TrackDatabase(file);
       trackDatabase.purge();
     }
     catch (IOException e) {
-      e.printStackTrace();
+		needToSetupAccount = true;
+		System.out.println("Exception so set needToSetupAccount ="+ needToSetupAccount);
+	//	e.printStackTrace();
     }
     playListManager = new PlayListManager(trackDatabase);
     playThread = new PlayThread(playListManager);
  
-    initGUI();
+	initGUI();
     
+	//if(needToSetupAccount==true)
+		new AccountDialog(display, trackDatabase);
+
+	System.out.println("needToSetupAccount ="+ needToSetupAccount);
     playThread.addUpdateListener(this);
     playThread.start();
     
@@ -244,7 +252,7 @@ public class Client implements UpdateListener {
   }
   
   void initGUI(){
-    display = new Display();
+  	display = new Display();
     shell = new Shell(display);
     shell.setText("iRATE radio");
     shell.addShellListener(new ShellAdapter()
@@ -274,13 +282,18 @@ public class Client implements UpdateListener {
     item1_1.setText("Download More");
     item1_1.addSelectionListener(new SelectionAdapter(){
       public void widgetSelected(SelectionEvent e){
-        System.out.println("DOwnload more");
         downloadThread.go();
       }
     });    
     
     MenuItem item1_2 = new MenuItem(menu1,SWT.PUSH);
     item1_2.setText("Purge");
+	item1_2.addSelectionListener(new SelectionAdapter(){
+	  public void widgetSelected(SelectionEvent e){
+		trackDatabase.purge();
+		update();
+	  }
+	});    
     
     //	MenuItem item1_3 = new MenuItem(menu1,SWT.SEPARATOR);
     
@@ -486,7 +499,7 @@ public class Client implements UpdateListener {
   }
   
   public void run(){
-    while (!shell.isDisposed()) {
+    while (true) {
     if (!display.readAndDispatch()) display.sleep();
     }		
   }
