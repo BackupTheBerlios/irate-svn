@@ -148,7 +148,7 @@
     <mkdir dir="mac/dist/iRATE.app/Contents/Resources/Java/dll"/>
     <copy todir="mac/dist/iRATE.app/Contents/Resources/Java/dll"
       overwrite="true" preservelastmodified="true">
-      <fileset dir="lib" includes="libswt-carbon-*.jnilib"/>
+      <fileset dir="lib" includes="libswt-*carbon-*.jnilib"/>
     </copy>
     <mkdir dir="mac/dist/iRATE.app/Contents/Resources Disabled"/>
   </target>
