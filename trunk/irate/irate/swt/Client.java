@@ -100,6 +100,7 @@ public class Client extends AbstractClient {
       public void newTrackStarted(Track track) { }
     };//ul
     downloadThread.addUpdateListener(ul);
+    update();
   }
 
   /** Init gui. Called from constructor */
