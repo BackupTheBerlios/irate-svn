@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="Survey View" default="release">
+<project name="iRATE radio" default="release">
   <target name="compile">
     <javac srcdir="." debug="true" debuglevel="lines,vars,source">
       <classpath>
