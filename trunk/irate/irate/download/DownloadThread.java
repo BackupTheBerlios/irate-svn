@@ -9,6 +9,7 @@ import irate.common.UpdateListener;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.zip.*;
 
 public class DownloadThread extends Thread {
 
@@ -330,7 +331,7 @@ public class DownloadThread extends Thread {
         socket = new Socket("202.72.160.235", trackDatabase.getPort());
       }
 
-      InputStream is = /*new java.util.zip.GZIPInputStream*/(socket.getInputStream());
+      InputStream is = socket.getInputStream();
       setState("Sending server request");
       OutputStream os = socket.getOutputStream();
       String str;
@@ -344,15 +345,13 @@ public class DownloadThread extends Thread {
       System.out.println("Request:");
       System.out.println(str);
       byte[] buf = str.getBytes();
-      boolean gzip = false;
-      os.write(("Content-Length: " + Integer.toString(buf.length) + (gzip ? "\r\nContent-Encoding: gzip" : "") + "\r\n\r\n").getBytes());
-      os.flush();
-      if (gzip)
-        os = new java.util.zip.GZIPOutputStream(os);
-      os.write(buf);
+      os.write(("Content-Length: " + Integer.toString(buf.length) + "\r\nContent-Encoding: gzip\r\n\r\n").getBytes());
+      GZIPOutputStream gos = new GZIPOutputStream(os);
+      gos.write(buf);
+      gos.finish();
       os.flush();
       setState("Receiving server reply");
-      TrackDatabase reply = new TrackDatabase(is);
+      TrackDatabase reply = new TrackDatabase(new GZIPInputStream(is));
       is.close();
       os.close();
       System.out.println("reply: ");

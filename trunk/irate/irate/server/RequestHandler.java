@@ -104,8 +104,8 @@ public class RequestHandler {
       e.printStackTrace(System.out);
     }
     finally {
-      if (is != null) try { is.close(); } catch (IOException e) { e.printStackTrace(); }
       if (os != null) try { os.close(); } catch (IOException e) { e.printStackTrace(); }
+      if (is != null) try { is.close(); } catch (IOException e) { e.printStackTrace(); }
       System.out.println();
     }
   }
