@@ -80,7 +80,7 @@ public class ErrorDialog {
   private void createCloseButton() {
     Button close = new Button(shell, SWT.NONE);
     close.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-    close.setText(Resources.getString("irate.resources.swt","ErrorDialog.Button.Close")); 
+    close.setText(getResourceString("ErrorDialog.Button.Close")); 
     close.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
         actionClose();
@@ -92,4 +92,13 @@ public class ErrorDialog {
     shell.dispose();
     shell = null;
   }
+  
+  /**
+   * Get a resource string from the properties file associated with this 
+   * class.
+   */
+  private String getResourceString(String key) {
+    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
+  }
+  
 }

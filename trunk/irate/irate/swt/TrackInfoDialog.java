@@ -102,7 +102,7 @@ public class TrackInfoDialog {
      
     // Left Grid, Column 1, Row 1: Create an 'Artist:' label
     Label artistLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    artistLabel.setText(Resources.getString("irate.resources.swt","TrackInfoDialog.Label.Artist")); 
+    artistLabel.setText(getResourceString("TrackInfoDialog.Label.Artist")); 
     
     gridData = new GridData();
     gridData.widthHint = 80;
@@ -125,7 +125,7 @@ public class TrackInfoDialog {
   
     // Left Grid, Column 1, Row 2: 'Album:' label
     Label albumLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    albumLabel.setText(Resources.getString("irate.resources.swt","TrackInfoDialog.Label.Album")); 
+    albumLabel.setText(getResourceString("TrackInfoDialog.Label.Album")); 
     albumLabel.setFont(resizeFontTo(albumLabel.getFont(),12));
     
     gridData = new GridData();
@@ -146,7 +146,7 @@ public class TrackInfoDialog {
     
     // Left Grid, Column 1, Row 3: 'Length:' label
     Label playTimeLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    playTimeLabel.setText(Resources.getString("irate.resources.swt","TrackInfoDialog.Label.Length")); 
+    playTimeLabel.setText(getResourceString("TrackInfoDialog.Label.Length")); 
     playTimeLabel.setFont(resizeFontTo(playTimeLabel.getFont(),12));
     
     gridData = new GridData();
@@ -168,7 +168,7 @@ public class TrackInfoDialog {
     
     //	Left Grid, Column 1, Row 4: 'Copyright:' label
     Label copyrightLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    copyrightLabel.setText(Resources.getString("irate.resources.swt","TrackInfoDialog.Label.Copyright")); 
+    copyrightLabel.setText(getResourceString("TrackInfoDialog.Label.Copyright")); 
     copyrightLabel.setFont(resizeFontTo(copyrightLabel.getFont(),12));
     
     gridData = new GridData();
@@ -216,7 +216,7 @@ public class TrackInfoDialog {
     
     // Left Grid, Column 1, Row 5: 'Comment:' label
     Label commentLabel = new Label(leftGrid, SWT.HORIZONTAL);
-    commentLabel.setText(Resources.getString("irate.resources.swt","TrackInfoDialog.Label.Comment")); 
+    commentLabel.setText(getResourceString("TrackInfoDialog.Label.Comment")); 
     commentLabel.setFont(resizeFontTo(commentLabel.getFont(),12));
     
     gridData = new GridData();
@@ -261,12 +261,12 @@ public class TrackInfoDialog {
       
     // Right Grid, Column 2, Row 2: Search button
     searchButton = new Button(rightGrid,0);
-    searchButton.setText(Resources.getString("irate.resources.swt","TrackInfoDialog.Button.Search")); 
+    searchButton.setText(getResourceString("TrackInfoDialog.Button.Search")); 
     searchButton.pack();
     
     // Right Grid, Column 2, Row 2: WWW Button
     wwwLink = new Button(rightGrid,0);
-    wwwLink.setText(Resources.getString("irate.resources.swt","TrackInfoDialog.Button.WWW")); 
+    wwwLink.setText(getResourceString("TrackInfoDialog.Button.WWW")); 
       
     gridData = new GridData();
     gridData.horizontalAlignment = GridData.END;
@@ -283,7 +283,7 @@ public class TrackInfoDialog {
     
     // Right Grid, Column 2, Row 3: Close Button
     closeButton = new Button(rightGrid,0);
-    closeButton.setText(Resources.getString("irate.resources.swt","TrackInfoDialog.Button.Close")); 
+    closeButton.setText(getResourceString("TrackInfoDialog.Button.Close")); 
       
     gridData = new GridData();
     gridData.widthHint = searchButton.getSize().x;
@@ -382,4 +382,13 @@ public class TrackInfoDialog {
     }
     return(new Font(display, fontData));
   }
+  
+  /**
+   * Get a resource string from the properties file associated with this 
+   * class.
+   */
+  private String getResourceString(String key) {
+    return Resources.getString(this.getClass().getPackage().getName() + ".locale", key); 
+  }
+  
 }
