@@ -11,10 +11,9 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.io.File;
 import java.net.URLConnection;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.InputStreamReader;
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 
 /**
  * @author Anthony Jones
@@ -76,13 +75,14 @@ public class BaseResources {
       URL url = getResource(name);
       URLConnection urlc = url.openConnection();
       InputStream is = url.openStream();
-      BufferedReader in = new BufferedReader(new InputStreamReader(is));
-      BufferedWriter out = new BufferedWriter(new FileWriter(myTempFile));
+      BufferedInputStream in = new BufferedInputStream(is);
+      BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(myTempFile));
       
       // Copy resource into temp file
-      int onechar;
-      while ((onechar = in.read()) != -1)
-        out.write(onechar);
+      int numchar;
+      byte[] buffer = new byte[512];
+      while ((numchar = in.read(buffer)) != -1)
+        out.write(buffer, 0, numchar);
       
       // Close streams
       in.close();
