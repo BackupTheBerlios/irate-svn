@@ -21,6 +21,7 @@ CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o
 ifeq ($(PLATFORM),win32)
 IRATE_CLIENT=irate-client.exe
 IRATE_SERVER=irate-server.exe
+export GCJ=/usr/local/crossgcc/bin/i586-pc-mingw32-gcj -g -pipe -O0
 endif
 
 CLIENT_FILES = \
