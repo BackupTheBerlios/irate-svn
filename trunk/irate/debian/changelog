@@ -1,3 +1,9 @@
+irate (0.3-0pre13) unstable; urgency=low
+
+  * Added German translation.
+
+ -- Anthony Jones <ajones@clear.net.nz>  Tue,  3 Feb 2004 11:59:36 +0800
+
 irate (0.3-0pre12) unstable; urgency=low
 
   * Fixed problem with rating via IR remote.
