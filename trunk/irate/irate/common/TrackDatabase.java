@@ -319,30 +319,35 @@ public class TrackDatabase {
       
   public Track chooseTrack(Random random) {
     Track[] tracks = getTracks();
-    float[] probs = new float[tracks.length]; 
-
-      // Choose a minimum probability
-    float minRating = MAX_RATING * random.nextFloat();
-//    System.out.println("minRating = " + minRating);
-    
-    float totalProb = 0;
-    for (int i = 0; i < tracks.length; i++) {
-      Track track = tracks[i];
-      if (track.getRating() >= minRating)
-        totalProb += getProbability(track);
-      probs[i] = totalProb;
-    }
-
-    if (totalProb == 0)
-      return null;
-
-    
     while (true) {
-      float rand = Math.abs(random.nextFloat()) * totalProb;
-//      System.out.println("r=" + Float.toString(rand));
-      for (int i = 0; i < tracks.length; i++) 
-        if (rand <= probs[i])
-          return tracks[i];
+      float[] probs = new float[tracks.length]; 
+
+        // Choose a minimum probability
+      float minRating = MAX_RATING * random.nextFloat();
+    
+      float totalProb = 0;
+      for (int i = 0; i < tracks.length; i++) {
+        Track track = tracks[i];
+        float rating = track.getRating();
+
+        if (rating >= minRating)
+          totalProb += getProbability(track);
+
+        probs[i] = totalProb;
+      }
+
+      if (totalProb == 0) {
+        if (minRating < 2)
+          return null;
+      }
+      else {
+        while (true) {
+          float rand = Math.abs(random.nextFloat()) * totalProb;
+          for (int i = 0; i < tracks.length; i++) 
+            if (rand <= probs[i])
+              return tracks[i];
+        }
+      }
     }
   }
 

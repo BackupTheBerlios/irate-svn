@@ -8,7 +8,7 @@ import org.w3c.dom.*;
 
 public class Track {
 
-  private final int DEFAULT_RATING = 5;
+  private final int DEFAULT_RATING = 7;
   private final int INITIAL_RATING = 10;
   
   private Element elt;

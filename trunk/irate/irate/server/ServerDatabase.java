@@ -25,8 +25,9 @@ public class ServerDatabase extends TrackDatabase {
       float rating = track.getRating();
       
         // This will mean that a track is only recommended to a user if the
-        // rating is above 5.
-      if (rating >= 5)
+        // rating is strictly above 5. That means that there has to be at least
+        // one person who think's it's better than just alright.
+      if (rating > 5)
         return rating * rating;
     }
     return 0;
