@@ -112,6 +112,7 @@ public class MasterDatabase extends ServerDatabase {
       reply.setError("empty", "empty.html");
     
       // Save the user database
+    purge(reply);
     try {
       user.add(reply);
       user.save();
@@ -120,7 +121,6 @@ public class MasterDatabase extends ServerDatabase {
       e.printStackTrace();
     }
     
-    purge(reply);
     return reply;
   } 
   

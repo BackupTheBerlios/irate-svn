@@ -16,6 +16,7 @@ public class DownloadThread extends Thread {
   private String state;
   private int percentComplete;
   private boolean ready;
+  private boolean continuous;
   
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
@@ -36,7 +37,9 @@ public class DownloadThread extends Thread {
           wasReady = ready;
 	}
 	if (wasReady) {
-	  process();
+          do {
+            process();
+          } while (continuous);
 	  ready = false;
 	}
       }
@@ -58,6 +61,10 @@ public class DownloadThread extends Thread {
       ready = true;
       notifyAll();
     }
+  }
+
+  public void setContinuous(boolean continuous) {
+    this.continuous = continuous;
   }
   
   public void process() {

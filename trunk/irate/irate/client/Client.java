@@ -34,6 +34,7 @@ public class Client extends JFrame {
   private DownloadThread downloadThread;
   private DownloadPanel downloadPanel;
   private JMenuItem menuItemDownload;
+  private JCheckBoxMenuItem menuItemContinuousDownload;
   private JMenuItem menuItemAccount;
   private ErrorDialog errorDialog;
   private ButtonGroup playerButtonGroup;
@@ -69,6 +70,7 @@ public class Client extends JFrame {
       }
 
       public void handleError(String code, String urlString) {
+        actionSetContinuousDownload(false);
         URL url;
         if (urlString.indexOf(':') < 0)
           url = getClass().getResource("help/" + urlString);
@@ -147,6 +149,12 @@ public class Client extends JFrame {
     errorDialog.showURL(getClass().getResource("help/about.html"));
   }
 
+  public void actionSetContinuousDownload(boolean state) {
+    menuItemContinuousDownload.setState(state);
+    downloadThread.setContinuous(state);
+    downloadThread.go();
+  }
+
   public JMenu createActionMenu() {
     JMenu m = new JMenu("Action");
 
@@ -157,6 +165,14 @@ public class Client extends JFrame {
       }
     });
     m.add(menuItemDownload);
+
+    menuItemContinuousDownload = new JCheckBoxMenuItem("Continuous download");
+    menuItemContinuousDownload.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        actionSetContinuousDownload(menuItemContinuousDownload.getState());
+      }
+    });
+    m.add(menuItemContinuousDownload);
 
     JMenuItem purge = new JMenuItem("Purge");
     purge.addActionListener(new ActionListener() {
@@ -278,7 +294,7 @@ public class Client extends JFrame {
       }
     });
     m.add(gettingStarted);
-    JMenuItem about = new JMenuItem("About");
+    JMenuItem about = new JMenuItem("Credits");
     about.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         actionAbout();

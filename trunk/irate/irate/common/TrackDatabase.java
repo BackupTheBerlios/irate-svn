@@ -352,7 +352,7 @@ public class TrackDatabase {
   }
 
   private int compare(Track track0, Track track1) {
-    return track0.getName().compareTo(track1.getName());
+    return track0.getName().compareToIgnoreCase(track1.getName());
   }
 
   public void purge() {
