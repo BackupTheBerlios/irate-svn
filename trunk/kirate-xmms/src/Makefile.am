@@ -1,5 +1,5 @@
 # set the include path for X, qt and KDE
-INCLUDES = -I/home/mat/svn/libcpp $(all_includes)
+INCLUDES = -I../../libcpp $(all_includes)
 
 # these are the headers for your project
 
