@@ -124,7 +124,9 @@ public class LibIRateNative implements irate.download.DownloadListener {
 			trackDatabase.setUnratedPlayListRatio(0);
 		}
 	}
-	
+	public boolean isPlayingUnrated(){
+		return trackDatabase.getUnratedPlayListRatio()!=0;
+	}
 	public Track next(boolean lastFinished){
 		if(lastFinished&&!this.lastTracks.empty()){
 			Track tr=(Track)this.lastTracks.peek();

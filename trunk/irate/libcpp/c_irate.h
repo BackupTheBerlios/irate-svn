@@ -324,7 +324,7 @@ short ir_isPendingPurge(track_t t);
   * @return true if a new account need to be created
   */
   short ir_needNewAccount();
-  
+  short ir_isPlayingUnrated();
 #ifdef _WIN32_PLATFORM
 #include <Winnls.h>
 /**Convert internal unicode string to Window native*/

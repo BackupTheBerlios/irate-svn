@@ -259,7 +259,9 @@ void ir_setPlayUnrated(short play){
 	iratelib::setPlayUnrated(play);
 }
   
-
+short ir_isPlayingUnrated(){
+	return iratelib::isPlayingUnrated();
+}
 #ifdef _WIN32_PLATFORM
 int ir_unicodeToNative(string_jt str, LPSTR buf, int buflen)
 {

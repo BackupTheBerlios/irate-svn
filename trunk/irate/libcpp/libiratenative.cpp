@@ -96,6 +96,9 @@ namespace iratelib {
 	void setPlayUnrated(bool play){
 		irateLib->setPlayUnrated((jboolean)play);
 	}
+	bool isPlayingUnrated(){
+		return (bool)irateLib->isPlayingUnrated();
+	}
 	bool needNewAccount(){
 		return (bool)irateLib->needNewAccount();
 	}

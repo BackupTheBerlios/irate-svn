@@ -131,6 +131,7 @@ namespace iratelib {
 	void setTrackPlayed(track_t t);
 	
 	void setPlayUnrated(bool playunrated);
+	bool isPlayingUnrated();
 	
 	bool needNewAccount();
 

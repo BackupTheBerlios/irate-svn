@@ -144,6 +144,9 @@ class IRateCenter:public LibIRateListener{
 		inline void setPlayUnrated(bool playunrated){
 			iratelib::setPlayUnrated(playunrated);
 		}
+		inline bool isPlayingUnrated(){
+			return iratelib::isPlayingUnrated();
+		}
 		/**True if a new account need to be created*/
 		inline bool needNewAccount(){
 			return iratelib::needNewAccount();
