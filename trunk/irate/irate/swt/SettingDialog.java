@@ -129,8 +129,10 @@ public class SettingDialog
   
 	private Composite createBrowserPage(Composite parent) {
 		Composite comp = new Composite(parent, SWT.NONE);
-    GridLayout layout = new GridLayout(2, false);
+    GridLayout layout = new GridLayout(1, false);
     comp.setLayout(layout);
+    new Label(comp, SWT.NONE).setText("Browser command(%url will be replaced with the address)");
+    Text t = new Text(comp, SWT.NONE);
     return comp;
   }
 }
