@@ -13,7 +13,7 @@
 
 # Version 0.03 - 22/9/2003
 
-# $Id: irate-control.pl,v 1.4 2003/09/21 14:34:05 eythian Exp $
+# $Id: irate-control.pl,v 1.5 2003/09/21 14:56:35 eythian Exp $
 
 use XML::Simple;
 use IO::Socket;
@@ -80,7 +80,6 @@ if ($result{type} eq "login-required") {
                 );
     print $socket XMLout(\%command, rootname => 'Command');
     $reply = <$socket>;
-    print $reply;
     %result = %{XMLin($reply)};
     if ($result{type} eq "login-failure") {
         die "Invalid password!\n";
@@ -91,7 +90,6 @@ while (!$finished) {
     my $reply;
     if ($poke) {
         $reply = <$socket>; # we may need to throw away a line
-        print $reply;
     }
     $poke = 0;
     # Get the current track playing
@@ -102,7 +100,6 @@ while (!$finished) {
     print $socket XMLout(\%command, rootname => 'Command');
     
     $reply = <$socket>;
-    print $reply;
     chomp $reply;
     
     my %result = %{XMLin($reply)};
