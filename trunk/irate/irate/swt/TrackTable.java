@@ -106,6 +106,8 @@ public class TrackTable
   private int currentSortColumn = 0;
   private boolean currentSortDirection = true;
   
+  final TableColumn artistCol;
+  
   /** Constructor to create a table contained in the given Shell where the
    * tracks are updated from the given TrackDatabase. 
    * @param composite     The Composite to add the Table to.
@@ -122,7 +124,14 @@ public class TrackTable
     table = new Table(composite, SWT.FULL_SELECTION);
     table.setEnabled(false);
 
-    final TableColumn artistCol = new TableColumn(table, SWT.LEFT);
+    if (Client.isWindows()) {
+        final TableColumn magicColumn = new TableColumn(table, SWT.LEFT, 0);
+        magicColumn.setText("Magic Windows Column");
+        magicColumn.setWidth(0);
+        magicColumn.setResizable(false);
+    }
+    
+    artistCol = new TableColumn(table, SWT.LEFT);
     artistCol.setWidth(200);
     addColumnListener(artistCol, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
@@ -214,6 +223,7 @@ public class TrackTable
     gridData.grabExcessVerticalSpace = true;
     gridData.horizontalSpan = 3;
     table.setLayoutData(gridData);
+
     table.pack();
 
 //    This code updates table items as they get selected and unselected. It would be good
@@ -297,9 +307,15 @@ public class TrackTable
           }
           System.out.println("mouseDown couldn't find a column");
         }
-        int colZeroWidth = table.getColumn(0).getWidth() + margin;
-        int colOneWidth = table.getColumn(1).getWidth() + margin;
-        int colTwoWidth = table.getColumn(2).getWidth() + margin;
+        
+        // Windows Bug: Since column 0 doesn't really exist, we need to
+        // offset all our column calculations to ignore it.
+        final int magicOffset = Client.isWindows() ? 1 : 0;
+        
+        
+        int colZeroWidth = table.getColumn(0+magicOffset).getWidth() + margin;
+        int colOneWidth = table.getColumn(1+magicOffset).getWidth() + margin;
+        int colTwoWidth = table.getColumn(2+magicOffset).getWidth() + margin;
         
         int colTwoX = gutter + (margin / 2) + colZeroWidth + colOneWidth;
         
@@ -509,14 +525,25 @@ public class TrackTable
   /** Loads the Track into the TableItem. */
   private void updateTableItem(TableItem tableItem, Track track) {
     
-    tableItem.setText(new String[] {
-      track.getArtist(),
-      track.getTitle(),
-      "",
-      String.valueOf(track.getNoOfTimesPlayed()),
-      track.getLastPlayed().toString(),
-      ""
-    });
+      int columnOffset = 0;
+      
+      // Dealing with a Windows XP bug.  We need to have an empty column #0 ..
+      // But, on other OSes we just have the standard column layout.
+      if (Client.isWindows()) {
+          columnOffset = 1;
+          tableItem.setText(new String[] {
+                  "",track.getArtist(),track.getTitle(),"",
+                  String.valueOf(track.getNoOfTimesPlayed()),
+                  track.getLastPlayed().toString(),""
+          });
+      } else {
+          tableItem.setText(new String[] {
+            track.getArtist(),track.getTitle(),"",
+            String.valueOf(track.getNoOfTimesPlayed()),
+            track.getLastPlayed().toString(),""
+          });   
+      }
+                  
     
     Color background = tableItem.getBackground();
 //  Can't get it to work out the current background color. COLOR_LIST_SELECTION
@@ -528,8 +555,9 @@ public class TrackTable
 //      if (tableItem == selection[i])
 //        background = display.getSystemColor(SWT.COLOR_LIST_SELECTION);
   
-    tableItem.setImage(2, getStateImage(background, track.getState())); 
-    tableItem.setImage(5, getIconImage(background, licenseIndex.get(track).getIcon()));    
+    tableItem.setImage(2+columnOffset, getStateImage(background, track.getState())); 
+    tableItem.setImage(5+columnOffset, getIconImage(background, licenseIndex.get(track).getIcon()));    
+
   }
   
   /** Remove the specified track from the table. */

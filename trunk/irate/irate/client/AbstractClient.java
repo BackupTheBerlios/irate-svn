@@ -496,6 +496,10 @@ public abstract class AbstractClient
     return System.getProperty("os.name").toLowerCase().startsWith("mac os x");
   }
   
+  public static boolean isWindows() {
+      return System.getProperty("os.name").toLowerCase().startsWith("windows xp");
+  }
+  
   /** For providing plugins with track list */
   public Track[] getTracks() {
   	return trackDatabase.getTracks();
