@@ -26,14 +26,14 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2003/12/01 03:48:28 $
+ * Date Updated: $Date: 2003/12/01 04:24:05 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.119 $
+ * @version $Revision: 1.120 $
  */
 public class Client extends AbstractClient {
 
@@ -46,7 +46,7 @@ public class Client extends AbstractClient {
   private Shell shell;
   private ProgressBar progressBar;
   private Scale volumeScale;
-  private SongProgressBar songProgressBar;
+  private TrackProgressBar songProgressBar;
 
   private ToolItem pause;
   private ToolItem previous;
@@ -729,7 +729,7 @@ public class Client extends AbstractClient {
     gridData.grabExcessHorizontalSpace = false;
     volumeScale.setLayoutData(gridData);
     
-    songProgressBar = new SongProgressBar(shell, SWT.NONE);
+    songProgressBar = new TrackProgressBar(shell, SWT.NONE);
 
     
   }

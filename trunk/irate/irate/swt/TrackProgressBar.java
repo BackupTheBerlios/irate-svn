@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ProgressBar;
 
 
-public class SongProgressBar extends Composite {
+public class TrackProgressBar extends Composite {
   
   private Label currentTimeText;
   private Label totalTimeText;
@@ -16,7 +16,7 @@ public class SongProgressBar extends Composite {
   
   private int currentTotalTime;
   
-  public SongProgressBar(Composite parent, int flags) {
+  public TrackProgressBar(Composite parent, int flags) {
     super(parent, flags);
     currentTotalTime = 0;
    
