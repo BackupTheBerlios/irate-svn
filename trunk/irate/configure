@@ -4,10 +4,10 @@ my @prefixes = ("/","/usr","/usr/local","/opt");
 
 my %lookup=("gcj"=>{"description"=>"GNU Java compiler",
 										"args"=>"-dumpversion"},
-						"make"=>{"description"=>"GNU Make"},
-						"ant"=>{"description"=>"Java build tool",
-										"args"=>"-version"},
-						"libswt-gtk2.so"=>{"description"=>"Systemwide SWT library",
+#						"make"=>{"description"=>"GNU Make"},
+#						"ant"=>{"description"=>"Java build tool",
+#										"args"=>"-version"},
+						"libswt-gtk2.so"=>{"description"=>"System-wide SWT library",
 						"type"=>"lib"}
 						);
 
