@@ -50,7 +50,7 @@ IRATE_SERVER=irate-server.exe
 #turn on below thing for error messages
 #CLIENT_LINKFLAGS=-Dgnu.gcj.runtime.NameFinder.use_addr2line=false -Dgnu.gcj.runtime.NameFinder.demangle=false
 export GCJ=/usr/local/crossgcc/bin/i586-pc-mingw32-gcj -g -pipe -O0
-CLIENT_LIBS += lib/libswt.o
+CLIENT_LIBS += lib/libswt.o icon.o
 CLASSPATH:=$(PWD)/lib/swt.jar:$(CLASSPATH)
 else
 
@@ -174,6 +174,12 @@ irate-server.o:irate/server/*.java
 
 %.txt.o: %.txt
 	$(GCJ) -c --resource $^ $^ -o $@
+
+icon.o: irate/resources/icon.png
+	png2ico icon.ico $^ 
+	echo irate_icon ICON DISCARDABLE "icon.ico" > icon.rc
+	i586-pc-mingw32-windres -i icon.rc -o $@
+	rm -f icon.ico icon.rc
 
 libmadplayer.o: irate/client/AbstractPlayer.java irate/client/LibMadPlayer.java irate/client/LibMadPlayer.cc
 	gcjh -o irate/client/AbstractPlayer.h irate.client.AbstractPlayer
