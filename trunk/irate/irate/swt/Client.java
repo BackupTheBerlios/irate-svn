@@ -362,6 +362,8 @@ public class Client extends AbstractClient {
     shell.setLayout(layout);
   }
 
+  /** @deprecated */
+  
   public Reader getResource(String s) {
     if (s.endsWith(".html"))
       s = s.substring(0, s.length() - 5) + ".txt";
