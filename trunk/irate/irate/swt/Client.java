@@ -649,6 +649,7 @@ public class Client implements UpdateListener, PluginApplication {
       });
     }
 
+    /* Under construction
     MenuItem item2_1 = new MenuItem(menu2,SWT.PUSH);
     item2_1.setText("Plug-ins");
     item2_1.addSelectionListener(new SelectionAdapter(){
@@ -656,6 +657,7 @@ public class Client implements UpdateListener, PluginApplication {
         new PluginDialog(display, pluginManager);
       }
     });
+    */
 
     MenuItem item3 = new MenuItem(menubar,SWT.CASCADE);
     item3.setText("Info");
