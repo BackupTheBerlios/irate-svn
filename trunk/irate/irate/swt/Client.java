@@ -20,13 +20,13 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/10 23:55:46 $
+ * Date Updated: $Date: 2003/10/11 04:27:21 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.84 $
+ * @version $Revision: 1.85 $
  */
 public class Client extends AbstractClient {
 
@@ -870,7 +870,7 @@ public class Client extends AbstractClient {
 		item.setText("www");
 		item.setToolTipText("Visit artist website");
 		item.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) throws IOException{
+      public void widgetSelected(SelectionEvent e) {
 					showURL(getSelectedTrack().getArtistWebsite());
       }
 		});
