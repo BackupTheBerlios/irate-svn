@@ -16,7 +16,13 @@ ifeq ($(PLATFORM),win32)
 	unzip swt-2.1-win32.zip
 	touch libswt.o
 else
+
+ifeq ($(PLATFORM),linux-gtk2)
+	unzip swt-2.1.1-linux-gtk.zip
+else
 	echo Unknown PLATFORM $(PLATFORM), please specify on commandline && exit 1 
+endif
+
 endif
 
 endif
@@ -36,7 +42,7 @@ else
 endif
 
 libswt-pi.o: swt-pi.jar
-	$(GCJ) -classpath swt.jar -o libswt-pi.o -c  swt-pi.jar
+	$(GCJ) -fjni -classpath swt.jar -o libswt-pi.o -c  swt-pi.jar
 
 libnanoxml-lite.o: nanoxml-lite-2.2.3.jar
 	$(GCJ) -o libnanoxml-lite.o -c nanoxml-lite-2.2.3.jar
