@@ -19,13 +19,13 @@ import java.util.*;
 import java.net.*;
 
 /**
- * Date Updated: $Date: 2003/10/04 05:23:34 $
+ * Date Updated: $Date: 2003/10/07 06:22:13 $
  * @author Creator: Taras Glek
  * @author Creator: Anthony Jones
  * @author Updated: Eric Dalquist
  * @author Updated: Allen Tipper
  * @author Updated: Stephen Blackheath
- * @version $Revision: 1.81 $
+ * @version $Revision: 1.82 $
  */
 public class Client extends AbstractClient {
 
@@ -326,7 +326,8 @@ public class Client extends AbstractClient {
       downloadThread.checkAutoDownload();
     }
     else {
-      playThread.goBack();
+      if(!playThread.goBack())
+        previous.setEnabled(false);
     }
   }
 

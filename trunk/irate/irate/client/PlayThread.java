@@ -124,7 +124,11 @@ public class PlayThread extends Thread {
   public Track getCurrentTrack() {
     return currentTrack;
   }
-
+  
+  /**
+  Skips to the next song
+  @param reverse indicates whether we should go back in history
+  */
   private void skipSong(boolean reverse) {
       // It must not be paused if you want to reject a track.
     setPaused(false);
@@ -153,8 +157,13 @@ public class PlayThread extends Thread {
     skipSong(false);			
 	}
 
-	public synchronized void goBack(){
+  /** Play the previous song 
+  @returns false if we are at the begining */
+	public synchronized boolean goBack(){
+    if(!hasHistory())
+      return false;
     skipSong(true);			
+    return true;
 	}
 	
 	public boolean hasHistory() {
