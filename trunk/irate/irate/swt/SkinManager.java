@@ -50,9 +50,10 @@ public class SkinManager {
     controls.add(skinControl);
   }
   
-  public void add(ThreeModeButton button, String name) {
+  public SkinButton add(ThreeModeButton button, String name) {
    SkinButton skinButton = new SkinButton(button, name);
    buttons.add(skinButton);
+   return skinButton;
   }
 
   
@@ -180,6 +181,9 @@ public class SkinManager {
     } 
   }
   
+  
+  
+  
   public class SkinButton {
     
     private ISkinableButton button;
@@ -201,6 +205,7 @@ public class SkinManager {
       update();
     }
 
+    
     private ImageData getImageData(String name) throws IOException {
       ZipEntry zipEntry = zip.getEntry(name + ".png"); // Returns null if not found
       if(zipEntry != null) {
@@ -212,12 +217,21 @@ public class SkinManager {
 
     public void update() {
       try {
-        button.setNormalText(Resources.getString(name + ".normalText"));
-        button.setPressedText(Resources.getString(name + ".pressedText"));
-        ImageData normalImg = getImageData(name + ".normal");
-        ImageData pressedImg = getImageData(name + ".pressed");
-        //button.setNormalImage(normalImg);
-        //button.setPressedImage(pressedImg);
+        ImageData normalImg = getImageData(Resources.getString(name + ".normalImage"));
+        ImageData pressedImg = getImageData(Resources.getString(name + ".pressedImage"));
+        ImageData activeImg = getImageData(Resources.getString(name + ".activeNormalImage"));
+        ImageData activePressedImg = getImageData(Resources.getString(name + ".activePressedImage"));
+        
+        button.setNormalImage(normalImg);
+        button.setPressedImage(pressedImg);
+        
+        if(activeImg != null) {
+          button.setActiveNormalImage(activeImg);
+        }
+        if(activePressedImg != null) {
+          button.setActivePressedImage(activePressedImg);
+        }
+        
         button.redraw();
       } catch (IOException e) { }
   }

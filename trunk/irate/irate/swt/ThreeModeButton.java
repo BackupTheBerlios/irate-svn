@@ -1,5 +1,6 @@
 package irate.swt;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.*;
 import org.eclipse.swt.graphics.*;
 import org.eclipse.swt.widgets.Canvas;
@@ -15,6 +16,7 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
     boolean isPressed = false;
     boolean isMouseOver = false;
     boolean isActive = false;
+    boolean isEnabled = true;
     GC gc = null;
     int width, height;
 
@@ -67,7 +69,7 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
     // released the mouse button.
     // - switch the 'active' flag to false (long longer held down)
     // - switch the 'pressed' flag to whatever it wasn't
-    protected void pressButton(MouseEvent arg0) {
+    public void pressButton(MouseEvent arg0) {
       isActive = false;
       isPressed = !isPressed;
       redraw();
@@ -90,6 +92,11 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
     protected void mouseOverButton(MouseEvent e) {
       isMouseOver = true;
       redraw();
+    }
+    
+    public void setEnabled(boolean flag) {
+     isEnabled = flag;
+     redraw();
     }
 
     // Be sure to dispose of all the images when the buttons are disposed.
@@ -129,8 +136,13 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
             Image tempImage = new Image(this.getDisplay(), textBackground.getImageData());
             GC tempGC = new GC(tempImage);
             
-            if(isMouseOver) {
-              tempGC.drawRectangle(0,0,textBackground.getImageData().width-2,textBackground.getImageData().height-2);
+            if(isEnabled) {
+              if(isMouseOver) {
+                tempGC.drawRectangle(0,0,textBackground.getImageData().width-2,textBackground.getImageData().height-2);
+              }
+            }
+            else {
+             tempGC.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY)); 
             }
             
             if(isPressed) {
@@ -153,9 +165,14 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
         // we need to cut out anything that was previously there.
         else {
           
-          if(isMouseOver) {
-            gc.drawRectangle(0,0,this.getBounds().width-2,this.getBounds().height-2);   
-         }
+          if(isEnabled) {
+            if(isMouseOver) {
+              gc.drawRectangle(0,0,this.getBounds().width-2,this.getBounds().height-2);   
+            }
+          }
+          else {
+            gc.setForeground(this.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY)); 
+          }
           
           if(isPressed) {
             int length = getStringLength(pressedText);
@@ -174,7 +191,6 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
         }
       }
       else {
-
       // Graphic mode!
         
       // If graphic types havn't been set, then we shoudln't blow up, 
@@ -234,22 +250,10 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
       return new Point(width, height);    
     }
     
-    private Image createTransparentImage(ImageData image) {
-      
-      ImageData imgData = transparencyManager.getBackground(this);
-      
-      // Ok.  Go through the image and find every white pixel.  Replace the
-      // white pixel with the corresponding pixel from the background image.
-      for (int i = 0; i < image.height; i++) { 
-        for(int j = 0; j < image.width; j++) {
-          if(image.getPixel(j,i) == 16777215) {
-            image.setPixel(j,i, imgData.getPixel(j,i));
-          }
-        }
-      }
-      
-      return new Image(this.getDisplay(), image);
-      
+    private Image createTransparentImage(ImageData image) {    
+      ImageMerger im = new ImageMerger(transparencyManager, this);
+      ImageData newImg = im.merge(0,0,image);
+      return new Image(this.getDisplay(), newImg);
     }
     
     
@@ -287,20 +291,18 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
       
     }
 
-    /* (non-Javadoc)
-     * @see irate.swt.ISkinableButton#setActiveNormalImage(org.eclipse.swt.graphics.ImageData)
-     */
+
     public void setActiveNormalImage(ImageData image) {
-      // TODO Auto-generated method stub
-      
+      this.setBounds(this.getLocation().x, this.getLocation().y, image.width, image.height);
+      this.activeNormalImage = createTransparentImage(image);
+      this.redraw();
     }
 
-    /* (non-Javadoc)
-     * @see irate.swt.ISkinableButton#setActivePressedImage(org.eclipse.swt.graphics.ImageData)
-     */
+
     public void setActivePressedImage(ImageData image) {
-      // TODO Auto-generated method stub
-      
+      this.setBounds(this.getLocation().x, this.getLocation().y, image.width, image.height);
+      this.activePressedImage = createTransparentImage(image);
+      this.redraw();
     }
 
     public void setNormalText(String text) {
@@ -325,6 +327,10 @@ public class ThreeModeButton extends Canvas implements ISkinableButton {
       }
       pressedText = text;
       this.redraw();
+    }
+    
+    public boolean isEnabled() {
+      return isEnabled;
     }
 
   }

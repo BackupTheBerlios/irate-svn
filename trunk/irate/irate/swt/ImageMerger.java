@@ -36,14 +36,18 @@ public class ImageMerger {
     
     // Merge the foreground onto the background
     int[] foregroundPixels = new int[foregroundData.width];
-    byte[] alpha = new byte[foregroundData.width];
     int[] backgroundPixels = new int[foregroundData.width];
     int[] destPixels = new int[foregroundData.width];
     for (int i = 0; i < foregroundData.height; i++) {
         foregroundData.getPixels(0, i, foregroundPixels.length, foregroundPixels, 0);
         backgroundData.getPixels(x, y + i, backgroundPixels.length, backgroundPixels, 0);
+        
         for (int j = 0; j < destPixels.length; j++) {
-          byte a = alpha[j];
+          
+          // Grab the alpha value of the pixel we're deal with
+          int a = foregroundData.getAlpha(j,i);
+         
+          // Calculate the merge value
           RGB frgb = foregroundData.palette.getRGB(foregroundPixels[j]);
           RGB brgb = backgroundData.palette.getRGB(backgroundPixels[j]);
           int r = (frgb.red * a + brgb.red * (255 - a)) / 255;
