@@ -15,7 +15,9 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -42,12 +44,18 @@ import java.util.TreeMap;
  * processed at a time.
  *
  * @author <a href="mailto:lenbok@gmail.com">Len Trigg</a>
- * @version $Revision: 1.2 $
+ * @version $Revision: 1.3 $
  */
 public class Daemon {
 
   /** Default port to listen on. */
-  public static final int DEFAULT_PORT = 12543;
+  public static final int DEFAULT_PORT = 12543;  
+
+  /**
+   * Recent track history length. At least this many songs must occur
+   * before a song will be repeated.
+   */
+  public static final int RECENT_HISTORY = 15;
 
   /** The track database */
   private final TrackDatabase mTrackDatabase;
@@ -57,6 +65,9 @@ public class Daemon {
   
   /** Holds the commands we know how to execute. */
   private final Map mCommands = new TreeMap();
+
+  /** A history of recently played/rated songs to avoid selecting in playlists */
+  private final LinkedList mRecentTracks = new LinkedList();
 
   private boolean mKeepRunning = true;
 
@@ -135,15 +146,31 @@ public class Daemon {
       public void process(String input, PrintWriter out) throws IOException {
         Track t = getTrack(input);
         if (t != null) {
-          t.updateTimeStamp();
           t.incNoOfTimesPlayed();
+          addRecentTrack(t);
           out.println(t.toString() + " " + (t.isRated() ? Integer.toString((int) t.getRating()) : "unrated" ));
         } else {
           out.println("ERROR: No track named \"" + input + "\"");
         }
       }
       public String description() {
-        return "Increments playcount and timestamp information for the specified. Give the name of the track to query.";
+        return "Informs the daemon that a track has played to completion. Give the name of the track.";
+      }
+    };
+
+  private final Command mPlayingCommand = new Command("playing") {
+      public void process(String input, PrintWriter out) throws IOException {
+        Track t = getTrack(input);
+        if (t != null) {
+          t.updateTimeStamp();
+          addRecentTrack(t);
+          out.println(t.toString() + " " + (t.isRated() ? Integer.toString((int) t.getRating()) : "unrated" ));
+        } else {
+          out.println("ERROR: No track named \"" + input + "\"");
+        }
+      }
+      public String description() {
+        return "Informs the daemon that a track has started playing. Give the name of the track.";
       }
     };
 
@@ -153,6 +180,10 @@ public class Daemon {
           out.println("Going online.");
           System.err.println("Going online.");
           mDownloader.start();
+        } else {
+          out.println("Already online. " + (mDownloader.getDownloadState() == null 
+                                           ? "inactive" 
+                                           : mDownloader.getDownloadState()));
         }
       }
       public String description() {
@@ -227,11 +258,13 @@ public class Daemon {
               }
               System.err.println("Rating set to " + t.getRating() + " for track " + t.toString());
 
+              addRecentTrack(t);
               mTrackDatabase.save();
 
               if (mDownloader.isAlive()) {
                 mDownloader.checkAutoDownload();
               }
+
 
             } else {
               out.println("ERROR: No track named \"" + trackName + "\"");
@@ -244,15 +277,45 @@ public class Daemon {
       }
     };
 
-  private final Command mPlaylistCommand = new Command("playlist") {
+  private final Command mChooseCommand = new Command("choose") {
+
       public void process(String input, PrintWriter out) throws IOException {
-        final String msgArgs = "ERROR: Expected numUnrated and numRated parameters.";
+        int unratedRatio = mTrackDatabase.getUnratedPlayListRatio();
+        if (input.length() > 0) {
+          try {
+            unratedRatio = Integer.parseInt(input);
+          } catch (NumberFormatException nfe) {
+          }
+        }
+
+        Random r = new Random();
+        HashSet toOmit = new HashSet(mRecentTracks);
+        Track t = (r.nextInt(100) < unratedRatio) 
+          ? mTrackDatabase.chooseUnratedTrack(r, toOmit)
+          : mTrackDatabase.chooseTrack(r, toOmit);
+        if (t == null) {
+          System.err.println("Couldn't find track. Picking from all rated tracks.");
+          mTrackDatabase.chooseTrack(r, null);
+        }
+        out.println("# " + t.toString());
+        out.println(t.getFile());
+        addRecentTrack(t);
+      }
+
+      public String description() {
+        return "Chooses a track to play. Optionally give the percentage chance (0 - 100) of selecting an unrated track.";
+      }
+    };
+
+  private final Command mPlaylistCommand = new Command("playlist") {
+
+      public void process(String input, PrintWriter out) throws IOException {
         String[] args = Utils.split(input, ' ');
         if (args.length > 2) {
-          out.println(msgArgs);
+          out.println("ERROR: Expected numUnrated and numRated parameters.");
         } else {
-          int numUnrated = -1;
-          int numRated = -1;
+          int numUnrated = mTrackDatabase.getNoOfUnratedOnPlaylist();
+          int numRated = mTrackDatabase.getPlayListLength() - numUnrated;
           if (args.length > 0) {
             try {
               numUnrated = Integer.parseInt(args[0]);
@@ -272,6 +335,7 @@ public class Daemon {
             Track track = (Track) playlist.get(i);
             out.println("# " + track.toString());
             out.println(track.getFile());
+            addRecentTrack(track);
           }
         }
       }
@@ -344,6 +408,7 @@ public class Daemon {
     mTrackDatabase = new TrackDatabase(dbFile);
     mDownloader = new DownloadThread(mTrackDatabase);
 
+
     addCommand(mHelpCommand);
     addCommand(mSummaryCommand);
     addCommand(mQuitCommand);
@@ -355,6 +420,7 @@ public class Daemon {
     // Single track commands
     addCommand(mQueryCommand);
     addCommand(mPlayedCommand);
+    addCommand(mChooseCommand);
     addCommand(mRateCommand);
 
     // Others...
@@ -383,6 +449,17 @@ public class Daemon {
     return track;
   }
 
+
+  private void addRecentTrack(Track track) {
+    long start = System.currentTimeMillis();
+    mRecentTracks.remove(track);
+    System.err.println("Remove took " + (System.currentTimeMillis() - start) + "ms");
+    mRecentTracks.addFirst(track);
+    while (mRecentTracks.size() > RECENT_HISTORY) {
+      mRecentTracks.removeLast();
+    }
+    //System.err.println("Most recently used tracks:\n" + mRecentTracks);
+  }
 
   /**
    * Starts the daemon waiting for connections and initiates
