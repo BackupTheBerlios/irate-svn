@@ -14,6 +14,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
@@ -62,6 +63,23 @@ public class MarsyasResultDialog extends BaseDialog{
       }      
     });
     btnDownload = addButton(Resources.getString("download_track"));
+    btnDownload.addSelectionListener(new SelectionAdapter() {
+      public void widgetSelected(SelectionEvent arg0) {
+        int i = resultTable.getSelectionIndex();
+        if(i < 0)
+          return;
+        MarsyasSimilaritySearch.ServerTrack t = ((MarsyasSimilaritySearch.ServerTrack)resultTable.getItem(i).getData());
+        resultTable.remove(i);
+        boolean ret = t.download();
+        MessageBox m = new MessageBox(getShell());
+        m.setText("Track queueing");
+        if(ret)
+          m.setMessage("Queued track for download");
+        else
+          m.setMessage("Couldn't add track to track database");
+        m.open();
+      }      
+    });
     btnPlay.setEnabled(false);
     btnDownload.setEnabled(false);
     addButton(Resources.getString("close")).addSelectionListener(new SelectionAdapter() {

@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.io.StringReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -58,6 +59,7 @@ public class MarsyasSimilaritySearch extends Thread  {
       return t1.compareTo(t2);
     }
   };
+ 
   /**
    * @param plugin
    * @param username
@@ -83,6 +85,10 @@ public class MarsyasSimilaritySearch extends Thread  {
     Track track = null;
     final int URL_ID = 1;
     final int FEATURES_ID = 2;
+    final int COPYRIGHT_ID = 3;
+    final int TITLE_ID = 5;
+    final int ARTIST_ID = 4;
+    
     
     public ServerTrack(String line) {
       StringTokenizer st = new StringTokenizer(line,",",true);
@@ -140,6 +146,26 @@ public class MarsyasSimilaritySearch extends Thread  {
       if(!isLocal())
         return;
       plugin.playTrack(track);
+    }
+
+    /**
+     *  Add's track to trackdatabase and downloads it
+     */
+    public boolean download() {
+      if(isLocal())
+        return false;
+      
+      try {
+        track = new Track(new URL(str_data[URL_ID]));
+        track.setArtist(str_data[ARTIST_ID]);
+        track.setTitle(str_data[TITLE_ID]);
+        track.setProperty("copyright",str_data[COPYRIGHT_ID]);
+        track.setProperty("marsyas",str_data[FEATURES_ID]);
+        } catch (MalformedURLException e) {
+        e.printStackTrace();
+        return false;
+      }
+      return true;
     }
   }
   
@@ -223,6 +249,7 @@ public class MarsyasSimilaritySearch extends Thread  {
             m.setText("Similarity search failed");
             m.setMessage("Server said:\r\n"+tmpString);
             m.open();
+            fake.dispose();
           }
         });        
         return;

@@ -74,7 +74,8 @@ public class DownloadThread extends Thread {
     }
   }
 
-  // This seems to be the sanctioned way of signalling that we should do stuff.
+  /** This seems to be the sanctioned way of signalling that we should do stuff.
+  */
   public void checkAutoDownload()
   {
     synchronized (this) {

@@ -1633,5 +1633,13 @@ public class Client extends AbstractClient {
    */
   public String getUserName() {
     return trackDatabase.getUserName();
+  }
+
+  /* (non-Javadoc)
+   * @see irate.plugin.PluginApplication#addTrack(irate.common.Track)
+   */
+  public void addTrack(Track track) {
+    trackDatabase.add(track);
+    downloadThread.checkAutoDownload();
   }    
 }

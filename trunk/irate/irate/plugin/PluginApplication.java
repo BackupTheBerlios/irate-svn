@@ -128,6 +128,11 @@ public void addTrackAction(String name, SelectionListener listener);
  */
 public void playTrack(Track track);
 
+/** 
+ * Add a track from some plugin source to trackdb
+ * @param track
+ */
+public void addTrack(Track track);
 /**
  * @return username from trackdatabase
  */
