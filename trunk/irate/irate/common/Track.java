@@ -552,7 +552,7 @@ public class Track implements TrackDetails {
   }
   
   public boolean equals(Object track) {
-    return track instanceof Track && getURL().equals(((Track)track).getURL());
+    return track instanceof Track && getURL().toString().equals(((Track)track).getURL().toString());
   }
 
   /** Returns the web site associated with this track */
