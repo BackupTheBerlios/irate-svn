@@ -1,0 +1,55 @@
+What's missing and ideas:
+(8)	- Playlist length unused (all songs (not broken) rated better than This Sux displayed). (The problem is I
+		don't know how to choose songs to display or not)
+
+////////////This is partialy done most of it.
+(7)	- missing retry code in case of error (like checking retry depending on wich error appeared)
+		Some errors that must be checked :
+			Connection closed by server (this is typically an error that is recoverable)
+			Connection lost (Like the timeout)
+			Unable to reach server (usually server are valid we can pretend this)
+		////////////////////Not done
+		Maybe check that at least one connection was successfull before marking song as broken
+		Maybe pick random broken song in database to check if it's actually valid
+			This must be done only if the error wasn't "File doesn't exist"
+			Maybe do this by adding a file error.xml ?
+			
+///////////////For help wait till non-programmer use it
+(2)	- HELP about the program (quite important actually).
+
+//////////////Same as above actually displacing the dir is sufficient
+(5)	- configure iRate dir in Configuration Dialog.
+//////////////Like the idea 
+(4)	- code for exporting songs to friends and importing (Cool but not for now)
+//////////////Quick Fixed
+(5)	- Undo for rating (quick fixed actually by leaving the song till next This Sux rating).
+(4)	- Check for existing link and show it in info box (artists.iuma can be guessed the same for magnatune)
+//////////////Later
+(7)	- Manage the autodownload count (find where it's actually usefull)
+//////////////
+(4)	- Themed info box (quick to do)
+//////////////Job on the site
+(9)	- Add Text about majors/music politics and so on that can be i18n'd
+		- excellent artist experience and political position from aredje.net to include
+(7)	- Document code if someone else want to contribute
+//////////////////Done
+(10)	- unload crash (quite anoying to do)
+
+Already done:
+	- Rating
+	- Configuration Dialog
+	- Popup for Unrated song (see screenshot)
+	- Multiple file download (you can set how much) at a same time
+	- Disable/enable internet connexion
+	- Only download one file at a time from a specific server
+	- Resuming of download
+	- New account creation (screenshot http://hacker.nabix.net/noatun/noatuncreateaccount.png)
+	- Retry a download (on connexion lost and timeout,etc...)
+	- Almost all is i18n compatible (thought no translation done)
+	- GZip compression in communication with server
+	- About
+	- Configurable song selection algorythm (like play only songs with rating higher than, set weight of unrated songs, care about how many time a song has been played or not, use squared rating)
+	- Configurable display (actually just font)
+	- Export songs as m3u playlist with URL (for sharing with friends) or local filename. Export is based on rating.
+	- irate folder is now configurable at account creation
+
