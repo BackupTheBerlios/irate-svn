@@ -203,13 +203,21 @@ public class TrackTable {
   
   /** Loads the Track into the TableItem. */
   private void updateTableItem(TableItem tableItem, Track track) {
-    tableItem.setText(new String[] {
-      track.getArtist(),
-      track.getTitle(),
-      track.getState(),
-      String.valueOf(track.getNoOfTimesPlayed()),
-      track.getLastPlayed().toString()
+     
+    // Quick fix.  This shouldn't have to update the entire table 
+    // to remove a single track. 
+    if(track.getRating() == 0) {
+      updateTable();
+    }
+    else {
+      tableItem.setText(new String[] {
+																	 track.getArtist(),
+																	 track.getTitle(),
+																	 track.getState(),
+																	 String.valueOf(track.getNoOfTimesPlayed()),
+																	 track.getLastPlayed().toString()
     });
+    }
   }
   
   /** Updates a single track. */
@@ -218,20 +226,20 @@ public class TrackTable {
     if (tableItem != null) {
       updateTableItem(tableItem, track);
       
-      // If the tracks are now out of order then we have to sort the list.
-      int index = table.indexOf(tableItem);
-      if (index != 0) {
-        Track prevTrack = (Track) hashByTableItem.get(table.getItem(index - 1));
-        if (comparator.compare(prevTrack, track) > 0) {
-          load();
-          return;          
+        // If the tracks are now out of order then we have to sort the list.
+        int index = table.indexOf(tableItem);
+        if (index != 0) {
+          Track prevTrack = (Track) hashByTableItem.get(table.getItem(index - 1));
+          if (comparator.compare(prevTrack, track) > 0) {
+            load();
+            return;          
+          }
         }
-      }
-      if (index + 1 < table.getItemCount()) {
-        Track nextTrack = (Track) hashByTableItem.get(table.getItem(index + 1));
-        if (comparator.compare(track, nextTrack) > 0)
-          load();
-      }
+        if (index + 1 < table.getItemCount()) {
+          Track nextTrack = (Track) hashByTableItem.get(table.getItem(index + 1));
+          if (comparator.compare(track, nextTrack) > 0)
+            load();
+        }
     }
   }
 
