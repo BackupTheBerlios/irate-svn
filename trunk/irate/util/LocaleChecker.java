@@ -1,3 +1,5 @@
+package util;
+
 /** Copyright 2004 Taras Glek(is this right?) */
 import java.util.*;
 import java.io.*;
