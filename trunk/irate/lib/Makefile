@@ -1,5 +1,5 @@
 
-all: libswt.o libnanoxml-lite.o libhttpclient.o
+all: libswt.o libnanoxml-lite.o
 
 #libswt.so:libswt.o
 #	gcj -shared -o libswt.so libswt.o
@@ -46,9 +46,6 @@ libswt-pi.o: swt-pi.jar
 
 libnanoxml-lite.o: nanoxml-lite-2.2.3.jar
 	$(GCJ) -o libnanoxml-lite.o -c nanoxml-lite-2.2.3.jar
-
-libhttpclient.o:
-	$(GCJ) -O0 -o libhttpclient.o -c HTTPClient.jar
 
 #libnanoxml-lite.a: libnanoxml-lite.o
 #	ar rcs libnanoxml-lite.a libnanoxml-lite.o

@@ -1,16 +1,16 @@
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
 DOC=$(DESTDIR)/usr/doc/irate
-export GCJ=gcj -g -pipe -march=i586 -mcpu=i586 -O2
+export GCJ=gcj -g -pipe -O0
 IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
 export PLATFORM=linux-motif
 PWD=$(shell pwd)
-export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar:$(PWD)/lib/HTTPClient.jar
+export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
 
 
 CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
-CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o lib/libhttpclient.o
+CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o 
 
 ifeq ($(PLATFORM),linux-gtk2)
 CLIENT_LIBS += lib/libswt-pi.o

@@ -10,10 +10,8 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-import HTTPClient.*;
-
 public class DownloadThread extends Thread {
-  
+
   private Vector updateListeners = new Vector();
   private TrackDatabase trackDatabase;
   private Track currentTrack;
@@ -22,11 +20,11 @@ public class DownloadThread extends Thread {
   private int percentComplete;
   private boolean ready;
   private boolean continuous;
-  
+
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
     downloadDir = trackDatabase.getDownloadDirectory();
-    if (!downloadDir.exists()) 
+    if (!downloadDir.exists())
       downloadDir.mkdir();
   }
 
@@ -50,7 +48,7 @@ public class DownloadThread extends Thread {
         }
       }
       catch (IOException ioe) {
-        if (continuous) 
+        if (continuous)
           handleError("continuousfailed", "continuousfailed.html");
         ioe.printStackTrace();
       }
@@ -77,21 +75,21 @@ public class DownloadThread extends Thread {
   public void setContinuous(boolean continuous) {
     this.continuous = continuous;
   }
-  
+
   private boolean downloadSinglePending() throws IOException {
     Track[] tracks = trackDatabase.getTracks();
     for (int i = 0; i < tracks.length; i++) {
       currentTrack = tracks[i];
       if (!currentTrack.isHidden()) {
         File file = currentTrack.getFile();
-        if (file == null) 
+        if (file == null)
           download(currentTrack);
         else if (!file.exists()) {
           currentTrack.unSetFile();
           try {
             trackDatabase.save();
             download(currentTrack);
-  
+
               // We've successfully downloaded a track.
             return true;
           }
@@ -117,69 +115,59 @@ public class DownloadThread extends Thread {
 
   URLConnection openConnection(URL u) throws IOException{
   	final URL url = u;
-  	
+
   	return null;
   }
-  
-private abstract class TimeoutWorker implements Runnable{
+
+  private abstract class TimeoutWorker implements Runnable{
 	protected Object input;
   	private Object output;
 	private Thread timeoutThread;
 	private Exception exception;
-    
+
 	public TimeoutWorker(Object input) {
 	  this.input = input;
 //    workerThread = new Thread(this);
 	}
-	
+
 	protected void setOutput(Object output) {
 		this.output = output;
-		//timeoutThread.interrupt();
+	//	timeoutThread.interrupt();
 	}
-		
+
 	protected void setException(Exception exception) {
 		this.exception = exception;
-		//timeoutThread.interrupt();
+	//	timeoutThread.interrupt();
 	}
-		
+
 	public abstract void run();
-	
+
 	public Object runOrTimeout(long timeout) throws Exception {
 		//running thread
 		timeoutThread = Thread.currentThread();
+		//increment..the bigger the less cpu we use...but slower downloads
+		int step = 100;
+		//reset outputs
+		exception = null;
+		output = null;
 		//start thread with a task that might timeout
-    Thread th = new Thread(this);
-    th.start();
-    final int delay = 10;
-		/*try {
-			Thread.sleep(timeout);
-		} catch(InterruptedException ie) {
+		Thread th = new Thread(this);
+		th.start();
+		while(timeout > 0){
+			Thread.sleep(step);
+			timeout -= step;
 			if(exception != null)
 				throw exception;
-			else
+			else if(output != null)
 				return output;
-		}*/
-    while(timeout > 0){
-      timeout -= delay;
-      try{
-        Thread.sleep(delay);
-      }catch(Exception e){
-        e.printStackTrace();
-        break;
-      }
-      
-      if(output != null)
-        return output;
-      else if(exception != null)
-        throw exception;
-    }
-    //th.stop();
-    //th.destroy();
+		}
+		//should probably mark th somehow so it doesn't try to set any values once it times out
+		th = null;
 		throw new IOException("Timeout exceeded");
 	}
-}
- 
-  
+  }
+
+
   public void download(Track track) throws IOException {
     try {
       try {
@@ -198,36 +186,50 @@ private abstract class TimeoutWorker implements Runnable{
         File file = new File(downloadDir, urlString);
 
         setState("Connecting " + track.getName());
-        
-        //30 second timeout for the impatient
-        int timeout = 60000;
-        HTTPConnection.setDefaultTimeout(timeout);
-       
-        HTTPConnection con = new HTTPConnection(url);
-        int contentLength = 0;
-        InputStream is = null;
+
+        //0 second timeout for the impatient
+        long timeout = 60000;
+        TimeoutWorker worker = new TimeoutWorker((Object) url) {
+        	public void run() {
+        		try {
+        			URLConnection conn = ((URL)input).openConnection();
+        			conn.connect();
+        			Vector v = new Vector();
+        			v.add(conn);
+        			v.add(new Integer(conn.getContentLength()));
+					setOutput(v);
+        		} catch(IOException e) {
+        			setException(e);
+        		}
+        	}
+        };
+        URLConnection conn;
+        Integer intContentLength;
         try{
-          HTTPResponse   rsp = con.Get(url.getFile());
-          contentLength = rsp.getHeaderAsInt("Content-Length");
-          if(rsp.getStatusCode() >= 300){
-            System.err.println("HTTP Error:"+rsp.getReasonLine());
-            System.err.println(rsp.getText());
-            return;
-          }
-          setState("Downloading " + track.getName());
-          is = rsp.getInputStream();
-        }catch(HTTPClient.ModuleException me){
-          me.printStackTrace();
-          return;
-        }catch(HTTPClient.ParseException pe){
-          pe.printStackTrace();
-          return;
+          Vector v =  (Vector) worker.runOrTimeout(timeout);
+          conn = (URLConnection) v.elementAt(0);
+          intContentLength = (Integer) v.elementAt(1);
+        }catch(Exception e) {
+        	setState("Could not connect: "+ e);
+          e.printStackTrace();
+        	return;
         }
-		
+        //get rid of the problem where tracks are downloaded but in reality they are 404 messages or some other html crud
+		String contentType = conn.getContentType();
+		if(contentType.indexOf("text") != -1) {
+			track.setBroken();
+			track.setRating(0);
+			return;
+		}
+
+        worker = null;
+        int contentLength = intContentLength.intValue();
+        setState("Downloading " + track.getName());
+        final InputStream is = conn.getInputStream();
         OutputStream os = new FileOutputStream(file);
-        final byte buf[] = new byte[256000];
+        final byte buf[] = new byte[128000];
         int totalBytes = 0;
-        /*worker = new TimeoutWorker((Object) is){
+        worker = new TimeoutWorker((Object) is){
           public void run() {
             int n;
             try {
@@ -238,21 +240,21 @@ private abstract class TimeoutWorker implements Runnable{
             }
             setOutput(new Integer(n));
           }
-        };*/
-            
+        };
+
         while (true) {
           int nbytes;
-          /*try {
+          try {
             nbytes = ((Integer) worker.runOrTimeout(timeout)).intValue();
           } catch(Exception e) {
             e.printStackTrace();
             return;
-          }*/
-          nbytes = is.read(buf);
+          }
+
           if (nbytes < 0)
             break;
           os.write(buf, 0, nbytes);
-          
+
           if (contentLength >= 0) {
             totalBytes += nbytes;
             int percent = totalBytes * 100 / contentLength;
@@ -336,26 +338,26 @@ private abstract class TimeoutWorker implements Runnable{
     this.state = state;
     notifyUpdateListeners();
   }
-  
+
   public void addUpdateListener(UpdateListener updateListener) {
     updateListeners.add(updateListener);
   }
-  
+
   private void notifyUpdateListeners() {
     for (int i = 0; i < updateListeners.size(); i++) {
       UpdateListener updateListener = (UpdateListener) updateListeners.elementAt(i);
       updateListener.actionPerformed();
     }
   }
-  
+
   private void doCheckAutoDownload() {
     String state = null;
     synchronized (trackDatabase) {
       int autoDownload = trackDatabase.getAutoDownload();
       int autoDownloadCount = trackDatabase.getAutoDownloadCount();
-      if (autoDownload == 0) 
+      if (autoDownload == 0)
         state = " ";
-      else if (autoDownloadCount < autoDownload) 
+      else if (autoDownloadCount < autoDownload)
         state = "Download in " + (autoDownload - autoDownloadCount) + " plays";
       else
         trackDatabase.setAutoDownloadCount(0);
