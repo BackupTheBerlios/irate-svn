@@ -535,6 +535,22 @@ public class Track {
   }
 
   /**
+   * Gets the genre for this track
+   * @return A string representing the genre in the track's ID3 tag or
+   *   an empty string if not avaliable.
+   */
+  public String getGenre() {
+    try {
+      MP3File mp3 = new MP3File(this.getFile());
+      return mp3.getGenre();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }		
+    return null;
+  }
+
+  /**
    * Gets a string reperesentation of the playing time of this track
    * @return A string representing the playing time in the track's ID3 tag
    */
@@ -549,6 +565,22 @@ public class Track {
     }
   }
   
+  /**
+   * Gets the year of this track
+   * @return A string representing the year in the track's ID3 tag or
+   *   an empty string if not avaliable.
+   */
+  public String getYear() {
+    try {
+      MP3File mp3 = new MP3File(this.getFile());
+      return mp3.getYear();
+    }
+    catch (Exception e) {
+      e.printStackTrace();
+    }		
+    return null;
+  }
+
   /**
    * Get the number of times this download has been attempted this session.
    * @return the number of times the program has attempted to download the track

@@ -29,10 +29,18 @@ public class TrackInfoDialog {
   
   private Label trackTitle;
   private Label artist;
-  private Label album;
+
   private Label playTime;
   private Label copyright;
-  private Label comment;
+
+  private Label labelAlbum;
+
+  private Label labelComment;
+
+  private Label labelGenre;
+
+  private Label labelYear;
+
   private Button closeButton;
   private Button wwwLink;
   private Button searchButton;
@@ -109,14 +117,34 @@ public class TrackInfoDialog {
       createLabel(infoGrid,
                   getResourceString("TrackInfoDialog.Label.Artist"),
                   currentTrack.getArtist(), m_fontLarge);
-    album =
-      createLabel(infoGrid,
-                  getResourceString("TrackInfoDialog.Label.Album"),
-                  currentTrack.getAlbum(), m_fontLarge);
+    String album = currentTrack.getAlbum();
+    if (! album.trim().equals(""))
+      labelAlbum =
+        createLabel(infoGrid,
+                    getResourceString("TrackInfoDialog.Label.Album"),
+                    album, m_fontLarge);
     playTime =
       createLabel(infoGrid,
                   getResourceString("TrackInfoDialog.Label.Length"),
                   currentTrack.getPlayingTimeString(), m_fontLarge);
+    String genre = currentTrack.getGenre();
+    if (! genre.trim().equals(""))
+      labelGenre =
+        createLabel(infoGrid,
+                    getResourceString("TrackInfoDialog.Label.Genre"),
+                    genre, m_fontMedium);
+    String year = currentTrack.getYear();
+    if (! year.trim().equals(""))
+      labelYear =
+        createLabel(infoGrid,
+                    getResourceString("TrackInfoDialog.Label.Year"),
+                    year, m_fontMedium);
+    String comment = currentTrack.getComment();
+    if (! comment.trim().equals(""))
+      labelComment =
+        createLabel(infoGrid,
+                    getResourceString("TrackInfoDialog.Label.Comment"),
+                    comment, m_fontMedium);
     copyright =
       createLabel(infoGrid,
                   getResourceString("TrackInfoDialog.Label.Copyright"),
@@ -138,10 +166,6 @@ public class TrackInfoDialog {
       gridData.horizontalAlignment = GridData.END;
       licenseButton.setLayoutData(gridData);
     }
-    comment =
-      createLabel(infoGrid,
-                  getResourceString("TrackInfoDialog.Label.Comment"),
-                  currentTrack.getComment(), m_fontMedium);
     return infoGrid;
   }
 
