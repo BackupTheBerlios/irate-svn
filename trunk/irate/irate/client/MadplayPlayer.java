@@ -86,8 +86,8 @@ public class MadplayPlayer extends ExternalPlayer {
               out.flush();
             }
           } 
-          in.close();
-          out.close();
+            // We mustn't close os here, because it is System.out.  The
+            // caller takes care of closing the streams.
         } 
         catch (IOException ioe) {
           //ioe.printStackTrace();
