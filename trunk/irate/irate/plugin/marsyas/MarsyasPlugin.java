@@ -6,9 +6,13 @@
  */
 package irate.plugin.marsyas;
 
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
+import org.eclipse.swt.widgets.Shell;
 
 import irate.plugin.*;
 import irate.common.Track;
@@ -20,6 +24,7 @@ extends Plugin
 implements TrackLifeCycleListener
 {
   private boolean initialized = false;
+  private boolean havePrereqs = false;
   /**
    * Get a short identifier for this Plugin.
    */
@@ -50,6 +55,32 @@ implements TrackLifeCycleListener
     System.out.println("Hello there from Marsyas");
   }
   
+  /**
+   * @return
+   */
+  private void checkPrereqs() throws Exception{
+    if(havePrereqs)
+      return;
+    
+    boolean haveStuff = true;
+    try{
+      Process p = Runtime.getRuntime().exec("madplay");
+      p.destroy();
+    }catch(Exception e) {
+      haveStuff = false;
+      throw new Exception ("Please install madplay");
+    }
+    try{
+      Process p = Runtime.getRuntime().exec(MarsyasExtractor.extractCMD);
+      p.destroy();
+    }catch(Exception e) {
+      haveStuff= false;
+      throw new Exception ("Failed find to run ("+MarsyasExtractor.extractCMD+").\n Please install childmarsyas: http://irate.sourceforge.net/snapshots/childmarsyas-0.2-taras.tar.bz2");
+    }
+    
+    havePrereqs=haveStuff;
+  }
+
   protected void doDetach()
   {
     getApp().removeTrackLifeCycleListener(this);
@@ -110,6 +141,24 @@ implements TrackLifeCycleListener
   	
     getApp().addTrackAction(Resources.getString("find_similar"), (SelectionListener)new SelectionAdapter() {
       public void widgetSelected(SelectionEvent e) {
+        try {
+          checkPrereqs();
+        } catch (final Exception e1) {
+          final Display d = Display.findDisplay(Thread.currentThread());
+          d.asyncExec(new Runnable() {
+            public void run() {
+              Shell fake = new Shell(d);
+              MessageBox m = new MessageBox(fake,SWT.OK | SWT.ICON_ERROR| SWT.APPLICATION_MODAL);
+             
+              m.setText("MarsyasPlugin prerequisite check failed");
+              m.setMessage("Could not find a prerequisite application:\r\n"+e1.getMessage());
+              m.open();
+              fake.dispose();
+            }
+          });        
+          return;
+
+        }
         Track track = getApp().getSelectedTrack();
         new MarsyasSimilaritySearch(MarsyasPlugin.this, getApp().getUserName(), getApp().getTracks(), track);
       }
@@ -129,7 +178,7 @@ implements TrackLifeCycleListener
   }
   
   void dbg(String msg) {
-    System.err.println("MarsyasSimilaritySearch: "+msg);
+    System.err.println("MarsyasPlugin: "+msg);
   }
 	
   /** CHeck if the track needs to be processed by marsyas */

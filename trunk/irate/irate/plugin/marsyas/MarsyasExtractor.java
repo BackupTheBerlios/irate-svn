@@ -17,8 +17,8 @@ import irate.common.Track;
  */
 public class MarsyasExtractor extends Thread{
   private static MarsyasExtractor me = new MarsyasExtractor();
-  final private String extractCMD = "/usr/local/bin/extract";
-  final private String featureName = "SVMFCC";
+  final static public String extractCMD = "/usr/local/bin/extract";
+  final static private String featureName = "SVMFCC";
   private Vector queue = new Vector();
   
   private MarsyasExtractor() {
