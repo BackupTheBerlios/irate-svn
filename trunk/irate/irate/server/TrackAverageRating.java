@@ -29,6 +29,12 @@ public class TrackAverageRating {
   }
 
   public ServerDatabase getAverages() {
+/*    Track[] tracks = averages.getTracks();
+    for (int i = 0; i < tracks.length; i++) {
+      Track track = tracks[i];
+      if (track.getRating() > 6.5F)
+        System.out.println("Avg: " + track.getName() + " " + track.getRating() + " " + track.getWeight());
+    } */
     return averages;
   }
 

@@ -82,7 +82,8 @@ public class TrackDatabase {
     synchronized (this) {
       Track copy;
       if ((copy = getTrack(track)) == null) {
-        copy = new FastTrack((XMLElement) track.getElement(), downloadDir);
+        copy = new FastTrack(track);
+        copy.setDownloadDir(downloadDir);
         docElt.addChild(copy.getElement());
         tracks.add(copy);
         hash.put(copy.getKey(), copy);
@@ -428,7 +429,7 @@ public class TrackDatabase {
         Track track = tracks[i];
           float rating = track.getRating();
 
-        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track)) && track.getFile() != null)
+        if (rating >= minRating && (toOmit == null || !toOmit.containsKey(track)))
           totalProb += getProbability(track);
 
         probs[i] = totalProb;
@@ -469,8 +470,6 @@ public class TrackDatabase {
     if (list.size() == 0)
       return null;
 
-//Commented out by EBD in favor of a true random int method
-//    int rand = Math.round(Math.abs(random.nextFloat()) * list.size());
     int rand = random.nextInt(list.size());
 
     return (Track) list.get(rand);

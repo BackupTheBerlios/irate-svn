@@ -15,6 +15,12 @@ public class FastTrack extends Track {
     rating = super.getRawRating();
   }
 
+  public FastTrack(Track track) {
+    super(track);
+    key = super.getKey();
+    rating = super.getRawRating();
+  }
+  
   public String key() {
     return key;
   }

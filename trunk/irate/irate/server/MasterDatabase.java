@@ -10,10 +10,10 @@ import java.util.*;
 public class MasterDatabase extends ServerDatabase {
 
     /** Add an orphan track one time in n. */
-  private final int orphanChance = 10;
+  private final int orphanChance = 5;
 
     /** Add a random track one time in n. */
-  private final int randomChance = 5;
+  private final int randomChance = 3;
 
     /** Issue five tracks to correlate. */
   private final int correlateNoOfTracks = 4;
@@ -107,6 +107,7 @@ public class MasterDatabase extends ServerDatabase {
 
         // See if we can correlate a track
       ServerDatabase corel = getBest(user);
+      System.out.println("Correlated tracks: " + corel.getNoOfTracks());
       for (int i = 0; i < correlateNoOfTracks; i++) {
         Track track = corel.chooseTrack(random);
         if (track != null) {
@@ -201,16 +202,33 @@ public class MasterDatabase extends ServerDatabase {
   public ServerDatabase getBest(ServerDatabase user) {
     ServerDatabase[] users = userList.getUsers();
     TrackAverageRating tar = new TrackAverageRating();
+    TreeMap treeMap = new TreeMap(new Comparator() {
+      public int compare(Object o0, Object o1) {
+        DatabaseCorrelator dc0 = (DatabaseCorrelator) o0;
+        DatabaseCorrelator dc1 = (DatabaseCorrelator) o1;
+        if (dc0.getCorrelation() > dc1.getCorrelation())
+          return -1;
+        return 1;
+      }
+    });
     for (int i = 0; i < users.length; i++) {
       if (user != users[i]) {
         DatabaseCorrelator dc = new DatabaseCorrelator(user, users[i]);
         dc.process();
         float correlation = dc.getCorrelation();
         if (correlation > 0) {
-//          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation());
-          tar.add(dc.getSpares(), correlation);
+//          System.out.println("Friend: " + users[i].getUserName() + " " + dc.getCorrelation() + " " + dc.getSpares().getNoOfTracks());
+          treeMap.put(dc, dc);
+//          tar.add(dc.getSpares(), correlation);
         }
       }
+    }
+    int count = treeMap.size() / 10;
+    for (Iterator itr = treeMap.values().iterator(); count >= 0 && itr.hasNext(); count--) {
+      DatabaseCorrelator dc = (DatabaseCorrelator) itr.next();
+      tar.add(dc.getSpares(), dc.getCorrelation());
+//      if (dc.getSpares().getNoOfTracks() != 0)
+//        System.out.println("Friend: " + dc.getCorrelation() + " " + dc.getSpares().getNoOfTracks());
     }
     return tar.getAverages();
   }

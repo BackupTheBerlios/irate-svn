@@ -6,8 +6,6 @@ import java.io.*;
 import java.util.*;
 import java.sql.*;
 
-import nanoxml.XMLElement;
-
 public class SQLTrackDatabase extends TrackDatabase{
   
   private int MAX_RATING = 10;

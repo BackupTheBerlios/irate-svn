@@ -19,6 +19,16 @@ public class DatabaseCorrelator {
     tracks1 = db1.getTracks();
   }
 
+  private boolean isRatingValid(Track track) {
+    float rating = track.getRating();
+    return 
+        rating == 0.0F ||
+        rating == 2.0F ||
+        rating == 5.0F ||
+        rating == 7.0F ||
+        rating == 10.0F;
+  }
+
   public void process() {
     Vector spares = new Vector();
     sparesDatabase = new ServerDatabase();
@@ -37,7 +47,7 @@ public class DatabaseCorrelator {
     float total1 = 0;
     for (int i = 0; i < tracks1.length; i++) {
       Track track1 = tracks1[i];
-      if (track1.isRated()) {
+      if (track1.isRated() && isRatingValid(track1)) {
         float rating1 = track1.getRating();
         Track track0 = db0.getTrack(track1);
         if (track0 == null) {
@@ -46,7 +56,7 @@ public class DatabaseCorrelator {
           spares.add(track1);
         }
         else {
-          if (track0.isRated()) {
+          if (track0.isRated() && isRatingValid(track0)) {
             float rating0 = track0.getRating();
 
               // Add this to the intersect list

@@ -20,6 +20,28 @@ public class Track {
     this.elt = elt;
     this.dir = dir;
   }
+  
+  public Track(Track track) {
+    elt = new XMLElement(new Properties(), true, false);
+    elt.setName("Track");
+    copy(track);
+  }
+  
+  private void copy(Track track) {
+    dir = track.dir;
+    setURL(track.getURL());
+    setTitle(track.getTitle());
+    setArtist(track.getArtist());
+    setRating(track.getRawRating());
+    setWeight(track.getWeight());
+//    System.out.println(elt);
+//    setWebURL(track.getWebURL());
+    // copy other attributes
+  }
+
+  public void setDownloadDir(File dir) {
+    this.dir = dir;
+  }
 
   /*package visibility*/ void setElement(XMLElement elt) {
     this.elt = elt;
@@ -137,8 +159,8 @@ public class Track {
 
   public void unSetNoOfTimesPlayed() {
     synchronized (this) {
-      elt.setAttribute("played", "");
-      elt.setAttribute("last", "");
+      elt.removeAttribute("played");
+      elt.removeAttribute("last");
     }
   }
 
@@ -154,7 +176,7 @@ public class Track {
   }
 
   public void unSetRating() {
-    elt.setAttribute("rating", "");
+    elt.removeAttribute("rating");
   }
 
   public void setWeight(float weight) {
@@ -162,7 +184,7 @@ public class Track {
   }
 
   public void unSetWeight() {
-    elt.setAttribute("weight", "");
+    elt.removeAttribute("weight");
   }
 
   public float getWeight() {
@@ -188,7 +210,7 @@ public class Track {
   }
   
   public void unSetVolume() {
-    elt.setAttribute("volume", "");
+    elt.removeAttribute("volume");
   }
   
   public void setBroken() {
@@ -219,11 +241,19 @@ public class Track {
     return isBroken() || getRating() == 0;
   }
 
+  public void setArtist(String artist) {
+    elt.setAttribute("artist", artist);
+  }
+
   public String getArtist() {
     String artist = elt.getStringAttribute("artist");
     if (artist == null)
       return "";
     return artist;
+  }
+  
+  public void setTitle(String title) {
+    elt.setAttribute("title", title);
   }
 
   public String getTitle() {
@@ -233,6 +263,10 @@ public class Track {
     return title;
   }
 
+  public void setURL(URL url) {
+    elt.setAttribute("url", url.toString());
+  }
+  
   public URL getURL() {
     try {
       String url = elt.getStringAttribute("url");
@@ -273,7 +307,7 @@ public class Track {
   }
 
   public void unSetFile() {
-    elt.setAttribute("file", "");
+    elt.removeAttribute("file");
   }
   
   public boolean isOnPlayList() {
