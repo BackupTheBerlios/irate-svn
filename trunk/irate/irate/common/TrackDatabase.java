@@ -124,23 +124,15 @@ public class TrackDatabase {
   }
 
   private XMLElement getElement(String eltName) {
-    Enumeration enum = docElt.enumerateChildren();
-    while(enum.hasMoreElements())
+    Enumeration e = docElt.enumerateChildren();
+    while(e.hasMoreElements())
     {
-      XMLElement elt = (XMLElement) enum.nextElement();
+      XMLElement elt = (XMLElement) e.nextElement();
       if(elt.getName().equals(eltName))
         return elt;
       }
 
     return null;
-    /*NodeList nodeList = docElt.getElementsByTagName(eltName);
-
-    if (nodeList.getLength() != 0) {
-      Node node = nodeList.item(0);
-      if (node instanceof Element)
-        return (Element) node;
-    }
-    return null;*/
   }
 
   protected String getAttribute(String name, String attName) {
@@ -334,9 +326,9 @@ public class TrackDatabase {
     docElt.parseFromReader(new InputStreamReader(is));
 
     if (docElt.getName().equals(docElementName)) {
-      Enumeration enum = docElt.enumerateChildren();
-      while(enum.hasMoreElements()) {
-        XMLElement elt = (XMLElement)enum.nextElement();
+      Enumeration e = docElt.enumerateChildren();
+      while(e.hasMoreElements()) {
+        XMLElement elt = (XMLElement)e.nextElement();
         if(!elt.getName().equals(trackElementName)) continue;
         //System.out.println(elt.toString());
         Track track = new FastTrack(elt, downloadDir);

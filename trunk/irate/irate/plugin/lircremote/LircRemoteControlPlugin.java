@@ -393,9 +393,9 @@ public class LircRemoteControlPlugin
       func.clearConfig();
     }
 
-    Enumeration enum = elt.enumerateChildren();
-    while (enum.hasMoreElements()) {
-      XMLElement funcElt = (XMLElement) enum.nextElement();
+    Enumeration e = elt.enumerateChildren();
+    while (e.hasMoreElements()) {
+      XMLElement funcElt = (XMLElement) e.nextElement();
       if (funcElt.getName().equals("function")) {
         String id = funcElt.getStringAttribute("id");
         for (int i = 0; i < functions.size(); i++) {

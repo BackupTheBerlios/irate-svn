@@ -35,9 +35,9 @@ public class Preferences {
       
       XMLElement docElt = getConfigFileAsXML();
       
-      Enumeration enum = docElt.enumerateChildren();
-      while(enum.hasMoreElements()) {
-        XMLElement elt = (XMLElement)enum.nextElement();
+      Enumeration e = docElt.enumerateChildren();
+      while(e.hasMoreElements()) {
+        XMLElement elt = (XMLElement)e.nextElement();
         if (elt.getName().equals("preference")) {
           String identifier = elt.getStringAttribute("id");
           if(identifier.equals("downloadDir")) {
@@ -56,9 +56,9 @@ public class Preferences {
     try {    
      XMLElement docElt = getConfigFileAsXML();
   
-     Enumeration enum = docElt.enumerateChildren();
-     while(enum.hasMoreElements()) {
-       XMLElement elt = (XMLElement)enum.nextElement();
+     Enumeration e = docElt.enumerateChildren();
+     while(e.hasMoreElements()) {
+       XMLElement elt = (XMLElement)e.nextElement();
        if (elt.getName().equals("preference")) {
         String identifier = elt.getStringAttribute("id");
         if(identifier.equals(prefName)) {
@@ -88,10 +88,10 @@ public class Preferences {
       
       docElt = getConfigFileAsXML();
     
-      Enumeration enum = docElt.enumerateChildren();
+      Enumeration e = docElt.enumerateChildren();
       
-      while(enum.hasMoreElements()) {
-        XMLElement elt = (XMLElement)enum.nextElement();
+      while(e.hasMoreElements()) {
+        XMLElement elt = (XMLElement)e.nextElement();
           if (elt.getName().equals(child.getName())) {
             String identifier = elt.getStringAttribute("id");
             if(identifier.equals(child.getAttribute("id"))) {
@@ -133,9 +133,9 @@ public class Preferences {
      docElt = getConfigFileAsXML();
      
      
-     Enumeration enum = docElt.enumerateChildren();
-      while(enum.hasMoreElements()) {
-        XMLElement elt = (XMLElement)enum.nextElement();
+     Enumeration e = docElt.enumerateChildren();
+      while(e.hasMoreElements()) {
+        XMLElement elt = (XMLElement)e.nextElement();
         if (elt.getName().equals("preference")) {
           String identifier = elt.getStringAttribute("id");
           if(identifier.equals(prefName)) {

@@ -42,9 +42,9 @@ public class ServerDatabase extends TrackDatabase {
     if (friends == null) {
       friends = new HashSet();
       XMLElement docElt = getDocElement();
-      Enumeration enum = docElt.enumerateChildren();
-      while(enum.hasMoreElements()) {
-        XMLElement elt = (XMLElement)enum.nextElement();
+      Enumeration e = docElt.enumerateChildren();
+      while(e.hasMoreElements()) {
+        XMLElement elt = (XMLElement)e.nextElement();
         if (elt.getName().equals("Friend")) {
           DatabaseReference friend = userList.getUser(elt);
           friends.add(friend);

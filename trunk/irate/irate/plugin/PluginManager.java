@@ -88,9 +88,9 @@ public class PluginManager
     inputStreamReader.close();
     is.close();
     
-    Enumeration enum = docElt.enumerateChildren();
-    while(enum.hasMoreElements()) {
-      XMLElement elt = (XMLElement)enum.nextElement();
+    Enumeration e = docElt.enumerateChildren();
+    while(e.hasMoreElements()) {
+      XMLElement elt = (XMLElement)e.nextElement();
       if (elt.getName().equals("plugin")) {
         String identifier = elt.getStringAttribute("id");
         if (identifier != null)

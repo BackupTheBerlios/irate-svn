@@ -30,9 +30,9 @@ public abstract class Function
   public void parseXML(XMLElement elt)
   {
     buttons.clear();
-    Enumeration enum = elt.enumerateChildren();
-    while (enum.hasMoreElements()) {
-      XMLElement child = (XMLElement) enum.nextElement();
+    Enumeration e = elt.enumerateChildren();
+    while (e.hasMoreElements()) {
+      XMLElement child = (XMLElement) e.nextElement();
       if (child.getName().equals("button"))
         buttons.add(new Button(child));
     }
