@@ -237,6 +237,12 @@ public abstract class ExternalPlayer extends AbstractPlayer {
           process.waitFor();
 
           // If we get here, the player subprocess has gone away.
+          try {
+            process.getOutputStream().close();
+            process.getInputStream().close();
+            process.getErrorStream().close();
+          } catch (IOException e) {
+          } catch (NullPointerException e) {}
           playing = false;
           if (process.exitValue() != 0) {
             setPlayingThread(null);
@@ -254,8 +260,14 @@ public abstract class ExternalPlayer extends AbstractPlayer {
           // drivers.
           deepSleep(100);
           try {
-          process.destroy();
-          process.waitFor();
+            try {
+              process.getOutputStream().close();
+              process.getInputStream().close();
+              process.getErrorStream().close();
+            } catch (IOException ex) {
+            } catch (NullPointerException ex) {}
+            process.destroy();
+            process.waitFor();
           } catch (InterruptedException foo) {}
 
           synchronized(this) {
