@@ -1,0 +1,81 @@
+Name: irate-client-gtk
+Summary: The iRATE music database client
+Version: snapshot1
+Release: 1
+Group: Applications/Multimedia
+Copyright: GPL
+Packager: Todd Pytel <tppytel@sophrosune.org>
+BuildRoot: /tmp/build-%{name}
+Source0: irate-src.tar.gz
+Source1: menu-mdk91
+Requires: mad
+
+%description
+iRATE radio is a collaborative filtering mp3 player/downloader. The client logs into
+an iRATE server containing a large database of legally downloadable music. You rate 
+downloaded tracks and the server matches your ratings with those of other people to 
+provide you with music you'll like. 
+
+This package was built from a developer's version of iRATE. Thus, it may have
+be unstable or have other undesirable behavior.
+
+%prep
+rm -rf $RPM_BUILD_ROOT
+mkdir $RPM_BUILD_ROOT
+
+%setup -n irate
+
+%build
+make PLATFORM=linux-gtk2 irate-client
+
+%install
+make PLATFORM=linux-gtk2 DESTDIR=$RPM_BUILD_ROOT install
+mv $RPM_BUILD_ROOT/usr/bin/irate-client $RPM_BUILD_ROOT/usr/bin/irate-client-gtk
+
+mkdir -p $RPM_BUILD_ROOT/usr/lib/menu
+cp $RPM_SOURCE_DIR/menu-mdk91 $RPM_BUILD_ROOT/usr/lib/menu/irate-client-gtk
+
+mkdir -p $RPM_BUILD_ROOT/usr/share/man/man1
+cp debian/irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1
+ln -s irate-client.1 $RPM_BUILD_ROOT/usr/share/man/man1/irate-client-gtk.1
+
+%post
+%{update_menus}
+
+%postun
+%{clean_menus}
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+rm -rf $RPM_BUILD_DIR/irate
+
+%files
+%defattr(-,root,root)
+%doc README COPYING
+/usr/bin
+/usr/lib
+/usr/share/man
+
+%changelog
+* Sat Sep 20 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-1
+- Initial CVS commit
+
+* Sat Sep 20 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-b
+- Removed makefile patch due to new makefile, added PLATFORM export
+- added man page
+
+* Thu Sep 18 2003 Todd Pytel <tppytel@sophrosune.org> snapshot1-a
+- Initial snapshot spec required various name changes
+- moved menu file to separate source, rather than patch
+- removed icon
+
+* Sat Sep 13 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-1
+- Initial public RPM package
+
+* Sat Sep 13 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-b
+- Changed dependency to mad/madplay
+- Replaced desktop file with a menu system entry
+- Added post/postun menu macros
+
+* Wed Sep 10 2003 Todd Pytel <tppytel@sophrosune.org> 0.2-a
+- Initial Mandrake RPM package
