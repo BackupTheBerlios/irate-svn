@@ -31,10 +31,10 @@ $socket = IO::Socket::INET->new(PeerAddr => $remote_host,
 
 my %command = ( 'type' => 'pause' );
 
-print $socket XMLout(\%command, rootname => 'command');
+print $socket XMLout(\%command, rootname => 'Command');
 
 %command = ( 'type' => 'disconnect' );
 
-print $socket XMLout(\%command, rootname => 'command');
+print $socket XMLout(\%command, rootname => 'Command');
 
 close($socket);

@@ -6,15 +6,15 @@ PORT=12473
 case "$1" in
   skip)
         echo "Skipping to next track"
-        echo '<command type="skip"/>' |telnet ${HOST} ${PORT} >/dev/null
+        echo '<Command type="skip"/>' |telnet ${HOST} ${PORT} >/dev/null
 	;;
   invert-pause)
         echo "Inverting pause state of audio play"
-        echo '<command type="invert-pause"/>' |telnet ${HOST} ${PORT} >/dev/null
+        echo '<Command type="invert-pause"/>' |telnet ${HOST} ${PORT} >/dev/null
 	;;
   pause)
         echo "Pausing audio play"
-        echo '<command type="pause"/>' |telnet ${HOST} ${PORT} >/dev/null
+        echo '<Command type="pause"/>' |telnet ${HOST} ${PORT} >/dev/null
 	;;
   *)
 	echo Usage $0 "<command>"

@@ -46,7 +46,7 @@ while (!$finished) {
                    'type' => 'currenttrack'
                    );
     
-    print $socket XMLout(\%command, rootname => 'command');
+    print $socket XMLout(\%command, rootname => 'Command');
     
     $reply = <$socket>;
     chomp $reply;
@@ -86,7 +86,7 @@ while (!$finished) {
                     );
         $poke = 1;
     }
-    print $socket XMLout(\%command, rootname => 'command');
+    print $socket XMLout(\%command, rootname => 'Command');
     
     # work around for iRATE bug
     if ($input =~ /s|1/i) {

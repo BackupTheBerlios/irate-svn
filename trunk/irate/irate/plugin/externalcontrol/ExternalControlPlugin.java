@@ -107,14 +107,14 @@ public class ExternalControlPlugin
       while (notFinished) {
         XMLElement command = new XMLElement(new Hashtable(), true, false);
         XMLElement response = new XMLElement(new Hashtable(), true, false);
-        response.setName("irate-client");
+        response.setName("IrateClient");
         try {
           command.parseFromReader(new InputStreamReader(in));
         } catch (XMLParseException e) {
           fatal = true;
         }
         boolean replyNeeded = false;
-        if (fatal || !command.getName().equals("command")) {
+        if (fatal || !command.getName().equals("Command")) {
           // Fatal error - compose response, disconnect.
           response.setAttribute("type", "error");
           response.setAttribute("errorcondition", "unknown-command");
