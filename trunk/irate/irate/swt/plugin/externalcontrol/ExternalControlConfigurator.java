@@ -16,10 +16,10 @@ import irate.plugin.externalcontrol.ExternalControlPlugin;
  * SWT version of the configurator for the external control plugin
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2004/05/31 04:38:45 $$
+ * Date Updated: $$Date: 2004/06/15 12:13:19 $$
  * @author Creator:	Robin <robin@kallisti.net.nz> (eythain)
- * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.6 $$
+ * @author Updated:	$$Author: blackh $$
+ * @version $$Revision: 1.7 $$
  */
 public class ExternalControlConfigurator {
   private Display display;
@@ -69,7 +69,7 @@ public class ExternalControlConfigurator {
     port.setText(Integer.toString(plugin.getPort()));
     port.addModifyListener(callSetup);
 
-    new Label(shell, SWT.NONE).setText("Simultanious connections");
+    new Label(shell, SWT.NONE).setText("Simultaneous connections");
     simConn = new Text(shell, SWT.SINGLE | SWT.BORDER);
     simConn.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL));
     simConn.setText(Integer.toString(plugin.getSimConnections()));

@@ -13,10 +13,10 @@ import nanoxml.*;
  * network socket.
  *
  * Date Created: 18/9/2003
- * Date Updated: $$Date: 2004/05/31 04:38:44 $$
+ * Date Updated: $$Date: 2004/06/15 12:13:19 $$
  * @author Creator: Robin <robin@kallisti.net.nz> (eythian)
- * @author Updated:	$$Author: eythian $$
- * @version $$Revision: 1.14 $$
+ * @author Updated:	$$Author: blackh $$
+ * @version $$Revision: 1.15 $$
  */
 
 public class ExternalControlPlugin 
@@ -120,14 +120,14 @@ public class ExternalControlPlugin
   }
 
   /**
-   * Returns the current simultanious connection limit
+   * Returns the current simultaneous connection limit
    */
   public int getSimConnections() {
     return simConns;
   }
 
   /**
-   * Sets the simultanious connection limit
+   * Sets the simultaneous connection limit
    */
   public void setSimConnections(int s) {
     simConns = s;
