@@ -10,6 +10,8 @@ import org.xml.sax.*;
 
 public class TrackDatabase {
   
+  private int MAX_RATING = 10;
+  
   private final String docElementName = "TrackDatabase";
   private final String trackElementName = "Track";
   private final String userElementName = "User";
@@ -319,11 +321,16 @@ public class TrackDatabase {
     Track[] tracks = getTracks();
     float[] probs = new float[tracks.length]; 
 
+      // Choose a minimum probability
+    float minRating = MAX_RATING * random.nextFloat();
+//    System.out.println("minRating = " + minRating);
+    
     float totalProb = 0;
     for (int i = 0; i < tracks.length; i++) {
-      totalProb += getProbability(tracks[i]);
+      Track track = tracks[i];
+      if (track.getRating() >= minRating)
+        totalProb += getProbability(track);
       probs[i] = totalProb;
-//      System.out.println(Float.toString(totalProb) + " " + getProbability(tracks[i]) + " " + tracks[i]);
     }
 
     if (totalProb == 0)

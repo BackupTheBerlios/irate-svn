@@ -9,6 +9,7 @@ import org.w3c.dom.*;
 public class Track {
 
   private final int DEFAULT_RATING = 5;
+  private final int INITIAL_RATING = 10;
   
   private Element elt;
   
@@ -57,6 +58,8 @@ public class Track {
   public float getRating() {
     if (isRated())
       return getRawRating();
+    if (getNoOfTimesPlayed() == 0)
+      return INITIAL_RATING;
     return DEFAULT_RATING;
   }
 
