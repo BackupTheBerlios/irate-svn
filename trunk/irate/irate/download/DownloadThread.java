@@ -223,6 +223,7 @@ public class DownloadThread extends Thread {
       int contentLength;
       long continueOffset;
       InputStream inputStream;
+      boolean timedOut = false;
       try {
         // These values are returned by the Timeout Worker.
         final URLConnection[] urlConnectionArray = new URLConnection[1];
@@ -300,6 +301,7 @@ public class DownloadThread extends Thread {
                 }.runOrTimeout(timeout);
               }
               catch (Exception e) {
+                timedOut = true;
                 throw new IOException(e.toString());
               }
     
@@ -324,7 +326,17 @@ public class DownloadThread extends Thread {
         }
       }
       finally {
-        inputStream.close();
+        // Seems to be an ugly Java bug in the URLConnection.
+        // If a connection times out (connection lost) and then we attempt to 
+        // close the stream, it blocks -- forever.  Or, until data is available, anyway.
+        // So, in this case, lets not close the stream, as ugly as that is.  It shouldn't happen
+        // all that often.
+        if(!timedOut) {
+          inputStream.close();
+        }
+        else {
+          timedOut = false;
+        }
       }
       track.setFile(file);
       trackDatabase.save();
