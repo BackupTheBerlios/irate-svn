@@ -16,14 +16,13 @@ public class Help {
   
 	public Help()
   {
-    add("help/about.txt", "iRATE radio 0.3rc4 http://irate.sourceforge.net\n"
+    add("help/about.txt", "iRATE radio 0.3rc5 http://irate.sourceforge.net\n"
         + "\n"
-        + "Written by Anthony Jones <ajones@clear.net.nz>. Many thanks to Taras Glek for\n"
-        + "SWT client, GCJ compilation, nanoxml library. Thanks to Stephen Blackheath for\n"
-        + "several bug fixes.\n"
-        + "\n"
-        + "Give yourself a pat on the back for rating tracks. Your input in the\n"
-        + "collaborative filtering system is much appreciated.\n"
+        + "Original concept by Anthony Jones <ajones@clear.net.nz>. Written by Anthony\n"
+        + "Jones and Taras Glek. Thanks to Stephen Blackheath, Robin Sheat, Chris Manley,\n"
+        + "Eric Dalquist, Markus Ezenberger, Todd Pytel, Michael Crawford and Judd Cohen.\n"
+        + "Thanks also to those who contributed patches or bug fixes, filed bug reports\n"
+        + "or submitted music web sites.\n"
         + "\n"
         + "This program is free software; you can redistribute it and/or modify it under\n"
         + "the terms of the GNU General Public License as published by the Free Software\n"
