@@ -16,7 +16,7 @@ public class ToolTipArmListener
   private static PluginApplication currentApp;
   private static String currentTooltip;
   private static long currentTime;
-  private static long displayFor = 2000L;  /* Display tool tips on status bar for 2 seconds. */
+  private static long displayFor = 5000L;  /* Display tool tips on status bar for 5 seconds. */
 
   /**
    * @param app Gives access to the application's status bar.
