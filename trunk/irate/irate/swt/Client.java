@@ -480,6 +480,13 @@ public class Client extends AbstractClient {
   }
 
   public void createMenu() {
+    // Needed to clean up on Mac regular quit event
+    display.addListener(SWT.Close, new Listener() {
+      public void handleEvent(Event e) {
+        quit();
+      }
+    });
+    
     Menu menubar = new Menu(shell, SWT.BAR);
     shell.setMenuBar(menubar);
 

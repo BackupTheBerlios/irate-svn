@@ -19,9 +19,9 @@ depends on Sun's Swing library which does not meet the DFSG (Debian Free
 Software Guidelines) requirements of being free.
 
 The SWT version works on Windows, Linux using Motif widgets and Linux using
-GTK2 widgets. The SWT library itself is free software but both Windows and
-Motif are non-free. Therefore the the GTK2 version of iRATE is recommended
-if it is supported on your platform.
+GTK2 widgets, as well as Mac OS X using Aqua widgets. The SWT library itself
+is free software but both Windows and Motif are non-free. Therefore the the
+GTK2 version of iRATE is recommended if it is supported on your platform.
 
 
 BUILDING WITH JAVA SDK
@@ -41,7 +41,7 @@ $ ant
 To run the SWT version on a *nix platform you need to do this:
 
 $ export LD_LIBRARY_PATH=lib
-$ java -jar irate-client.jar
+$ java -jar irate-client-swt.jar
 
 To run the SWT version on any platform you need to do:
 
@@ -49,11 +49,19 @@ $ java -Djava.library.path=lib -jar irate-client-swt.jar
 
 To run the Swing version you will need to do this:
 
-$ java -jar irate-swing-client.jar
+$ java -jar irate-client-swing.jar
 
 To run the Swing version on any platform you need to do:
 
 $ java -Djava.library.path=lib -jar irate-client-swing.jar
+
+
+The SWT build on Mac OS X needs to be run from an application bundle:
+
+$ ant mac
+
+This will create an application bundle iRATE.app under dist/mac, and a
+distributable disk image irate-client-macosx.dmg.
 
 
 BUILDING WITH GCJ

@@ -119,6 +119,50 @@
     </exec>
   </target>
 
+    <!-- Mac application bundle -->
+  <target name="macapp" depends="jar">
+    <mkdir dir="mac/dist"/>
+    <mkdir dir="mac/dist/iRATE.app"/>
+    <mkdir dir="mac/dist/iRATE.app/Contents"/>
+    <copy file="mac/Info.plist"
+      todir="mac/dist/iRATE.app/Contents" overwrite="true"/>
+    <copy file="mac/PkgInfo"
+      todir="mac/dist/iRATE.app/Contents" overwrite="true"/>
+    <mkdir dir="mac/dist/iRATE.app/Contents/MacOS"/>
+    <copy file="mac/bin/java_swt"
+      todir="mac/dist/iRATE.app/Contents/MacOS"
+      overwrite="true" preservelastmodified="true"/>
+    <chmod file="mac/dist/iRATE.app/Contents/MacOS/java_swt" perm="755"/>
+    <mkdir dir="mac/dist/iRATE.app/Contents/Resources"/>
+    <copy file="irate/resources/iRateApp.icns"
+      todir="mac/dist/iRATE.app/Contents/Resources"
+      overwrite="true" preservelastmodified="true"/>
+    <mkdir dir="mac/dist/iRATE.app/Contents/Resources/Java"/>
+    <copy file="irate-client-swt.jar"
+      todir="mac/dist/iRATE.app/Contents/Resources/java"
+      overwrite="true" preservelastmodified="true"/>
+    <copy todir="mac/dist/iRATE.app/Contents/Resources/Java"
+      overwrite="true" preservelastmodified="true">
+      <fileset dir="lib" includes="*.jar"/>
+    </copy>
+    <mkdir dir="mac/dist/iRATE.app/Contents/Resources/Java/dll"/>
+    <copy todir="mac/dist/iRATE.app/Contents/Resources/Java/dll"
+      overwrite="true" preservelastmodified="true">
+      <fileset dir="lib" includes="libswt-carbon-*.jnilib"/>
+    </copy>
+    <mkdir dir="mac/dist/iRATE.app/Contents/Resources Disabled"/>
+  </target>
+  
+    <!-- Disk image of the Mac app -->
+  <target name="mac" depends="macapp">
+    <exec executable="hdiutil">
+      <arg line="create -srcfolder mac/dist -ov -volname 'iRATE SWT Client' -nouuid -gid 99 -format UDZO -imagekey zlib-level=9 irate-client-macosx.dmg"/>
+    </exec>
+    <exec executable="hdiutil">
+      <arg line="internet-enable -yes irate-client-macosx.dmg"/>
+    </exec>
+  </target>
+  
   <target name="all" depends="gzip,nsis">
   </target>
 
@@ -140,6 +184,7 @@
       <fileset file="irate-client-linux.tar.gz"/>
       <fileset file="irate-client-win32.exe"/>
       <fileset file="irate/resources/skin.zip"/>
+      <fileset file="irate-client-macosx.dmg"/>
       
       <!-- Old files no longer used -->
       <fileset file="irate-client-macosx.zip"/>
@@ -150,6 +195,7 @@
       <fileset file="irate-client-installer.exe"/>
       <fileset file="irate/resources/skin.zip"/>
     </delete>
+    <delete dir="mac/dist/iRATE.app"/>
   </target>
 
   <target name="javadoc">
