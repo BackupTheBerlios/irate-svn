@@ -5,7 +5,7 @@ import java.io.*;
 import java.util.*;
 import javax.sound.sampled.*;
 import irate.common.*;
-import javazoom.jl.player.Player;
+//import javazoom.jl.player.Player;
 
 public class PlayThread extends Thread {
  
@@ -34,7 +34,6 @@ public class PlayThread extends Thread {
   }
 
   private void playFile(File file) throws Exception {
-    externalPlayer = playListManager.getPlayList().getPlayer();
     if (externalPlayer.length() != 0) {
       playerProcess = Runtime.getRuntime().exec(new String[] { externalPlayer, file.getPath() });
       try {
@@ -49,6 +48,7 @@ public class PlayThread extends Thread {
       player = new Player(new BufferedInputStream(
           new FileInputStream(file), 2048));
       player.play();
+      player = null;
     }
   }
 
@@ -69,6 +69,8 @@ public class PlayThread extends Thread {
       }
 
       if (currentTrack != null) {
+          // Work out which player we're planning to use
+        externalPlayer = playListManager.getPlayList().getPlayer();
         notifyActionListeners();
         File file = currentTrack.getFile();
         if (file.exists()) {
@@ -121,6 +123,21 @@ public class PlayThread extends Thread {
 
   public void setRating(int rating) {
     currentTrack.setRating(rating);
+  }
+
+  public void setPaused(boolean paused) {
+    if (player != null)
+      player.setPaused(paused);
+  }
+
+  public boolean isPaused() {
+    if (player == null)
+      return false;
+    return player.isPaused();
+  }
+
+  public boolean isPauseSupported() {
+    return externalPlayer.length() == 0;
   }
 
   public void addActionListener(ActionListener actionListener) {

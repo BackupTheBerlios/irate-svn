@@ -15,6 +15,7 @@ public class PlayPanel extends JPanel {
 //  private Track[] tracks;
   private TrackTable trackTable;
   private JTable table;
+  private JButton pauseButton;
   
   public PlayPanel(PlayListManager playListManager, PlayThread playThread) {
     super(new BorderLayout());
@@ -103,14 +104,35 @@ public class PlayPanel extends JPanel {
     });
     panel.add(veryGoodButton);
 
+    pauseButton = new JButton(""); 
+    pauseButton.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        setPaused(!playThread.isPaused());
+      }
+    });
+    setPaused(false);
+    panel.add(pauseButton);
+
     JButton skipButton = new JButton(">>");
     skipButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
         playThread.reject();
+        setPaused(false);
       }
     });
     panel.add(skipButton);
     return panel;
+  }
+
+  public void setPaused(boolean paused) {
+    if (paused) {
+      playThread.setPaused(true);
+      pauseButton.setText(">");
+    }
+    else {
+      playThread.setPaused(false);
+      pauseButton.setText("||");
+    }
   }
 
   public void setRating(int rating) {
@@ -127,16 +149,6 @@ public class PlayPanel extends JPanel {
     Track currentTrack = playThread.getCurrentTrack();
     currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
     trackTable.notifyListeners();
-//    synchronized (this) {
-//      currentSongLabel.setText(currentTrack == null ? " " : currentTrack.toString());
-//
-//      tracks = playListManager.getPlayList().getTracks();
-//      String items[] = new String[tracks.length];
-//      for (int i = 0; i < tracks.length; i++) 
-//        items[i] = tracks[i].toString();
-//      Object o = list.getSelectedValue();
-//      list.setListData(items);
-//      list.setSelectedValue(o, true);
-//    }
+    pauseButton.setEnabled(playThread.isPauseSupported());
   }
 }

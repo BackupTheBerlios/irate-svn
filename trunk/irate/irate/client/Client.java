@@ -41,7 +41,7 @@ public class Client extends JFrame {
   public Client() throws Exception {
     setTitle("iRATE radio");
 
-    setSize(600, 400);
+    setSize(640, 400);
   
     File file = new File("trackdatabase.xml");
     try {
