@@ -323,7 +323,8 @@ public class Track implements TrackDetails {
   }
 
   public boolean isDeleted() {
-      return isRated() && getState().equals("deleted");
+      String isDeleted = elt.getStringAttribute("deleted");
+      return isRated() && isDeleted != null && isDeleted.equals("true");
   }
   
   public boolean isActive() {
@@ -471,10 +472,17 @@ public class Track implements TrackDetails {
         return Resources.getString("track.rating.downloading") + " " + percent_complete + "%";
       return Resources.getString("track.rating.notdownloaded");
     }
-    if (isMissing())
+    String isDeleted = elt.getStringAttribute("deleted");
+    if ((isDeleted != null) && (isDeleted.equals("true"))) {
+        return "deleted";
+    }
+    if (isMissing()) {
       return Resources.getString("track.rating.missing");
+    }
     if (isRated())
+    {
       return Integer.toString((int) getRating());
+    }
     return Resources.getString("track.rating.unrated");
   }
   
