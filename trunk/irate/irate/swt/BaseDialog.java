@@ -13,24 +13,27 @@ import org.eclipse.swt.widgets.*;
     to be filled by the user and a button composite where buttons
     can be added with the addButton function.
 */
-public class BaseDialog extends Shell {
+public class BaseDialog {
+
   public Composite mainComposite;
 
+  public Shell shell;
+
   public BaseDialog(Display display, String title) {
-    super(display);
-    setLayout(new GridLayout(1, false));
-    setText(title);
+    shell = new Shell(display);
+    shell.setLayout(new GridLayout(1, false));
+    shell.setText(title);
     setImage(display);
-    mainComposite = new Composite(this, SWT.NONE);
+    mainComposite = new Composite(shell, SWT.NONE);
     GridData data;
     data = new GridData(GridData.FILL_HORIZONTAL | GridData.FILL_VERTICAL);
     mainComposite.setLayoutData(data);
-    buttonsComposite = new Composite(this, SWT.NONE);
+    buttonsComposite = new Composite(shell, SWT.NONE);
     buttonsComposite.setLayout(new FillLayout());
     data = new GridData();
     data.horizontalAlignment = GridData.END;
     buttonsComposite.setLayoutData(data);
-    addDisposeListener(new DisposeListener() {
+    shell.addDisposeListener(new DisposeListener() {
         public void widgetDisposed(DisposeEvent e) {
           if (image != null)
             image.dispose();
@@ -48,8 +51,8 @@ public class BaseDialog extends Shell {
 
   /** Center this shell on a parent shell or on display if parent == null. */
   public void centerOn(Shell parent) {
-    Rectangle displaySize = getDisplay().getClientArea();
-    Point size = getSize();
+    Rectangle displaySize = shell.getDisplay().getClientArea();
+    Point size = shell.getSize();
     int x, y;
     if (parent == null) {
       x = displaySize.x + (displaySize.width - size.x) / 2;
@@ -71,7 +74,7 @@ public class BaseDialog extends Shell {
       y = displaySize.y;
     else if (y > yMax)
       y = yMax;
-    setLocation(x, y);
+    shell.setLocation(x, y);
   }
 
   private Composite buttonsComposite;
@@ -83,7 +86,7 @@ public class BaseDialog extends Shell {
       InputStream stream = BaseResources.getResourceAsStream("icon.gif");
       ImageData imageData = new ImageData(stream); 
       image = new Image(display, imageData);
-      setImage(image);
+      shell.setImage(image);
     }
     catch (Exception e) {
       e.printStackTrace();

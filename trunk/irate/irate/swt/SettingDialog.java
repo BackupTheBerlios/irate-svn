@@ -14,10 +14,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.*;
 
 /**
- * Date Updated: $Date: 2004/01/07 00:02:32 $
+ * Date Updated: $Date: 2004/01/10 23:20:57 $
  * @author Creator: Stephen Blackheath
  * @author Updated: Robin Sheat
- * @version $Revision: 1.16 $
+ * @version $Revision: 1.17 $
  */
 public class SettingDialog
 {
@@ -50,7 +50,7 @@ public class SettingDialog
   /** Show prefs window 
   @param display swt display */
   public void open(Display display) {
-    dialog.open();
+    dialog.shell.open();
     while (!done) {
       if (!display.readAndDispatch()) display.sleep();
     }
@@ -62,7 +62,7 @@ public class SettingDialog
       e.printStackTrace();
     }
     //should do dispose in a finalyzer
-    dialog.dispose();
+    dialog.shell.dispose();
 
   }
 
@@ -70,7 +70,7 @@ public class SettingDialog
   private void createWidgets(Display display) {
     String title = getResourceString("SettingDialog.Title.Settings"); 
     dialog = new BaseDialog(display, title);
-    dialog.addShellListener(new ShellAdapter() {
+    dialog.shell.addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           done=true;
         }
@@ -96,13 +96,13 @@ public class SettingDialog
             Preferences.savePreferenceToFile("browser", browser); 
           } catch (IOException ioe) {
             ioe.printStackTrace();
-            dialog.close();
+            dialog.shell.close();
           }
-          dialog.close();
+          dialog.shell.close();
         }
       });
     
-    dialog.pack();    
+    dialog.shell.pack();
   }
   
   private Composite createPluginPage(Composite parent) {
@@ -252,7 +252,7 @@ public class SettingDialog
     
     browseButton.addSelectionListener(new SelectionAdapter(){
         public void widgetSelected(SelectionEvent e){
-          FileDialog fd = new FileDialog(dialog, SWT.OPEN);
+          FileDialog fd = new FileDialog(dialog.shell, SWT.OPEN);
           fd.setText(getResourceString("SettingDialog.FileDialog.Text")); 
           fd.open();
           if (!fd.getFileName().equals("")) { 

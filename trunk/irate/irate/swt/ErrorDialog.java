@@ -30,10 +30,9 @@ public class ErrorDialog {
       createDialog();
       createText(r);
       createCloseButton();
-      Point size = dialog.getSize();
-      dialog.pack();
+      dialog.shell.pack();
       dialog.centerOn(parent);
-      dialog.open();
+      dialog.shell.open();
     }
   }
   
@@ -46,7 +45,7 @@ public class ErrorDialog {
     dialog = new BaseDialog(display, "");
     GridLayout layout = new GridLayout(1, false);
     dialog.mainComposite.setLayout(layout);
-    dialog.addShellListener(new ShellAdapter() {
+    dialog.shell.addShellListener(new ShellAdapter() {
       public void shellClosed(ShellEvent e){
         actionClose();
       }
@@ -92,7 +91,7 @@ public class ErrorDialog {
   }
 
   private void actionClose() {
-    dialog.dispose();
+    dialog.shell.dispose();
     dialog = null;
   }
   

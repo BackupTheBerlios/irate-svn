@@ -38,9 +38,9 @@ public class AboutDialog {
       data.heightHint = numberLinesShown * text.getLineHeight();;
       text.setLayoutData(data);
       createCloseButton();
-      dialog.pack();
+      dialog.shell.pack();
       dialog.centerOn(parent);
-      dialog.open();
+      dialog.shell.open();
     }
   }
 
@@ -61,7 +61,7 @@ public class AboutDialog {
       + getResourceString("titlebar.program_name");
     dialog = new BaseDialog(display, title);
     dialog.mainComposite.setLayout(new GridLayout(1, false));
-    dialog.addShellListener(new ShellAdapter() {
+    dialog.shell.addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           actionClose();
         }
@@ -128,7 +128,7 @@ public class AboutDialog {
   }
 
   private void actionClose() {
-    dialog.dispose();
+    dialog.shell.dispose();
     dialog = null;
   }
 

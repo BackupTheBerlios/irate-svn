@@ -112,7 +112,7 @@ public class TrackInfoDialog {
       licenseButton = new Button(infoGrid, SWT.FLAT);      
       try {
         Image licenseImage =
-          new Image(dialog.getDisplay(),
+          new Image(dialog.shell.getDisplay(),
                     BaseResources.getResourceAsStream(license.getIcon()));
         licenseButton.setImage(licenseImage);
       }
@@ -199,9 +199,9 @@ public class TrackInfoDialog {
 
     addListeners();
 
-    dialog.pack();
+    dialog.shell.pack();
     dialog.centerOn(parent);
-    dialog.open();    
+    dialog.shell.open();    
   }
 
   /**
@@ -209,7 +209,7 @@ public class TrackInfoDialog {
    */
   private void addListeners() {
     // Add a listener on the shell so it will close properly
-    dialog.addShellListener(new ShellAdapter() {
+    dialog.shell.addShellListener(new ShellAdapter() {
         public void shellClosed(ShellEvent e){
           actionClose();
         }
@@ -261,7 +261,7 @@ public class TrackInfoDialog {
    * Dispose of the shell when a user closes the dialogue box.
    */
   private void actionClose() {
-    dialog.dispose();
+    dialog.shell.dispose();
     dialog = null;
   }
 
