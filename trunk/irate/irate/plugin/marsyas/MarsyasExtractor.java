@@ -83,6 +83,10 @@ public class MarsyasExtractor extends Thread{
         BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream()));
         String features = br.readLine();
         br.close();
+	if(features == null) {
+		dbg("extract failed, please try running extract "+wav.getAbsolutePath()+" and email Taras about this");
+		return;
+	}
 //      replace tabs with commas and remove trailing comma
         if(features.length()!=0) {	
           features = features.replace('\t',',');
