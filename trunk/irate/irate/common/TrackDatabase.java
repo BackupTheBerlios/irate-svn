@@ -18,13 +18,13 @@ public class TrackDatabase {
   /** The highest allowable rating. */
   public static final int MAX_RATING = 10;
   
-  private final String docElementName = "TrackDatabase";
-  private final String trackElementName = "Track";
-  private final String userElementName = "User";
-  private final String autoDownloadElementName = "AutoDownload";
-  private final String playListElementName = "PlayList";
-  private final String defaultHost = "server.irateradio.org";
-  private final int defaultPort = 2278;
+  private static final String docElementName = "TrackDatabase";
+  private static final String trackElementName = "Track";
+  private static final String userElementName = "User";
+  private static final String autoDownloadElementName = "AutoDownload";
+  private static final String playListElementName = "PlayList";
+  private static final String defaultHost = "server.irateradio.org";
+  private static final int defaultPort = 2278;
   private TreeSet tracks;
   private Hashtable hash;
   private File file;

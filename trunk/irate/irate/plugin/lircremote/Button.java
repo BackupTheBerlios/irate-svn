@@ -69,5 +69,14 @@ public class Button
     else
       return false;
   }
+
+  /**
+   * Returns a hashcode for this object, based solely on the ID.
+   *
+   * @return a hash code value for this object.
+   */
+  public int hashCode() {
+    return id.hashCode();
+  }
 }
 

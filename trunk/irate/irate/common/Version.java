@@ -35,9 +35,9 @@ public class Version {
       Reader reader = new InputStreamReader(inputStream);
       BufferedReader bufferedReader = new BufferedReader(reader);
       String line = bufferedReader.readLine();
+      bufferedReader.close();
       if (line == null)
         return "";
-      bufferedReader.close();
       return line.trim();
     }
     catch (java.io.IOException e) {

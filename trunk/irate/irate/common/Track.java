@@ -12,7 +12,7 @@ import nanoxml.XMLElement;
 public class Track implements TrackDetails {
 
   private static final TimeZone UTC = new SimpleTimeZone(/*SimpleTimeZone.UTC_TIME*/ 2, "UTC");
-  private final int DEFAULT_RATING = 6;
+  private static final int DEFAULT_RATING = 6;
   
   private XMLElement elt;
   private File dir;
@@ -147,7 +147,7 @@ public class Track implements TrackDetails {
     return getRating(DEFAULT_RATING);
   }
 
-  public float getRating(float defaultRating) {
+  public synchronized float getRating(float defaultRating) {
     if (isRated())
       return getRawRating();
     return defaultRating;
@@ -494,8 +494,8 @@ public class Track implements TrackDetails {
     return file != null && file.exists();
   }
   
-  public boolean equals(Track track) {
-    return getURL().equals(track.getURL());
+  public boolean equals(Object track) {
+    return track instanceof Track && getURL().equals(((Track)track).getURL());
   }
 
   /** Returns the web site associated with this track */

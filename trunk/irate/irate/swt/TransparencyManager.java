@@ -91,6 +91,17 @@ public class TransparencyManager {
       Area area = (Area) obj;
       return parentImageData == area.parentImageData && bounds.equals(area.bounds);
     }
+
+    /**
+     * Returns a hash code derived from the
+     * <code>parentImageData</code> and the <code>bounds</code>.
+     *
+     * @return a hash code for this object.
+     */
+    public int hashCode() {
+      return parentImageData.hashCode() + bounds.hashCode();
+    }
+
   }
   
   private class Scale {
@@ -105,6 +116,17 @@ public class TransparencyManager {
       Scale scale = (Scale) obj;
       return width == scale.width && height == scale.height && imageData == scale.imageData;
     }
-}
+
+    /**
+     * Returns a hash code derived from the <code>width</code>,
+     * <code>height</code> and the <code>imageData</code>.
+     *
+     * @return a hash code for this object.
+     */
+    public int hashCode() {
+      return width*height + imageData.hashCode();
+    }
+
+  }
   
 }
