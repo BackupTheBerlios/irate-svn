@@ -16,7 +16,7 @@ export PLATFORM=linux-motif
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar
 
-CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o libmadplayer.o
+CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o #libmadplayer.o
 CLIENT_LIBS = lib/libnanoxml-lite.o 
 
 JAVA_SWTSRC=irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
@@ -65,8 +65,8 @@ CLIENT_FILES = \
 	irate/client/Speech.java \
 	irate/client/Help.java \
 	irate/client/AbstractPlayer.java \
-	irate/client/PlayerListener.java \
-	irate/client/LibMadPlayer.java
+	irate/client/PlayerListener.java
+#	irate/client/LibMadPlayer.java
 #	irate/client/AudioDevice.java 
 #	irate/client/JavaSoundAudioDevice.java 
 #	irate/client/JavaLayerPlayer.java 
