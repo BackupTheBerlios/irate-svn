@@ -21,19 +21,19 @@ public class PlayerList {
     }
     
     try {
-      players.add(new ExternalPlayer("mpg123", new String[] { "/usr/bin/mpg123", "/usr/local/bin/mpg123" }));
-    }
-    catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-    
-    try {
       players.add(new ExternalPlayer("madplay", new String[] { "madplay", "/usr/bin/madplay", "/usr/local/bin/madplay", "madplay.exe" }));
     }
     catch (FileNotFoundException e) {
       e.printStackTrace();
     }
 
+    try {
+      players.add(new ExternalPlayer("mpg123", new String[] { "/usr/bin/mpg123", "/usr/local/bin/mpg123" }));
+    }
+    catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    
     this.players = (Player[]) players.toArray(new Player[players.size()]);
   }
 
