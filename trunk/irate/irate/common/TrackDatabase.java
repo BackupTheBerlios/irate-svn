@@ -15,16 +15,9 @@ public class TrackDatabase {
   private final String autoDownloadElementName = "AutoDownload";
   private final String defaultHost = "takahe.blacksapphire.com";
   private final int defaultPort = 2278;
-  private Vector tracks = new Vector();
-  private Hashtable hash = new Hashtable();
+  private Vector tracks;
+  private Hashtable hash;
   private File file;
- /* private DocumentBuilderFactory dbf;
-  private DocumentBuilder db;
-  private DOMImplementationLS dil;
-  private DOMWriter dw;
-  private Document doc;
-  private Element docElt;
-  */
   private XMLElement docElt;
     
   public TrackDatabase() {
@@ -59,7 +52,7 @@ public class TrackDatabase {
     try {
       tracks = new Vector();
       hash = new Hashtable();
-      docElt = new XMLElement();
+      docElt = new XMLElement(new Hashtable(), false, false);
       docElt.setName(docElementName);
     }
     catch (Exception e) {
@@ -124,6 +117,7 @@ public class TrackDatabase {
     String att = elt.getStringAttribute(attName);
     if (att == null)
       return "";
+    System.out.println(att);
     return att;
   }
 
