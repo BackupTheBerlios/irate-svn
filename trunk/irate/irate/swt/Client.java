@@ -61,6 +61,7 @@ public class Client extends AbstractClient {
 //  private SkinManager.SkinItem pauseSkin;
   private ThreeModeButton play;
   private ThreeModeButton previous;
+  private ThreeModeButton next;
   private Track previousTrack;
   private Help help = new Help();
   private ErrorDialog errorDialog;
@@ -401,6 +402,8 @@ public class Client extends AbstractClient {
    */
   public void newTrackStarted(final Track track) {
     super.newTrackStarted(track);
+    play.setEnabled(true);
+    next.setEnabled(true);
     display.asyncExec(new Runnable() {
       public void run() {
         update(track, true);
@@ -1195,7 +1198,8 @@ public class Client extends AbstractClient {
 //    gridData = new GridData();
 //    gridData.verticalAlignment = GridData.VERTICAL_ALIGN_END;
 //    play.setLayoutData(gridData);
-    
+    play.setSelection(true);
+    play.setEnabled(false);
     play.addMouseListener(new MouseListener() {
       public void mouseDoubleClick(MouseEvent arg0) {}
       public void mouseDown(MouseEvent arg0) {}
@@ -1207,8 +1211,8 @@ public class Client extends AbstractClient {
     skinManager.add(play, "button.play");
     
     /************ NEXT BUTTON  ****************/
-    ThreeModeButton next = new ThreeModeButton(topPanel, SWT.NONE);
-    
+    next = new ThreeModeButton(topPanel, SWT.NONE);
+    next.setEnabled(false);
     next.addMouseListener(new MouseListener() {
       public void mouseDoubleClick(MouseEvent arg0) {}
       public void mouseDown(MouseEvent arg0) {}

@@ -59,16 +59,20 @@ public class ThreeModeButton extends AlphaLabel implements Skinable {
   }
 
   public void setSelection(boolean state) {
-    isActive = false;
-    isPressed = state;
-    updateState();
+    if(isEnabled) {
+      isActive = false;
+      isPressed = state;
+      updateState();
+    }
   }
 
   // Call when a button is clicked on, and the mouse held down.
   // - switch the 'active' flag to true.
   protected void activateButton(MouseEvent arg0) {
-    isActive = true;
-    updateState();
+    if(isEnabled) {
+      isActive = true;
+      updateState();
+    }
   }
 
   // If the mouse stops hovering over a button, then switch the mouseOver flag and redraw()
