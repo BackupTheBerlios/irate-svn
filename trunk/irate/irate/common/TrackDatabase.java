@@ -477,6 +477,7 @@ public class TrackDatabase {
   public boolean hasRatedEnoughTracks() {
     Track[] tracks = getTracks();
     int noOfRated = 0;
+    int noOfUnrated = 0;
     int noOfValidTracks = 0;
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
@@ -484,8 +485,16 @@ public class TrackDatabase {
         noOfValidTracks++;
         if (tracks[i].isRated())
           noOfRated++;  
+        else 
+          if (!tracks[i].isHidden())
+            noOfUnrated++;
       }
     }
+
+      // Limit the number of unrated tracks a user is allowed.
+    if (noOfUnrated >= 50)
+      return false;
+    
     return noOfValidTracks < MAX_NO_OF_UNRATED || noOfRated >= MIN_NO_OF_RATED;
   }
 }

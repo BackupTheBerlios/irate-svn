@@ -70,8 +70,19 @@ public class DatabaseCorrelator {
     for (int i = 0; i < intersectLength; i++)
       sum += (intersect0[i] - offset0) * (intersect1[i] - offset1);
 //    correlation = sum * intersectLength * intersectLength / (total0 * total1);
+
+      // Dividing by the intersectLength would give the average track
+      // correlation.
     correlation = sum / intersectLength;
+
+      // Weight it a little towards large intersections
+    if (intersectLength >= 20)
+      correlation *= 2;
     
+      // Cube it to make it weight highly towards good correlations.
+    correlation = correlation * correlation * correlation;
+    
+
       // Set the correlation value for each track.
     for (int i = 0; i < spares.size(); i++) {
       Track track = (Track) spares.elementAt(i);

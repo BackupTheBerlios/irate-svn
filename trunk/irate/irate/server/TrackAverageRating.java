@@ -41,12 +41,14 @@ public class TrackAverageRating {
       this.track = averages.add(track);
       this.sum = track.getRating() * weight;
       this.weight = weight;
+      this.track.setWeight(this.weight);
     }
 
     public void add(Track track, float weight) {
       this.sum += track.getRating() * weight;
       this.weight += weight;
       this.track.setRating(sum / this.weight);
+      this.track.setWeight(this.weight);
     }    
   }
 }

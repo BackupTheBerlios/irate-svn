@@ -20,6 +20,10 @@ public class Track {
     this.elt = elt;
     this.dir = dir;
   }
+
+  /*package visibility*/ void setElement(XMLElement elt) {
+    this.elt = elt;
+  }
   
   public String toString() {
     String ratingStr = getState();
@@ -163,7 +167,7 @@ public class Track {
 
   public float getWeight() {
     try {
-      return Integer.parseInt(elt.getStringAttribute("weight"));
+      return Float.parseFloat(elt.getStringAttribute("weight"));
     }
     catch (Exception e) {
     }

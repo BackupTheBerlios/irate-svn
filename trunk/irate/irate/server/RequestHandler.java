@@ -86,6 +86,11 @@ public class RequestHandler {
 //      System.out.println("Reply:");
 //      System.out.println(reply.toString());
       os.write(reply.toString().getBytes());
+
+        // Print any error
+      String error = reply.getErrorCode();
+      if (error.length() != 0)
+        System.out.println("Error: " + error);
     }
     catch (Exception e) {
       e.printStackTrace(System.out);

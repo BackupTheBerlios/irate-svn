@@ -10,10 +10,10 @@ import java.util.*;
 public class MasterDatabase extends ServerDatabase {
 
     /** Add an orphan track one time in n. */
-  private final int orphanChance = 2;
+  private final int orphanChance = 10;
 
     /** Add a random track one time in n. */
-  private final int randomChance = 4;
+  private final int randomChance = 5;
 
     /** Issue five tracks to correlate. */
   private final int correlateNoOfTracks = 4;
@@ -81,7 +81,7 @@ public class MasterDatabase extends ServerDatabase {
     }
 
     if (!user.hasRatedEnoughTracks()) {
-      reply.setError("notenoughrating", "http://www.irateradio.org/irate/client/help/notenoughratings.html");
+      reply.setError("notenoughratings", "http://www.irateradio.org/irate/client/help/notenoughratings.html");
       return reply;
     }
 
@@ -110,8 +110,9 @@ public class MasterDatabase extends ServerDatabase {
       for (int i = 0; i < correlateNoOfTracks; i++) {
         Track track = corel.chooseTrack(random);
         if (track != null) {
-          System.out.println("Correlation: " + track.getName() + " " + track.getRating());
+          System.out.println("Correlation: " + track.getName() + " " + track.getRating() + " " + track.getWeight());
           reply.add(track);
+          corel.remove(track);
         }
       }
     }
@@ -123,7 +124,7 @@ public class MasterDatabase extends ServerDatabase {
         if (peer != null) {
           System.out.println("Peer: " + peer.getUserName());
           Track track = peer.chooseTrack(random);
-          if (track != null) {
+          if (track != null && user.getTrack(track) == null) {
             System.out.println("Peer track: " + track.getName() + " " + track.getRating());
             reply.add(track);
             break;
@@ -232,9 +233,10 @@ public class MasterDatabase extends ServerDatabase {
     Track[] tracks = getTracks();
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
-      if (track.getWeight() == 10) {
+      if (!Float.isNaN(track.getWeight())) {
         System.out.println(track.getName());
         comp.add(track);
+        track.unSetWeight();
       }
     }
     return comp;
