@@ -707,7 +707,7 @@ public class Client extends AbstractClient {
   }
 
   public void createToolBar() {
-    trackGroup = new Composite(topPanel, SWT.FLAT );
+    trackGroup = new Composite(topPanel, SWT.BORDER);
     skinManager.addControl(trackGroup, "panel.track");
     trackGroup.setEnabled(false);
     GridData gridData = new GridData();
