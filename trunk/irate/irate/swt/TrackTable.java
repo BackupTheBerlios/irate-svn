@@ -531,6 +531,16 @@ public class TrackTable {
   private String getResourceString(String key) {
     return Resources.getString(key); 
   }
+  
+  /**
+   * Sort the table according to a given column
+   * (simulates column header click for platforms where this is broken in SWT)
+   */
+  public void setSortColumn(int colnum) {
+    TableColumn col = table.getColumn(colnum);
+    col.notifyListeners(SWT.Selection, new Event());
+    sort();
+  }
 
 }
 

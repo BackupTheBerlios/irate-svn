@@ -397,6 +397,10 @@ public class Client extends AbstractClient {
     shell.pack();
 
     Rectangle rec = shell.getBounds();
+    // pack doesn't work right on Mac; enforce minimum size
+    if (isMac())
+        if (rec.width < 920)
+            rec.width = 920;
     rec.height = 300;
     shell.setBounds(rec);
 
@@ -546,17 +550,20 @@ public class Client extends AbstractClient {
     item_undo.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.undo")));
     skinManager.addItem(item_undo, "toolbar.menu_item.undo");
 
-    MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
-    item1_4.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent e) {
-        quit();
-      }
-    });
-    skinManager.addItem(item1_4, "toolbar.menu_item.quit");
+    if (!isMac()) {
+      // Mac OS X already has Quit in the app menu
+      MenuItem item1_4 = new MenuItem(menu1, SWT.PUSH);
+      item1_4.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          quit();
+        }
+      });
+      skinManager.addItem(item1_4, "toolbar.menu_item.quit");
 
-    //Added for a nicer UI by Allen Tipper 14.9.03
-    item1_4.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.quit")));
-    //end add
+      //Added for a nicer UI by Allen Tipper 14.9.03
+      item1_4.addArmListener(new ToolTipArmListener(Resources.getString("toolbar.menu_item.tooltip.quit")));
+      //end add
+    }
 
     MenuItem item2 = new MenuItem(menubar, SWT.CASCADE);
     skinManager.addItem(item2, "toolbar.menu_title.settings");
@@ -925,6 +932,57 @@ public class Client extends AbstractClient {
   public void createTableMenu() {
     Menu menu = new Menu(shell, SWT.POP_UP);
     trackTable.setMenu(menu);
+    if (isMac()) {
+      // SWT for Carbon doesn't pass table column clicks, so can't sort.
+      // https://bugs.eclipse.org/bugs/show_bug.cgi?id=34160
+      // hack added Brion Vibber 2004-05-26
+      MenuItem view = new MenuItem(menu, SWT.CASCADE);
+      skinManager.addItem(view, "toolbar.menu_title.sort");
+      
+      Menu mView = new Menu(view);
+      view.setMenu(mView);
+      
+      MenuItem mSortArtist = new MenuItem(mView, SWT.PUSH);
+      mSortArtist.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          trackTable.setSortColumn(0);
+        }
+      });
+      skinManager.addItem(mSortArtist, "TrackTable.Heading.Artist");
+      
+      MenuItem mSortTrack = new MenuItem(mView, SWT.PUSH);
+      mSortTrack.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          trackTable.setSortColumn(1);
+        }
+      });
+      skinManager.addItem(mSortTrack, "TrackTable.Heading.Track");
+      
+      MenuItem mSortRating = new MenuItem(mView, SWT.PUSH);
+      mSortRating.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          trackTable.setSortColumn(2);
+        }
+      });
+      skinManager.addItem(mSortRating, "TrackTable.Heading.Rating");
+      
+      MenuItem mSortPlays = new MenuItem(mView, SWT.PUSH);
+      mSortPlays.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          trackTable.setSortColumn(3);
+        }
+      });
+      skinManager.addItem(mSortPlays, "TrackTable.Heading.Plays");
+      
+      MenuItem mSortLast = new MenuItem(mView, SWT.PUSH);
+      mSortLast.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          trackTable.setSortColumn(4);
+        }
+      });
+      skinManager.addItem(mSortLast, "TrackTable.Heading.Last");
+      // end add
+    }
     MenuItem info = new MenuItem(menu, SWT.NONE);
     info.addArmListener(new ToolTipArmListener(Resources.getString("button.info.tooltip")));
     final Client clientToPass = this;
@@ -1128,4 +1186,8 @@ public class Client extends AbstractClient {
       
     client.run();
   }    
+  
+  public static boolean isMac() {
+    return System.getProperty("os.name").toLowerCase().startsWith("mac os x");
+  }
 }

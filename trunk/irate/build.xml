@@ -148,17 +148,12 @@
   </target>
   
     <!-- Zip archive of the Mac app -->
-    <!-- Can be built on Mac or Linux -->
+    <!-- Can be built on Mac or Linux; requires ant 1.5.2 for exec bit -->
   <target name="maczip" depends="mac">
-    <!--
     <zip destfile="irate-client-macosx.zip">
-      <zipfileset dir="iRATE.app" prefix="iRATE.app"/>
+      <zipfileset dir="iRATE.app" prefix="iRATE.app" excludes="iRATE.app/Contents/MacOS/java_swt"/>
+      <zipfileset file="iRATE.app/Contents/MacOS/java_swt" fullpath="iRATE.app/Contents/MacOS/java_swt" filemode="755"/>
     </zip>
-    -->
-    <!-- Use info-zip to preserve the execute bit -->
-    <exec executable="zip">
-      <arg line="-r irate-client-macosx.zip iRATE.app"/>
-    </exec>
   </target>
   
     <!-- Disk image of the Mac app -->
