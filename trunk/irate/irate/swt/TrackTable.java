@@ -96,7 +96,7 @@ public class TrackTable {
     col.setWidth(200);
     addColumnListener(col, comparator = new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-          return new MagicString(track0.getArtist()).compareTo(new MagicString(track1.getArtist()));
+          return magicStringCompare(track0.getArtist(), track1.getArtist());
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.Artist"); 
@@ -105,7 +105,7 @@ public class TrackTable {
     col.setWidth(200);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-        return new MagicString(track0.getTitle()).compareTo(new MagicString(track1.getTitle()));
+        return magicStringCompare(track0.getTitle(), track1.getTitle());
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.Track"); 
@@ -116,7 +116,7 @@ public class TrackTable {
     col.setAlignment(SWT.LEFT);
     addColumnListener(col, new TrackComparator() {
       public int compareTrack(Track track0, Track track1) {
-        return new MagicString(track0.getState()).compareTo(new MagicString(track1.getState()));
+        return magicStringCompare(track0.getState(), track1.getState());
       }        
     });
     skinManager.addItem(col, "TrackTable.Heading.Rating");
@@ -514,6 +514,34 @@ public class TrackTable {
 
     public int compareURL(Track track0, Track track1) {
       return track0.getURL().toString().compareTo(track1.getURL().toString());
+    }
+    
+    private int valueOf(String s) {
+       int value = 0;
+       for (int i = 0; i < s.length(); i++) {
+         char c = s.charAt(i);
+         if (!Character.isDigit(c))
+         	break;
+         value = (value * 10) + (c - '0');
+       }
+       return value;
+    }
+    
+    public int magicStringCompare(String str0, String str1) {
+      if (!str0.equals(str1) && str0.length() != 0 && str1.length() != 0)
+      {
+        char c0 = str0.charAt(0);
+        char c1 = str1.charAt(0);
+        if (Character.isDigit(c0) && Character.isDigit(c1)) {
+          int i0 = valueOf(str0);
+          int i1 = valueOf(str1);
+          if (i0 < i1)
+          	return -1;
+          if (i0 > i1)
+          	return 1;
+        }
+      }
+      return str0.compareTo(str1);
     }
           
     public abstract int compareTrack(Track track0, Track track1);  
