@@ -20,7 +20,6 @@ public class DownloadThread extends Thread {
   private final String LOCALE_RESOURCE_LOCATION = "irate.download.locale";
   private Vector updateListeners = new Vector();
   private TrackDatabase trackDatabase;
-  private Track currentTrack;
   private File downloadDir;
   private String state;
   private int percentComplete;
@@ -87,10 +86,10 @@ public class DownloadThread extends Thread {
     boolean success = false;
     Track[] tracks = trackDatabase.getTracks();
     //keep queued files there
-    Vector downloadTracks = new Vector();
+    Hashtable downloadTracks = new Hashtable();
     
     for (int i = 0; i < tracks.length; i++) {
-      currentTrack = tracks[i];
+      Track currentTrack = tracks[i];
       if (!currentTrack.isHidden()) {
         File file = currentTrack.getFile();
         if ((file == null || !file.exists()) && currentTrack.getDownloadAttempts() < 10) {
@@ -100,12 +99,12 @@ public class DownloadThread extends Thread {
               trackDatabase.save();
             }
             //Are we already downloading from this host?
-            /*String host = currentTrack.getURL().getHost();
+            String host = currentTrack.getURL().getHost();
             if(downloadTracks.get(host)!=null)
               continue;
-            */
-            //downloadTracks.put(host, currentTrack);
-            downloadTracks.add(currentTrack);
+            
+            downloadTracks.put(host, currentTrack);
+            //downloadTracks.add(currentTrack);
           }
           catch (IOException e) {
             e.printStackTrace();
@@ -113,13 +112,13 @@ public class DownloadThread extends Thread {
         }
       }
     }
-    Enumeration keys = downloadTracks.elements();
+    Enumeration keys = downloadTracks.keys();
     Thread downloadThreads[] = new Thread[5];
     int threads = 0;
     while(keys.hasMoreElements() && threads < downloadThreads.length) {
-      //String host = (String)keys.nextElement();
-      final Track track = (Track)keys.nextElement();
-      //Track t = (Track) downloadTracks.get(host);
+      String host = (String)keys.nextElement();
+      //final Track track = (Track)keys.nextElement();
+      final Track track = (Track) downloadTracks.get(host);
       System.out.println("Simultaniously downloading url "+track.getURL() + " hidden="+track.isHidden());
       Thread th = new Thread(){
         public void run() {
@@ -292,12 +291,12 @@ public class DownloadThread extends Thread {
       e.printStackTrace();
       if (e instanceof FileNotFoundException) {
         setState("Broken download: " + track.getName()); //$NON-NLS-1$
-        currentTrack.setBroken();
+        track.setBroken();
       } else
         if (e instanceof IOException) {
           setState(getResourceString("DownloadThread.Download_failure")
                    + track.getName());
-          currentTrack.increaseDownloadAttempts();
+          track.increaseDownloadAttempts();
         }
         else {
           System.out.println("Exception not handled");
