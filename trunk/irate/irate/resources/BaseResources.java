@@ -9,9 +9,7 @@ import java.net.URL;
 import java.util.Hashtable;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.Vector;
 import java.io.File;
-import java.util.Enumeration;
 import java.net.URLConnection;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -25,6 +23,7 @@ public class BaseResources {
   
   private static Class cls = new BaseResources().getClass();
   private static Hashtable cachedBundles = new Hashtable();
+  private static Hashtable temporaryFiles = new Hashtable();
 
   public static URL getResource(String name) {
     return cls.getResource(name);
@@ -56,24 +55,18 @@ public class BaseResources {
   }
   
   /**
-   * Function used to extract a ressource into a temp folder and return the path of the
-   * file. A vector can be passed to store filenames in -- those filenames refer to ressources
-   * that have already been extracted (and can be reused for extra efficiency).
+   * Function used to extract a resource into a temp folder and return the path of the
+   * file. If the resource has already been extracted, a File referencing the existing file is
+   * returned.
    */
-  public static File getResourceAsFile(String name, Vector tempFiles) throws IOException {
+  public static File getResourceAsFile(String name) throws IOException {
     File myTempFile;
-    String[] myStrings;   // Used in tempFiles: first string is the ressource name, second is the file path
+    
+    // Check if resource has already been extracted
+    if (temporaryFiles.get(name) != null)
+      return new File((String)temporaryFiles.get(name));
+    
     if(getResource(name) != null) {
-      
-      // Search tempFile list to see if ressource already extracted
-      if (tempFiles != null) {
-        for (Enumeration e = tempFiles.elements(); e.hasMoreElements();) {
-          myStrings = (String[])(e.nextElement());
-          if (name.equals(myStrings[0]))
-            return new File(myStrings[1]);
-        }
-      }
-      
       // Create temp file
       myTempFile = File.createTempFile("irate", name);
       myTempFile.deleteOnExit();
@@ -94,25 +87,13 @@ public class BaseResources {
       in.close();
       out.close();
       
-      // Add file to filelist if required
-      if (tempFiles != null) {
-        myStrings = new String[] {name, myTempFile.getPath() };
-        tempFiles.add(myStrings);
-      }
+      // Add file to filelist
+      temporaryFiles.put(name, myTempFile.getPath());
       
       return myTempFile;
     }
     else
       throw new IOException();
-  }
-  
-  /**
-   * Get a ressource as a temporary file. A new file will be created each time
-   * this function is called, even if the same ressource is accessed twice. To prevent
-   * this, use getResourceAsFile(String, Vector) instead.
-   */
-  public static File getResourceAsFile(String name) throws IOException {
-    return getResourceAsFile(name, null);
   }
   
 }
