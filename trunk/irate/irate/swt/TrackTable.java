@@ -306,7 +306,9 @@ public class TrackTable
             select(selected, true);
               // Put the menu 10 pixels below the mouse position so there is less risk of
               // choosing "THIS SUX" accidentally.
-            popupMenu.popUp(menuSelectedTrack, table.toDisplay(e.x, e.y+10));
+            if(!menuSelectedTrack.isNotDownloaded()) {
+                popupMenu.popUp(menuSelectedTrack, table.toDisplay(e.x, e.y+10));
+            }
               // Note: We will now receive a 'widgetSelected' event.  This will call
               // select(selected, false) - this will ensure the correct track is
               // highlighted, because menuSelectedTrack overrides the 'selected' track.
