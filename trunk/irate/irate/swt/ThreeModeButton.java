@@ -6,6 +6,7 @@ import org.eclipse.swt.events.MouseListener;
 import org.eclipse.swt.events.MouseTrackListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 
@@ -125,6 +126,21 @@ public class ThreeModeButton extends AlphaLabel implements Skinable {
       }
     }
     setKey(key);
+  }
+
+  public void setImageUpdate(boolean state) {
+    if (state) {
+      ImageData normal = getImage("");
+      if (normal == null)
+        return;
+      
+      defaultImage("hot", "");
+      defaultImage("active", "");
+      defaultImage("pressed", "active");
+      defaultImage("pressed.hot", "pressed");
+      defaultImage("pressed.active", "pressed");
+    }
+    super.setImageUpdate(state);
   }
 
 /*  

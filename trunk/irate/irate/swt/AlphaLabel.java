@@ -30,7 +30,7 @@ public class AlphaLabel extends Canvas implements Skinable {
   private TransparencyManager transparencyManager;
 
   private Image image;
-
+  
   private Hashtable imageHash = new Hashtable();
   
   private Hashtable textHash = new Hashtable();
@@ -91,7 +91,7 @@ public class AlphaLabel extends Canvas implements Skinable {
     Image newImage;
 
     ImageData backgroundData = transparencyManager.getBackground(label);
-    ImageData imageData = (ImageData) imageHash.get(key);
+    ImageData imageData = getImage(key);
     if (imageData == null) {
       String text = (String) textHash.get(key);
       if (text == null)
@@ -167,7 +167,6 @@ public class AlphaLabel extends Canvas implements Skinable {
   public void setKey(String key) {
     if (!key.equals(this.key)) {
       this.key = key;
-      System.out.println("Key = " + key);
       updateImage();
       String toolTip = (String) toolTipHash.get(key);
       label.setToolTipText(toolTip == null ? "" : toolTip);
@@ -177,6 +176,16 @@ public class AlphaLabel extends Canvas implements Skinable {
   public void setImage(String key, ImageData imageData) {
     imageHash.put(key, imageData);
     if (key.equals(this.key)) updateImage();
+  }
+  
+  public ImageData getImage(String key) {
+    return (ImageData) imageHash.get(key);
+  }
+  
+  public void defaultImage(String key, String def) {
+    ImageData imageData = getImage(key);
+    if (imageData == null)
+      setImage(key, getImage(def));
   }
 
   public void setText(String key, String text) {
