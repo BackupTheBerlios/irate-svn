@@ -45,6 +45,7 @@ public class Client extends JFrame {
     File file = new File("trackdatabase.xml");
     try {
       trackDatabase = new TrackDatabase(file);
+      trackDatabase.purge();
     }
     catch (IOException e) {
       e.printStackTrace();
@@ -150,6 +151,15 @@ public class Client extends JFrame {
       }
     });
     m.add(menuItemDownload);
+
+    JMenuItem purge = new JMenuItem("Purge");
+    purge.addActionListener(new ActionListener() {
+      public void actionPerformed(ActionEvent e) {
+        trackDatabase.purge();
+        playPanel.update();
+      }
+    });
+    m.add(purge);
     
     JMenuItem exit = new JMenuItem("Close");
     exit.addActionListener(new ActionListener() {

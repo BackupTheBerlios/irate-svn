@@ -24,7 +24,7 @@ public class Speech {
       return;
 
     if (first) {
-      festival("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt 8.0))))");
+      festival("(set! after_synth_hooks (list (lambda (utt) (utt.wave.rescale utt 4.0))))");
       festival("(Parameter.set 'Duration_Stretch 1.5)");
       first = false;
     }
@@ -35,7 +35,7 @@ public class Speech {
     int ch = is.read();
     if (ch < 0)
       throw new IOException("Unexpected end of file");
-    System.out.print((char) ch);
+//    System.out.print((char) ch);
     return (char) ch;
   }
 
@@ -56,7 +56,7 @@ public class Speech {
     while (is.available() > 0)
       getch();
     
-    System.out.println(s);
+//    System.out.println(s);
     os.write((s + "\n").getBytes());
     os.flush();
 
@@ -65,6 +65,6 @@ public class Speech {
         if (getch() == ' ')
           break;
    
-    System.out.println();
+//    System.out.println();
   }
 }

@@ -60,6 +60,8 @@ public class TrackTable implements TableModel {
       case 0: return track.getArtist();
       case 1: return track.getTitle();
       case 2: 
+        if (track.isBroken()) 
+          return "Broken";
         File file = track.getFile();
         if (file == null)
           return "Not downloaded";

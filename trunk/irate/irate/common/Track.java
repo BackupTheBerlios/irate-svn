@@ -112,6 +112,19 @@ public class Track {
     return Float.NaN;
   }
 
+  public void setBroken() {
+    elt.setAttribute("broken", "yes");
+  }
+
+  public boolean isBroken() {
+    String s = elt.getAttribute("broken");
+    return s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true");
+  }
+
+  public boolean isHidden() {
+    return isBroken() || getRating() == 0;
+  }
+
   public String getArtist() {
     return elt.getAttribute("artist");
   }

@@ -302,6 +302,14 @@ public class TrackDatabase {
     return track0.getName().compareTo(track1.getName());
   }
 
+  public void purge() {
+    for (int i = tracks.size() - 1; i >= 0; i--) {
+      Track track = (Track) tracks.elementAt(i);
+      if (track.isHidden())
+        tracks.remove(i);
+    }
+  }
+
     /** A nice ol' bubble sort. This is used because it has a passable 
      * performance when the list starts off sorted. */
   public void sort() {
