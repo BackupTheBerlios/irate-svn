@@ -4,6 +4,7 @@ include make.configure
 
 BIN=$(DESTDIR)/usr/bin
 LIB=$(DESTDIR)/usr/lib
+RES=$(DESTDIR)/usr/share
 JPATH=.:lib/nanoxml-lite-2.2.3.jar:lib/skinlf.jar:lib/jl030.jar:lib/jlGui2.2.jar:lib/jd3lib.jar
 JAVAC=javac -classpath $(JPATH)
 export GCJ=gcj -g -pipe -O0
@@ -88,7 +89,22 @@ make.configure:
 
 install: $(IRATE_CLIENT)
 	install -d $(BIN) $(LIB)
+ifdef NO_RESOURCE
+	install $(IRATE_CLIENT) $(BIN)/irate-client-bin
+	install irate-client-resource.sh $(BIN)/irate-client
+	install -d $(RES)/irate/
+	install -d $(RES)/irate/common/
+	install irate/common/locale.properties $(RES)/irate/common/
+	install -d $(RES)/irate/download/
+	install irate/download/locale.properties $(RES)/irate/download/
+	install -d $(RES)/irate/swt/
+	install irate/swt/locale.properties $(RES)/irate/swt/
+	install -d $(RES)/irate/resources/
+	install irate/resources/*.gif $(RES)/irate/resources/
+else
 	install $(IRATE_CLIENT) $(BIN)
+endif
+
 ifeq ($(PLATFORM),linux-motif)	
 	install lib/libswt-gnome-motif-3009.so $(LIB)
 	install lib/libswt-kde-motif-3009.so $(LIB)
