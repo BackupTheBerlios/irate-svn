@@ -208,11 +208,7 @@ public class DownloadThread extends Thread {
     int index = urlString.lastIndexOf('/');
     if (index > 0)
       urlString = urlString.substring(index + 1);
-    try {
-      urlString = URLDecoder.decode(urlString, "UTF-8"); //$NON-NLS-1$
-    } catch (UnsupportedEncodingException e) {
-      // Should never happen -- UTF-8 is built-in
-    }
+    urlString = URLDecoder.decode(urlString); //$NON-NLS-1$
     return new File(trackDatabase.getDownloadDirectory(), urlString);
   }
   

@@ -323,26 +323,6 @@ public abstract class ExternalPlayer extends AbstractPlayer {
   
   public abstract boolean processPlayerTrackOutput(String line);
   
-  /**
-   * Splits a string in multiple substrings. Implemented here instead of using String.split() in order
-   * to remain compatible with JDK 1.3. Maximum of 4 string divisions.
-   */
-  public static String[] split(String data, char divisor) {
-    String[] temp = new String[4];
-    int currentSubString = 0;
-    int lastpos = 0;
-
-    while (data.indexOf(divisor, lastpos) != -1 && currentSubString != temp.length - 1) {
-      temp[currentSubString] = data.substring(lastpos, data.indexOf(divisor, lastpos));
-      lastpos = data.indexOf(divisor, lastpos) + 1;
-      currentSubString++;
-    }
-    
-    temp[currentSubString] = data.substring(lastpos);
-
-    return temp;
-  }
-  
   public static String format00(int number) {
     if (number < 10)
       return "0"+Integer.toString(number);

@@ -4,6 +4,7 @@ package irate.client;
 
 import java.io.FileNotFoundException;
 import java.io.File;
+import irate.common.Utils;
 
 public class MadplayPlayer extends ExternalPlayer {
 
@@ -60,8 +61,8 @@ public class MadplayPlayer extends ExternalPlayer {
       data = line.substring(1); // remove first char (negative sign)
       //splits = data.split(" ");
       //splits = splits[0].split(":");
-      splits = split(data, ' '); // isolate position indicator
-      splits = split(splits[0], ':'); // split in hours, minutes & seconds
+      splits = Utils.split(data, ' '); // isolate position indicator
+      splits = Utils.split(splits[0], ':'); // split in hours, minutes & seconds
 
       hours = Integer.valueOf(splits[0]).intValue();
       minutes = Integer.valueOf(splits[1]).intValue();

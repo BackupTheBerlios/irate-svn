@@ -17,7 +17,7 @@ import nanoxml.XMLElement;
  * settings XML file is written every time a preference is set, and
  * read every time a preference value is looked up.
  *
- * @version $Revision: 1.9 $
+ * @version $Revision: 1.10 $
  */
 public class Preferences {
 
@@ -121,7 +121,7 @@ public class Preferences {
    * @param enabled the boolean preference value.
    */
   public static void setUserPreference(String prefName, boolean enabled) {
-    setUserPreference(prefName, Boolean.toString(enabled));
+    setUserPreference(prefName, enabled ? "true" : "false");
   }
 
 

@@ -42,7 +42,7 @@ import java.util.TreeMap;
  * processed at a time.
  *
  * @author <a href="mailto:lenbok@gmail.com">Len Trigg</a>
- * @version $Revision: 1.1 $
+ * @version $Revision: 1.2 $
  */
 public class Daemon {
 
@@ -247,7 +247,7 @@ public class Daemon {
   private final Command mPlaylistCommand = new Command("playlist") {
       public void process(String input, PrintWriter out) throws IOException {
         final String msgArgs = "ERROR: Expected numUnrated and numRated parameters.";
-        String[] args = input.split(" ");
+        String[] args = Utils.split(input, ' ');
         if (args.length > 2) {
           out.println(msgArgs);
         } else {
