@@ -345,10 +345,12 @@ public class DownloadThread extends Thread {
           if (downloadingFile.renameTo(finishedFile)) {
             track.setFile(finishedFile);
             succeeded = true;
+            System.out.println("Finished downloading to " + finishedFile);
           } else {
             // I don't think this could occur, since we've already
             // checked to see if finishedFile exists, but...
-            System.out.println("For some reason we couldn't rename the file!");
+            System.out.println("For some reason we couldn't rename \"" 
+                               + downloadingFile + "\" to \"" + finishedFile + "\"");
           }
           exponentialBackoffManager.succeeded(track.getURL());
         }
