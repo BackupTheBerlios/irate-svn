@@ -1,0 +1,7 @@
+Ok. So here is what we would like to add :
+
+- New, better correlation algorithms
+- Support for other medias (video, ...)
+- Preprocessing of correlation, and caching the results 
+for future use
+

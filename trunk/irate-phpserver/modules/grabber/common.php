@@ -48,7 +48,7 @@ Class IRS_Grabber {
                // uncomment to see what this function is doing
 //                echo("\$ret[" . implode($hash_stack, "][") . "] = '{$val[value]}';\n");
 
-               eval("\$ret[" . implode($hash_stack, "][") . "][] = '{$val[value]}';");
+               eval("\$ret[" . implode($hash_stack, "][") . "][] = '".str_replace("'","\'",$val[value])."';");
                array_pop($hash_stack);
            break;
          }

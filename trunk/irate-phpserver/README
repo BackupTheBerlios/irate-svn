@@ -1,10 +1,19 @@
-iRATE PHP server v0.1
-GPL licensed
-PeerMajor.org
+*********
+Crash Course
+***************************
 
 
+What is this ? => iRATE PHP server v0.1 "Simonika"
+
+Which license ? => GPL licensed, baby
+
+Who wrote it ? => PeerMajor.org (nice place for free music)
+
+
+
+***
 Intro
------
+**************************
 
 This is an iRATE server written in PHP.
 
@@ -13,8 +22,10 @@ SQL backend.
 
 
 
+
+*********
 Installation
-------------
+***************************************
 
 You basically need an Apache+PHP server, and some SQL database.
 
@@ -38,62 +49,116 @@ Then log in as admin to create the admin account.
 
 
 
-!! Draft of the new HTTP iRATE protocol
 
-! Logging in
 
-Client : GET http://irate.server.org/?u=myuser&p=mypass
+******
+Quick FAQ
+*************************
 
-"u=myuser&p=mypass" : The client connects with login/pass : myuser/mypass . If the user "myuser" doesn't exists, it'll be automatically created with the given password.
+ - A server written in PHP ? WTF ?!
 
-After the first login, the client can only send a hash of this password to the server.
+We'll most likely end up rewritting this code in C/C++ in the next
+few years, but for the moment, writting it in PHP makes sense, 
+maybe more for Apache than for PHP. Performance issues will be
+mostly SQL related, and Apache will help with scalability. We also
+would like many people to test new correlation algorithms, and
+PHP is very easy to learn and use.
 
-! Computing the hash
+ - Why a new HTTP protocol ?
 
-SHA1("irate".$password)
+To allow people behind a firewall to use iRATE.
 
-! Asking for new tracks
 
-Client : GET http://../?u=myuser&h=HASH&do=getnew&n=5
 
-"do=getnew&n=5" : The client asks for 5 new tracks.
 
-Server reply : \\
- (HTTP Headers) \\
- \\
- <tracks> \\
-  <track> \\
-  <id>XXXX</id> \\
-  <artistname>XXXX</artistname> \\
-  <albumname>XXXX</albumname> \\
-  <distribution>
-   <id>SHA1</id> \\
-   <codec>VORBIS</codec> \\
-   <averagebitrate>128</averagebitrate> \\
-   <crediturl>http://www.magnatune.com/artists/XXXX</crediturl> \\
-   <source> \\
-    <protocol>http</protocol> \\
-    <link>http://../XXX.mp3</link> \\
-   </source> \\
-   <source> \\
-    ... \\
-   </source> \\
-  </distribution> \\
-  <distribution> \\
-   ... \\
-  </distribution> \\
- </track> \\
- \\
- <track> \\
-  ... \\
- </track> \\
- \\
- ... 3 more times .... \\
+
+**********
+The Protocol
+*************************
+
+Actually communicating with the iRATE server is very easy :
+it can be done with a web browser for testing purposes, and
+with any HTTP library for your third-party apps.
+
+The server replies with XML data.
+
+
+Here are the main things you can do with irate-phpserver :
+
+* Logging in
+------------
+
+ GET http://irate.server.org/?u=myuser&p=mypass
+
+"u=myuser&p=mypass" : The client connects with login/pass : myuser/mypass.
+ If the user "myuser" doesn't exists, it'll be automatically created
+ with the given password.
+
+ After the first login, the client can only send a hash of this password
+ to the server.
+ 
+ The Holly hash is : SHA1("irate".$password); Great, moo ?
+
+ So now we get "?u=myuser&h=HASH" instead of "?u=myuser&p=mypass"
+
+
+* Asking for new tracks
+-----------------------
+
+ GET http://../?u=myuser&h=HASH&do=getnew&n=5
+
+"do=getnew&n=5" : The client asks for 5 new tracks to rate.
+
+
+Server replies :
+ (HTTP Headers)
+ 
+ <tracks>
+  <track>
+  <id>XXXX</id>
+  <artistname>XXXX</artistname>
+  <albumname>XXXX</albumname>
+  ...
+  <distributions>
+   <distribution>
+    <hash_sha1>SHA1</hash_sha1>
+    <codec>VORBIS</codec>
+    <averagebitrate>128</averagebitrate>
+    <crediturl>http://www.magnatune.com/artists/XXXX</crediturl>
+    ...
+    <sources>
+     <source>
+      <protocol>http</protocol>
+      <link>http://../XXX.mp3</link>
+      ...
+     </source>
+     ...
+    </sources>
+   </distribution>
+   ...
+  <distributions>
+ </track>
+ ...
 </tracks>
 
-! Fields for a track
 
-* id : ldbid -0,  -1 : server specific (12 digit - 3digit - 2digit mod 97, -0/1)
+So we have 3 hierarchical things : track, distribution and source.
+
+- Fields for a track
+
+* id : 
+
+This is a custom LDBID (http://www.libredb.org/).
+
+iRATE servers can have two kinds of files. The ones that come
+from LibreDB, and the other, server-specific ones.
+
+For LibreDB files, The ID will be [LDBID]-0
+
+For the others, the ID will be XXXXXXX-YYY-ZZ-1 (same scheme
+as LDBIDs, but it's the irate server admin who gives
+these IDs.)
+
 * artistname : string
 * albumname : string
 * trackname : string
@@ -101,7 +166,7 @@ Server reply : \\
 * license
 * crediturl : string
 
-! Fields for a distribution
+- Fields for a distribution
 
 * crediturl : string
 * codec : string (http://www.matroska.org/technical/specs/codecid/)
@@ -109,7 +174,7 @@ Server reply : \\
 * hash_sha1 : string(40)
 * filesize : int
 
-! Fields for a source
+- Fields for a source
 
 * protocol : string (eg. "http" or "bittorrent" or whatever)
 * link : string
@@ -119,37 +184,74 @@ Server reply : \\
 The shown crediturl should be the first available from source, distribution and then track.
 
 
-! Rating tracks
+* Rating tracks
+---------------
 
-Client : GET http://../?u=myuser&h=HASH&do=rate&rate=XX:6,YY:9
+ GET http://../?u=myuser&h=HASH&do=rate&rate=XX:6,YY:9
 
 "do=rate&t=99:6,33:9" : Rate the tracks XX and YY to 6/10 and 9/10 
 
-Replace XX and YY by track IDs like 1043-001-34-0
+ Replace XX and YY by track IDs like 1043-001-34-0
 
 
-! Getting all the ratings back to the client
+* Getting all the ratings back to the client
+--------------------------------------------
 
 Client : GET http://../&u=myuser&h=HASH&do=getratings
 
 "do=getratings" : the client asks for its previous ratings
 
-Server replu : \\
-(HTTP Headers) \\
-\\
+Server replies : 
+(HTTP Headers)
+
 <ratings>XX:6,YY:3</ratings>
 
 The client had previously done 2 ratings : it rated the track with ID XX to 6/10, and the track YY to 3/10
 
 
-! Errors
+* Errors
+--------
 
-The server returns an error like this :
+At any time, the server can return an error like this :
 
-Server reply : \\
+Server reply :
+
 <error>ERROR_CODE</error>
 
 The error codes can be :
 * WRONG_PASSWORD : The password doesn't match for the user.
 * MUST_LOGIN : The username or the password wasn't given
-  
+
+
+
+* Admin actions
+---------------
+
+The user named "admin" is the admin of the server (not kidding)
+
+You must set a password for this user when setting up your
+server, logging in with "?u=admin&p=new_admin_password", at
+the very beginning.
+
+Then what you can do is :
+
+ - Grab all new tracks from LibreDB :
+   "?u=admin&p=...&do=admin&action=grab&grab=libredb_audio1"
+
+
+
+
+
+****
+What's next ?
+************************
+
+That's all folks, if you have any ideas/comments/suggestions/... ,
+feel free to contact the right man, that's to say :
+
+ * webmaster@irate.sf.net : for iRATE related stuff
+ * irate@peermajor.org : For iRATE-phpserver specific stuff
+ * root@localhost : For personal stuff.
+
+
+Ok, EOF :)

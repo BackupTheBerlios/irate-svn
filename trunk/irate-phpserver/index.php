@@ -142,8 +142,8 @@ function initCorrelation() {
 
  require_once("modules/correlation/common.php");
 
+  // hoping for better one :)
  $corr="sylvinus1";
-
 
  require_once("modules/correlation/".$corr.".php");
 
