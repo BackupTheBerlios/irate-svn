@@ -19,7 +19,7 @@ Class IRS_Grabber_Libredb_Audio1 extends IRS_Grabber {
  set_time_limit(0);
 
  //$str=implode("",file("/home/sylvinus/cvsroot/libredb/site/libredb/pub/audio1.xml"));
- $str=implode("",file("http://www.libredb.org/pub/audio1.xml"));
+ $str=implode("",gzfile($this->cfg["grabber_libredb_audio1_url"]));
 
 
  

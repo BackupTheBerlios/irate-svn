@@ -17,14 +17,13 @@ function get($num,$accept="http") {
 
  $trackids=$this->_get($num,explode(",",$accept));
 
- return $this->format($this->gettrackdata($trackids));
+ return $trackids;
 
 
 }
 
 
 function gettrackdata($trackids) {
-
 
 
 $t=$this->irs->db->getAll("SELECT * FROM tracks WHERE id=".implode(" OR id=",$trackids));
@@ -64,6 +63,8 @@ $o="<tracks>";
 for ($i=0;$i<count($data);$i++) {
 $o.="<track>";
 
+ $data[$i]["track"]["id"]=$this->irs->int2id($data[$i]["track"]["id"]);
+ 
  unset($data[$i]["adddate"]);
 
  reset($data[$i]["track"]);

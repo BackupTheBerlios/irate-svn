@@ -86,6 +86,9 @@ Actually communicating with the iRATE server is very easy :
 it can be done with a web browser for testing purposes, and
 with any HTTP library for your third-party apps.
 
+The variables can be sent in GET or POST mode (POST is better
+for long ones)
+
 The server replies with XML data.
 
 
@@ -243,6 +246,25 @@ Then what you can do is :
 
  - Grab all new tracks from LibreDB :
    "?u=admin&p=...&do=admin&action=grab&grab=libredb_audio1"
+
+
+
+
+* Migrating from old irate (dev only !)
+---------------------------------------
+
+Get a track ID from a http url :
+ - "?u=..&p=..&do=OLD_url2id&url=http://artist.iuma.com/..."
+
+Migration steps :
+
+ 1. server: Import user database
+ 2. server: Export all tracks to libredb and them import them from libredb to irate (they have IDs now)
+ 3. client: Make the new client ask for IDs. (see above)
+ 4. client: Make the client send again all his ratings with
+ appropriate IDs
+ 5. client: Move files,database,... to the new scheme
+
 
 
 

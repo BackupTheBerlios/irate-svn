@@ -13,12 +13,6 @@
 Class IRS_Correlation_sylvinus1 extends IRS_Correlation {
 
 
-// two times :
-//  1) Get user list
-//
-
-
-
 
 
 function _get($num,$accept) {
@@ -55,6 +49,9 @@ for ($i=0;$i<count($ratings);$i++) {
 }
 */
 
+
+
+ //this is not really scientific :/
 
 
 $maxdiff=2;
@@ -100,6 +97,8 @@ if (count($tracks)<$num) {
 
 
 
+
+
 function getTracksLike($users,$minrating,$num) {
 
 
@@ -110,7 +109,7 @@ FROM ratings LEFT JOIN ratings as ratings2
 ON ratings.trackid=ratings2.trackid   
 AND ratings2.userid=!
 WHERE (ratings.userid=".implode(" OR ratings.userid=",$users).") 
-AND ratings2.id IS NULL
+AND (ratings2.id IS NULL OR ratings2.weight<100)
 GROUP BY ratings.trackid
 HAVING avgrating>!
 ORDER BY c1 DESC , avgrating DESC 
