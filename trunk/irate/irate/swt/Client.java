@@ -456,29 +456,52 @@ public class Client implements UpdateListener {
     //item2_1.setText("Account");
     
     MenuItem mDownload = new MenuItem(mSettings, SWT.CASCADE);
-    mDownload.setText("Auto Download");
+    mDownload.setText("Auto download");
     Menu menu2 = new Menu(mDownload);
     mDownload.setMenu(menu2);
   
-    int counts[] = new int[] {0,2, 5, 11, 17, 23, 29};
+    int[] counts = new int[] {0, 2, 5, 11, 17, 23, 29};
     int autoDownload = trackDatabase.getAutoDownload(); 
     for(int i=0;i< counts.length;i++){
-          MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
+      MenuItem mTimes = new MenuItem(menu2, SWT.CHECK, i);
       final int count = counts[i];
       mTimes.setText(i==0?"Disabled":"Every " + count + " times" );
       mTimes.setSelection(count == autoDownload);
       mTimes.addSelectionListener(new SelectionAdapter(){
-      public void widgetSelected(SelectionEvent e){
-        //stupid trick to make self the only selected item
-        MenuItem self = (MenuItem)e.getSource();
-        uncheckSiblingMenuItems(self);
-        self.setSelection(true);
+        public void widgetSelected(SelectionEvent e){
+          //stupid trick to make self the only selected item
+          MenuItem self = (MenuItem)e.getSource();
+          uncheckSiblingMenuItems(self);
+          self.setSelection(true);
       
-        trackDatabase.setAutoDownload(count);
-        downloadThread.checkAutoDownload();
-      }
+          trackDatabase.setAutoDownload(count);
+          downloadThread.checkAutoDownload();
+        }
       });
     }
+    
+    MenuItem mPlayList = new MenuItem(mSettings, SWT.CASCADE);
+    mPlayList.setText("Play list");
+    Menu menuPlayList = new Menu(mPlayList);
+    mPlayList.setMenu(menuPlayList);
+  
+    counts = new int[] { 5, 7, 13, 19, 29 };
+    int playListLength = trackDatabase.getPlayListLength();
+    for (int i = 0; i < counts.length; i++) {
+      MenuItem mTimes = new MenuItem(menuPlayList, SWT.CHECK, i);
+      final int count = counts[i];
+      mTimes.setText(count + " tracks");
+      mTimes.setSelection(count == playListLength);
+      mTimes.addSelectionListener(new SelectionAdapter() {
+        public void widgetSelected(SelectionEvent e) {
+          MenuItem self = (MenuItem)e.getSource();
+          uncheckSiblingMenuItems(self);
+          self.setSelection(true);
+          
+          trackDatabase.setPlayListLength(count);          
+        }
+      });
+    } 
       
     MenuItem mPlayers = new MenuItem(mSettings, SWT.CASCADE);
     mPlayers.setText("Player");

@@ -41,14 +41,25 @@ public class PlayListManager {
       }
     }
     
+      // Remove extra unwanted items.
+    while (playList.size() > trackDatabase.getPlayListLength()) 
+      playList.remove(playList.size() - 1);
+    
       // Loop around one time for each track which needs to be added to the 
       // play list. Don't worry too much if we don't exactly that number of
       // tracks because it will likely get one next time around.
     for (int i = trackDatabase.getPlayListLength() - playList.size(); i > 0; i--) {
       synchronized (trackDatabase) {
         Track track = trackDatabase.chooseTrack(random);
-        if (track != null)
-          playList.add(track);
+        if (track != null) {
+            // Only add it if it's not already in the list
+          add: {
+            for (int j = 0; j < playList.size(); j++)
+              if (playList.get(j) == track)
+                break add; 
+            playList.add(track);
+          }
+        }
       }
     }
     
@@ -97,10 +108,6 @@ public class PlayListManager {
         playList.add(track);
     }
     randomise(playList);
-    
-      // Remove extra unwanted items.
-    while (playList.size() > trackDatabase.getPlayListLength()) 
-      playList.remove(playList.size() - 1);
     
     return playList;
   }

@@ -207,13 +207,17 @@ public class TrackDatabase {
     return 0; 
   }
   
+  public void setPlayListLength(int length) {
+    setAttribute("PlayList", "length", Integer.toString(length));
+  }
+  
   public int getPlayListLength() {
     try {
       return Integer.parseInt(getAttribute("PlayList", "length"));
     }
     catch (NumberFormatException e) {
     }
-    return 20;
+    return 5;
   }
 
   public void setAutoDownloadCount(int count) {
@@ -253,8 +257,7 @@ public class TrackDatabase {
     docElt.parseFromReader(new InputStreamReader(is));
     if (docElt.getName().equals(docElementName)) {
       Enumeration enum = docElt.enumerateChildren();
-      while(enum.hasMoreElements())
-      {
+      while(enum.hasMoreElements()) {
         XMLElement elt = (XMLElement)enum.nextElement();
         if(!elt.getName().equals(trackElementName)) continue;
         //System.out.println(elt.toString());
