@@ -15,7 +15,8 @@ public class Track {
   
   private XMLElement elt;
   private File dir;
-  
+  private TrackDatabase trackDatabase;
+
   public Track(XMLElement elt, File dir) {
     this.elt = elt;
     this.dir = dir;
@@ -37,6 +38,17 @@ public class Track {
 //    System.out.println(elt);
 //    setWebURL(track.getWebURL());
     // copy other attributes
+  }
+
+  public void setTrackDatabase(TrackDatabase trackDatabase) {
+    this.trackDatabase = trackDatabase;
+  }
+
+  public void updateSerial() {
+    if(trackDatabase == null)
+      return;
+
+    elt.setAttribute("serial", ""+(trackDatabase.getSerial()+1));
   }
 
   public void setDownloadDir(File dir) {
@@ -140,6 +152,7 @@ public class Track {
   public void incNoOfTimesPlayed() {
     synchronized (this) {
       elt.setAttribute("played", Integer.toString(getNoOfTimesPlayed() + 1));
+      updateSerial();
       try {
         Calendar c = new GregorianCalendar(UTC);
         elt.setAttribute("last",
@@ -173,6 +186,7 @@ public class Track {
 
   public void setRating(float rating) {
     elt.setAttribute("rating", Float.toString(rating));
+    updateSerial();
   }
 
   public void unSetRating() {
@@ -181,6 +195,7 @@ public class Track {
 
   public void setWeight(float weight) {
     elt.setAttribute("weight", Float.toString(weight));
+    updateSerial();
   }
 
   public void unSetWeight() {

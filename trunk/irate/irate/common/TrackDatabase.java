@@ -87,6 +87,7 @@ public class TrackDatabase {
         docElt.addChild(copy.getElement());
         tracks.add(copy);
         hash.put(copy.getKey(), copy);
+	copy.setTrackDatabase(this);
       }
       return copy;
     }
