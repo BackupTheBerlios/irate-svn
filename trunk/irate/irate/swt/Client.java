@@ -836,7 +836,7 @@ public class Client extends AbstractClient {
         Object appmenu = appMenuClass.newInstance();
         enablePreferences.invoke(appmenu, new Object[] {});
         insertMenuItem.invoke(appmenu, new Object[] {
-          Resources.getString("toolbar.menu_item.credits"),
+          Resources.getString("toolbar.menu_item.about"),
           new Integer(0), "abou" });
         insertSeparator.invoke(appmenu, new Object[] {new Integer(1)});
         
