@@ -132,7 +132,7 @@ public class PlayListManager {
     } else {
       int currentIndex = playListIndex;
       do {
-        if (++playListIndex >= size)
+        if (++playListIndex >= size || playListIndex < 0)
           playListIndex = 0;
         selectedTrack = (Track) playList.get(playListIndex);
         
