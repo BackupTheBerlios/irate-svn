@@ -9,6 +9,8 @@ import irate.resources.BaseResources;
 
 import java.io.*;
 import java.net.*;
+import java.util.Enumeration;
+import java.util.Hashtable;
 import java.util.Vector;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -84,6 +86,9 @@ public class DownloadThread extends Thread {
   private boolean downloadSinglePending() throws IOException {
     boolean success = false;
     Track[] tracks = trackDatabase.getTracks();
+    //keep queued files there
+    Vector downloadTracks = new Vector();
+    
     for (int i = 0; i < tracks.length; i++) {
       currentTrack = tracks[i];
       if (!currentTrack.isHidden()) {
@@ -94,8 +99,13 @@ public class DownloadThread extends Thread {
               currentTrack.unSetFile();
               trackDatabase.save();
             }
-            download(currentTrack);
-            success = true;
+            //Are we already downloading from this host?
+            /*String host = currentTrack.getURL().getHost();
+            if(downloadTracks.get(host)!=null)
+              continue;
+            */
+            //downloadTracks.put(host, currentTrack);
+            downloadTracks.add(currentTrack);
           }
           catch (IOException e) {
             e.printStackTrace();
@@ -103,6 +113,41 @@ public class DownloadThread extends Thread {
         }
       }
     }
+    Enumeration keys = downloadTracks.elements();
+    Thread downloadThreads[] = new Thread[5];
+    int threads = 0;
+    while(keys.hasMoreElements() && threads < downloadThreads.length) {
+      //String host = (String)keys.nextElement();
+      final Track t = (Track)keys.nextElement();
+      //Track t = (Track) downloadTracks.get(host);
+      System.out.println("Simultaniously downloading url "+t.getURL() + " hidden="+t.isHidden());
+      Thread th = new Thread(){
+        public void run() {
+          try {
+            download(currentTrack);
+          } catch(IOException ioe) {
+            ioe.printStackTrace();
+          }
+        }
+      };
+      th.start();
+      downloadThreads[threads++] = th;
+    }
+    boolean downloadsRunning = false;
+    do {
+      try {
+        Thread.sleep(1000);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+      for (int i = 0; i < threads; i++) {
+        Thread th = downloadThreads[i];
+        if(th.isAlive())
+          downloadsRunning = true;
+      }
+    } while (downloadsRunning); 
+    
+    success = true;
     return success;
   }
 
@@ -225,6 +270,7 @@ public class DownloadThread extends Thread {
               int percent = totalBytes * 100 / contentLength;
               if (percent != percentComplete) {
                 percentComplete = percent;
+                track.setPercentComplete(percent);
                 notifyUpdateListeners();
               }
             }
