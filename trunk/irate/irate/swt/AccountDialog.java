@@ -14,10 +14,10 @@ import irate.download.DownloadThread;
 /**
  * 
  * Date Created: Jun 19, 2003
- * Date Updated: $Date: 2003/09/26 17:15:16 $
+ * Date Updated: $Date: 2003/09/26 17:18:30 $
  * @author Creator:	taras
  * @author Updated:	$Author: ajones $
- * @version $Revision: 1.7 $
+ * @version $Revision: 1.8 $
  */
 public class AccountDialog {
   boolean done = false;
@@ -104,6 +104,7 @@ public class AccountDialog {
     shell.dispose();
   }
 
+  /** Create the user input field. */
   private void createUserInfo() {
     new Label(shell, SWT.NONE).setText("User");
     txtUser = new Text(shell, SWT.SINGLE | SWT.BORDER);
@@ -114,7 +115,8 @@ public class AccountDialog {
       userName = System.getProperty("user.name") + " " + randomString(3); 
     txtUser.setText(userName);
   }
-
+ 
+  /** Create the OK button. */
   private void createAcceptButton() {
     Button btnAccept = new Button(shell, SWT.NONE);
     btnAccept.setText("OK");
@@ -132,7 +134,7 @@ public class AccountDialog {
     });
   }
 
-    /** Create a random string of the given length */  
+  /** Create a random string of the given length. */  
   private String randomString(int length) {
     StringBuffer sb = new StringBuffer();
     while (sb.length() < length) {
