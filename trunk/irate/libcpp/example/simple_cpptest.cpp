@@ -97,7 +97,42 @@ void newAccountRequested() {
 	}
 }
 
-
+void printFullSong(IRateTrack<std::string>* t){
+	cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
+	cout<<"isRated "<<t->isRated()<<endl;
+	cout<<"Rating "<<t->getRating()<<endl;
+	cout<<"getNoOfTimesPlayed "<<t->getNoOfTimesPlayed()<<endl;
+	cout<<"getVolume "<<t->getVolume()<<endl;
+	cout<<"isBroken "<<t->isBroken()<<endl;
+	cout<<"isMissing "<<t->isMissing()<<endl;
+	cout<<"isDeleted "<<t->isDeleted()<<endl;
+	cout<<"isActive "<<t->isActive()<<endl;
+	cout<<"isNotDownloaded "<<t->isNotDownloaded()<<endl;
+	cout<<"isHidden "<<t->isHidden()<<endl;
+	cout<<"isPendingPurge "<<t->isPendingPurge()<<endl;
+	cout<<"isOnPlayList "<<t->isOnPlayList()<<endl;
+	cout<<"getProbability "<<t->getProbability()<<endl;
+	cout<<"exists "<<t->exists ()<<endl;
+	cout<<"getPlayingTime "<<t->getPlayingTime()<<endl;
+	cout<<"getDownloadAttempts "<<t->getDownloadAttempts()<<endl;
+	cout<<"getName "<<t->getName()<<endl;
+	cout<<"getLastPlayed "<<t->getLastPlayed()<<endl;
+	cout<<"getArtist "<<t->getArtist ()<<endl;
+	cout<<"getTitle "<<t->getTitle ()<<endl;
+	cout<<"getURL "<<t->getURL ()<<endl;
+	cout<<"getKey "<<t->getKey ()<<endl;
+	cout<<"getFile "<<t->getFile ()<<endl;
+	cout<<"getState "<<t->getState()<<endl;
+	cout<<"getWebSite "<<t->getWebSite ()<<endl;
+	cout<<"getLicense "<<t->getLicense ()<<endl;
+	cout<<"getAlbum "<<t->getAlbum ()<<endl;
+	cout<<"getComment "<<t->getComment ()<<endl;
+	cout<<"getCopyrightInfo "<<t->getCopyrightInfo()<<endl;
+	cout<<"getGenre "<<t->getGenre ()<<endl;
+	cout<<"getPlayingTimeString "<<t->getPlayingTimeString ()<<endl;
+	cout<<"getYear "<<t->getYear ()<<endl;
+	cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl<<endl;
+}
 
 
 //Main function, here come serious things
@@ -105,22 +140,24 @@ int main(int argc, char *argv[]) {
 	//This is one of the most important function, it start and init the IRate engine
 	//This must be called befor all other IRate functions even function about strings
 	//we pass as parameter the function we would like to be called (see def of this function above)
+	cout<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl<<"Welcome on the example of using libirate with C++"<<endl<<"%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"<<endl;
 	list<IRateTrack<std::string>*> l;
 	IRateTrack<std::string>* currentTrack;
 	IRateTrack<std::string>* t;
 	std::string input("h");
 	initSTDIRateCenter("UTF-8", false);
+	cout<<"IRate Started"<<endl;
 	MyIRListener * listener= new MyIRListener();
 	IRateCenter<std::string>::instance()->addListener(listener);
 	
 	//Do we need to create a new account or there's already one, if not..
-	if(!IRateCenter<std::string>::instance()->needNewAccount()){
+	/*if(!IRateCenter<std::string>::instance()->needNewAccount()){
 		//Start the downloading, connection to server and so on
 		IRateCenter<std::string>::instance()->startDownloading();
 	}
 	else{//we can't start download because there's nothing to download starting of download is set when the account is actually created
 		newAccountRequested();
-	}
+	}*/
 	//this is a loop to look for user input
 	while(input[0]!='q'&&input[0]!='Q'){
 		
@@ -138,14 +175,16 @@ current as \"Love it\"\n\nq - quit this program"<<endl;
 				//this is usefull if the track was skipped 
 				currentTrack=IRateCenter<std::string>::instance()->next(0);
 				//print the track returned by next
-				cout<<"Current song is "<<currentTrack->getName()<<" Filename "<<currentTrack->getFile()<<endl;
+				printFullSong(currentTrack);
+				//cout<<"Current song is "<<currentTrack->getName()<<" Filename "<<currentTrack->getFile()<<endl;
 				//printSong(currentTrack);
 			break;
 			case 'm':
 				//Here we look for the next song but we set the parameter to 1
 				//the last track will be updated with a new last played date and a new numberOfTime played
 				currentTrack=IRateCenter<std::string>::instance()->next(0);
-				cout<<"Current song is "<<currentTrack->getName()<<" Filename "<<currentTrack->getFile()<<endl;
+				//cout<<"Current song is "<<currentTrack->getName()<<" Filename "<<currentTrack->getFile()<<endl;
+				printFullSong(currentTrack);
 			break;
 			case 'p':
 				//Here we look for the previous track
@@ -153,7 +192,8 @@ current as \"Love it\"\n\nq - quit this program"<<endl;
 				t=IRateCenter<std::string>::instance()->previous();
 				if(t!=NULL){
 					currentTrack=t;
-					cout<<"Current song is "<<currentTrack->getName()<<" Filename "<<currentTrack->getFile()<<endl;
+					//cout<<"Current song is "<<currentTrack->getName()<<" Filename "<<currentTrack->getFile()<<endl;
+					printFullSong(currentTrack);
 					t=NULL;
 				}
 			break;
@@ -167,7 +207,8 @@ current as \"Love it\"\n\nq - quit this program"<<endl;
 						//We don't want to show the track if it is a broken download, a track rated as This Sux and so on, so we check for it with ir_isHidden
 						t=*it;
 						if(!t->isHidden()){
-							cout<<t->getName()<<" || "<<t->getState()<<" || "<<t->getRating()<<endl;
+							//cout<<t->getName()<<" || "<<t->getState()<<" || "<<t->getRating()<<endl;
+							printFullSong(t);
 						}
 					}
 					t=NULL;

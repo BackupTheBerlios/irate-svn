@@ -93,7 +93,7 @@ string_jt ir_getTitle (track_t t) {
 }
 
 string_jt ir_getURL (track_t t) {
-	return (string_jt)((irate::common::Track*)t)->getProperty(JvNewStringUTF("url"));
+	return (string_jt)((irate::common::Track*)t)->getProperty(JvNewStringLatin1("url"));
 }
 
 string_jt ir_getKey (track_t t) {
@@ -101,7 +101,7 @@ string_jt ir_getKey (track_t t) {
 }
 
 string_jt ir_getFile (track_t t) {
-	return (string_jt)((irate::common::Track*)t)->getProperty(JvNewStringUTF("file"));
+	return (string_jt)((irate::common::Track*)t)->getProperty(JvNewStringLatin1("file"));
 }
 
 
@@ -111,11 +111,11 @@ string_jt ir_getState (track_t t) {
 
 
 string_jt ir_getWebSite (track_t t) {
-	return (string_jt)((irate::common::Track*)t)->getProperty(JvNewStringUTF("www"));
+	return (string_jt)((irate::common::Track*)t)->getProperty(JvNewStringLatin1("www"));
 }
 
 string_jt ir_getLicense (track_t t) {
-	return (string_jt)((irate::common::Track*)t)->getProperty(JvNewStringUTF("license"));
+	return (string_jt)((irate::common::Track*)t)->getProperty(JvNewStringLatin1("license"));
 }
 string_jt ir_getAlbum (track_t t) {
 	if(((irate::common::Track*)t)->exists())

@@ -31,6 +31,10 @@ int ir_getStringLength(string_jt str){
  	return ((jstring)str)->length();
 }
 int ir_getStringChars(string_jt str,char **buffer,int maxlen,int* realLength){
+	if(str==NULL){
+		*realLength=0;
+		return 0;
+	}
 	JArray<jbyte> *myarray =((jstring) str)->getBytes(_priv_ir_Encoding);
 	int l=myarray->length;
 	*realLength=l;
@@ -45,6 +49,10 @@ int ir_getStringChars(string_jt str,char **buffer,int maxlen,int* realLength){
 }
 
 char *ir_getMallocedStringDecoded(string_jt s,int* length){
+	if(s==NULL){
+		*length=0;
+		return NULL;
+	}
 	JArray<jbyte> *myarray =((jstring) s)->getBytes(_priv_ir_Encoding);
 	(*length)=myarray->length;
 	jbyte * mybyte=elements(myarray);
@@ -65,6 +73,10 @@ char *ir_getMallocedStringDecoded(string_jt s,int* length){
 	return buffer;
 }
 char *ir_getNewedStringDecoded(string_jt s,int* length){
+	if(s==NULL){
+		*length=0;
+		return NULL;
+	}
 	JArray<jbyte> *myarray =((jstring) s)->getBytes(_priv_ir_Encoding);
 	(*length)=myarray->length;
 	if(_priv_ir_nullTerminated){

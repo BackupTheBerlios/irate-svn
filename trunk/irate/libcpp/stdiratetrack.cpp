@@ -32,6 +32,7 @@ void stdir_setDefaultEncoding(char * encoding,bool nullTerminated){
 }
 
 std::string decodeSTDString(string_jt str){
+	if(str==NULL)return std::string();
 	JArray<jbyte> *myarray =((jstring) str)->getBytes(_priv_def_std_encoding);
 	int size= myarray->length;
 	if(_priv_std_null_terminated){

@@ -27,7 +27,7 @@
 @author Matthias Studer
 */
 #ifdef _CPPIR_USE_CHAR
-void setDefaultEncoding(char * encoding,bool nullTerminated=true);
+void stdir_setDefaultEncoding(char * encoding,bool nullTerminated=true);
 std::string decodeSTDString(string_jt);
 bool std_isNullOrEmptyString(const std::string &s);
 void initSTDIRateCenter(char * encoding, bool nullTerminated);

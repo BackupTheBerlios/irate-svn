@@ -19,6 +19,7 @@
  ***************************************************************************/
 #include <iratetrack.h>
 #include <irate/common/Track.h>
+#include <gcj/cni.h>
 bool BaseIRateTrack::isRated() {
 	return (bool)((irate::common::Track*)this->_mt)->isRated();
 }
@@ -61,3 +62,73 @@ long BaseIRateTrack::getPlayingTime () {
 	else return 0;
 }
 int BaseIRateTrack::getDownloadAttempts () {return (int)((irate::common::Track*)this->_mt)->getDownloadAttempts();}
+
+
+//String part is protected as it is intended as beeing used in subclasses
+string_jt BaseIRateTrack::_getName() {
+	return (string_jt)((irate::common::Track*)this->_mt)->getName();
+}
+
+string_jt BaseIRateTrack::_getLastPlayed() {
+	return (string_jt)((irate::common::Track*)this->_mt)->getLastPlayed();
+}
+string_jt BaseIRateTrack::_getArtist () {
+	return (string_jt)((irate::common::Track*)this->_mt)->getArtist();
+}
+string_jt BaseIRateTrack::_getTitle () {
+	return (string_jt)((irate::common::Track*)this->_mt)->getTitle();
+}
+
+string_jt BaseIRateTrack::_getURL () {
+	return (string_jt)((irate::common::Track*)this->_mt)->getProperty(JvNewStringLatin1("url"));
+}
+
+string_jt BaseIRateTrack::_getKey () {
+	return (string_jt)((irate::common::Track*)this->_mt)->getKey();
+}
+
+string_jt BaseIRateTrack::_getFile () {
+	return (string_jt)((irate::common::Track*)this->_mt)->getProperty(JvNewStringLatin1("file"));
+}
+
+
+string_jt BaseIRateTrack::_getState () {
+	return (string_jt)((irate::common::Track*)this->_mt)->getState();
+}
+
+
+string_jt BaseIRateTrack::_getWebSite () {
+	return (string_jt)((irate::common::Track*)this->_mt)->getProperty(JvNewStringLatin1("www"));
+}
+
+string_jt BaseIRateTrack::_getLicense () {
+	return (string_jt)((irate::common::Track*)this->_mt)->getProperty(JvNewStringLatin1("license"));
+}
+string_jt BaseIRateTrack::_getAlbum () {
+	if(((irate::common::Track*)this->_mt)->exists())
+		return (string_jt)((irate::common::Track*)this->_mt)->getAlbum();
+	else return NULL;
+}
+
+string_jt BaseIRateTrack::_getComment () {
+	if(((irate::common::Track*)this->_mt)->exists())
+		return (string_jt)((irate::common::Track*)this->_mt)->getComment();
+	else return NULL;
+}
+string_jt BaseIRateTrack::_getCopyrightInfo() {
+	if(((irate::common::Track*)this->_mt)->exists())return (string_jt)((irate::common::Track*)this->_mt)->getCopyrightInfo();
+	else return NULL;
+}
+
+string_jt BaseIRateTrack::_getGenre () {
+	if(((irate::common::Track*)this->_mt)->exists())return (string_jt)((irate::common::Track*)this->_mt)->getGenre();
+	else return NULL;
+}
+string_jt BaseIRateTrack::_getPlayingTimeString () {
+	if(((irate::common::Track*)this->_mt)->exists())return (string_jt)((irate::common::Track*)this->_mt)->getPlayingTimeString();
+	else return NULL;
+}
+string_jt BaseIRateTrack::_getYear () {
+	if(((irate::common::Track*)this->_mt)->exists())return (string_jt)((irate::common::Track*)this->_mt)->getYear();
+	else return NULL;
+}

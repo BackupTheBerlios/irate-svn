@@ -54,12 +54,16 @@ class IRateCenterListener{
 	*/
 	virtual void downloadStarted (IRateTrack<_IR_String>* track)=0;
 	/**When we start creating a new account this show current progression of the creation
+	* Typically you would like to start the download if state==2 with IRateCenter\<_IR_String\>::instance()->startDownloading();
 	*@param statut a string describing the statut
 	* @param state if 1 then creation is in progress if 2 then account was successfully created if 3 account creation hase failed
 	*/
 	virtual void newAccountCreationMessage(_IR_String statut,int state)=0;
 };
-/**This class control IRate 
+/**This class control IRate it also cache IRateTrack instance.
+* Cached IRateTrack are automatically deleted at the end of the program
+*@see IRateTrack a class to get information about IRate Track 
+*@see IRateCenterListener To get notified about IRate events
 */
 template <typename _IR_String>
 class IRateCenter:public LibIRateListener{
@@ -118,9 +122,14 @@ class IRateCenter:public LibIRateListener{
 		}
 		/**Return a list of track playable or not*/
 		std::list<IRateTrack<_IR_String>*> availableTracks();
+		/**Start to download if we haven't do it before, you need to be sure to call it only once.
+		* But you may want not to start downloading before having an account on the server
+		* So check if needNewAccount 
+		*/
 		inline void startDownloading(){
 			if(!_mdownloading){
 				iratelib::startDownloading();
+				_mdownloading=true;
 			}
 		}
 		/**true if it's possible to undo last rating*/
@@ -148,7 +157,7 @@ class IRateCenter:public LibIRateListener{
 		/**remove a previously added listener all instance found are removed
 		*/
 		void removeListener(IRateCenterListener<_IR_String>* listener){
-			std::list<IRateCenterListener<_IR_String>*>::iterator it;
+			ListenerIterator it;
 			for(it=_mlistener.begin(); it != _mlistener.end();++it){
 				if((*it)==listener){
 					_mlistener.erase(it);
@@ -156,6 +165,8 @@ class IRateCenter:public LibIRateListener{
 			}
 		}
 	protected:
+		typedef typename std::list<IRateCenterListener<_IR_String>*>::iterator ListenerIterator;
+		
 		IRateTrack<_IR_String>* doCache(const track_t& trackHandle,const bool& update){
 			IRateTrack<_IR_String>* track=NULL;
 			if(_mcache.find(trackHandle)!=_mcache.end()){
@@ -173,7 +184,7 @@ class IRateCenter:public LibIRateListener{
 			}
 			return NULL;
 		}
-		IRateCenter():LibIRateListener(){}
+		IRateCenter():LibIRateListener(),_mdownloading(false){}
 		virtual ~IRateCenter();
 		std::map<track_t,IRateTrack<_IR_String>*> _mcache;
 		static _IR_String(*decodeString)(string_jt);
@@ -215,7 +226,7 @@ void IRateCenter<_IR_String>::closeAndQuitEngine(){
 }
 template <typename _IR_String>IRateCenter<_IR_String>::~IRateCenter(){
 	std::list<IRateTrack<_IR_String>* > lt=this->availableTracks();
-	std::list<IRateTrack<_IR_String>* >::iterator it;
+	typename std::list<IRateTrack<_IR_String>* >::iterator it;
 	IRateTrack<_IR_String>* tr;
 	for(it=lt.begin(); it != lt.end();++it){
 		tr=*it;
@@ -227,7 +238,7 @@ template <typename _IR_String>IRateCenter<_IR_String>::~IRateCenter(){
 template <typename _IR_String>
 void IRateCenter<_IR_String>::updateTrack (const track_t& trackHandle){
 	IRateTrack<_IR_String>* tr= this->doCache(trackHandle,true);
-	std::list<IRateCenterListener<_IR_String>*>::iterator it;
+	ListenerIterator it;
 	for(it=_mlistener.begin(); it != _mlistener.end();++it){
 		(*it)->updateTrack(tr);
 	}
@@ -236,7 +247,7 @@ template <typename _IR_String>
 void IRateCenter<_IR_String>::handleError (string_jt code, string_jt url){
 	_IR_String mycode=decodeString(code);
 	_IR_String myurl=decodeString(url);
-	std::list<IRateCenterListener<_IR_String>*>::iterator it;
+	ListenerIterator it;
 	for(it=_mlistener.begin(); it != _mlistener.end();++it){
 		(*it)->handleError(mycode,myurl);
 	}
@@ -244,7 +255,7 @@ void IRateCenter<_IR_String>::handleError (string_jt code, string_jt url){
 template <typename _IR_String>
 void IRateCenter<_IR_String>::downloadFinished (const track_t& trackHandle, bool success){
 	IRateTrack<_IR_String>* tr= this->doCache(trackHandle,true);
-	std::list<IRateCenterListener<_IR_String>*>::iterator it;
+	ListenerIterator it;
 	for(it=_mlistener.begin(); it != _mlistener.end();++it){
 		(*it)->downloadFinished(tr,success);
 	}
@@ -253,7 +264,7 @@ void IRateCenter<_IR_String>::downloadFinished (const track_t& trackHandle, bool
 template <typename _IR_String>
 void IRateCenter<_IR_String>::downloadProgressed (const track_t& trackHandle, const int& percent){
 	IRateTrack<_IR_String>* tr= this->doCache(trackHandle,true);
-	std::list<IRateCenterListener<_IR_String>*>::iterator it;
+	ListenerIterator it;
 	for(it=_mlistener.begin(); it != _mlistener.end();++it){
 		(*it)->downloadProgressed(tr,percent);
 	}
@@ -261,7 +272,7 @@ void IRateCenter<_IR_String>::downloadProgressed (const track_t& trackHandle, co
 template <typename _IR_String>
 void IRateCenter<_IR_String>::downloadStarted (const track_t& trackHandle){
 	IRateTrack<_IR_String>* tr= this->doCache(trackHandle,true);
-	std::list<IRateCenterListener<_IR_String>*>::iterator it;
+	ListenerIterator it;
 	for(it=_mlistener.begin(); it != _mlistener.end();++it){
 		(*it)->downloadStarted(tr);
 	}
@@ -269,14 +280,14 @@ void IRateCenter<_IR_String>::downloadStarted (const track_t& trackHandle){
 template <typename _IR_String>
 void IRateCenter<_IR_String>::newAccountCreationMessage(string_jt statut,int state){
 	_IR_String str=decodeString(statut);
-	std::list<IRateCenterListener<_IR_String>*>::iterator it;
+	ListenerIterator it;
 	for(it=_mlistener.begin(); it != _mlistener.end();++it){
 		(*it)->newAccountCreationMessage(str,state);
 	}
 }
 template <typename _IR_String>
 std::list<IRateTrack<_IR_String>*> IRateCenter<_IR_String>::availableTracks(){
-	std::map<track_t,IRateTrack<_IR_String>*>::iterator it;
+	typename std::map<track_t,IRateTrack<_IR_String>*>::iterator it;
 	std::list<IRateTrack<_IR_String>*> l;
 	for(it=this->_mcache.begin();it!=this->_mcache.end();++it){
 		l.push_front((*it).second);

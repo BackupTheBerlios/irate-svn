@@ -24,12 +24,6 @@
 void QTIRateSignaler::customEvent(QCustomEvent * e) {
 	int type=e->type()-QEvent::User-2307;
 	if(type<0)return;
-	void irateError(QString,QString);
-		void trackUpdated(QTrack *);
-		void trackDownloadFinished(QTrack *,bool);
-		void trackDownloadProgressed(QTrack *,int);
-		void trackDownloadStarted(QTrack *);
-		void accountCreationMessage(QString ,int);
 	if(type==_IR_ERROR_EVENT){
 		QTIRateEventError* ev2=(QTIRateEventError*)e;
 		emit irateError(ev2->getCode(),ev2->getUrl());
@@ -56,6 +50,7 @@ void QTIRateSignaler::customEvent(QCustomEvent * e) {
 	}
 }
 QString qt_decodeAsQString(string_jt str){
+	if(str==NULL)return QString();
 	QString s;
 	s.setUnicodeCodes((ushort*)JvGetStringChars((jstring)str),((jstring)str)->length());
 	return s;
