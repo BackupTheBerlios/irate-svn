@@ -22,7 +22,7 @@
 //
 // Conventionally on the Macintosh your whole application shares a single
 // menu bar (that's why it's at the top of the screen, not on a window!)
-// When in a window where some operations ar enot supported, you gray out
+// When in a window where some operations are not supported, you gray out
 // those items/menus but they're still _there_. Also, the Edit menu is
 // normally present and functional when a dialog box is active.
 //
@@ -38,46 +38,46 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 class MacMenuFixer {
-	static Menu mainMenuBar;
-	
-	// If we're not on Mac OS X, don't bother locking the menu bar item
-	static public void setMenuBar(Menu menubar) {
-	    if(System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
-			mainMenuBar = menubar;
-	}
-	
-	static public Menu getMenuBar() {
-		return mainMenuBar;
-	}
-	
-	// If on a Mac, make a copy of the menu bar for the given shell
-	// and gray out all the items. Otherwise return null.
-	static public Menu grayMenuBar(Shell shell) {
-	    if(mainMenuBar == null)
-	    	return null;
-	    if(!System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
-	    	return null;
-		Menu gray = new Menu(shell, mainMenuBar.getStyle());
-	    return copyGrayMenu(gray, mainMenuBar);
-	}
-	
-	static Menu copyGrayMenu(Menu gray, Menu menu) {
-		for(int i = 0; i < menu.getItemCount(); i++) {
-			MenuItem item = menu.getItem(i);
-			MenuItem grayItem = new MenuItem(gray, item.getStyle());
-			grayItem.setText(item.getText());
-			
-			if((item.getStyle() & SWT.CASCADE) != 0) {
-				// Submenu -- copy it.
-				Menu submenu = new Menu(grayItem);
-				copyGrayMenu(submenu, item.getMenu());
-				grayItem.setMenu(submenu);
-			} else {
-				// Single item -- gray it out.
-				grayItem.setEnabled(false);
-			}
-		}
-		return gray;
-	}
+  static Menu mainMenuBar;
+  
+  // If we're not on Mac OS X, don't bother locking the menu bar item
+  static public void setMenuBar(Menu menubar) {
+    if(System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
+      mainMenuBar = menubar;
+  }
+  
+  static public Menu getMenuBar() {
+    return mainMenuBar;
+  }
+  
+  // If on a Mac, make a copy of the menu bar for the given shell
+  // and gray out all the items. Otherwise return null.
+  static public Menu grayMenuBar(Shell shell) {
+      if(mainMenuBar == null)
+        return null;
+      if(!System.getProperty("os.name").toLowerCase().startsWith("mac os x"))
+        return null;
+    Menu gray = new Menu(shell, mainMenuBar.getStyle());
+      return copyGrayMenu(gray, mainMenuBar);
+  }
+  
+  static Menu copyGrayMenu(Menu gray, Menu menu) {
+    for(int i = 0; i < menu.getItemCount(); i++) {
+      MenuItem item = menu.getItem(i);
+      MenuItem grayItem = new MenuItem(gray, item.getStyle());
+      grayItem.setText(item.getText());
+      
+      if((item.getStyle() & SWT.CASCADE) != 0) {
+        // Submenu -- copy it.
+        Menu submenu = new Menu(grayItem);
+        copyGrayMenu(submenu, item.getMenu());
+        grayItem.setMenu(submenu);
+      } else {
+        // Single item -- gray it out.
+        grayItem.setEnabled(false);
+      }
+    }
+    return gray;
+  }
 
 }
