@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="iRATE radio" default="release">
+<project name="iRATE radio" default="jar">
   <target name="compile">
     <javac srcdir="." debug="true" debuglevel="lines,vars,source">
       <classpath>
@@ -23,17 +23,34 @@
       <fileset dir="." includes="irate/common/*.class"/>
     </jar>
     
-    <uptodate property="release.notrequired" targetfile="irate-installer.exe">
+    <uptodate property="nsis.notrequired" targetfile="irate-installer.exe">
       <srcfiles dir="." includes="*.jar"/>
+      <srcfiles dir="." includes="*.html"/>
     </uptodate>
   </target>
 
-  <target name="release" depends="jar" unless="release.notrequired">
+  <target name="tar" depends="jar">
+    <tar destfile="irate-client.tar" basedir=".." includes="irate/irate-client.jar,irate/jl020.jar,irate/xercesImpl.jar,irate/xmlParserAPIs.jar,irate/help/*.html"/>
+  </target>
+
+  <target name="gzip" depends="tar">
+    <gzip src="irate-client.tar" zipfile="irate-client.tar.gz"/>
+  </target>
+  
+  <target name="bzip2" depends="tar">
+    <bzip2 src="irate-client.tar" zipfile="irate-client.tar.bz2"/>
+  </target>
+  
+    <!-- Windoze installer -->
+  <target name="nsis" depends="jar" unless="nsis.notrequired">
     <exec executable="makensis.exe">
       <arg line="irate-client.nsi"/>
     </exec>
   </target>
-  
+
+  <target name="all" depends="gzip,bzip2,nsis">
+  </target>
+
   <target name="clean">
     <delete file="**/*.class"/>
     <delete file="irate-server.jar"/>

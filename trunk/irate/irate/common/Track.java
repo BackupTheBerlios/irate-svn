@@ -15,7 +15,9 @@ public class Track {
   }
 
   public String toString() {
-    String rating = " (" + Integer.toString(getRating()) + "/" + getNoOfTimesPlayed()+ ")";
+    int ratingValue = getRawRating();
+    String ratingStr = ratingValue < 0 ? "UNRATED" : Integer.toString(getRating());
+    String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ")";
     String artist = getArtist();
     String title = getTitle();
     if (artist.length() == 0) { 
@@ -28,13 +30,24 @@ public class Track {
     return artist + " / " + title + rating;
   }
 
-  public int getRating() {
+  /**
+   * Return the rating with -1 meaning that it hasn't been rated.
+   */
+  private int getRawRating() {
     try {
       return Integer.parseInt(elt.getAttribute("rating"));
     }
     catch (NumberFormatException e) {
     }
-    return DEFAULT_RATING;
+    return -1;
+  }
+
+  public int getRating() {
+    int rating = getRawRating();
+    if (rating < 0)
+	return DEFAULT_RATING;
+    else
+	return rating;
   }
 
   public int getNoOfTimesPlayed() {
