@@ -70,24 +70,36 @@ public class DownloadThread extends Thread {
     this.continuous = continuous;
   }
   
-  public void process() {
-    contactServer(trackDatabase);
+  private boolean downloadSinglePending() {
     Track[] tracks = trackDatabase.getTracks();
     for (int i = 0; i < tracks.length; i++) {
       currentTrack = tracks[i];
-      File file = currentTrack.getFile();
-      if (file == null) 
-        download(currentTrack);
-      else if (!file.exists()) {
-        currentTrack.unSetFile();
-        try {
-          trackDatabase.save();
+      if (!currentTrack.isHidden()) {
+        File file = currentTrack.getFile();
+        if (file == null) 
           download(currentTrack);
-        }
-        catch (IOException e) {
-          e.printStackTrace();
+        else if (!file.exists()) {
+          currentTrack.unSetFile();
+          try {
+            trackDatabase.save();
+            download(currentTrack);
+  
+              // We've successfully downloaded a track.
+            return true;
+          }
+          catch (IOException e) {
+            e.printStackTrace();
+          }
         }
       }
+    }
+    return false;
+  }
+
+  public void process() {
+    if (!downloadSinglePending()) {
+      contactServer(trackDatabase);
+      downloadSinglePending();
     }
   }
 

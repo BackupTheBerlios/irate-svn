@@ -31,7 +31,6 @@ public class TrackTable implements TableModel {
   
   public synchronized void notifyListeners() {
     TrackDatabase td = playListManager.getPlayList();
-    td.sort();
     tracks = td.getTracks();
     for (int i = 0; i < listeners.size(); i++) 
       ((TableModelListener) listeners.elementAt(i)).tableChanged(new TableModelEvent(this));

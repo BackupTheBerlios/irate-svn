@@ -68,6 +68,26 @@ public class Track {
     return DEFAULT_RATING;
   }
 
+  public void erase() {
+    if (!isErased()) {
+      File f = getFile();
+      if (f != null && f.exists()) {
+        try {
+          f.delete();
+        } 
+        catch (Exception e) {
+          e.printStackTrace();
+        }
+        setFileState("erased");
+        elt.setAttribute("file", "");
+      }
+    }
+  }
+
+  public boolean isErased() {
+    return getFileState().equals("erased");
+  }
+
   public int getNoOfTimesPlayed() {
     try {
       String s = elt.getStringAttribute("played");
@@ -130,10 +150,25 @@ public class Track {
   }
 
   public void setBroken() {
-    elt.setAttribute("broken", "yes");
+    setFileState("broken");
+  }
+
+  private String getFileState() {
+    String s = elt.getStringAttribute("state");
+    if (s == null)
+      return "";
+    return s;
+  }
+
+  private void setFileState(String state) {
+    elt.setAttribute("state", state);
   }
 
   public boolean isBroken() {
+    if (getFileState().equals("broken"))
+      return true;
+
+      // This part is for backwards compatibility
     String s = elt.getStringAttribute("broken");
     return s != null && (s.equalsIgnoreCase("yes") || s.equalsIgnoreCase("true"));
   }
@@ -196,10 +231,18 @@ public class Track {
   }
 
   public float getProbability() {
+    int noOfTimesPlayed = getNoOfTimesPlayed();
     float rating = getRating();
-    float prob = rating * rating / (1 + getNoOfTimesPlayed());
+    float prob = rating * rating / (1 + noOfTimesPlayed);
     if (prob < 0)
       return 0;
+
+      // Make it 1/10th of the chance of being played if the number of times 
+      // played is a multiple of the rating. This means that a track will get
+      // played in chunks proportional to the number of times it has been 
+      // played.
+    if (noOfTimesPlayed != 0 && (noOfTimesPlayed % rating) == 0)
+      prob /= 10;
     return prob;
   }
 
@@ -220,6 +263,15 @@ public class Track {
     return elt;
   }
 
+  public int compareTo(Track track) {
+    String a0 = getArtist();
+    String a1 = track.getArtist();
+    int comp = a0.compareToIgnoreCase(a1);
+    if (comp != 0)
+      return comp;
+    return getTitle().compareToIgnoreCase(track.getTitle());
+  }
+  
   public boolean equals(Track track) {
     return getURL().equals(track.getURL());
   }

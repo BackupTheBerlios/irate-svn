@@ -16,7 +16,7 @@ public class TrackDatabase {
   private final String autoDownloadElementName = "AutoDownload";
   private final String defaultHost = "takahe.blacksapphire.com";
   private final int defaultPort = 2278;
-  private Vector tracks;
+  private TreeSet tracks;
   private Hashtable hash;
   private File file;
   private XMLElement docElt;
@@ -51,7 +51,14 @@ public class TrackDatabase {
 
   private void create() {
     try {
-      tracks = new Vector();
+      tracks = new TreeSet(new Comparator() {
+        public int compare(Object o0, Object o1) {
+          return ((Track) o0).compareTo((Track) o1);
+        }
+        public boolean equals(Object o0, Object o1) {
+          return compare(o0, o1) == 0;
+        }
+      });
       hash = new Hashtable();
       docElt = new XMLElement(new Hashtable(), false, false);
       docElt.setName(docElementName);
@@ -244,7 +251,7 @@ public class TrackDatabase {
         //System.out.println(elt.toString());
         Track track = new Track(elt);
         tracks.add(track);
-		//System.out.println("key="+track.getKey());
+        //System.out.println("key="+track.getKey());
         hash.put(track.getKey(), track);
       }
     }
@@ -325,7 +332,7 @@ public class TrackDatabase {
       float[] probs = new float[tracks.length]; 
 
         // Choose a minimum probability
-      float minRating = MAX_RATING * random.nextFloat();
+      float minRating = (MAX_RATING - 1) * random.nextFloat();
     
       float totalProb = 0;
       for (int i = 0; i < tracks.length; i++) {
@@ -358,39 +365,10 @@ public class TrackDatabase {
   }
 
   public void purge() {
-    for (int i = tracks.size() - 1; i >= 0; i--) {
-      Track track = (Track) tracks.elementAt(i);
-      if (track.isHidden()){
-        File f = track.getFile();
-        if(f.exists())
-        	try {
-                f.delete();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        tracks.remove(i);
-      }
+    for (Iterator itr = tracks.iterator(); itr.hasNext(); ) {
+      Track track = (Track) itr.next();
+      if (track.isHidden()) 
+        track.erase();
     }
   }
-
-    /** A nice ol' bubble sort. This is used because it has a passable 
-     * performance when the list starts off sorted. */
-  public void sort() {
-    synchronized (this) {
-      boolean swap;
-      do {
-        swap = false;
-        for (int i = 1; i < tracks.size(); i++) {
-          Track lastTrack = (Track) tracks.elementAt(i - 1);
-          Track track = (Track) tracks.elementAt(i);
-          if (compare(lastTrack, track) > 0) {
-            tracks.setElementAt(track, i - 1);
-            tracks.setElementAt(lastTrack, i);
-            swap = true;
-          }
-        }
-      } while (swap);
-    }
-  }
-  
 }

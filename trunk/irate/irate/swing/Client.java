@@ -58,7 +58,6 @@ public class Client extends JFrame {
     File file = new File("trackdatabase.xml");
     try {
       trackDatabase = new TrackDatabase(file);
-      trackDatabase.purge();
     }
     catch (IOException e) {
       e.printStackTrace();
