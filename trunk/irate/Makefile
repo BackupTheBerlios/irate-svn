@@ -30,10 +30,10 @@ JAVA_OBJS=$(JAVA_SWINGSRC:.java=.class) $(JAVA_COMMONSRC:.java=.class) $(JAVA_CL
 #request resource compilation if not gcj 3.0.4
 #set in make.configure
 ifndef NO_RESOURCE
-IMAGES_GIF = $(shell find irate/resources/ -name '*.gif')
-#IMAGES_PNG = $(shell find irate/resources/ -name '*.png')
+IMAGES_GIF = $(wildcard irate/resources/*.gif)
+IMAGES_PNG = $(wildcard irate/resources/*.png)
 CLIENT_DEPS += $(IMAGES_GIF:.gif=.gifres.o)
-#CLIENT_DEPS += $(IMAGES_PNG:.png=.pngres.o)
+CLIENT_DEPS += $(IMAGES_PNG:.png=.pngres.o)
 LOCALES = \
   $(wildcard irate/common/locale*.properties) \
   $(wildcard irate/download/locale*.properties) \
@@ -181,8 +181,8 @@ irate-server.o:irate/server/*.java
 %.gifres.o: %.gif
 	$(GCJ) -c --resource $^ $^ -o $@
 
-#%.pngres.o: %.png
-#	$(GCJ) -c --resource $^ $^ -o $@
+%.pngres.o: %.png
+	$(GCJ) -c --resource $^ $^ -o $@
 
 %.properties.o: %.properties	
 	$(GCJ) -c --resource $^ $^ -o $@
@@ -237,5 +237,5 @@ irate-client-swing.jar:
 	jar -cmf META-INF/manifest.irate-client irate-client-swing.jar $(JAVA_OBJS) $(HELPFILES)
 
 clean:
-	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o setup.exe -R irate-linux-i586* irate/resources/skin.zip
+	rm -f $(DEPS) $(IRATE_CLIENT) $(IRATE_SERVER) *.a *.o setup.exe -R irate-linux-i586* irate/resources/skin.zip `find irate/ -name \*.o`
 	$(MAKE) -C lib clean

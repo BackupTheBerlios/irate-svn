@@ -39,8 +39,16 @@ public class TransparencyManager {
     
     // If there's no parent composite then we don't have a parent image.
     Composite parent = control.getParent();    
-    if (parent == null)
-      return null;
+    if (parent == null) {
+      Image image = new Image(control.getDisplay(), bounds.width, bounds.height);
+      GC gc = new GC(image);
+      gc.setBackground(control.getBackground());
+      gc.fillRectangle(0, 0, bounds.width, bounds.height);
+      imageData = image.getImageData();
+      image.dispose();
+      control.setData(key, imageData);
+      return imageData;
+    }
 
     // If the parent has no image then we bail.
     ImageData parentImageData = getBackground(parent);
