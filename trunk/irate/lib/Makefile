@@ -19,8 +19,16 @@ else
 
 ifeq ($(PLATFORM),linux-gtk2)
 	unzip swt-2.1.1-linux-gtk.zip
+
+else
+
+ifeq ($(PLATFORM),linux-libswt-gtk2)
+	unzip swt-2.1.1-linux-gtk.zip
+
 else
 	echo Unknown PLATFORM $(PLATFORM), please specify on commandline && exit 1 
+endif
+
 endif
 
 endif

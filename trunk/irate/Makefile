@@ -5,12 +5,17 @@ IRATE_CLIENT=irate-client
 IRATE_SERVER=irate-server
 export PLATFORM=linux-motif
 #export PLATFORM=linux-gtk2
+#export PLATFORM=linux-libswt-gtk2
 #export PLATFORM=win32
 PWD=$(shell pwd)
 export CLASSPATH=$(PWD):$(PWD)/lib/nanoxml-lite-2.2.3.jar:$(PWD)/lib/swt.jar
 
 CLIENT_DEPS = irate-swt.o irate-common.o irate-client.o irate-download.o
+ifeq ($(PLATFORM),linux-libswt-gtk2)
+CLIENT_LIBS = /usr/lib/libswt-gtk2.so lib/libnanoxml-lite.o 
+else
 CLIENT_LIBS = lib/libswt.o lib/libnanoxml-lite.o 
+endif
 
 #cute hack to see if we can bundle the docs too
 #ifneq ($(shell html2text -help 2> /dev/null),)
@@ -45,15 +50,32 @@ all: lib $(IRATE_CLIENT) $(IRATE_SERVER)
 install: $(IRATE_CLIENT)
 	install -d $(BIN) $(LIB)
 	install $(IRATE_CLIENT) $(BIN)
+ifeq ($(PLATFORM),linux-motif)	
 	install lib/libswt-gnome-motif-3009.so $(LIB)
 	install lib/libswt-kde-motif-3009.so $(LIB)
 	install lib/libswt-motif-3009.so $(LIB)
+else
+ifeq ($(PLATFORM),linux-gtk2)
+	install lib/libswt-gnome-gtk-2135.so $(LIB)
+	install lib/libswt-gtk-2135.so $(LIB)
+	install lib/libswt-pi-gtk-2135.so $(LIB)
+else
+ifeq ($(PLATFORM),linux-libswt-gtk2)
+	# Don't need to install anything special for libswt
+else
+	echo Unknown PLATFORM $(PLATFORM), please specify on commandline && exit 1 
+endif	
+endif
+endif
 
 lib:
 	$(MAKE) -C lib/
 
 lib/libswt.o:
 	$(MAKE) -C lib/ libswt.o
+
+lib/swt.jar:
+	$(MAKE) -C lib/ swt.jar
 
 lib/libnanoxml-lite.o:
 
@@ -70,7 +92,7 @@ $(IRATE_CLIENT): $(CLIENT_LIBS) $(CLIENT_DEPS)
 $(IRATE_SERVER): $(SERVER_LIBS) $(SERVER_DEPS) 
 	$(GCJ)  $(SERVER_DEPS) $(SERVER_LIBS) -o $(IRATE_SERVER) --main=irate.server.Server
 	
-irate-swt.o: irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java
+irate-swt.o: irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java lib/swt.jar
 	$(GCJ) -c irate/swt/*.java irate/swt/plugin/*.java irate/swt/plugin/*/*.java -o irate-swt.o
 
 irate-client.o: $(CLIENT_FILES)
