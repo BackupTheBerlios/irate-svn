@@ -222,7 +222,7 @@ public class Client implements UpdateListener {
       TableItem item = new TableItem(tblSongs,SWT.NULL);
       String[] data = {tracks[i].getArtist(),
       tracks[i].getTitle(),
-      String.valueOf(tracks[i].getRating()),
+      tracks[i].getState(),
       String.valueOf(tracks[i].getNoOfTimesPlayed()),
       tracks[i].getLastPlayed() };
       item.setText(data);

@@ -20,7 +20,7 @@ public class Track {
   }
 
   public String toString() {
-    String ratingStr = isRated() ? Integer.toString((int) getRating()) : "UNRATED";
+    String ratingStr = getState();
     String rating = " (" + ratingStr + "/" + getNoOfTimesPlayed()+ ")";
     String s = getName() + rating;
     if (getFile() == null)
@@ -203,6 +203,19 @@ public class Track {
     return prob;
   }
 
+  public String getState() {
+    if (isBroken()) 
+      return "Broken";
+    File file = getFile();
+    if (file == null)
+      return "Not downloaded";
+    if (!file.exists())
+      return "Missing";
+    if (isRated())
+      return Integer.toString((int) getRating());
+    return "Unrated";
+  }
+  
   public XMLElement getElement() {
     return elt;
   }

@@ -61,17 +61,7 @@ public class TrackTable implements TableModel {
     switch (columnIndex) {
       case 0: return track.getArtist();
       case 1: return track.getTitle();
-      case 2: 
-        if (track.isBroken()) 
-          return "Broken";
-        File file = track.getFile();
-        if (file == null)
-          return "Not downloaded";
-        if (!file.exists())
-          return "Missing";
-        if (track.isRated())
-          return Integer.toString((int) track.getRating());
-        return "Unrated";
+      case 2: return track.getState();
       case 3: return Integer.toString(track.getNoOfTimesPlayed());
       case 4: return track.getLastPlayed();
     }
