@@ -208,6 +208,12 @@ public class Client implements UpdateListener {
     TableItem ti = (TableItem) hashSongs.get(track);
     track2TableItem(track, ti);
     update();
+    //save the precious ratings :)
+    try{
+    	trackDatabase.save();
+    }catch(Exception e){
+    	e.printStackTrace();
+    }
   } 
  
   public void setPaused(boolean paused) {
