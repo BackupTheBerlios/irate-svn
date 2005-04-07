@@ -12,6 +12,7 @@ import irate.common.Utils;
 import java.io.*;
 import java.net.*;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
@@ -37,6 +38,8 @@ public class DownloadThread extends Thread {
     new ExponentialBackoffManager();
   private int numThreads=0; // Counts the num of download threads running
   private ArrayList messageList; // Stores the messages from the threads
+  
+  private HashSet tracksBeingDownloaded = new HashSet();
     
   public DownloadThread(TrackDatabase trackDatabase) {
     this.trackDatabase = trackDatabase;
@@ -118,7 +121,8 @@ public class DownloadThread extends Thread {
             toSave = true;
           }
           if (!exponentialBackoffManager.isBackedOff(currentTrack.getURL()))
-            downloadTracks.add(currentTrack);
+            if (tracksBeingDownloaded.contains(currentTrack))
+              downloadTracks.add(currentTrack);
         }
       }
     }
@@ -230,6 +234,7 @@ public class DownloadThread extends Thread {
   }
 
   public void download(final Track track) throws IOException {
+    tracksBeingDownloaded.add(track);
     final URL url = getProxyURL(track.getURL());
     System.out.println(url);
     final File finishedFile = getFileName(url);
@@ -387,6 +392,7 @@ public class DownloadThread extends Thread {
     }
     finally {
       percentComplete = 0;
+      tracksBeingDownloaded.remove(track);
     }
   }
 
