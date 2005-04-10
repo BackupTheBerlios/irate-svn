@@ -25,7 +25,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.StringTokenizer;
+import java.util.Map;
 
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
@@ -117,8 +117,6 @@ public class BasicPlayer implements Runnable
     if (file != null)
     {
       m_dataSource = file;
-      System.out.println("Setting file datasource: "+file); // @debug
-      System.out.println(JDK13Services.getProviders(AudioFileReader.class));
       initAudioInputStream();
     }
   }
@@ -751,46 +749,15 @@ public class BasicPlayer implements Runnable
    */
   public double getTotalLengthInSeconds()
   {
-    double lenghtInSecond = 0.0;
+    double lengthInSecond = 0.0;
     if (getAudioFileFormat() != null)
     {
-      int FL = (getAudioFileFormat()).getFrameLength();
-      int FS = (getAudioFormat()).getFrameSize();
-      float SR = (getAudioFormat()).getSampleRate();
-      float FR = (getAudioFormat()).getFrameRate();
-      int TL = (getAudioFileFormat()).getByteLength();
-      String type = (getAudioFileFormat()).getType().toString();
-      String encoding = (getAudioFormat()).getEncoding().toString();
-      if ( (FL != -1) && ( (type.startsWith("MP3")) || (type.startsWith("VORBIS"))))
-      {
-        // No accurate formula :-(
-        // Alternative dirty solution with SPI
-        StringTokenizer st = new StringTokenizer(type, "x");
-        st.nextToken();
-        st.nextToken();
-        String totalMSStr = st.nextToken();
-        lenghtInSecond = Math.round( (Integer.parseInt(totalMSStr)) / 1000);
-      }
-      else
-      {
-        int br = getBitRate();
-        if (br > 0)
-        {
-          lenghtInSecond = TL * 8 / br;
-        }
-        else
-        {
-          lenghtInSecond = TL / (FS * SR);
-
-        }
-      }
-      trace(2, getClass().getName(), "Type=" + type + " Encoding=" + encoding + " FL=" + FL + " FS=" + FS + " SR=" + SR + " FR=" + FR + " TL=" + TL, " lenghtInSecond=" + lenghtInSecond);
+      Map props = getAudioFileFormat().properties();
+      Long lenInMicroL = (Long)props.get("duration");
+      long lenInMicro = lenInMicroL.longValue();
+      lengthInSecond = lenInMicro / 1000;
     }
-    if (lenghtInSecond < 0.0)
-    {
-      lenghtInSecond = 0.0;
-    }
-    return lenghtInSecond;
+    return lengthInSecond;
   }
 
   /**
@@ -801,36 +768,9 @@ public class BasicPlayer implements Runnable
     int bitRate = 0;
     if (getAudioFileFormat() != null)
     {
-      int FL = (getAudioFileFormat()).getFrameLength();
-      int FS = (getAudioFormat()).getFrameSize();
-      float SR = (getAudioFormat()).getSampleRate();
-      float FR = (getAudioFormat()).getFrameRate();
-      int TL = (getAudioFileFormat()).getByteLength();
-      String type = (getAudioFileFormat()).getType().toString();
-      String encoding = (getAudioFormat()).getEncoding().toString();
-      // Assumes that type includes xBitRate string.
-      if ( (type != null) && ( (type.startsWith("MP3")) || (type.startsWith("VORBIS"))))
-      {
-        // BitRate string appended to type.
-        // Another solution ?
-        StringTokenizer st = new StringTokenizer(type, "x");
-        if (st.hasMoreTokens())
-        {
-          st.nextToken();
-          String bitRateStr = st.nextToken();
-          bitRate = Math.round( (Integer.parseInt(bitRateStr)));
-        }
-      }
-      else
-      {
-        bitRate = Math.round(FS * FR * 8);
-      }
-      trace(2, getClass().getName(), "Type=" + type + " Encoding=" + encoding + " FL=" + FL + " FS=" + FS + " SR=" + SR + " FR=" + FR + " TL=" + TL, " bitRate=" + bitRate);
-    }
-    // N/A so computes bitRate for output.
-    if ( (bitRate <= 0) && (m_line != null))
-    {
-      bitRate = Math.round( ( (m_line.getFormat()).getFrameSize()) * ( (m_line.getFormat()).getFrameRate()) * 8);
+      Map props = getAudioFormat().properties();
+      Integer br = (Integer)props.get("bitrate");
+      bitRate = br.intValue();
     }
     return bitRate;
   }
