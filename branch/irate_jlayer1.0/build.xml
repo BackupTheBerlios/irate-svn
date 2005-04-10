@@ -6,12 +6,14 @@
       <classpath>
         <pathelement path="lib/HTTPClient.jar"/>
         <pathelement path="lib/nanoxml-lite-2.2.3.jar"/>
-        <pathelement path="lib/jl0.4.jar"/>
+        <pathelement path="lib/jl1.0.jar"/>
         <pathelement path="lib/swt.jar"/>
         <pathelement path="lib/swt-pi.jar"/>
         <pathelement path="lib/skinlf.jar"/>
         <pathelement path="lib/jd3lib.jar"/>
         <pathelement path="lib/swtdock.jar"/>
+        <pathelement path="lib/mp3spi1.9.2.jar"/>
+        <pathelement path="lib/tritonus_share.jar"/>
       </classpath>
     </javac>
   </target>
@@ -65,7 +67,7 @@
       </tarfileset>
       <tarfileset dir="..">
         <include name="irate/irate-client-swt.jar"/>
-        <include name="irate/lib/jl0.4.jar"/>
+        <include name="irate/lib/jl1.0.jar"/>
         <include name="irate/lib/nanoxml-lite-2.2.3.jar"/>
         <include name="irate/lib/swt.jar"/>
       </tarfileset>
@@ -100,8 +102,9 @@
       todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true"/>
     <copy todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true">
       <fileset dir="lib" includes="jd3lib.jar"/>
-      <fileset dir="lib" includes="jl0.4.jar"/>
-      <fileset dir="lib" includes="mp3sp.1.6.jar"/>
+      <fileset dir="lib" includes="jl1.0.jar"/>
+      <fileset dir="lib" includes="mp3spi1.9.2.jar"/>
+      <fileset dir="lib" includes="tritonus_share.jar"/>
       <fileset dir="lib" includes="nanoxml-lite-2.2.3.jar"/>
       <fileset dir="lib" includes="swtdock.jar"/>
     </copy>

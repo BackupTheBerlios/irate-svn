@@ -19,20 +19,27 @@ package javazoom.jlGui;
  *   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *----------------------------------------------------------------------
  */
-import java.io.*;
-import java.util.*;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
+import java.util.StringTokenizer;
 
-import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Control;
 import javax.sound.sampled.DataLine;
+import javax.sound.sampled.FloatControl;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
 import javax.sound.sampled.UnsupportedAudioFileException;
-import javax.sound.sampled.FloatControl;
-import javax.sound.sampled.Control;
+import javax.sound.sampled.spi.AudioFileReader;
+
+import com.sun.media.sound.JDK13Services;
 //import javazoom.Util.Debug;
 
 /**
@@ -110,6 +117,8 @@ public class BasicPlayer implements Runnable
     if (file != null)
     {
       m_dataSource = file;
+      System.out.println("Setting file datasource: "+file); // @debug
+      System.out.println(JDK13Services.getProviders(AudioFileReader.class));
       initAudioInputStream();
     }
   }
