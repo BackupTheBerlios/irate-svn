@@ -1,0 +1,200 @@
+<?xml version="1.0"?>
+
+<project name="iRATE radio" default="jar">
+  <target name="compile">
+    <javac srcdir="." debug="true" debuglevel="lines,vars,source" deprecation="true" source="1.3" target="1.1" optimize="true">
+      <classpath>
+        <pathelement path="lib/HTTPClient.jar"/>
+        <pathelement path="lib/nanoxml-lite-2.2.3.jar"/>
+        <pathelement path="lib/jl0.4.jar"/>
+        <pathelement path="lib/swt.jar"/>
+        <pathelement path="lib/swt-pi.jar"/>
+        <pathelement path="lib/skinlf.jar"/>
+        <pathelement path="lib/jd3lib.jar"/>
+        <pathelement path="lib/swtdock.jar"/>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="skin">
+    <zip destfile="irate/resources/skin.zip">
+      <fileset dir="irate/resources/skin/" includes="*.png"/>
+    </zip>
+  </target>
+    
+  <target name="jar" depends="compile,skin,timestamp">
+    <jar jarfile="irate-client-swt.jar" manifest="META-INF/manifest.irate-swt-client" compress="true">
+      <fileset dir="." includes="irate/swt/*.class"/>
+      <fileset dir="." includes="irate/swt/locale*.properties"/>
+      <fileset dir="." includes="irate/resources/*.class"/>
+      <fileset dir="." includes="irate/resources/*.gif"/>
+      <fileset dir="." includes="irate/resources/*.png"/>
+      <fileset dir="." includes="irate/resources/*.mp3"/>
+      <fileset dir="." includes="irate/resources/skin.zip"/>
+      <fileset dir="." includes="irate/client/*.class"/>
+      <fileset dir="." includes="irate/client/locale*.properties"/>
+      <fileset dir="." includes="irate/client/help/*.txt"/>
+      <fileset dir="." includes="irate/common/*.class"/>
+      <fileset dir="." includes="irate/common/locale*.properties"/>
+      <fileset dir="." includes="irate/common/*.txt"/>
+      <fileset dir="." includes="irate/download/*.class"/>
+      <fileset dir="." includes="irate/download/locale*.properties"/>
+      <fileset dir="." includes="irate/plugin/*.class"/>
+      <fileset dir="." includes="irate/plugin/locale*.properties"/>
+      <fileset dir="." includes="irate/plugin/*/*.class"/>
+      <fileset dir="." includes="irate/plugin/*/locale*.properties"/>
+      <fileset dir="." includes="irate/swt/plugin/*.class"/>
+      <fileset dir="." includes="irate/swt/plugin/locale*.properties"/>
+      <fileset dir="." includes="irate/swt/plugin/*/*.class"/>
+      <fileset dir="." includes="irate/swt/plugin/*/locale*.properties"/>
+      <fileset dir="." includes="javazoom/jlGui/*.class"/>
+    </jar>
+
+    <jar jarfile="irate-server.jar" manifest="META-INF/manifest.irate-server" compress="false">
+      <fileset dir="." includes="irate/server/*.class"/>
+      <fileset dir="." includes="irate/common/*.class"/>
+    </jar>
+  </target>
+
+  <target name="gzip" depends="jar">
+    <tar destfile="irate-client-swt.tar.gz" compression="gzip">
+      <tarfileset dir=".." mode="755">
+        <include name="irate/irate-client-swt.sh"/>
+        <include name="irate/lib/libswt-*motif-3009.so"/>
+        <include name="irate/lib/libXm.so.2"/>
+      </tarfileset>
+      <tarfileset dir="..">
+        <include name="irate/irate-client-swt.jar"/>
+        <include name="irate/lib/jl0.4.jar"/>
+        <include name="irate/lib/nanoxml-lite-2.2.3.jar"/>
+        <include name="irate/lib/swt.jar"/>
+      </tarfileset>
+    </tar>
+  </target>
+  
+    <!-- Debian deb package -->
+  <target name="deb">
+    <exec executable="dpkg-buildpackage">
+      <arg line="-b"/>
+      <arg line="-rfakeroot"/>
+    </exec>
+  </target>
+
+    <!-- Mac application bundle -->
+  <target name="mac" depends="jar">
+    <mkdir dir="iRATE.app"/>
+    <mkdir dir="iRATE.app/Contents"/>
+    <copy file="mac/Info.plist" todir="iRATE.app/Contents"/>
+    <copy file="mac/PkgInfo" todir="iRATE.app/Contents"/>
+    <mkdir dir="iRATE.app/Contents/MacOS"/>
+    <copy file="lib/swt-macosx/java_swt"
+      todir="iRATE.app/Contents/MacOS"
+      preservelastmodified="true"/>
+    <chmod file="iRATE.app/Contents/MacOS/java_swt" perm="755"/>
+    <mkdir dir="iRATE.app/Contents/Resources"/>
+    <copy file="irate/resources/iRateApp.icns"
+      todir="iRATE.app/Contents/Resources"
+      preservelastmodified="true"/>
+    <mkdir dir="iRATE.app/Contents/Resources/Java"/>
+    <copy file="irate-client-swt.jar"
+      todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true"/>
+    <copy todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true">
+      <fileset dir="lib" includes="jd3lib.jar"/>
+      <fileset dir="lib" includes="jl0.4.jar"/>
+      <fileset dir="lib" includes="mp3sp.1.6.jar"/>
+      <fileset dir="lib" includes="nanoxml-lite-2.2.3.jar"/>
+      <fileset dir="lib" includes="swtdock.jar"/>
+    </copy>
+    <copy todir="iRATE.app/Contents/Resources/Java" preservelastmodified="true">
+      <fileset dir="lib/swt-macosx" includes="*.jar"/>
+    </copy>
+    <mkdir dir="iRATE.app/Contents/Resources/Java/dll"/>
+    <copy todir="iRATE.app/Contents/Resources/Java/dll" preservelastmodified="true">
+      <fileset dir="lib/swt-macosx" includes="*.jnilib"/>
+    </copy>
+    <mkdir dir="iRATE.app/Contents/Resources Disabled"/>
+  </target>
+  
+    <!-- Zip archive of the Mac app -->
+    <!-- Can be built on Mac or Linux; requires ant 1.5.2 for exec bit -->
+  <target name="maczip" depends="mac">
+    <zip destfile="irate-client-macosx.zip">
+      <zipfileset dir="iRATE.app" prefix="iRATE.app" excludes="iRATE.app/Contents/MacOS/java_swt"/>
+      <zipfileset file="iRATE.app/Contents/MacOS/java_swt" fullpath="iRATE.app/Contents/MacOS/java_swt" filemode="755"/>
+    </zip>
+  </target>
+  
+    <!-- Disk image of the Mac app -->
+    <!-- Requires Mac OS X 10.3 to build -->
+  <target name="dmg" depends="mac">
+    <delete dir="mac/dist"/>
+    <mkdir dir="mac/dist"/>
+    <exec executable="ditto">
+      <!-- Make sure we copy all the exec bits etc -->
+      <arg line="iRATE.app mac/dist/iRATE.app"/>
+    </exec>
+    <copy file="COPYING" tofile="mac/dist/COPYING.txt"/>
+    <copy file="lib/about.html" tofile="mac/dist/about.html"/>
+    <exec executable="hdiutil">
+      <arg line="create -srcfolder mac/dist -ov -volname 'iRATE radio' -nouuid -gid 99 -format UDZO -imagekey zlib-level=9 irate-client-macosx.dmg"/>
+    </exec>
+    <exec executable="hdiutil">
+      <arg line="internet-enable -yes irate-client-macosx.dmg"/>
+    </exec>
+  </target>
+  
+    <!-- Bundle extractor and launcher for Java Web Start on Mac OS X -->
+  <target name="maclauncher" depends="maczip">
+    <javac srcdir="mac" debug="true" debuglevel="lines,vars,source" deprecation="true" source="1.3" target="1.1" optimize="true"/>
+    <jar jarfile="irate-mac-launcher.jar" manifest="META-INF/manifest.irate-mac-launcher" compress="false">
+      <fileset dir="." includes="mac/MacLauncher.class"/>
+      <zipfileset dir="." prefix="mac" includes="irate-client-macosx.zip"/>
+    </jar>
+  </target>
+  
+  <target name="all" depends="gzip">
+  </target>
+
+  <target name="timestamp">
+    <tstamp/>
+    <copy file="irate/common/timestamp.txt.in"
+     tofile="irate/common/timestamp.txt" overwrite="true"/>
+    <replace file="irate/common/timestamp.txt" token="@TIMESTAMP@"
+     value="${DSTAMP}${TSTAMP}"/>
+  </target>
+
+  <target name="clean">
+    <delete>
+      <fileset dir="." includes="**/*.class"/>
+      <fileset file="irate-server.jar"/>
+      <fileset file="irate-client-swt.jar"/>
+      <fileset file="irate-client.tar"/>
+      <fileset file="irate-client-linux.tar.gz"/>
+      <fileset file="irate-client-win32.exe"/>
+      <fileset file="irate/resources/skin.zip"/>
+      <fileset file="irate-client-macosx.zip"/>
+      <fileset file="irate-client-macosx.dmg"/>
+      <fileset file="irate-mac-launcher.jar"/>
+      
+      <!-- Old files no longer used -->
+      <fileset file="irate-client.jar"/>
+      <fileset file="irate-swing-client.jar"/>
+      <fileset file="irate-client-swing.jar"/>
+      <fileset file="irate-swt-client.jar"/>
+      <fileset file="irate-client.tar.bz2"/>
+      <fileset file="irate-client-installer.exe"/>
+      <fileset file="irate/resources/skin.zip"/>
+    </delete>
+    <delete dir="iRATE.app"/>
+    <delete dir="mac/dist"/>
+  </target>
+
+  <target name="javadoc">
+    <javadoc sourcepath="." destdir="javadoc"
+      doctitle="iRATE Source Documentation"
+      windowtitle="iRATE Source Documentation"
+      packagenames="irate.*"
+      private="yes"/>
+  </target>
+
+</project>

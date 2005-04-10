@@ -1,0 +1,69 @@
+#!/usr/bin/perl
+use strict;
+my @prefixes = ("/","/usr","/usr/local","/opt");
+
+my %lookup=("gcj"=>{"description"=>"GNU Java compiler",
+										"args"=>"-dumpversion"},
+#						"make"=>{"description"=>"GNU Make"},
+#						"ant"=>{"description"=>"Java build tool",
+#										"args"=>"-version"},
+						"libswt-win32-2133.dll"=>{"description"=>"System-wide SWT 
+library",
+						"type"=>"lib"}
+						);
+
+sub locate_program{
+		my ($name) = @_; 
+		print "Checking for $lookup{$name}{description} ($name): ";
+		my ($program,$args) = ($lookup{$name}{"exec"},$lookup{$name}{"args"});
+		$program = $name if not defined $program;
+		$args = "--version" if not defined $args;
+		
+		my @out = `$program $args`;
+		if (@out){
+				chomp($out[0]);
+				print $out[0]; 
+				$lookup{$name}{"version"}=$out[0];
+				$lookup{$name}{"path"}=$program;
+				
+		}else{
+				print " not found!";
+		}
+		print "\n";
+}
+
+sub locate_library{
+		my ($name) = @_;
+		print "Checking for $lookup{$name}{description} ($name): ";
+		foreach (@prefixes){
+				my $dir = $_ . "/lib/";
+				if ( -f $dir . $name){
+						$lookup{$name}{"dir"} = $dir;
+						print "Found in $dir";
+						last;
+				}
+		}
+		print " Not found" if not defined $lookup{$name}{"dir"};
+		print "\n";
+}
+
+foreach my $program (sort(keys(%lookup))){
+		if($lookup{$program}{"type"} eq "lib"){
+				locate_library($program);
+		}else{
+				locate_program($program);
+		}
+}
+
+my $out = "make.configure";
+open OUT, ">$out" or die ("Couldn't open $out for writing");
+
+if(defined($lookup{"libswt-gtk2.so"}{"dir"})){
+		print "\nSet up for a system-wide libswt\n";
+		print OUT "SWT_INCLUDE=".$lookup{"libswt-gtk2.so"}{"dir"}."/libswt-gtk2.jar\n";
+		print OUT "SWT_LIB=-lswt-gtk2\n";
+}
+
+print OUT "NO_RESOURCE=1\n" and print "Disabled use of gcj --resource due to gcj 3.0.4\n" if $lookup{"gcj"}{"version"} eq "3.0.4" ;
+#my $gcj = 
+#my $make = locate_program("make");
