@@ -46,10 +46,10 @@ swt-2.1.2-linux-motif.zip:
 	wget http://download.eclipse.org/downloads/drops/R-2.1.2-200311030802/swt-2.1.2-linux-motif.zip
 
 swt-2.1-win32.zip:
-	wget http://download2.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-win32.zip
+	wget http://download.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-win32.zip
 
 swt-2.1.1-linux-gtk.zip:
-	wget http://download2.eclipse.org/downloads/drops/R-2.1.1-200306271545/swt-2.1.1-linux-gtk.zip
+	wget http://download.eclipse.org/downloads/drops/R-2.1.1-200306271545/swt-2.1.1-linux-gtk.zip
 
 swt-3.0RC3-linux-gtk.zip:
 	wget http://download.eclipse.org/downloads/drops/S-3.0RC3-200406192000/swt-3.0RC3-linux-gtk.zip
