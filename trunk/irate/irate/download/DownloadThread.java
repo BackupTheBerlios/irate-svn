@@ -12,7 +12,6 @@ import irate.common.Utils;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
@@ -24,30 +23,30 @@ public class DownloadThread extends Thread {
   /** The maximum number of files that can be downloaded simultaneously */
   private static final int MAX_SIMULTANEOUS_DOWNLOADS = 6;
 
+  /**
+   * The minimum number of files to be downloaded simultaneously before
+   * contacting the server again
+   */
+  private static final int MIN_SIMULTANEOUS_DOWNLOADS = 1;
+
   private static final String LOCALE_RESOURCE_LOCATION = "irate.download.locale";
 
   private Vector updateListeners = new Vector();
 
   private Vector errorListeners = new Vector();
 
-  private TrackDatabase trackDatabase;
-
   private File downloadDir;
 
   private String state;
 
-  private boolean continuous;
-
   private int contactCount = 0;
 
-  private Vector downloadListeners = new Vector();
-
-  ExponentialBackoffManager exponentialBackoffManager = new ExponentialBackoffManager();
-
-  private TracksBeingDownloaded tracksBeingDownloaded = new TracksBeingDownloaded();
+  private DownloadContext downloadContext;
 
   public DownloadThread(TrackDatabase trackDatabase) {
-    this.trackDatabase = trackDatabase;
+
+    downloadContext = new DownloadContext(trackDatabase);
+
     downloadDir = trackDatabase.getDownloadDirectory();
     if (!downloadDir.exists()) downloadDir.mkdir();
     setDaemon(true);
@@ -58,15 +57,15 @@ public class DownloadThread extends Thread {
       try {
         try {
           if (areMoreTracksRequired()) {
-            if (!downloadPendingTracks()) {
-              contactServer(trackDatabase);
+            downloadPendingTracks();
+              
+            if (downloadContext.getTracksBeingDownloaded().size() < MIN_SIMULTANEOUS_DOWNLOADS) {
+              contactServer(downloadContext.getTrackDatabase());
               downloadPendingTracks();
             }
           }
         }
         catch (IOException ioe) {
-          if (continuous)
-            notifyErrorListeners("continuousfailed", "continuousfailed.html"); //$NON-NLS-1$ //$NON-NLS-2$
           ioe.printStackTrace();
         }
         catch (DownloadException e) {
@@ -89,21 +88,27 @@ public class DownloadThread extends Thread {
   }
 
   private List getTracksAvailableForDownload() throws IOException {
+    Track[] tracks = downloadContext.getTrackDatabase().getTracks();
+    TracksBeingDownloaded tracksBeingDownloaded = downloadContext
+        .getTracksBeingDownloaded();
+    ExponentialBackoffManager exponentialBackoffManager = downloadContext
+        .getExponentialBackoffManager();
+
     boolean hasTrackDatabaseBeenModified = false;
 
     List tracksAvailableForDownload = new ArrayList();
-    Track[] tracks = trackDatabase.getTracks();
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
       if (!track.isHidden()) {
         File file = track.getFile();
-        if ((file == null || !file.exists())
-            && track.getDownloadAttempts() < 10) {
+        if (file == null || !file.exists()) {
           if (file != null) {
             track.unSetFile();
             hasTrackDatabaseBeenModified = true;
           }
-          if (tracksBeingDownloaded.contains(track)
+
+          if (track.getDownloadAttempts() >= 10
+              || tracksBeingDownloaded.contains(track)
               || tracksBeingDownloaded.isServerAlreadyUsed(track)
               || exponentialBackoffManager.isBackedOff(track.getURL())) {
             // Don't download
@@ -116,37 +121,39 @@ public class DownloadThread extends Thread {
       }
     }
 
-    if (hasTrackDatabaseBeenModified) trackDatabase.save();
+    if (hasTrackDatabaseBeenModified)
+      downloadContext.getTrackDatabase().save();
 
     return tracksAvailableForDownload;
   }
 
-  private boolean downloadPendingTracks() throws IOException {
+  private void downloadPendingTracks() throws IOException {
     List downloadTracks = getTracksAvailableForDownload();
 
-    // download threads keyed by host
-    Hashtable downloadThreads = new Hashtable();
-
     // can't download anything..should contact server
-    if (downloadTracks.size() == 0) return false;
+    if (downloadTracks.size() == 0) return;
 
     // Scramble the list of download candidates into a random order
     Utils.scramble(downloadTracks);
 
-    // Limit the number of simultaneous downloads to a reasonable maximum
+    TracksBeingDownloaded tracksBeingDownloaded = downloadContext
+        .getTracksBeingDownloaded();
+
     for (Iterator itr = downloadTracks.iterator(); itr.hasNext();) {
 
-      if (tracksBeingDownloaded.size() >= MAX_SIMULTANEOUS_DOWNLOADS) break;
+      // Limit the number of simultaneous downloads to a reasonable maximum
+      if (downloadContext.getTracksBeingDownloaded().size() >= MAX_SIMULTANEOUS_DOWNLOADS)
+        break;
 
       Track track = (Track) itr.next();
-      TrackDownloader td = new TrackDownloader(tracksBeingDownloaded,
-          downloadListeners, trackDatabase, exponentialBackoffManager, track);
-      // silly gcj craps out if we call start fromt the TrackDownloader
-      // constructor
-      td.start();
-    }
 
-    return true;
+      if (!tracksBeingDownloaded.isServerAlreadyUsed(track)) {
+        TrackDownloader td = new TrackDownloader(downloadContext, track);
+        // silly gcj craps out if we call start fromt the TrackDownloader
+        // constructor
+        td.start();
+      }
+    }
   }
 
   /**
@@ -228,7 +235,7 @@ public class DownloadThread extends Thread {
   }
 
   public void addDownloadListener(DownloadListener downloadListener) {
-    downloadListeners.add(downloadListener);
+    downloadContext.addDownloadListener(downloadListener);
   }
 
   // Made public for UI Tweak by Allen Tipper 14.9.03
@@ -247,7 +254,7 @@ public class DownloadThread extends Thread {
   }
 
   public void removeDownloadListener(DownloadListener downloadListener) {
-    downloadListeners.remove(downloadListener);
+    downloadContext.removeDownloadListener(downloadListener);
   }
 
   public void removeUpdateListener(UpdateListener updateListener) {
@@ -278,6 +285,7 @@ public class DownloadThread extends Thread {
   }
 
   private boolean areMoreTracksRequired() {
+    TrackDatabase trackDatabase = downloadContext.getTrackDatabase();
     int noOfRated = trackDatabase.getNoOfRated();
     int noOfUnrated = trackDatabase.getNoOfUnrated();
     int noOfUnratedOnPlaylist = trackDatabase.getNoOfUnratedOnPlaylist();

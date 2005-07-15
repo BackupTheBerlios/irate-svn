@@ -16,34 +16,19 @@ import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.Iterator;
-import java.util.List;
-
 
 public class TrackDownloader extends Thread {
 
-  private TracksBeingDownloaded tracksBeingDownloaded;
-
-  private List downloadListeners;
-
-  private TrackDatabase trackDatabase;
-
-  private ExponentialBackoffManager exponentialBackoffManager;
+  private DownloadContext downloadContext;
 
   private Track track;
 
-  private DownloadThread dt;
-
-  public TrackDownloader(TracksBeingDownloaded tracksBeingDownloaded,
-      List downloadListeners, TrackDatabase trackDatabase,
-      ExponentialBackoffManager exponentialBackoffManager, Track track) {
-    this.tracksBeingDownloaded = tracksBeingDownloaded;
-    this.downloadListeners = downloadListeners;
-    this.trackDatabase = trackDatabase;
-    this.exponentialBackoffManager = exponentialBackoffManager;
+  public TrackDownloader(DownloadContext downloadContext, Track track) {
+    this.downloadContext = downloadContext;
     this.track = track;
     setDaemon(true); // This means the JVM is permitted to exit in the middle
     // of a transfer
+    downloadContext.getTracksBeingDownloaded().add(track);
   }
 
   public void run() {
@@ -63,13 +48,15 @@ public class TrackDownloader extends Thread {
     int index = urlString.lastIndexOf('/');
     if (index > 0) urlString = urlString.substring(index + 1);
     urlString = URLDecoder.decode(urlString); //$NON-NLS-1$
-    return new File(trackDatabase.getDownloadDirectory(), urlString);
+    return new File(downloadContext.getTrackDatabase().getDownloadDirectory(),
+        urlString);
   }
 
   /**
    * Create URL which contains any appropriate proxy information.
    */
   private URL getProxyURL(URL url) throws MalformedURLException {
+    TrackDatabase trackDatabase = downloadContext.getTrackDatabase();
     String proxy = trackDatabase.getHTTPProxy(); // JDR
     if ((proxy != null) && (!proxy.trim().equals(""))) // JDR //$NON-NLS-1$
     {// JDR HTTP proxy *is* defined in xml file.
@@ -87,7 +74,6 @@ public class TrackDownloader extends Thread {
 
   public void download() throws IOException {
     int percentComplete = -1;
-    tracksBeingDownloaded.add(track);
 
     final URL url = getProxyURL(track.getURL());
 
@@ -118,8 +104,8 @@ public class TrackDownloader extends Thread {
       if (contentType.indexOf("text") != -1)
         throw new FileNotFoundException("Content type is Text");
       int contentLength = connection.getContentLength();
-      long continueOffset = downloadingFile.exists() ? downloadingFile
-          .length() : 0;
+      long continueOffset = downloadingFile.exists() ? downloadingFile.length()
+          : 0;
       // If the file isn't already the right length, then we need to download
       if (continueOffset != contentLength) {
         boolean resume = false;
@@ -146,24 +132,20 @@ public class TrackDownloader extends Thread {
             connection = resumeConnection;
           }
         }
-        for (int i = 0; i < downloadListeners.size(); i++)
-          ((DownloadListener) downloadListeners.get(i))
-              .downloadStarted(track);
+        downloadContext.notifyDownloadStarted(track);
         final byte buf[] = new byte[8192];
 
         // If we are resuming a download, then we must feed the
         // already-downloaded
         // part of the file to the download listeners. They are only expected
         // to deal with whole files.
-        if (resume && downloadListeners.size() != 0) {
+        if (resume && downloadContext.hasListeners()) {
           FileInputStream is = new FileInputStream(downloadingFile.toString());
           try {
             while (true) {
               int nbytes = is.read(buf, 0, buf.length);
               if (nbytes <= 0) break;
-              for (int i = 0; i < downloadListeners.size(); i++)
-                ((DownloadListener) downloadListeners.get(i)).downloadData(
-                    track, buf, 0, nbytes);
+              downloadContext.notifyDownloadData(track, buf, 0, nbytes);
             }
           }
           finally {
@@ -186,21 +168,15 @@ public class TrackDownloader extends Thread {
             // Stephen Blackheath: I am in two minds as to whether this should
             // be a separate
             // listener, but it should be efficient enough as it is.
-            for (int i = 0; i < downloadListeners.size(); i++)
-              ((DownloadListener) downloadListeners.get(i)).downloadData(
-                  track, buf, 0, nbytes);
+            downloadContext.notifyDownloadData(track, buf, 0, nbytes);
             if (contentLength >= 0) {
               totalBytes += nbytes;
               int percent = totalBytes * 100 / contentLength;
               if (percent != percentComplete) {
                 percentComplete = percent;
                 if (track.setPercentComplete(percent)) {
-                  for (Iterator iter = downloadListeners.iterator(); iter
-                      .hasNext();) {
-                    DownloadListener d = (DownloadListener) iter.next();
-                    d.downloadProgressed(track, percent, Resources
-                        .getString("DownloadThread.Downloading_Tracks"));
-                  }
+                  downloadContext.notifyDownloadProgressed(track, percent,
+                      Resources.getString("DownloadThread.Downloading_Tracks"));
                 }
               }
             }
@@ -218,7 +194,8 @@ public class TrackDownloader extends Thread {
             System.out.println("For some reason we couldn't rename \""
                 + downloadingFile + "\" to \"" + finishedFile + "\"");
           }
-          exponentialBackoffManager.succeeded(track.getURL());
+          downloadContext.getExponentialBackoffManager().succeeded(
+              track.getURL());
         }
         finally {
           if (os != null) os.close();
@@ -228,27 +205,25 @@ public class TrackDownloader extends Thread {
           }
           catch (IOException exception) {
           }
-          for (int i = 0; i < downloadListeners.size(); i++)
-            ((DownloadListener) downloadListeners.get(i)).downloadFinished(
-                track, succeeded);
+          downloadContext.notifyDownloadFinished(track, succeeded);
         }
       }
-      trackDatabase.save();
+      downloadContext.getTrackDatabase().save();
+    }
+    catch (FileNotFoundException fnfe) {
+      fnfe.printStackTrace();
+      track.setBroken();
+    }
+    catch (IOException ioe) {
+      ioe.printStackTrace();
+      downloadContext.getExponentialBackoffManager().failed(track.getURL());
+      track.increaseDownloadAttempts();
     }
     catch (Exception e) {
+      System.err.println("Exception not handled");
       e.printStackTrace();
-      if (e instanceof FileNotFoundException) {
-        track.setBroken();
-      }
-      else if (e instanceof IOException) {
-        exponentialBackoffManager.failed(track.getURL());
-        track.increaseDownloadAttempts();
-      }
-      else {
-        System.out.println("Exception not handled");
-      }
     }
-    tracksBeingDownloaded.remove(track);
+    downloadContext.getTracksBeingDownloaded().remove(track);
   }
 
 }
