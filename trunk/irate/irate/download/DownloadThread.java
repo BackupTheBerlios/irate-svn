@@ -55,10 +55,14 @@ public class DownloadThread extends Thread {
   public void run() {
     while (true) {
       try {
+        synchronized (this) {
+          wait();
+        }
+
         try {
           if (areMoreTracksRequired()) {
             downloadPendingTracks();
-              
+
             if (downloadContext.getTracksBeingDownloaded().size() < MIN_SIMULTANEOUS_DOWNLOADS) {
               contactServer(downloadContext.getTrackDatabase());
               downloadPendingTracks();
