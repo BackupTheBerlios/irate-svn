@@ -6,17 +6,14 @@ import irate.common.ErrorListener;
 import irate.common.Track;
 import irate.common.TrackDatabase;
 import irate.common.UpdateListener;
-import irate.resources.BaseResources;
 import irate.common.Utils;
 
-import java.io.*;
-import java.net.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Vector;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
 
 public class DownloadThread extends Thread {
 
@@ -29,8 +26,6 @@ public class DownloadThread extends Thread {
    */
   private static final int MIN_SIMULTANEOUS_DOWNLOADS = 1;
 
-  private static final String LOCALE_RESOURCE_LOCATION = "irate.download.locale";
-
   private Vector updateListeners = new Vector();
 
   private Vector errorListeners = new Vector();
@@ -39,9 +34,14 @@ public class DownloadThread extends Thread {
 
   private String state;
 
-  private int contactCount = 0;
-
   private DownloadContext downloadContext;
+  
+  private RemoteServer server = new RemoteClassicServer() {
+    public void setState(String state) {
+      DownloadThread.this.state = state;
+      notifyUpdateListeners();
+    }
+  };
 
   public DownloadThread(TrackDatabase trackDatabase) {
 
@@ -53,20 +53,18 @@ public class DownloadThread extends Thread {
   }
 
   public void run() {
-    while (true) {
-      try {
+    try {
+      while (true) {
         synchronized (this) {
           wait();
         }
 
         try {
-          if (areMoreTracksRequired()) {
+          downloadPendingTracks();
+          if (downloadContext.getTracksBeingDownloaded().size() < MIN_SIMULTANEOUS_DOWNLOADS
+              && areMoreTracksRequired()) {
+            contactServer(downloadContext.getTrackDatabase());
             downloadPendingTracks();
-
-            if (downloadContext.getTracksBeingDownloaded().size() < MIN_SIMULTANEOUS_DOWNLOADS) {
-              contactServer(downloadContext.getTrackDatabase());
-              downloadPendingTracks();
-            }
           }
         }
         catch (IOException ioe) {
@@ -76,9 +74,9 @@ public class DownloadThread extends Thread {
           Thread.sleep(90000);
         }
       }
-      catch (InterruptedException ie) {
-        ie.printStackTrace();
-      }
+    }
+    catch (InterruptedException ie) {
+      ie.printStackTrace();
     }
   }
 
@@ -160,73 +158,9 @@ public class DownloadThread extends Thread {
     }
   }
 
-  /**
-   * Connects to the server, uploads the trackdatabase and requests new tracks
-   * to download.
-   * 
-   * @param trackDatabase
-   *          the trackdatabase that we work with.
-   */
-  public void contactServer(TrackDatabase trackDatabase)
-      throws DownloadException {
+  public void contactServer(TrackDatabase trackDatabase) throws DownloadException {
     try {
-      setState(getResourceString("DownloadThread.Connecting_to_server")); //$NON-NLS-1$
-
-      Socket socket = new Socket(trackDatabase.getHost(), trackDatabase
-          .getPort());
-      InputStream is = socket.getInputStream();
-      setState(getResourceString("DownloadThread.Sending_server_request")); //$NON-NLS-1$
-
-      OutputStream os = socket.getOutputStream();
-      String str;
-
-      if (contactCount++ > 0)
-        str = trackDatabase.toSerialString();
-      // send full db on first connect
-      else
-        str = trackDatabase.toString();
-
-      // System.out.println("Request:");
-      // System.out.println(str);
-      byte[] buf = str.getBytes();
-      os
-          .write(("Content-Length: " + Integer.toString(buf.length) + "\r\nContent-Encoding: gzip\r\n\r\n").getBytes()); //$NON-NLS-1$ //$NON-NLS-2$
-      GZIPOutputStream gos = new GZIPOutputStream(os);
-      gos.write(buf);
-      gos.finish();
-      os.flush();
-      setState(getResourceString("DownloadThread.Receiving_server_reply")); //$NON-NLS-1$
-      TrackDatabase reply = new TrackDatabase(new GZIPInputStream(is));
-      is.close();
-      os.close();
-      // System.out.println("reply: ");
-      // System.out.println(reply.toString());
-      trackDatabase.add(reply);
-      trackDatabase.save();
-
-      String errorCode = reply.getErrorCode();
-      // if errorCode == "password" we can give a better prompt.
-      System.out.println("DownloadThread.java:303: " + errorCode); //$NON-NLS-1$
-      if (errorCode.length() != 0) {
-        throw new DownloadException(errorCode, reply.getErrorURLString());
-      }
-      else
-        // if no error incrmement serial
-        trackDatabase.incrementSerial();
-    }
-    catch (UnknownHostException uhe) {
-      throw new DownloadException("nohost", "hostnotfound.html"); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-    catch (ConnectException ce) {
-      if (ce.getMessage().equals("Connection timed out")) //$NON-NLS-1$
-        throw new DownloadException("conntimeout", "connectiontimeout.html"); //$NON-NLS-1$ //$NON-NLS-2$
-      else if (ce.getMessage().equals("Connection refused")) //$NON-NLS-1$
-        throw new DownloadException("connrefused", "connectionrefused.html"); //$NON-NLS-1$ //$NON-NLS-2$
-      else
-        throw new DownloadException("conntimeout", "connectionfailed.html"); //$NON-NLS-1$ //$NON-NLS-2$
-    }
-    catch (IOException e) {
-      throw new DownloadException("serverioerror", "ioerror.html");
+      server.contactServer(trackDatabase);
     }
     catch (DownloadException de) {
       notifyErrorListeners(de.getCode(), de.getURLString());
@@ -240,13 +174,6 @@ public class DownloadThread extends Thread {
 
   public void addDownloadListener(DownloadListener downloadListener) {
     downloadContext.addDownloadListener(downloadListener);
-  }
-
-  // Made public for UI Tweak by Allen Tipper 14.9.03
-  // Can we have more reasons here?
-  public void setState(String state) {
-    this.state = state;
-    notifyUpdateListeners(null);
   }
 
   public void addUpdateListener(UpdateListener downloadListener) {
@@ -273,7 +200,7 @@ public class DownloadThread extends Thread {
     errorListeners.remove(errorListener);
   }
 
-  private void notifyUpdateListeners(Track track) {
+  private void notifyUpdateListeners() {
     for (int i = 0; i < updateListeners.size(); i++) {
       UpdateListener updateListener = (UpdateListener) updateListeners
           .elementAt(i);
@@ -295,16 +222,6 @@ public class DownloadThread extends Thread {
     int noOfUnratedOnPlaylist = trackDatabase.getNoOfUnratedOnPlaylist();
     return (noOfRated > 3 && noOfUnrated < noOfUnratedOnPlaylist)
         || noOfUnrated < 5;
-  }
-
-  /**
-   * Get a resource string from the properties file associated with this class.
-   * 
-   * This class can't determine it's own package, since it extends thread. It
-   * has to be stated explicitly.
-   */
-  private String getResourceString(String key) {
-    return BaseResources.getString(LOCALE_RESOURCE_LOCATION, key);
   }
 
 }
