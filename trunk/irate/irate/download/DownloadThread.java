@@ -42,6 +42,8 @@ public class DownloadThread extends Thread {
       notifyUpdateListeners();
     }
   };
+  
+  private RemoteServer buddy = new RemoteBuddyServer();
 
   public DownloadThread(TrackDatabase trackDatabase) {
 
@@ -53,6 +55,13 @@ public class DownloadThread extends Thread {
   }
 
   public void run() {
+    try {
+      buddy.contactServer(downloadContext.getTrackDatabase());
+    }
+    catch (DownloadException de) {
+      de.printStackTrace();
+    }
+    
     try {
       while (true) {
         synchronized (this) {
