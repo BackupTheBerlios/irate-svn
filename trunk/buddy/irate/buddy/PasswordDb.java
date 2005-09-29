@@ -21,6 +21,7 @@ public class PasswordDb {
   public PasswordDb(Transaction transaction, Environment env) throws DatabaseException {
     DatabaseConfig dbConfig = new DatabaseConfig();
     dbConfig.setAllowCreate(true);
+    dbConfig.setTransactional(true);
 
     database = env.openDatabase(transaction, "password.db", dbConfig);
   }
@@ -67,9 +68,4 @@ public class PasswordDb {
       e.printStackTrace();
     }
   }
-
-  public void finalize() {
-    close();
-  }
-
 }

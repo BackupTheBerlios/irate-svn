@@ -16,6 +16,7 @@ public class UserDb {
   public UserDb(Transaction transaction, Environment env) throws DatabaseException {
     DatabaseConfig dbConfig = new DatabaseConfig();
     dbConfig.setAllowCreate(true);
+    dbConfig.setTransactional(true);
 
     database = env.openDatabase(transaction, "user.db", dbConfig);
   }
@@ -54,9 +55,5 @@ public class UserDb {
     } catch (DatabaseException e) {
       e.printStackTrace();
     }
-  }
-
-  public void finalize() {
-    close();
   }
 }
