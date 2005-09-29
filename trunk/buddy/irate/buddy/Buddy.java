@@ -17,13 +17,9 @@ public class Buddy {
 
   private Environment env;
 
-  private UserDb userDb;
-
   public Buddy(boolean allowCreate) throws DatabaseException {
     this.allowCreate = allowCreate;
     openEnvironment();
-    userDb = new UserDb(env);
-    passwordDb = new PasswordDb(env);
   }
 
   private void openEnvironment() throws DatabaseException {
@@ -37,8 +33,8 @@ public class Buddy {
 
   public String login(String account, String password, boolean create) {
     try {
-      long userId = userDb.getUserId(account);
-      String password = getPassword(userId);
+        UserId userId = session.login(account, password, create);
+        return userId.toString();
     } catch (DatabaseException e) {
       e.printStackTrace();
     }

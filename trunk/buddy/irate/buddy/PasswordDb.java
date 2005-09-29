@@ -1,5 +1,8 @@
 package irate.buddy;
 
+import java.security.SecureRandom;
+import java.util.Random;
+
 import com.sleepycat.je.Database;
 import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseEntry;
@@ -13,34 +16,45 @@ public class PasswordDb {
 
   private Database database;
 
-  public PasswordDb(Environment env) throws DatabaseException {
+  private Random random = new SecureRandom();
+
+  public PasswordDb(Transaction transaction, Environment env) throws DatabaseException {
     DatabaseConfig dbConfig = new DatabaseConfig();
     dbConfig.setAllowCreate(true);
 
-    database = env.openDatabase(null, "password.db", dbConfig);
+    database = env.openDatabase(transaction, "password.db", dbConfig);
   }
 
-  public long getPassword(Transaction transaction, long userId) throws DatabaseException {
-    DatabaseEntry accountEntry = new DatabaseEntry(Long.toString(userId).getBytes());
-    DatabaseEntry userIdEntry = new DatabaseEntry();
-    OperationStatus status = database.get(transaction, accountEntry, userIdEntry,
-        LockMode.DEFAULT);
+  public String getPassword(Transaction transaction, UserId userId)
+      throws DatabaseException {
+    DatabaseEntry userIdEntry = userId.createDatabaseEntry();
+    DatabaseEntry passwordEntry = new DatabaseEntry();
+    OperationStatus status = database.get(transaction, userIdEntry,
+        passwordEntry, LockMode.DEFAULT);
 
     if (status != OperationStatus.SUCCESS)
-      throw new BuddyDatabaseException();
+      throw new DatabaseOperationFailedException("Retrieving password");
 
-    return Long.parseLong(new String(userIdEntry.getData()));
+    return new String(passwordEntry.getData());
   }
 
-  public long addPassword(Transaction transaction, String password) throws DatabaseException {
-    DatabaseEntry accountEntry = new DatabaseEntry(Long.toString(userId).getBytes());
-    DatabaseEntry userIdEntry = new DatabaseEntry(Long.toString(userId)
-        .getBytes());
-    OperationStatus status = database.putNoOverwrite(transaction, accountEntry,
-        userIdEntry);
-    
-    if (status != OperationStatus.SUCCESS)
-      throw new BuddyDatabaseException();
+  public UserId addPassword(Transaction transaction, String password)
+      throws DatabaseException {
+    DatabaseEntry passwordEntry = new DatabaseEntry(password.getBytes());
+    while (true) {
+      UserId userId = new UserId(random);
+      DatabaseEntry userIdEntry = userId.createDatabaseEntry();
+      OperationStatus status = database.putNoOverwrite(transaction,
+          userIdEntry, passwordEntry);
+
+      if (status == OperationStatus.SUCCESS)
+        return userId;
+
+      if (status != OperationStatus.KEYEXIST)
+          throw new DatabaseOperationFailedException("Adding password");
+      
+      // log something      
+    }
   }
 
   public void close() {

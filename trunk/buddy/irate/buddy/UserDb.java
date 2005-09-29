@@ -13,34 +13,36 @@ public class UserDb {
 
   private Database database;
 
-  public UserDb(Environment env) throws DatabaseException {
+  public UserDb(Transaction transaction, Environment env) throws DatabaseException {
     DatabaseConfig dbConfig = new DatabaseConfig();
     dbConfig.setAllowCreate(true);
 
-    database = env.openDatabase(null, "user.db", dbConfig);
+    database = env.openDatabase(transaction, "user.db", dbConfig);
   }
 
-  public long getUserId(Transaction transaction, String account) throws DatabaseException {
+  public UserId getUserId(Transaction transaction, String account)
+      throws DatabaseException {
     DatabaseEntry accountEntry = new DatabaseEntry(account.getBytes());
     DatabaseEntry userIdEntry = new DatabaseEntry();
-    OperationStatus status = database.get(transaction, accountEntry, userIdEntry,
-        LockMode.DEFAULT);
+    OperationStatus status = database.get(transaction, accountEntry,
+        userIdEntry, LockMode.DEFAULT);
 
     if (status != OperationStatus.SUCCESS)
-      throw new BuddyDatabaseException();
+        return null;
+//      throw new DatabaseOperationFailedException("Retrieving user account");
 
-    return Long.parseLong(new String(userIdEntry.getData()));
+    return new UserId(userIdEntry);
   }
 
-  public void addUser(Transaction transaction, String account, long userId) throws DatabaseException {
+  public void addUser(Transaction transaction, String account, UserId userId)
+      throws DatabaseException {
     DatabaseEntry accountEntry = new DatabaseEntry(account.getBytes());
-    DatabaseEntry userIdEntry = new DatabaseEntry(Long.toString(userId)
-        .getBytes());
+    DatabaseEntry userIdEntry = userId.createDatabaseEntry();
     OperationStatus status = database.putNoOverwrite(transaction, accountEntry,
         userIdEntry);
-    
+
     if (status != OperationStatus.SUCCESS)
-      throw new BuddyDatabaseException();
+      throw new DatabaseOperationFailedException("Adding user account");
   }
 
   public void close() {
