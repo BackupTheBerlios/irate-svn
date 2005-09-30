@@ -3,8 +3,6 @@ package irate.buddy;
 import java.security.SecureRandom;
 import java.util.Random;
 
-import com.sleepycat.je.Database;
-import com.sleepycat.je.DatabaseConfig;
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
@@ -14,23 +12,20 @@ import com.sleepycat.je.Transaction;
 
 public class PasswordDb {
 
-  private Database database;
+  private final Db db;
 
   private Random random = new SecureRandom();
 
-  public PasswordDb(Transaction transaction, Environment env) throws DatabaseException {
-    DatabaseConfig dbConfig = new DatabaseConfig();
-    dbConfig.setAllowCreate(true);
-    dbConfig.setTransactional(true);
-
-    database = env.openDatabase(transaction, "password.db", dbConfig);
+  public PasswordDb(Transaction transaction, Environment env)
+      throws DatabaseException {
+    db = new Db(transaction, env, "password.db");
   }
 
   public String getPassword(Transaction transaction, UserId userId)
       throws DatabaseException {
     DatabaseEntry userIdEntry = userId.createDatabaseEntry();
     DatabaseEntry passwordEntry = new DatabaseEntry();
-    OperationStatus status = database.get(transaction, userIdEntry,
+    OperationStatus status = db.getDatabase().get(transaction, userIdEntry,
         passwordEntry, LockMode.DEFAULT);
 
     if (status != OperationStatus.SUCCESS)
@@ -45,27 +40,20 @@ public class PasswordDb {
     while (true) {
       UserId userId = new UserId(random);
       DatabaseEntry userIdEntry = userId.createDatabaseEntry();
-      OperationStatus status = database.putNoOverwrite(transaction,
+      OperationStatus status = db.getDatabase().putNoOverwrite(transaction,
           userIdEntry, passwordEntry);
 
       if (status == OperationStatus.SUCCESS)
         return userId;
 
       if (status != OperationStatus.KEYEXIST)
-          throw new DatabaseOperationFailedException("Adding password");
-      
-      // log something      
+        throw new DatabaseOperationFailedException("Adding password");
+
+      // log something
     }
   }
 
   public void close() {
-    try {
-      if (database != null) {
-        database.close();
-        database = null;
-      }
-    } catch (DatabaseException e) {
-      e.printStackTrace();
-    }
+    db.close();
   }
 }
