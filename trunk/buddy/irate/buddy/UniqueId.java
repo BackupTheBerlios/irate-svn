@@ -1,11 +1,12 @@
 package irate.buddy;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Random;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class UniqueId {
+public class UniqueId implements Serializable {
   private byte[] bytes;
 
   public UniqueId(String s) {
@@ -43,7 +44,7 @@ public class UniqueId {
   public long longValue() {
     long l = 0;
     for (byte b : bytes) {
-      l = (l << 8) + b;
+      l = (l << 8) + (b & 0xff);
     }
     return l;
   }

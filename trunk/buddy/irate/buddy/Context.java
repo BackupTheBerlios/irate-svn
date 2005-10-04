@@ -4,7 +4,6 @@ import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import com.sleepycat.bind.serial.StoredClassCatalog;
 import com.sleepycat.je.DatabaseException;
@@ -13,7 +12,7 @@ import com.sleepycat.je.Transaction;
 
 public class Context {
 
-  public final Logger logger = Logger.getAnonymousLogger();
+  public final Logger logger = Logger.getLogger("Buddy");
 
   public final Environment env;
 
@@ -22,9 +21,10 @@ public class Context {
   public Context(Environment env) {
     this.env = env;
 
+    logger.setUseParentHandlers(false);
     logger.setLevel(Level.FINE);
     Handler handler = new ConsoleHandler();
-    handler.setFormatter(new SimpleFormatter());
+    handler.setFormatter(new BuddyFormatter());
     handler.setLevel(Level.FINE);
     logger.addHandler(handler);
   }
@@ -40,12 +40,12 @@ public class Context {
 
   public void close() {
     try {
-      if (classCatalogue != null)
-      {
+      if (classCatalogue != null) {
         classCatalogue.close();
       }
       env.close();
-    } catch (DatabaseException e) {
+    }
+    catch (DatabaseException e) {
       e.printStackTrace();
     }
   }

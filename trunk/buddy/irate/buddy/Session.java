@@ -30,13 +30,16 @@ public class Session {
 
     UniqueId userId;
     try {
-        context.logger.fine("Logging in " + account);
+      context.logger.fine("Logging in " + account);
       userId = userDb.getUserId(transaction, account);
       if (userId == null) {
         if (!create) return null;
 
         userId = passwordDb.addPassword(transaction, password);
         userDb.addUser(transaction, account, userId);
+        synchronized (sessions) {
+          sessions.add(userId);
+        }
         context.logger.fine("New user id=" + userId + " account=" + account
             + " password=" + password);
       }
@@ -66,10 +69,13 @@ public class Session {
     }
   }
 
-  public boolean verify(UniqueId userId) {
+  public boolean verify(UniqueId sessionId) {
+    boolean ok;
     synchronized (sessions) {
-      return sessions.contains(userId);
+      ok = sessions.contains(sessionId);
     }
+    if (!ok) context.logger.info("No session: " + sessionId);
+    return ok;
   }
 
   public void close() {

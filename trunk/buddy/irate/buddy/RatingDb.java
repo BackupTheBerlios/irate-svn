@@ -11,24 +11,24 @@ import com.sleepycat.je.Transaction;
 public class RatingDb {
   private final Db db;
 
-  private SerialBinding uniqueIdBinding;
+  private SerialBinding ratingKeyBinding;
 
-  private SerialBinding trackBinding;
+  private SerialBinding ratingBinding;
 
-  private Map<UniqueId, Track> map;
+  private Map<RatingKey, Rating> map;
 
   public RatingDb(Context context, Transaction transaction)
       throws DatabaseException {
     db = new Db(context, transaction, "rating.db");
     StoredClassCatalog classCatalogue = context.getClassCatalogue(transaction);
 
-    uniqueIdBinding = new SerialBinding(classCatalogue, UniqueId.class);
-    trackBinding = new SerialBinding(classCatalogue, Track.class);
-    map = (Map<UniqueId, Track>) new StoredMap(db.getDatabase(),
-        uniqueIdBinding, trackBinding, true);
+    ratingKeyBinding = new SerialBinding(classCatalogue, RatingKey.class);
+    ratingBinding = new SerialBinding(classCatalogue, Rating.class);
+    map = (Map<RatingKey, Rating>) new StoredMap(db.getDatabase(),
+        ratingKeyBinding, ratingBinding, true);
   }
 
-  public Map<UniqueId, Track> getMap() {
+  public Map<RatingKey, Rating> getMap() {
     return map;
   }
 

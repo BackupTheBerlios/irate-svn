@@ -1,7 +1,7 @@
 package irate.buddy;
 
-public class Rating {
-  public transient UniqueId trackId;
+import java.io.Serializable;
 
+public class Rating implements Serializable {
   public float rating;
 }

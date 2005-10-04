@@ -10,6 +10,7 @@ import org.apache.xmlrpc.WebServer;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
+import com.sleepycat.je.Transaction;
 
 public class Server {
 
@@ -26,7 +27,7 @@ public class Server {
       // server.sessionRpc.logout(userId);
 
       server.startWebServer();
-      server.close();
+//      server.close();
     } catch (DatabaseException e) {
       e.printStackTrace();
     }
@@ -35,17 +36,30 @@ public class Server {
   private Context context;
 
   private SessionRpc sessionRpc;
+  
+  private DataRpc dataRpc;
 
   public Server() throws DatabaseException {
     context = new Context(openEnvironment(true));
-    sessionRpc = new SessionRpc(context);
+
+    Transaction transaction = context.env.beginTransaction(null, null);
+    Session session = new Session(context, transaction);
+    sessionRpc = new SessionRpc(context, session);
+    
+    Data data = new Data(context, transaction);
+    dataRpc = new DataRpc(context, session, data);
+    
+    transaction.commit();
+    
   }
 
   public void startWebServer() {
     context.logger.fine("Starting web server");
     WebServer webServer = new WebServer(8031);
     webServer.addHandler("Session", sessionRpc);
+    webServer.addHandler("Data", dataRpc);
     webServer.start();
+    context.logger.fine("Server running");
   }
 
   private Environment openEnvironment(boolean allowCreate)
@@ -53,14 +67,14 @@ public class Server {
     EnvironmentConfig envConfig = new EnvironmentConfig();
     envConfig.setTransactional(true);
     envConfig.setAllowCreate(allowCreate);
-    envConfig.setCacheSize(1000000);
+    envConfig.setCacheSize(16000000);
 
     return new Environment(new File("."), envConfig);
   }
 
   public void close() {
     if (sessionRpc != null) {
-      sessionRpc.close();
+//      sessionRpc.close();
       sessionRpc = null;
     }
     if (context != null) {
