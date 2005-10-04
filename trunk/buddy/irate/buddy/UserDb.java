@@ -2,7 +2,6 @@ package irate.buddy;
 
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.Transaction;
@@ -11,11 +10,11 @@ public class UserDb  {
 
   private final Db db;
 
-  public UserDb(Transaction transaction, Environment env) throws DatabaseException {
-      db = new Db(transaction, env,  "user.db");
+  public UserDb(Context context, Transaction transaction) throws DatabaseException {
+      db = new Db(context, transaction, "user.db");
   }
 
-  public UserId getUserId(Transaction transaction, String account)
+  public UniqueId getUserId(Transaction transaction, String account)
       throws DatabaseException {
     DatabaseEntry accountEntry = new DatabaseEntry(account.getBytes());
     DatabaseEntry userIdEntry = new DatabaseEntry();
@@ -24,12 +23,11 @@ public class UserDb  {
 
     if (status != OperationStatus.SUCCESS)
         return null;
-//      throw new DatabaseOperationFailedException("Retrieving user account");
 
-    return new UserId(userIdEntry);
+    return new UniqueId(userIdEntry);
   }
 
-  public void addUser(Transaction transaction, String account, UserId userId)
+  public void addUser(Transaction transaction, String account, UniqueId userId)
       throws DatabaseException {
     DatabaseEntry accountEntry = new DatabaseEntry(account.getBytes());
     DatabaseEntry userIdEntry = userId.createDatabaseEntry();

@@ -2,43 +2,42 @@ package irate.buddy;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
 import com.sleepycat.je.Transaction;
 
 public class Session {
 
-  private Environment env;
+  private Context context;
 
   private UserDb userDb;
 
   private PasswordDb passwordDb;
 
-  private Set<UserId> sessions = new HashSet<UserId>();
+  private Set<UniqueId> sessions = new HashSet<UniqueId>();
 
-  public Session(Transaction transaction, Environment env)
+  public Session(Context context, Transaction transaction)
       throws DatabaseException {
-    this.env = env;
-    userDb = new UserDb(transaction, env);
-    passwordDb = new PasswordDb(transaction, env);
+    this.context = context;
+    userDb = new UserDb(context, transaction);
+    passwordDb = new PasswordDb(context, transaction);
   }
 
-  public UserId login(String account, String password, boolean create)
+  public UniqueId login(String account, String password, boolean create)
       throws DatabaseException {
 
-    Transaction transaction = env.beginTransaction(null, null);
+    Transaction transaction = context.env.beginTransaction(null, null);
 
-    UserId userId;
+    UniqueId userId;
     try {
+        context.logger.fine("Logging in " + account);
       userId = userDb.getUserId(transaction, account);
       if (userId == null) {
         if (!create) return null;
 
         userId = passwordDb.addPassword(transaction, password);
         userDb.addUser(transaction, account, userId);
-        Logger.global.fine("New user id=" + userId + " account=" + account
+        context.logger.fine("New user id=" + userId + " account=" + account
             + " password=" + password);
       }
       else {
@@ -47,11 +46,11 @@ public class Session {
           synchronized (sessions) {
             sessions.add(userId);
           }
-          Logger.global.fine("Logged id=" + userId);
+          context.logger.fine("Logged id=" + userId);
         }
         else {
           userId = null;
-          Logger.global.fine("Invalid password id=" + userId);
+          context.logger.fine("Invalid password id=" + userId);
         }
       }
     }
@@ -61,13 +60,13 @@ public class Session {
     return userId;
   }
 
-  public void logout(UserId userId) {
+  public void logout(UniqueId userId) {
     synchronized (sessions) {
       sessions.remove(userId);
     }
   }
 
-  public boolean verify(UserId userId) {
+  public boolean verify(UniqueId userId) {
     synchronized (sessions) {
       return sessions.contains(userId);
     }

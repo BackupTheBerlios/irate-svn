@@ -4,11 +4,6 @@
 package irate.buddy;
 
 import java.io.File;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Handler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 import org.apache.xmlrpc.WebServer;
 
@@ -23,41 +18,34 @@ public class Server {
     String account = args[0];
     String password = args[1];
 
-    Logger.getLogger("global");
-    Logger.global.setLevel(Level.FINEST);
-    Handler handler = new ConsoleHandler();
-    handler.setFormatter(new SimpleFormatter());
-    Logger.global.addHandler(handler);
-
     try {
       Server server = new Server();
-      
-      String userId = server.sessionRpc.login(account, password, true);
-      System.out.println("Login: " + userId);
-      server.sessionRpc.logout(userId);
 
-      
-      
-      // server.startWebServer();
+      // String userId = server.sessionRpc.login(account, password, true);
+      // System.out.println("Login: " + userId);
+      // server.sessionRpc.logout(userId);
+
+      server.startWebServer();
       server.close();
     } catch (DatabaseException e) {
       e.printStackTrace();
     }
   }
 
-  private Environment env;
+  private Context context;
 
   private SessionRpc sessionRpc;
 
   public Server() throws DatabaseException {
-    env = openEnvironment(true);
-    sessionRpc = new SessionRpc(env);
+    context = new Context(openEnvironment(true));
+    sessionRpc = new SessionRpc(context);
   }
-  
+
   public void startWebServer() {
-     WebServer webServer = new WebServer(8031);
-     webServer.addHandler("Session", sessionRpc);
-     webServer.start();      
+    context.logger.fine("Starting web server");
+    WebServer webServer = new WebServer(8031);
+    webServer.addHandler("Session", sessionRpc);
+    webServer.start();
   }
 
   private Environment openEnvironment(boolean allowCreate)
@@ -75,13 +63,9 @@ public class Server {
       sessionRpc.close();
       sessionRpc = null;
     }
-    try {
-      if (env != null) {
-        env.close();
-        env = null;
-      }
-    } catch (DatabaseException e) {
-      e.printStackTrace();
+    if (context != null) {
+      context.close();
+      context = null;
     }
   }
 

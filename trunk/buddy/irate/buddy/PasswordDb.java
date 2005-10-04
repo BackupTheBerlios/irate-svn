@@ -5,7 +5,6 @@ import java.util.Random;
 
 import com.sleepycat.je.DatabaseEntry;
 import com.sleepycat.je.DatabaseException;
-import com.sleepycat.je.Environment;
 import com.sleepycat.je.LockMode;
 import com.sleepycat.je.OperationStatus;
 import com.sleepycat.je.Transaction;
@@ -16,12 +15,12 @@ public class PasswordDb {
 
   private Random random = new SecureRandom();
 
-  public PasswordDb(Transaction transaction, Environment env)
+  public PasswordDb(Context context, Transaction transaction)
       throws DatabaseException {
-    db = new Db(transaction, env, "password.db");
+    db = new Db(context, transaction, "password.db");
   }
 
-  public String getPassword(Transaction transaction, UserId userId)
+  public String getPassword(Transaction transaction, UniqueId userId)
       throws DatabaseException {
     DatabaseEntry userIdEntry = userId.createDatabaseEntry();
     DatabaseEntry passwordEntry = new DatabaseEntry();
@@ -34,11 +33,11 @@ public class PasswordDb {
     return new String(passwordEntry.getData());
   }
 
-  public UserId addPassword(Transaction transaction, String password)
+  public UniqueId addPassword(Transaction transaction, String password)
       throws DatabaseException {
     DatabaseEntry passwordEntry = new DatabaseEntry(password.getBytes());
     while (true) {
-      UserId userId = new UserId(random);
+      UniqueId userId = new UniqueId(random);
       DatabaseEntry userIdEntry = userId.createDatabaseEntry();
       OperationStatus status = db.getDatabase().putNoOverwrite(transaction,
           userIdEntry, passwordEntry);

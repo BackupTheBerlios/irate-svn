@@ -5,14 +5,14 @@ import java.util.Random;
 
 import com.sleepycat.je.DatabaseEntry;
 
-public class UserId {
+public class UniqueId {
   private byte[] bytes;
 
-  public UserId(String s) {
+  public UniqueId(String s) {
     this(Long.parseLong(s));
   }
   
-  public UserId(long l) {
+  public UniqueId(long l) {
     bytes = new byte[8];
     for (int i = bytes.length - 1; i >= 0; i--)
     {
@@ -21,12 +21,12 @@ public class UserId {
     }
   }
   
-  public UserId(Random random) {
+  public UniqueId(Random random) {
     bytes = new byte[8];
     random.nextBytes(bytes);
   }
 
-  public UserId(DatabaseEntry dbEntry) {
+  public UniqueId(DatabaseEntry dbEntry) {
     this.bytes = dbEntry.getData();
   }
 
@@ -37,7 +37,7 @@ public class UserId {
   public boolean equals(Object object) {
     if (getClass() != object.getClass())
       return false;
-    return Arrays.equals(bytes, ((UserId) object).bytes);
+    return Arrays.equals(bytes, ((UniqueId) object).bytes);
   }
   
   public long longValue() {

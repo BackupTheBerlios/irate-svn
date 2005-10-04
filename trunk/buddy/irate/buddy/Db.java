@@ -10,12 +10,15 @@ public class Db {
 
   private Database database;
 
-  public Db(Transaction transaction, Environment env, String dbName)
+  public Db(Context context, Transaction transaction, String dbName)
       throws DatabaseException {
-    DatabaseConfig dbConfig = new DatabaseConfig();
+    Environment env = context.env;   
+
+    DatabaseConfig dbConfig = new DatabaseConfig();    
     dbConfig.setAllowCreate(env.getConfig().getAllowCreate());
     dbConfig.setTransactional(env.getConfig().getTransactional());
-
+    
+    context.logger.finer("Opening database " + dbName);
     database = env.openDatabase(transaction, dbName, dbConfig);
   }
 
