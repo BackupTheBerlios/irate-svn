@@ -21,8 +21,7 @@ public class RemoteBuddyServer implements RemoteServer {
   static {
     try {
       defaultUrl = new URL("http://127.0.0.1:8031/");
-    }
-    catch (MalformedURLException e) {
+    } catch (MalformedURLException e) {
       e.printStackTrace();
     }
   }
@@ -33,8 +32,7 @@ public class RemoteBuddyServer implements RemoteServer {
     try {
       TrackDatabase trackDatabase = new TrackDatabase();
       new RemoteBuddyServer().contactServer(trackDatabase);
-    }
-    catch (DownloadException e) {
+    } catch (DownloadException e) {
       e.printStackTrace();
     }
   }
@@ -50,22 +48,20 @@ public class RemoteBuddyServer implements RemoteServer {
   public void contactServer(TrackDatabase trackDatabase)
       throws DownloadException {
     try {
-      Hashtable hashTable = convertTracksToHashtable(trackDatabase.getTracks());
-
-      Vector args = new Vector();
-      args.add(hashTable);
-      
-      System.out.print("Sending ratings to server...");
-      client.execute("Buddy.setRatings", args);
+      System.out.print("Contacting server...");
+      String sessionId = login(trackDatabase.getUserName(), trackDatabase
+          .getPassword(), true);
       System.out.println(" done");
-    }
-    catch (IOException ioe) {
+
+      System.out.print("Sending ratings to server...");
+      setRatings(sessionId, trackDatabase.getTracks());
+      System.out.println(" done");
+    } catch (IOException ioe) {
       ioe.printStackTrace();
-      throw new DownloadException();
-    }
-    catch (XmlRpcException mue) {
+      // throw new DownloadException();
+    } catch (XmlRpcException mue) {
       mue.printStackTrace();
-      throw new DownloadException();
+      // throw new DownloadException();
     }
   }
 
@@ -76,5 +72,32 @@ public class RemoteBuddyServer implements RemoteServer {
       hashTable.put(track.getKey(), new Float(track.getRating()));
     }
     return hashTable;
+  }
+
+  public String login(String userName, String password, boolean create)
+      throws XmlRpcException, IOException {
+    Vector args = new Vector();
+    args.add(userName);
+    args.add(password);
+//    args.add(new Boolean(create));
+    Object response = (Object) client.execute("Session.login", args);
+    if (response instanceof XmlRpcException)
+	{
+      XmlRpcException x = (XmlRpcException) response;
+	  System.out.println("XmlRpc: " + x.getMessage());
+	}
+
+    System.out.println("{" + response.getClass() + "}");
+    return (String) response;
+  }
+
+  private void setRatings(String sessionId, Track[] tracks) throws XmlRpcException,
+      IOException {
+    Hashtable hashTable = convertTracksToHashtable(tracks);
+    Vector args = new Vector();
+    args.add(sessionId);
+    args.add(hashTable);
+
+    client.execute("Session.setRatings", args);
   }
 }
