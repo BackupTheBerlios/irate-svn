@@ -23,7 +23,7 @@ public class UrlDb {
 
   public UrlDb(Context context, Transaction transaction)
       throws DatabaseException {
-    db = new Db(context, transaction, "track.db");
+    db = new Db(context, transaction, "url.db");
     StoredClassCatalog classCatalogue = context.getClassCatalogue(transaction);
 
     uniqueIdBinding = new SerialBinding(classCatalogue, UniqueId.class);

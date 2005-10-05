@@ -7,6 +7,8 @@ import java.io.File;
 
 import org.apache.xmlrpc.WebServer;
 
+import com.sleepycat.collections.TransactionRunner;
+import com.sleepycat.collections.TransactionWorker;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
@@ -26,9 +28,10 @@ public class Server {
       // System.out.println("Login: " + userId);
       // server.sessionRpc.logout(userId);
 
+      server.populate();
       server.startWebServer();
-//      server.close();
-    } catch (DatabaseException e) {
+      // server.close();
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
@@ -36,7 +39,9 @@ public class Server {
   private Context context;
 
   private SessionRpc sessionRpc;
-  
+
+  private Data data;
+
   private DataRpc dataRpc;
 
   public Server() throws DatabaseException {
@@ -45,12 +50,44 @@ public class Server {
     Transaction transaction = context.env.beginTransaction(null, null);
     Session session = new Session(context, transaction);
     sessionRpc = new SessionRpc(context, session);
-    
-    Data data = new Data(context, transaction);
+
+    data = new Data(context, transaction);
     dataRpc = new DataRpc(context, session, data);
-    
+
     transaction.commit();
-    
+
+  }
+
+  private void populate() throws DatabaseException, Exception {
+    new TransactionRunner(context.env).run(new TransactionWorker() {
+      public void doWork() {
+        data
+            .addTrack(new Track("Beth Quist",
+                "http://magnatune.com/all/03-Monsters-Beth%20Quist.mp3",
+                "Monsters"));
+        data
+            .addTrack(new Track(
+                "Delectric",
+                "http://artists.iuma.com/dl/Delectric/audio/Delectric_-_You_Run_Your_Mouth.mp3",
+                "You Run Your Mouth"));
+        data
+            .addTrack(new Track(
+                "djBonez",
+                "http://files.mp3.com.au/MP3/djBonez/djBonez-None-Blown%20Away%20-%20Feat.%20Sunspot%20Jonz.mp3",
+                "Blown Away - Feat. Sunspot Jonz"));
+        data
+            .addTrack(new Track(
+                "Evolution",
+                "http://assets.artistdirect.com/Downloads/artd/listen/evolution-walkingonfire.mp3",
+                "Walking on fire"));
+        data.addTrack(new Track("S-Tribe",
+            "http://artists.iuma.com/dl/STribe/audio/STribe_-_Sweet_Mary.mp3",
+            "Sweet Mary"));
+        data.addTrack(new Track("Seismic Anamoly",
+            "http://magnatune.com/all/04-Jack%20Rabbit-Seismic%20Anamoly.mp3",
+            "Jack Rabbit"));
+      }
+    });
   }
 
   public void startWebServer() {
@@ -74,7 +111,7 @@ public class Server {
 
   public void close() {
     if (sessionRpc != null) {
-//      sessionRpc.close();
+      // sessionRpc.close();
       sessionRpc = null;
     }
     if (context != null) {

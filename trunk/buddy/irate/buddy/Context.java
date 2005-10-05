@@ -22,10 +22,10 @@ public class Context {
     this.env = env;
 
     logger.setUseParentHandlers(false);
-    logger.setLevel(Level.FINE);
+    logger.setLevel(Level.FINEST);
     Handler handler = new ConsoleHandler();
     handler.setFormatter(new BuddyFormatter());
-    handler.setLevel(Level.FINE);
+    handler.setLevel(Level.FINEST);
     logger.addHandler(handler);
   }
 
