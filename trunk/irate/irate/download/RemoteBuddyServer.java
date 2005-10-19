@@ -53,16 +53,18 @@ public class RemoteBuddyServer implements RemoteServer {
       Vector args = new Vector();
       Object response = (Object) client.execute("Session.ping", args);
 
-      System.out.print("Contacting server...");
+      System.out.print("Logging in...");
       String sessionId = login(trackDatabase.getUserName(), trackDatabase
           .getPassword(), true);
       System.out.println(" done");
 
-      System.out.print("Sending ratings to server...");
+      System.out.print("Sending ratings...");
       setRatings(sessionId, trackDatabase.getTracks());
       System.out.println(" done");
       
+      System.out.print("Logging out...");
       logout(sessionId);
+      System.out.println(" done");
     }
     catch (IOException ioe) {
       ioe.printStackTrace();
@@ -77,7 +79,7 @@ public class RemoteBuddyServer implements RemoteServer {
   private Hashtable convertTrackToHashTable(Track track) {
     Hashtable hashtable = new Hashtable();
     hashtable.put("url", track.getURL().toString());
-    hashtable.put("rating", new Float(track.getRating()));
+    hashtable.put("rating", new Float(track.isRated() ? track.getRating() : Float.NaN));
     return hashtable;
   }
 

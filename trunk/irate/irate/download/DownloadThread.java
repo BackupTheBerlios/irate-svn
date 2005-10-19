@@ -63,6 +63,13 @@ public class DownloadThread extends Thread {
     }
     
     try {
+      try {
+        downloadPendingTracks();
+      }
+      catch (IOException ioe) {
+        ioe.printStackTrace();
+      }
+      
       while (true) {
         synchronized (this) {
           wait();

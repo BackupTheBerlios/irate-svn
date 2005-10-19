@@ -19,10 +19,8 @@ swt.jar: swt-2.1-win32.zip
 else
 
 ifeq ($(PLATFORM),linux-gtk2)
-swt.jar: swt-2.1.3-linux-gtk.zip
-	unzip -o swt-2.1.3-linux-gtk.zip
-#swt.jar: swt-3.0RC3-linux-gtk.zip
-#	unzip -o swt-3.0RC3-linux-gtk.zip
+swt.jar: swt-3.1.1-gtk-linux-x86.zip
+	unzip -o swt-3.1.1-gtk-linux-x86.zip
 else
 
 ifeq ($(PLATFORM),linux-libswt-gtk2)
@@ -39,17 +37,14 @@ endif
 
 endif
 
-swt-2.1.3-linux-gtk.zip:
-	wget http://mirror.pacific.net.au/eclipse/eclipse/downloads/drops/R-2.1.3-200403101828/swt-2.1.3-linux-gtk.zip
-
-swt-2.1.2-linux-motif.zip:
-	wget http://download.eclipse.org/downloads/drops/R-2.1.2-200311030802/swt-2.1.2-linux-motif.zip
-
 swt-2.1-win32.zip:
 	wget http://download.eclipse.org/downloads/drops/R-2.1-200303272130/swt-2.1-win32.zip
 
 swt-2.1.1-linux-gtk.zip:
 	wget http://download.eclipse.org/downloads/drops/R-2.1.1-200306271545/swt-2.1.1-linux-gtk.zip
+
+swt-3.1.1-gtk-linux-x86.zip:
+	wget http://download.eclipse.org/eclipse/downloads/drops/R-3.1.1-200509290840/swt-3.1.1-gtk-linux-x86.zip
 
 swt-3.0RC3-linux-gtk.zip:
 	wget http://download.eclipse.org/downloads/drops/S-3.0RC3-200406192000/swt-3.0RC3-linux-gtk.zip
@@ -59,11 +54,7 @@ libswt.o: swt.jar
 ifeq ($(PLATFORM),win32)
 	echo libswt.o should come from the zip file ':)'	
 else
-ifeq ($(PLATFORM),linux-gtk2)
-	$(GCJ) -fjni -o libswt.o -c  swt-pi.jar swt.jar
-else
 	$(GCJ) -fjni -o libswt.o -c  swt.jar
-endif
 endif
 
 libnanoxml-lite.o: nanoxml-lite-2.2.3.jar
