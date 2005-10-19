@@ -4,9 +4,6 @@
 package irate.buddy;
 
 import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Random;
 
 import com.sleepycat.je.DatabaseException;

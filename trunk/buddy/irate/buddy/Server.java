@@ -18,8 +18,8 @@ public class Server {
 
   public static void main(String args[]) {
 
-    String account = args[0];
-    String password = args[1];
+//    String account = args[0];
+//    String password = args[1];
 
     try {
       Server server = new Server();
