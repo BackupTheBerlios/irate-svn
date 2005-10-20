@@ -50,8 +50,8 @@ public class RemoteBuddyServer implements RemoteServer {
   public void contactServer(TrackDatabase trackDatabase)
       throws DownloadException {
     try {
-      Vector args = new Vector();
-      Object response = (Object) client.execute("Session.ping", args);
+//      Vector args = new Vector();
+//      Object response = (Object) client.execute("Session.ping", args);
 
       System.out.print("Logging in...");
       String sessionId = login(trackDatabase.getUserName(), trackDatabase
@@ -61,6 +61,17 @@ public class RemoteBuddyServer implements RemoteServer {
       System.out.print("Sending ratings...");
       setRatings(sessionId, trackDatabase.getTracks());
       System.out.println(" done");
+      
+      System.out.print("Fetching list...");
+      Track[] newTracks = fetchTracks(sessionId, trackDatabase.getTracks());      
+      System.out.println(" done");
+      System.out.println("No of tracks: " + newTracks.length);
+      
+      System.out.print("Fetching track details...");
+      fetchTrackDetails(sessionId, newTracks);
+      System.out.println(" done");
+      
+      // add new tracks to track database
       
       System.out.print("Logging out...");
       logout(sessionId);
@@ -87,7 +98,8 @@ public class RemoteBuddyServer implements RemoteServer {
     Vector vector = new Vector();
     for (int i = 0; i < tracks.length; i++) {
       Track track = tracks[i];
-      vector.add(convertTrackToHashTable(track));
+      if (track.isRated())
+        vector.add(convertTrackToHashTable(track));      
     }
     return vector;
   }
@@ -114,6 +126,19 @@ public class RemoteBuddyServer implements RemoteServer {
     args.add(sessionId);
     args.add(convertTracksToVector(tracks));
 
-    client.execute("Data.setTrackData", args);
+    client.execute("Rating.setTrackData", args);
+  }
+  
+  private Track[] fetchTracks(String sessionId, Track[] tracks) throws XmlRpcException, IOException {
+	  Vector args = new Vector();
+	  args.add(sessionId);
+	  Object reponse = (Object) client.execute("Track.get", args);
+	  return new Track[0];
+  }
+  
+  private void fetchTrackDetails(String sessionId, Track[] tracks) throws XmlRpcException, IOException {
+	  Vector args = new Vector();
+	  args.add(sessionId);
+	  Object reponse = (Object) client.execute("Track.get", args);
   }
 }
