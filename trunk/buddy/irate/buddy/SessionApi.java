@@ -6,7 +6,7 @@ import java.util.Set;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Transaction;
 
-public class Session {
+public class SessionApi {
 
   private Context context;
 
@@ -16,7 +16,7 @@ public class Session {
 
   private Set<UniqueId> sessions = new HashSet<UniqueId>();
 
-  public Session(Context context, Transaction transaction)
+  public SessionApi(Context context, Transaction transaction)
       throws DatabaseException {
     this.context = context;
     userDb = new UserDb(context, transaction);

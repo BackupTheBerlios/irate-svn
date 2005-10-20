@@ -3,6 +3,7 @@
 	<name>Buddy</name>
 	<comment></comment>
 	<projects>
+		<project>irate</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

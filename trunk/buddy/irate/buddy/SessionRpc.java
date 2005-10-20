@@ -9,11 +9,11 @@ public class SessionRpc {
 
   private final Context context;
 
-  private Session session;
+  private SessionApi session;
 
-  public SessionRpc(Context context, Session session) throws DatabaseException {
+  public SessionRpc(Context context, SessionApi sessionApi) throws DatabaseException {
     this.context = context;
-    this.session = session;
+    this.session = sessionApi;
   }
 
   public String login(String account, String password, boolean create) {
