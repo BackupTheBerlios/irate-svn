@@ -3,39 +3,33 @@
  */
 package irate.buddy;
 
-import java.security.SecureRandom;
-import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Transaction;
 
 public class RatingApi {
 
-  private TrackDb trackDb;
+	private TrackDb trackDb;
 
-  private UrlDb urlDb;
+	private UrlDb urlDb;
 
-  private RatingDb ratingDb;
+	private RatingDb ratingDb;
 
-  public RatingApi(Context context, Transaction transaction)
-      throws DatabaseException {
-    urlDb = new UrlDb(context, transaction);
-    ratingDb = new RatingDb(context, transaction);
-  }
+	public RatingApi(Context context, Transaction transaction)
+			throws DatabaseException {
+		urlDb = new UrlDb(context, transaction);
+		ratingDb = new RatingDb(context, transaction);
+	}
 
-  public void updateTrack(UniqueId userId, UniqueId trackId, float ratingValue) {
-    RatingKey ratingKey = new RatingKey();
-    ratingKey.userId = userId;
-    ratingKey.trackId = trackId;
+	public void updateTrack(Rating rating) {
+		ratingDb.getMap().put(rating.getKey(), rating);
+	}
 
-    Rating rating = new Rating();
-    rating.rating = ratingValue;
-    ratingDb.getMap().put(ratingKey, rating);
-  }
-  
-//  public List<UniqueId> getTracks(UniqueId userId) {
-//    List<UniqueId> tracks = new ArrayList<UniqueId>();
-//    return tracks;
-//  }
+	public List<UniqueId> getTracks(UniqueId userId) {
+		List<UniqueId> tracks = new ArrayList<UniqueId>();
+		return tracks;
+	}
 
 }

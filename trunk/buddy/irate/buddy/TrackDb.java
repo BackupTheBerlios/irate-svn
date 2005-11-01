@@ -10,26 +10,32 @@ import com.sleepycat.je.Transaction;
 
 public class TrackDb {
 
-  private final Db db;
-  private SerialBinding uniqueIdBinding;
-  private SerialBinding trackBinding;
-  private Map<UniqueId, Track> map;
+	private final Db db;
 
-  public TrackDb(Context context, Transaction transaction)
-      throws DatabaseException {
-    db = new Db(context, transaction, "track.db");
-    StoredClassCatalog classCatalogue = context.getClassCatalogue(transaction);
+	private SerialBinding uniqueIdBinding;
 
-    uniqueIdBinding = new SerialBinding(classCatalogue, UniqueId.class);
-    trackBinding = new SerialBinding(classCatalogue, Track.class);
-    map = (Map<UniqueId, Track>) new StoredMap(db.getDatabase(), uniqueIdBinding, trackBinding, true);
-  }
-  
-  public Map<UniqueId, Track> getMap() {
-    return map;
-  }
+	private SerialBinding trackBinding;
 
-  public void close() {
-    db.close();
-  }
+	private Map<UniqueId, Track> map;
+
+	@SuppressWarnings("unchecked")
+	public TrackDb(Context context, Transaction transaction)
+			throws DatabaseException {
+		db = new Db(context, transaction, "track.db");
+		StoredClassCatalog classCatalogue = context
+				.getClassCatalogue(transaction);
+
+		uniqueIdBinding = new SerialBinding(classCatalogue, UniqueId.class);
+		trackBinding = new SerialBinding(classCatalogue, Track.class);
+		map = (Map<UniqueId, Track>) new StoredMap(db.getDatabase(),
+				uniqueIdBinding, trackBinding, true);
+	}
+
+	public Map<UniqueId, Track> getMap() {
+		return map;
+	}
+
+	public void close() {
+		db.close();
+	}
 }

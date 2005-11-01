@@ -7,8 +7,6 @@ import java.io.File;
 
 import org.apache.xmlrpc.WebServer;
 
-import com.sleepycat.collections.TransactionRunner;
-import com.sleepycat.collections.TransactionWorker;
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Environment;
 import com.sleepycat.je.EnvironmentConfig;
@@ -74,6 +72,7 @@ public class Server {
 		context.logger.fine("Starting web server");
 		WebServer webServer = new WebServer(8031);
 		webServer.addHandler("Session", sessionRpc);
+		webServer.addHandler("Track", trackRpc);
 		webServer.addHandler("Rating", ratingRpc);
 		webServer.start();
 		context.logger.fine("Server running");

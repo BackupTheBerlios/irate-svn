@@ -33,7 +33,7 @@ public class RatingRpc {
 
 	public void setTrackData(String sessionId,
 			Vector<Hashtable<String, Object>> trackData) {
-		context.logger.info("RPC: setTrackData " + sessionId);
+		context.logger.info("RPC: Rating.setTrackData " + sessionId);
 		final UniqueId userId = new UniqueId(sessionId);
 		if (!session.verify(userId))
 			return;
@@ -47,7 +47,6 @@ public class RatingRpc {
 			}
 			try {
 				transactionRunner.run(new TransactionWorker() {
-
 					public void doWork() {
 						String key = (String) track.get("trackId");
 
@@ -60,8 +59,8 @@ public class RatingRpc {
 						}
 						Number rating = (Number) track.get("rating");
 
-						ratingApi.updateTrack(userId, trackId, rating
-								.floatValue());
+						ratingApi.updateTrack(new Rating(userId, trackId, rating
+								.floatValue()));
 					}
 				});
 				noOfTracksUpdated++;
@@ -71,5 +70,22 @@ public class RatingRpc {
 			}
 		}
 		context.logger.fine("Updated " + noOfTracksUpdated);
+	}
+
+	public Vector getTracks(String sessionId) {
+		context.logger.info("RPC: Rating.getTracks " + sessionId);
+		final UniqueId userId = new UniqueId(sessionId);
+		if (!session.verify(userId))
+			return null;
+
+		Vector tracks = new Vector();
+		try {
+			ratingApi.getTracks(userId);
+		} catch (Exception e) {
+			e.printStackTrace();
+			context.logger.log(Level.FINER, "Database update failed", e);
+		}
+		context.logger.finest("Got " + tracks.size() + " tracks");
+		return tracks;
 	}
 }

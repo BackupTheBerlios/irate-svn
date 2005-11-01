@@ -17,7 +17,7 @@ public class SessionRpc {
   }
 
   public String login(String account, String password, boolean create) {
-    context.logger.info("RPC: login " + account);
+    context.logger.info("RPC: Session.login " + account);
     try {
       UniqueId userId = session.login(account, password, create);
       return userId.toString();
@@ -28,7 +28,7 @@ public class SessionRpc {
   }
 
   public void logout(String userIdString) {
-    context.logger.info("RPC: logout " + userIdString);
+    context.logger.info("RPC: Session.logout " + userIdString);
     UniqueId userId = new UniqueId(userIdString);
     session.logout(userId);
   }
