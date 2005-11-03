@@ -12,6 +12,8 @@
         <pathelement path="lib/skinlf.jar"/>
         <pathelement path="lib/jd3lib.jar"/>
         <pathelement path="lib/swtdock.jar"/>
+        <pathelement path="lib/xmlrpc-2.0.jar"/>
+        <pathelement path="lib/commons-codec-1.3.jar"/>
       </classpath>
     </javac>
   </target>
