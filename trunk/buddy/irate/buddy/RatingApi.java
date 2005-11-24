@@ -4,7 +4,10 @@
 package irate.buddy;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+
+import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
 
 import com.sleepycat.je.DatabaseException;
 import com.sleepycat.je.Transaction;
@@ -27,9 +30,7 @@ public class RatingApi {
 		ratingDb.getMap().put(rating.getKey(), rating);
 	}
 
-	public List<UniqueId> getTracks(UniqueId userId) {
-		List<UniqueId> tracks = new ArrayList<UniqueId>();
-		return tracks;
+	public Collection<Rating> getTracks(UniqueId userId) {
+		return ratingDb.getRatings(userId);
 	}
-
 }

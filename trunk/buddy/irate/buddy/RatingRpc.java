@@ -3,6 +3,7 @@
  */
 package irate.buddy;
 
+import java.util.Collection;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.logging.Level;
@@ -59,8 +60,8 @@ public class RatingRpc {
 						}
 						Number rating = (Number) track.get("rating");
 
-						ratingApi.updateTrack(new Rating(userId, trackId, rating
-								.floatValue()));
+						ratingApi.updateTrack(new Rating(userId, trackId,
+								rating.floatValue()));
 					}
 				});
 				noOfTracksUpdated++;
@@ -72,15 +73,21 @@ public class RatingRpc {
 		context.logger.fine("Updated " + noOfTracksUpdated);
 	}
 
-	public Vector getTracks(String sessionId) {
+	public Vector<Hashtable> getTracks(String sessionId) {
 		context.logger.info("RPC: Rating.getTracks " + sessionId);
 		final UniqueId userId = new UniqueId(sessionId);
 		if (!session.verify(userId))
 			return null;
 
-		Vector tracks = new Vector();
+		Vector<Hashtable> tracks = new Vector<Hashtable>();
 		try {
-			ratingApi.getTracks(userId);
+			Collection<Rating> ratings = ratingApi.getTracks(userId);
+			for (Rating rating : ratings) {
+				Hashtable<String, Object> hashTable = new Hashtable<String, Object>();
+				hashTable.put("trackId", rating.getTrackId().toString());
+				hashTable.put("rating", new Float(rating.getRating()));
+				tracks.add(hashTable);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			context.logger.log(Level.FINER, "Database update failed", e);
@@ -88,4 +95,5 @@ public class RatingRpc {
 		context.logger.finest("Got " + tracks.size() + " tracks");
 		return tracks;
 	}
+
 }

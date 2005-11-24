@@ -7,6 +7,8 @@ import com.sleepycat.bind.serial.SerialSerialBinding;
 
 public class Rating implements Serializable {
 
+	static final long serialVersionUID = -7138214834474829683L;
+
 	private RatingKey key;
 
 	private RatingData data;
@@ -38,6 +40,8 @@ public class Rating implements Serializable {
 	}
 
 	public static class RatingKey implements Serializable {
+		static final long serialVersionUID = 4435312860486931886L;
+
 		private UniqueId userId;
 
 		private UniqueId trackId;
@@ -49,6 +53,8 @@ public class Rating implements Serializable {
 	}
 
 	public static class RatingData implements Serializable {
+		static final long serialVersionUID = 5724864233179155579L;
+
 		private float rating;
 
 		private RatingData(float rating) {
@@ -73,6 +79,5 @@ public class Rating implements Serializable {
 		public Object objectToData(Object entity) {
 			return ((Rating) entity).data;
 		}
-
 	}
 }
