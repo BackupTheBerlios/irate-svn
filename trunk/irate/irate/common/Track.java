@@ -86,6 +86,14 @@ public class Track implements TrackDetails {
 
     elt.setAttribute("serial", ""+(trackDatabase.getSerial()+1));
   }
+  
+  public String getId() {
+	  return elt.getStringAttribute("id");
+  }
+  
+  public void setId(String id) {
+      elt.setAttribute("id", id);
+  }
 
   public int getSerial() {
     String str = elt.getStringAttribute("serial");

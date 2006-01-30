@@ -9,7 +9,13 @@ import irate.common.TrackDatabase;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.xmlrpc.XmlRpcClient;
@@ -63,12 +69,12 @@ public class RemoteBuddyServer implements RemoteServer {
       System.out.println(" done");
       
       System.out.print("Fetching list...");
-      Track[] newTracks = fetchTracks(sessionId, trackDatabase.getTracks());      
+      String[] newTracks = fetchTracks(sessionId, trackDatabase.getTracks());      
       System.out.println(" done");
       System.out.println("No of tracks: " + newTracks.length);
       
       System.out.print("Fetching track details...");
-      fetchTrackDetails(sessionId, newTracks);
+      Track[] tracks = fetchTrackDetails(sessionId, newTracks);
       System.out.println(" done");
       
       // add new tracks to track database
@@ -129,16 +135,36 @@ public class RemoteBuddyServer implements RemoteServer {
     client.execute("Rating.setTrackData", args);
   }
   
-  private Track[] fetchTracks(String sessionId, Track[] tracks) throws XmlRpcException, IOException {
+  private String[] fetchTracks(String sessionId, Track[] tracks) throws XmlRpcException, IOException {
 	  Vector args = new Vector();
 	  args.add(sessionId);
-	  Object reponse = (Object) client.execute("Track.get", args);
-	  return new Track[0];
+	  Object response = (Object) client.execute("Rating.getTracks", args);
+	  Vector newTracks = (Vector) response;
+	  
+	  Set trackIds = new HashSet();
+	  for (int i = 0; i < tracks.length; i++)
+		  trackIds.add(tracks[i].getId());
+	  
+	  List newTrackIds = new ArrayList();
+	  for (Iterator itr = newTracks.iterator(); itr.hasNext(); ) {
+		  String id = (String) itr.next();
+		  if (!trackIds.contains(id))
+			  newTrackIds.add(id);
+	  }
+	  
+	  return (String[]) newTrackIds.toArray(new String[newTrackIds.size()]);
   }
   
-  private void fetchTrackDetails(String sessionId, Track[] tracks) throws XmlRpcException, IOException {
-	  Vector args = new Vector();
+  private Track[] fetchTrackDetails(String sessionId, String[] trackIds) throws XmlRpcException, IOException {
+	  Vector args = new Vector(Arrays.asList(trackIds));
 	  args.add(sessionId);
-	  Object reponse = (Object) client.execute("Track.get", args);
+	  args.add(new Vector(Arrays.asList(trackIds)));
+	  Object response = (Object) client.execute("Track.getDetails", args);
+	  if (response instanceof XmlRpcException)
+		  ((XmlRpcException) response).printStackTrace();
+	  Vector trackDetails = (Vector)response;	  
+	  
+//	  return tracks.toArray(new Track[tracks.size()]);
+	  return new Track[0];
   }
 }
