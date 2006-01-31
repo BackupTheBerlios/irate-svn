@@ -12,7 +12,7 @@ public class RatingByUserKeyCreator extends SerialSerialKeyCreator {
 	}
 
 	public Object createSecondaryKey(Object primaryKeyInput, Object valueInput) {
-		Rating value = (Rating)valueInput;
-		return value.getUserId();
+		RatingKey key = (RatingKey) primaryKeyInput; 
+		return key.getUserId();
 	}
 }

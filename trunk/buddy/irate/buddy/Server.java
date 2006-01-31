@@ -58,7 +58,7 @@ public class Server {
 
 		ratingApi = new RatingApi(context, transaction);
 		ratingRpc = new RatingRpc(context, session, ratingApi, trackApi);
-
+		
 		transaction.commit();
 
 	}

@@ -28,11 +28,11 @@ public class Rating implements Serializable {
 	}
 
 	public UniqueId getUserId() {
-		return key.userId;
+		return key.getUserId();
 	}
 
 	public UniqueId getTrackId() {
-		return key.trackId;
+		return key.getTrackId();
 	}
 
 	public float getRating() {
@@ -50,6 +50,14 @@ public class Rating implements Serializable {
 			this.userId = userId;
 			this.trackId = trackId;
 		}
+
+		public UniqueId getUserId() {
+			return userId;
+		}
+
+		public UniqueId getTrackId() {
+			return trackId;
+		}		
 	}
 
 	public static class RatingData implements Serializable {
@@ -73,11 +81,11 @@ public class Rating implements Serializable {
 		}
 
 		public Object objectToKey(Object entity) {
-			return ((Rating) entity).key;
+			return (RatingKey)((Rating) entity).key;
 		}
 
 		public Object objectToData(Object entity) {
-			return ((Rating) entity).data;
+			return (RatingData)((Rating) entity).data;
 		}
 	}
 }
