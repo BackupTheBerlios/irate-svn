@@ -563,6 +563,10 @@ public class Track implements TrackDetails {
     return track instanceof Track && getURL().toString().equals(((Track)track).getURL().toString());
   }
 
+  public synchronized void setWebSite(URL url) {
+    elt.setAttribute("www", url.toString());    
+  }
+  
   /** Returns the web site associated with this track */
   public synchronized URL getWebSite() {
     try {
