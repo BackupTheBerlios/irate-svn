@@ -26,7 +26,7 @@ public class TrackApi {
 				trackId = new UniqueId(random);
 			} while (trackDb.getMap().containsKey(trackId));
 
-			Track track = new Track(url, "", "");
+			Track track = new Track(url, "", "", "");
 			track.url = url;
 			trackDb.getMap().put(trackId, track);
 			urlDb.getMap().put(url, trackId);

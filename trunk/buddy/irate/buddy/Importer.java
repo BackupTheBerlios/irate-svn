@@ -3,6 +3,7 @@ package irate.buddy;
 import irate.common.TrackDatabase;
 
 import java.io.File;
+import java.net.URL;
 
 import com.sleepycat.collections.TransactionRunner;
 import com.sleepycat.collections.TransactionWorker;
@@ -27,8 +28,9 @@ public class Importer {
 		new TransactionRunner(context.env).run(new TransactionWorker() {
 			public void doWork() {
 				for (irate.common.Track commonTrack : commonTracks) {
+                    URL webSite = commonTrack.getWebSite();
 					Track track = new Track(commonTrack.getURL().toString(),
-							commonTrack.getArtist(), commonTrack.getTitle());
+							commonTrack.getArtist(), commonTrack.getTitle(), webSite == null ? null : webSite.toString());
 					trackApi.addTrack(track);
 					// context.logger.finest(track.url);
 				}
