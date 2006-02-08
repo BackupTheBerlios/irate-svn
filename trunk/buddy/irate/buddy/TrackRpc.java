@@ -1,6 +1,8 @@
 package irate.buddy;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 import java.util.Vector;
 
 public class TrackRpc {
@@ -29,11 +31,11 @@ public class TrackRpc {
             trackDetails.put("artist", track.artist);
             trackDetails.put("title", track.title);
             trackDetails.put("url", track.url);
+            
             if (track.www != null)
                 trackDetails.put("www", track.www);
             tracks.add(trackDetails);
         }
         return tracks;
     }
-
 }

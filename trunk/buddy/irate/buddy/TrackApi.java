@@ -40,9 +40,6 @@ public class TrackApi {
 
 	public void addTrack(Track track) {
 		UniqueId trackId = getTrackId(track.url);
-		if (trackDb.getMap().containsKey(trackId))
-			return;
-
 		trackDb.getMap().put(trackId, track);
 	}
 }

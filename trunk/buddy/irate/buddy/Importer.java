@@ -31,7 +31,7 @@ public class Importer {
                     URL webSite = commonTrack.getWebSite();
 					Track track = new Track(commonTrack.getURL().toString(),
 							commonTrack.getArtist(), commonTrack.getTitle(), webSite == null ? null : webSite.toString());
-					trackApi.addTrack(track);
+					trackApi.addTrack(track);                    
 					// context.logger.finest(track.url);
 				}
 			}
