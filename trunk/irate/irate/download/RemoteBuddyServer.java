@@ -155,7 +155,7 @@ public class RemoteBuddyServer implements RemoteServer {
     return (RatingPair[]) newTrackIds.toArray(new RatingPair[newTrackIds.size()]);
   }
 
-  private Map getTrackMap(TrackDatabase trackDatabase) {
+  private Map getTrackMap(TrackDatabase trackDatabase) {    
     Track[] tracks = trackDatabase.getTracks();
     Map map = new HashMap();
     for (int i = 0; i < tracks.length; i++) {
@@ -168,7 +168,7 @@ public class RemoteBuddyServer implements RemoteServer {
   private String[] findNewTracks(RatingPair[] ratingPairs, Map trackMap) {
     List newTracks = new ArrayList();
     for (int i = 0; i < ratingPairs.length; i++) {
-      RatingPair ratingPair = new RatingPair();
+      RatingPair ratingPair = ratingPairs[i];
       if (!trackMap.containsKey(ratingPair.trackId))
         newTracks.add(ratingPair.trackId);
     }
@@ -194,6 +194,7 @@ public class RemoteBuddyServer implements RemoteServer {
       String artist = (String) trackDetails.get("artist");
       String title = (String) trackDetails.get("title");
       String webSite = (String) trackDetails.get("www");
+      System.out.println(artist + " " + title);
       Track track = new Track(new URL(url));
       track.setId(trackId);
       track.setArtist(artist);
@@ -212,11 +213,10 @@ public class RemoteBuddyServer implements RemoteServer {
 
   private int updateRatings(Map trackMap, RatingPair[] ratingPairs) {
     int ratingsUpdated = 0;
-    List newTracks = new ArrayList();
     for (int i = 0; i < ratingPairs.length; i++) {
-      RatingPair ratingPair = new RatingPair();
+      RatingPair ratingPair = ratingPairs[i];
       Track track = (Track) trackMap.get(ratingPair.trackId);
-      if (ratingPair.rating == track.getRating()) {
+      if (track != null && ratingPair.rating != track.getRating()) {
         System.out.println("Was " + track.getRating() + " should be " + ratingPair.rating);
         // track.setRating(ratingPair.rating);
         ratingsUpdated++;

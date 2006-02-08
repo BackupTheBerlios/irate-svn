@@ -29,7 +29,7 @@ public class TrackDatabase {
   private static final String defaultHost = "server.irateradio.org";
   private static final int defaultPort = 2278;
   private Track[] tracksCachedArray;
-  private TreeSet tracks;
+  private HashSet tracks;
   private Hashtable hash;
   private File file;
   private File downloadDir;
@@ -70,14 +70,7 @@ public class TrackDatabase {
 
   private void create() {
     try {
-      tracks = new TreeSet(new Comparator() {
-        public int compare(Object o0, Object o1) {
-          return ((Track) o0).compareTo((Track) o1);
-        }
-        public boolean equals(Object o0, Object o1) {
-          return compare(o0, o1) == 0;
-        }
-      });
+      tracks = new HashSet();
       hash = new Hashtable();
       docElt = new XMLElement(new Hashtable(), false, false);
       docElt.setName(docElementName);
